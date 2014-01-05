@@ -1,0 +1,43 @@
+//MEMBERS
+Members:New member			Crea utente
+Members:Edit				Modifica
+Members:Delete				Elimina
+Members:Create member		Crea l'utente
+Members:Edit member			Modifica anagrafica
+Members:Last login			Ultimo accesso
+Members:Name				Nome
+Members:E-mail				E-mail
+Members:Username			Nome utente
+Members:Password			Password
+Members:Affiliation			Affiliazione
+Members:Expiration			Scadenza
+Members:Status				Status
+Members:Active				Attivo
+Members:Suspended			Sospeso
+Members:Deleted				Eliminato
+Members:Meta-data			Informazioni aggiuntive
+Members:Add Meta-data		Aggiungi un campo nuovo
+Members:Photo gallery		Galleria fotografica
+Members:Document gallery	Galleria documenti
+Members:Private Area		Area riservata
+Members:Subscribed newsletter lists							Newsletter sottoscritte
+Members:Error while updating newsletter subscriptions		Errore durante l'aggiornamento dell'iscrizione alle newsletter
+Members:This user has access to the following directories	Questo utente ha accesso alle seguenti cartelle
+Members:Single user			Singolo utente
+Members:Batch creation		Creazione automatizzata
+Members:Leave empty for no expiration	Lascia vuoto per nessuna scadenza
+Members:Filters				Filtri
+Members:Newsletters			Newsletter
+Members:all					tutti
+Members:subscribers of one or more lists	iscritti a una o più liste
+Members:not subscribers		non iscritti
+Members:equal to			uguale a
+Members:different from		diverso da
+Members:contains			contiene
+Members:greater than		maggiore di
+Members:lower than			minore di
+Members:apply filters		applica filtri
+Members:Create on			Creato il
+Members:Latests access		Ultimo accesso
+Members:Export				Esporta
+Members:members in current selection	membri nella selezione corrente

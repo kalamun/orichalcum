@@ -1,0 +1,8 @@
+//DICTIONARY
+Dictionary:Term						Term
+Dictionary:Translation				Translation
+Dictionary:%s translation			%s translation
+Dictionary:Actions					Actions
+Dictionary:Add a new term			Add a new term
+Dictionary:Import terms from default template			Import terms from default template
+Dictionary:No terms defined yet		No terms defined yet

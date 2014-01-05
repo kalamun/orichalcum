@@ -1,0 +1,106 @@
+//PAGES
+Pages:Pages					Pages
+Pages:Add a page			Ajouter une page
+Pages:Edit a page			Modifier une page
+Pages:Delete a page			Supprimer une page
+Pages:Create a new page		Créer une nouvelle page
+Pages:Created				Créé
+Pages:Last change			Dernière modification
+Pages:Comments				Commentaires
+Pages:Comment management	Gestion de Commentaires
+Pages:This page is commentable	Cette page est commentable
+Pages:This page has %s comments, %s of which still to moderate	Cette page ai %s commentaires, %s qui restent à modérer
+Pages:Title					Titre
+Pages:Subtitle				Sous-titre
+Pages:Introduction			Introduction
+Pages:Contents				Contenu
+Pages:Photo gallery			Gallerie de photos
+Pages:Document gallery		Gallerie de documentes
+Pages:SEO					SEO (<em>Search Engine Optimization</em>)
+Pages:Page URL				URL de la page
+Pages:This URL already exists	Cette URL existe déjà
+Pages:Add to menu			Ajouter au menu
+Pages:Visit					Visitez
+Pages:Add this page to the site menu	Ajouter cette page dans le menu du site
+Pages:Copy contents from the page	Copier le contenu a partir du la page
+Pages:Errors occurred while copying contents	Des erreurs sont survenues lors de la copie du contenu
+Pages:Errors occurred while saving	Des erreurs sont survenues lors de l'enregistrement
+Pages:Page saved			Page enregistrée
+Pages:Edit					Modifier
+Pages:Create a copy			Créer une copie
+Pages:Delete				Supprimes
+Pages:Change frequency		Fréquence de changement
+Pages:Description			Description
+Pages:Priority				Priorité
+Pages:Keywords				Mot-clés
+Pages:No index				Ne pas index
+Pages:No follow				Ne pas suivre
+Pages:No archive			Ne pas archiver
+Pages:Always				Toujours
+Pages:Hourly				Horaire
+Pages:Daily					Quotidien
+Pages:Weekly				Hebdomadaire
+Pages:Monthly				Mensuel
+Pages:Yearly				Annuel
+Pages:Never					Jamais
+Pages:Meta-data				Méta-données
+Pages:Add Meta-data			Ajouter méta-données
+Pages:Template				Modèle
+Pages:Layout				Disposition
+Pages:Translations			Traductions
+Pages:You are going to delete the page "%s": are you sure?	Vous allez supprimer la page "<em>%s</em>": êtes-vous sûr?
+Pages:Errors occurred while deleting page from database	Des erreurs sont survenues lors de la suppression de la page à partir de la base de données
+Pages:Page was successfully deleted	Cette page a été supprimé avec succès
+Pages:Searching for translation		Recherche de traduction en cours
+Pages:if nothing happens, click here	si rien ne se passe, cliquez ici
+Pages:This page is the translated version of	Cette page est la version traduite de
+Pages:DRAFT					PROJET
+Pages:CONVERSIONS			CONVERSIONS
+Pages:Set as draft			Définissez comme projet
+Pages:Set as public			Définissez comme public
+Pages:Page published! Now the whole world can visit it, good luck	Page publiée! Maintenant tout le monde peut le visiter, bonne chance
+Pages:Now the page is a draft	Maintenant la page est un projet
+Pages:Error occurred while inserting in menu	S'est produite un erreur lors de l'insertion dans le menu
+
+Pages:Conversions				Conversions
+Pages:Conversions are active	Conversions are active
+Pages:Conversions management	Conversions management
+Pages:Conversions Manager		Conversions Manager
+Pages:None						None
+Pages:CAPTCHA					CAPTCHA
+Pages:Moderation				Moderation
+Pages:Moderate requests			Moderate requests
+Pages:Double opt-in				Double opt-in
+Pages:Save as member			Save as member
+Pages:Create a private directory called as the username		Create a private directory called as the username
+Pages:Subscribe to the following newsletters	Subscribe to the following newsletters
+Pages:Unsubscribe from the following newsletters	Unsubscribe from the following newsletters
+Pages:Settings					Settings
+Pages:Input variables			Input variables
+Pages:Notifications				Notifications
+Pages:Follow-up					Follow-up
+Pages:Conversion code			Conversion code
+Pages:Fail code					Code to show in case of failure
+Pages:Variable name				Variable name
+Pages:Correspondence			Correspondence
+Pages:Notifications sender		Notifications sender
+Pages:Custom sender				Custom sender
+Pages:Notify to this e-mails	Notify to this e-mails
+Pages:one for line				one for line
+Pages:Subject					Subject
+Pages:Sender					Sender
+Pages:Follow-up e-mail			Follow-up e-mail
+Pages:Placeholders				Placeholders
+Pages:Name						Name
+Pages:Surname					Surname
+Pages:E-mail					E-mail
+Pages:Username					Username
+Pages:Password					Password
+Pages:Affiliation				Affiliation
+Pages:Expiration				Expiration
+Pages:Subscriber				Subscriber
+Pages:Admin						Admin
+Pages:Custom					Custom
+Pages:Changes successfully saved	Changes successfully saved
+Pages:Errors occurred while saving	Ops, errors occurred while saving!
+Pages:No newsletters available	Nessuna newsletter disponibile

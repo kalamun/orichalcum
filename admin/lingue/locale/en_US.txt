@@ -1,0 +1,15 @@
+//LANGUAGES
+Languages:Management			Management
+Languages:Copy content			Copy content
+Languages:Copy pages			Copy pages
+Languages:Source language		Source language
+Languages:Destination language	Destination language
+Languages:What do you want to copy?	What do you want to copy?
+Languages:What pages do you want to copy?	What pages do you want to copy?
+Languages:Overwrite existing ones		Overwrite existing ones
+Languages:Map of translations		Map of translations
+
+//LOGS
+Languages:Source and destination languages can't be the same		Source and destination languages can't be the same
+Languages:Language successfully copied								Language successfully copied
+Languages:Pages successfully copied									Pages successfully copied

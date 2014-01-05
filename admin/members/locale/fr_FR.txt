@@ -1,0 +1,43 @@
+//MEMBERS
+Members:New member				Créer
+Members:Edit				Modifier
+Members:Delete				Supprimer
+Members:Create member		Créer membre
+Members:Edit member			Modifier membre
+Members:Last login			Dernière connexion
+Members:Name				Nom et prénom
+Members:E-mail				E-mail
+Members:Username			Nom d'utilisateur
+Members:Password			Mot de passe
+Members:Affiliation			Affiliation
+Members:Expiration			Expiration
+Members:Status				Statut
+Members:Active				Actif
+Members:Suspended			Suspendu
+Members:Deleted				Supprimé
+Members:Meta-data			Méta-données
+Members:Add Meta-data		Ajouter Méta-dpnnées
+Members:Photo gallery		Galerie de photos
+Members:Document gallery	Galerie de document
+Members:Private Area		Espace Privé
+Members:Subscribed newsletter lists							Listes de bulletins souscrites
+Members:Error while updating newsletter subscriptions		Erreur lors de la mise à jour des abonnements aux bulletins
+Members:This user has access to the following directories	Cet utilisateur a accès aux répertoires suivants
+Members:Single user			Utilisateur individuel
+Members:Batch creation		Création automatique
+Members:Leave empty for no expiration	Laissez vide pour pas d'expiration
+Members:Filters				Filtres
+Members:Newsletters			Bulletins
+Members:all					tous
+Members:subscribers of one or more lists	abonnés d'un ou de plusieurs listes
+Members:not subscribers		non abonnés
+Members:equal to			égal à
+Members:different from		différent de
+Members:contains			contient
+Members:greater than		supérieure à
+Members:lower than			inférieure à
+Members:apply filters		appliquer filtres
+Members:Create on			Crée le
+Members:Latests access		Derniér accès
+Members:Export				Exportation
+Members:members in current selection	membres dans la sélection actuelle

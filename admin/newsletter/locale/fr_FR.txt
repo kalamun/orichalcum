@@ -1,0 +1,76 @@
+// NEWSLETTER
+
+Newsletter:Newsletter					Bulletin
+Newsletter:Write an e-mail				Ecrire un e-mail
+Newsletter:Subscribe to a list			S'abonner à une liste
+Newsletter:Lists management				Gestion de listes
+Newsletter:Archive						Archives
+Newsletter:Lists						Listes
+Newsletter:Subscribers					Abonnés
+Newsletter:Description					Description
+Newsletter:Actions						Actes
+Newsletter:Subject						Sujet
+Newsletter:Message						Message
+Newsletter:Template						Modèle
+Newsletter:Add a new subscriber			Ajouter un nouvel abonné
+Newsletter:Single subscription			Seul abonnement
+Newsletter:Mass subscription			Abonnement de masse
+Newsletter:Next step					Prochaine étape
+Newsletter:Never						Jamais
+Newsletter:E-mail address				E-mail
+Newsletter:Full name					Nom et prénom
+Newsletter:Expiration date				Date d'expiration
+Newsletter:Date of subscription			Date de souscription
+Newsletter:Subscribed lists				Listes souscrites
+Newsletter:Lists to subscribe to		Listes de souscrire à
+Newsletter:Send the welcome message		Envoyer le message de bienvenue
+Newsletter:Error while creating member	Erreur lors de la création de membre
+Newsletter:Error while subscribing		Erreur lors de la souscription
+Newsletter:Error while deleting list	Erreur lors de la suppression de la liste
+Newsletter:Successfully saved			Enregistré avec succès
+Newsletter:Successfully removed			Supprimé avec succès
+Newsletter:Show subscribers				Voir abonnés
+Newsletter:Edit							Modifier
+Newsletter:Edit subscriptions			Modifier les abonnements
+Newsletter:Delete						Supprimer
+Newsletter:Add a new list				Ajouter une nouvelle liste
+Newsletter:List name					Nom de la liste
+Newsletter:Create list					Créer une liste
+Newsletter:Write addresses, one for line, in one of the stadard formats Name <email@addres> or only email@addres	Des adresses d'écriture, un puor ligne, dans l'un des formats standard <email@addres> ou seulement email@address
+Newsletter:Successfully created			Créé avec succès
+Newsletter:Error while creating list	Erreur lors de la création de la liste
+Newsletter:User not found				Utilisateur introuvable
+Newsletter:Error while saving			Erreur lors de l'enregistrement
+Newsletter:User successfully removed	Utilisateur supprimé avec succès
+Newsletter:Are you sure you want to delete this user?	Êtes-vous sûr de vouloir supprimer cet utilisateur?
+Newsletter:You are going to delete the following list	Vous allez supprimer la liste ci-dessous
+Newsletter:What do you want to do of its subscribers?	Que voulez-vous faire de ses abonnés?
+Newsletter:Remove all subscribers		Retirez tous les abonnés
+Newsletter:Move here					Déplacer ici
+Newsletter:Processing queue				File d'attente de traitement
+Newsletter:Process queue				Processus file d'attente
+Newsletter:E-mail queue					E-mail file d'attente
+Newsletter:There are %d e-mails in queue	Il y a %d e-mails dans la file d'attente
+Newsletter:Submission date				Date de soumission
+Newsletter:Recipients number			Nombre des destinataires
+Newsletter:Edit as new					Nouveau message à partir de celui-ci
+Newsletter:Preview						Avant-première
+Newsletter:Send newsletter				Envoyer lettre d'information
+Newsletter:Which lists to send?			Qui listes les envoyer?
+Newsletter:Next page					Page suivante
+Newsletter:Previous page				Page précédente
+Newsletter:On queue						En file d'attente
+Newsletter:Processing					Traitement
+Newsletter:Already sent					Déjà envoyé
+Newsletter:Sent							Expédié
+Newsletter:Queued						En file d'attente
+Newsletter:Total						Total
+Newsletter:Do you really want to delete this entry and all his e-mails still in queue?		Voulez-vous vraiment supprimer cette entrée et tous ses e-mails toujours en file d'attente?
+Newsletter:Entry successfully deleted	Entrée supprimé avec succès
+Newsletter:Error while deleting from database		Erreur lors de la suppression de la base de données
+Newsletter:Done! All mail was successfully sent		Fait! Tout le courrier a été envoyé avec succès
+Newsletter:Yes, it's slow! Be patient, this slowliness is needed to save your e-mails from anti-spam systems	Oui, c'est lent! Soyez patient, cela lenteur est nécessaire pour sauver vos e-mails de systèmes anti-spam
+Newsletter:Do you really want to close this window? If you close it, you will interrupt the queue processing (yes, it could be restarted later)		Voulez-vous vraiment fermer cette fenêtre? Si vous le fermez, vous interrompra le traitement file d'attente (oui, il pourrait être relancé plus tard)
+Newsletter:E-mail added to queue		E-mail ajouté à la file d'attente
+Newsletter:Successfully updated			Mise à jour réussie
+Newsletter:Error while updating list	Erreur lors de la mise à jour la liste

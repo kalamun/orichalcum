@@ -1,0 +1,27 @@
+//BANNER
+Banner:Banner					Bannière
+Banner:Add a new banner			Ajouter une nouvelle bannière
+Banner:Edit a banner			Modifier une bannière
+Banner:Delete a banner			Supprimer une bannière
+Banner:Edit						Modifier
+Banner:Title or short description	Titre ou une brève description
+Banner:Title					Titre
+Banner:Short description		Brève description
+Banner:Category					Catégorie
+Banner:File						Fichier
+Banner:New File					Nouveau Fichier
+Banner:Target URL				URL cible
+Banner:Views					Vues
+Banner:Error while uploading	Erreur pendant le chargement
+Banner:Successfully uploaded	Transféré avec succès
+Banner:Please write the title	S'il vous plaît écrivez le titre
+Banner:Select the category to edit	Sélectionnez la catégorie à modifier
+Banner:Are you sure you want to delete it?	Etes-vous sûr de vouloir le supprimer?
+Banner:Moving...				Déménagement...
+Banner:Saving...				Enregistrement en cours...
+Banner:Successfully Updated		Mise à jour avec succès
+Banner:Successfully Deleted		Supprimé avec succès
+Banner:Problems occurred while deleting banner	Problèmes lors de la suppression bannière
+Banner:Error while uploading database	Erreur lors de la base de données
+Banner:Error while uploading the new file	Erreur lors du téléchargement du nouveau fichier
+Banner:DRAFT					PROJET

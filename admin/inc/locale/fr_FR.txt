@@ -1,0 +1,167 @@
+//MENU
+Menu:Control Panel	Panneau d'administration
+Menu:Upgrade		Upgrade
+Menu:Help			Aide
+Menu:Welcome		Accueil
+Menu:Your Profile	Votre profil
+Menu:Logout			Déconnexion
+Menu:Site Contents	Contenu du site
+Menu:Home Page		Page d'accueil
+Menu:Pages			Pages
+Menu:News			Nouvelles
+Menu:Photogallery	Galerie de photos
+Menu:Navigation Menu	Menu de navigation
+Menu:Tools			Outils
+Menu:Members		Membres
+Menu:Private Area	Espace privé
+Menu:Shop			Boutique
+Menu:Newsletter		Bulletin
+Menu:Landing Page	Landing Page
+Menu:Tiny URLs		URLs miniscules
+Menu:Banners		Bannières
+Menu:Repository		Dépôt
+Menu:Statistics		Statistiques
+Menu:Setup			Configuration
+Menu:Languages		Langues
+Menu:Dictionary		Dictionnaire
+Menu:Basic Setup	Configuration base
+Menu:Advanced Setup	Configuration avancée
+Menu:Activity Log	Journal d'activité
+Menu:Users			Utilisateurs
+Menu:Languages		Langues
+
+//UI
+UI:Username			Nom d'utilisateur
+UI:Password			Mot de passe
+UI:Automatic log-in	Log-in automatique
+UI:Enter			Entrer
+UI:Save				Sauver
+UI:Move				Déplacer
+UI:Edit				Éditer
+UI:Delete			Supprimer
+UI:Cancel			Annuler
+UI:Copy				Copier
+UI:Please Wait...	Attendez s'il vous plaît...
+UI:View				Voir
+UI:Search			Rechercher
+UI:refresh			rafraîchir
+UI:Comments			Commentaires
+UI:comments			commentaires
+UI:Comment			Comment
+UI:comment			comment
+UI:Comments management	Gestion des commentaires
+UI:Forbidden		Forbidden, you can't access this page
+UI:Back to home		Back to home
+UI:Back				Arrière
+UI:optional			facultatif
+UI:mandatory		obligatoire
+UI:Are you sure?	êtes-vous sûr?
+
+//IMAGE MANAGER
+Img:Browse				Parcourir...
+Img:Image				Image
+Img:Images				Images
+Img:Dimensions			Dimensions
+Img:Save Changes		Enregistrer les modifications
+Img:Insert a picture	Insérer une image
+Img:Picture Management	Gestion d'image
+Img:Picture Properties	Propriétés de l'image
+Img:Files				Fichiers
+Img:Usage				Usage
+Img:Watch it			Regardez
+Img:Delete				Effacer
+Img:No Images			Aucune Image
+Img:Upload from computer	Envoie depuis l'ordinateur
+Img:Insert the picture	Insérez l'image
+Img:Insert the thumbnail	Insérer la vignette
+Img:Choose from repository	Choisissez à partir du l'archive
+Img:Choose from internet	Choisissez à partir d'internet
+Img:Choose a picture	Choisissez une photo
+Img:Upload a picture	Envoie une photo
+Img:Upload picture		Envoie photo
+Img:Image successfully uploaded	Image envoyé avec succès
+Img:Automatic resize	Redimensionnement automatique
+Img:Image URL			URL de l'image
+Img:Width				Largeur
+Img:Height				Hauteur
+Img:Caption				Légende
+Img:Thumbnail			Vignette
+Img:Thumbnail successfully updated	Vignette mis à jour
+Img:Automatic thumbnail	Vignette automatique
+Img:Choose a custom thumbnail	Choisissez une vignette personnalisée
+Img:Copy to your website	Copier sur votre site web
+Img:Load as Hotlink		Chargez comme Hotlink
+
+//DOCUMENT MANAGER
+Doc:Document			Document
+Doc:Documents			Documents
+Doc:Save changes		Enregistrer les modifications
+Doc:Insert a file		Joindre un fichier
+
+//LINK MANAGER
+Link:Link Manager		Manager du liens
+Link:Target URL			URL de destination
+Link:Description		Description
+Link:Open mode			Mode d'ouverture
+Link:Default			Défaut
+Link:_top				Ecraser tous les cadres
+Link:_blank				Dans une nouvelle fenêtre
+Link:Don't follow		Moteur de recherche sera pas suivre ce lien
+Link:CSS class			Classe CSS
+Link:Create link		Créer un lien
+Link:Save changes		Enregistrer les modifications
+Link:Remove link		Supprimer le liens
+
+//COMMENTS MANAGER
+Comments:Comments management	Gestion des commentaires
+Comments:Delete			Supprimer
+Comments:Approve		Approuver
+Comments:Hide			Cacher
+Comments:No comment		Aucun commentaire
+
+//EDITOR
+Editor:Source Code		Code Source
+Editor:Insert Source Code	Insérer Code Source
+
+//SEO
+SEO:SEO					SEO (Search Engine Optimization)
+SEO:Change frequency	Fréquence de changement
+SEO:Description			Description
+SEO:Priority			Priorité
+SEO:Keywords			Mot-clés
+SEO:No index			Ne pas index
+SEO:No follow			Ne pas suivre
+SEO:No archive			Ne pas archiver
+SEO:Always				Toujours
+SEO:Hourly				Horaire
+SEO:Daily				Quotidien
+SEO:Weekly				Hebdomadaire
+SEO:Monthly				Mensuel
+SEO:Yearly				Annuel
+SEO:Never				Jamais
+SEO:Meta-data			Méta-données
+SEO:Add Meta-data		Ajouter méta-données
+SEO:Robots					Robots
+SEO:A decimal included from 0 to 1		Un décimal compris de 0 à 1
+
+//METADATA
+Metadata:No available fields	No available fields
+
+//ERRORS
+Errors:You don't have permission to use this function	Vous n'avez pas la permission d'utiliser cette fonction
+
+//HOME
+Home:Welcome to your Content Management System	Bienvenue à votre système de gestion de contenu
+Home:pages				Pages
+Home:news				Nouvelles
+Home:banner				Bannière
+Home:private			Espace privé
+Home:shop				Boutique
+Home:photogallery		Galerie de photos
+Home:newsletter			Bulletin
+Home:stats				Statistiques
+Home:users				Utilisateurs
+Home:members			Utilisateurs
+Home:License			License
+Home:read				lire
+Home:Copyright			est un logiciel <em>open-source</em> publié sous licence <acronym title="Gnu General Public License v.3">GPL 3</acronym>

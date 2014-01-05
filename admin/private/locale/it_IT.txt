@@ -1,0 +1,44 @@
+//PRIVATE AREA
+Private:Private Area						Area riservata
+Private:New Folder							Crea una nuova cartella
+Private:Upload files						Carica i file
+Private:Upload one or more files			Carica uno o pi&ugrave; file
+Private:Uploading...						Sto caricando...
+Private:Directory Name						Nome della cartella
+Private:Permissions							Permessi
+Private:Inherit permissions					Eredita i permessi dalla cartella precedente
+Private:Nobody can access					Nessuno pu&ograve; accedere
+Private:Only specified members can access	Solo gli utenti specificati possono accedere
+Private:All members can access				Tutti gli utenti registrati possono accedere
+Private:public								Chiunque
+Private:members								Tutti i membri
+Private:restricted							Solo alcuni membri
+Private:private								Nessuno
+Private:Inherited							ereditato
+Private:Anyone can access					Chiunque pu&ograve; accedere
+Private:Create Folder						Crea cartella
+Private:Back to parent directory			Torna alla cartella precedente
+Private:Size								Dimensione
+Private:Who can access						Chi pu&ograve; accedere
+Private:Move								Muovi
+Private:Rename								Rinomina
+Private:New name							Nuovo nome
+Private:Delete								Elimina
+Private:Edit								Modifica
+Private:Edit permissions					Modifica i permessi
+Private:Max upload size allowed				Dimensione massima di caricamento
+Private:Max number of files					Numero massimo di file
+Private:Enabled members						Utenti abilitati
+Private:No members available in this folder	Nessun utente disponibile in questa cartella
+Private:Can also upload/delete files		Possono anche caricare/cancellare file
+Private:Anyone with reading permissions		Chiunque abbia i permessi di lettura
+Private:Only specified members can upload and delete files	Solo i membri specificati possono caricare e cancellare file
+Private:Nobody can write					Nessuno può caricare/cancellare
+Private:Select all							Sel. tutti
+Private:Unselect all						Desel. tutti
+Private:Access								Accesso
+Private:Writing								Scrittura
+Private:Members with reading permissions	Membri con i permessi di lettura
+Private:Members with writing permissions	Membri con i permessi di scrittura
+
+Private:Are you sure? This operation is not reversible!		Sei sicuro? Questa operazione non è reversibile!

@@ -1,0 +1,23 @@
+//HOME
+Home:Home page		Home page
+Home:Set the page to display as home page		Set the page to display as home page
+Home:Custom							Custom
+Home:Current home page is			Current home page is
+Home:Choose a new home page			Choose a new home page
+Home:Page							Page
+Home:Set as home page				Set as home page
+Home:Choose something about news	Choose something about news
+Home:Set news as home page			Show the news as home page
+Home:or choose a category:			or choose a category
+Home:Set selected category as home page		Show the selected category as home page
+Home:Choose something about photogalleries	Choose something about photogalleries
+Home:Set photogalleries as home page	Show the photogalleries as home page
+Home:Choose something about shop	Choose something about shop
+Home:Set shop as home page			Show the shop as home page
+Home:Choose something about private area	Choose something about private area
+Home:Set private area as home page	Show the private area as home page
+Home:Set a custom item				Set a custom item
+Home:URL							URL
+Home:Successfully saved				Successfully saved
+Home:Error while setting the new home page	Error while setting the new home page
+Home:remember to do it for each language! remember to do it for each language!

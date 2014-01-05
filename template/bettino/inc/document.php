@@ -1,0 +1,1 @@
+<a href="<?= kGetDocumentURL(); ?>"><?= kGetDocumentCaption()!=""?kGetDocumentCaption():kGetDocumentFilename(); ?></a>

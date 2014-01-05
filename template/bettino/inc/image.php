@@ -1,0 +1,1 @@
+<img src="<?= kGetImageURL(); ?>" width="<?= kGetImageWidth(); ?>" height="<?= kGetImageHeight(); ?>" alt="<?= kGetImageAlt(); ?>" rel="lightbuzz" />

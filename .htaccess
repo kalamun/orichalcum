@@ -1,0 +1,23 @@
+# Bettino CMS #
+# deny directory listing #
+Options -Indexes
+
+# rewrite engine #
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase {VAR_BASEDIR}
+
+RewriteRule ^arch/private/(.*) / [L]
+RewriteRule ^(arch/.*) $1 [L,QSA]
+RewriteRule ^(template/.*) $1 [L,QSA]
+RewriteRule ^(img/.*) $1 [L,QSA]
+RewriteRule ^(admin/.*) $1 [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(..)/(.*)? index.php?lang=$1&url=$2 [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*) shortURL.php?url=$1 [L,QSA]
+</IfModule>

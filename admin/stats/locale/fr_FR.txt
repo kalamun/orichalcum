@@ -1,0 +1,25 @@
+# STATISTICS
+
+Statistics:Statistics	Statistiques
+Statistics:Realtime		En temps réel
+Statistics:Visitors		Visiteurs
+Statistics:Visits		Visites
+Statistics:Page			Page
+Statistics:Pages		Pages
+Statistics:Systems and Browsers		Systèmes et Navigateurs
+Statistics:Referer		Referer
+Statistics:user			utilisateur
+Statistics:users		utilisateurs
+Statistics:time			heurs
+Statistics:is watching	est à regarder
+Statistics:system		système
+Statistics:country		pays
+Statistics:unknown		inconnu
+Statistics:Visited pages	Pages visitées
+Statistics:Landing pages	Landing pages
+Statistics:Exit pages	Pages de sortie
+Statistics:Browsers		Navigateurs
+Statistics:Operative Systems		Systèmes d'exploitation
+Statistics:Mobile		Mobile
+Statistics:via mobile	via mobile
+Statistics:Countries	Pays

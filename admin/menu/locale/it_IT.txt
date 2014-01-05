@@ -1,0 +1,26 @@
+//MENU
+Menu:Navigation menu management		Gestione del men&ugrave; del sito
+Menu:Save order						Salva l'ordinamento
+Menu:Add a new element				Aggiungi una nuova voce
+Menu:Title							Titolo
+Menu:Page							Pagina
+Menu:Choose Image					Scegli immagine
+Menu:Add to menu					Inserisci nel men&ugrave;
+Menu:Custom							Personalizzato
+Menu:URL							URL
+Menu:Add a page						Aggiungi un link alla pagina
+Menu:Add something about news		Aggiungi qualcosa relativo alle notizie
+Menu:Add link to the main news page	Aggiungi un link alla pagina principale delle notizie
+Menu:or choose a category:			o scegli una categoria:
+Menu:Add link to the selected category	Aggiungi un link alla categoria selezionata
+Menu:Add something about photogalleries	Aggiungi qualcosa relativo alle gallerie fotografiche
+Menu:Add link to the main photogallery page	Aggiungi un link alla pagina principale delle gallerie
+Menu:Add something about shop		Aggiungi qualcosa relativo al negozio
+Menu:Add link to the main shop page	Aggiungi un link alla pagina principale del negozio
+Menu:Add something about private area	Aggiungi qualcosa relativo all'area riservata
+Menu:Add link to the private area	Aggiungi un link all'area riservata
+Menu:Add custom item				Aggiungi un oggetto personalizzato
+Menu:Main menu						Men&ugrave; principale
+Menu:Add new menu					Crea nuovo men&ugrave;
+Menu:Menu name						Nome del men&ugrave;
+Menu:Create menu					Crea men&ugrave;

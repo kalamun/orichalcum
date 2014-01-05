@@ -1,0 +1,95 @@
+//SHOP
+Shop:Shop						Shop
+Shop:Add an item				Add an item
+Shop:Manage items				Manage items
+Shop:Delete items from shop		Delete items from shop
+Shop:Categories management		Categories management
+Shop:Add						Add
+Shop:Edit						Edit
+Shop:Delete						Delete
+Shop:Categories					Categories
+Shop:Item's name				Item's name
+Shop:Item URL					Item URL
+Shop:Visible from date			Visible from date
+Shop:Expiration date			Expiration date
+Shop:and from time				and from time
+Shop:and time					and time
+Shop:Create Item				Create Item
+Shop:Created on					Created on
+Shop:Visible from				Visible from
+Shop:Expiration date			Expiration date
+Shop:and from time				and from time
+Shop:and time					and time
+Shop:Create Item				Create Item
+Shop:Item successfully added	Item successfully added
+Shop:Problems while adding the item to the database		Problems while adding the item to the database
+Shop:Title						Title
+Shop:Subtitle					Subtitle
+Shop:Preview					Preview
+Shop:Description				Description
+Shop:Categories					Categories
+Shop:Photogallery				Photogallery
+Shop:Document gallery			Document gallery
+Shop:URL						URL
+Shop:Item's URL					Item's URL
+Shop:Order						Order
+Shop:Price						Price
+Shop:Discounted					Discounted
+Shop:Weight						Weight
+Shop:Qty						Qty
+Shop:Quantity					Quantity
+Shop:This item has				This item has
+Shop:Item successfully saved	Item successfully saved
+Shop:On-line					On-line
+Shop:DRAFT						PROJET
+Shop:Turn off-line				Turn off-line
+Shop:Item successfully off-lined	Item successfully off-lined
+Shop:Item successfully deleted	Item successfully deleted
+Shop:Do you want to off-line this item?		Do you want to off-line this item?
+Shop:Do you want to COMPLETELY DELETE this item?	Do you want to COMPLETELY DELETE this item?
+Shop:Opened orders				Opened orders
+Shop:Closed orders				Closed orders
+Shop:Close order				Close order
+Shop:Cancel order				Cancel order
+Shop:Canceled orders			Canceled orders
+Shop:Are you sure?				Are you sure?
+Shop:Details					Details
+Shop:Close						Close
+Shop:Cancel						Cancel
+Shop:Mark as payed				Mark as payed
+Shop:Mark as shipped			Mark as shipped
+Shop:Not yet shipped			Not yet shipped
+Shop:Shipped					Shipped
+Shop:Payment details			Payment details
+Shop:Shipment details			Shipment details
+Shop:Shipment data				Shipment data
+Shop:Order #					Order #
+Shop:Order number				Order number
+Shop:Transactions				Transactions
+Shop:No payments received yet	No payments received yet
+Shop:Report a payment			Report a payment
+Shop:Report						Report
+Shop:Payment method				Payment method
+Shop:Date						Date
+Shop:Customer					Customer
+Shop:Payment					Payment
+Shop:Delivery					Delivery
+Shop:Amount						Amount
+Shop:Successfully saved			Successfully saved
+Shop:Sorry, error while saving	Sorry, error while saving
+Shop:Shipment					Shipment
+Shop:Tracking number			Tracking number
+Shop:Tracking URL				Tracking URL
+Shop:Deliverer					Deliverer
+Shop:Shipped on					Shipped on
+Shop:Report shipment			Report shipment
+Shop:Personal data				Personal data
+Shop:Name						Name
+Shop:E-mail						E-mail
+Shop:This order was moved into CLOSED orders list	This order has been moved into CLOSED orders list
+Shop:This order was moved into CANCELED orders list	This order has been into CANCELED orders list
+Shop:Order details				Order details
+Shop:Total amount				Total amount
+Shop:Invoice data				Invoice data
+Shop:Forced closure				Fermeture forcée
+Shop:Sheet						Onglet

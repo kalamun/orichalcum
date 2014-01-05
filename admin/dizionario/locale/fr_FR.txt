@@ -1,0 +1,8 @@
+//DICTIONARY
+Dictionary:Term						Motte
+Dictionary:Translation				Traduction
+Dictionary:%s translation			Traduction %s
+Dictionary:Actions					Actions
+Dictionary:Add a new term			Ajouter une nouvelle motte
+Dictionary:Import terms from default template			Importer du template prédéfinit
+Dictionary:No terms defined yet		Il n'y a pas aucun term

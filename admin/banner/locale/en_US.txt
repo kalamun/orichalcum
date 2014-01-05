@@ -1,0 +1,27 @@
+//BANNER
+Banner:Banner					Banner
+Banner:Add a new banner			Add a new banner
+Banner:Edit a banner			Edit a banner
+Banner:Delete a banner			Delete a banner
+Banner:Edit						Edit
+Banner:Title or short description	Title or short description
+Banner:Title					Title
+Banner:Short description		Short description
+Banner:Category					Category
+Banner:File						File
+Banner:New File					New File
+Banner:Target URL				Target URL
+Banner:Views					Views
+Banner:Error while uploading	Error while uploading
+Banner:Successfully uploaded	Successfully uploaded
+Banner:Please write the title	Please write the title
+Banner:Select the category to edit	Select the category to edit
+Banner:Are you sure you want to delete it?	Are you sure you want to delete it?
+Banner:Moving...				Moving...
+Banner:Saving...				Saving...
+Banner:Successfully Updated		Successfully Updated
+Banner:Successfully Deleted		Successfully Deleted
+Banner:Problems occurred while deleting banner	Problems occurred while deleting banner
+Banner:Error while uploading database	Error while uploading database
+Banner:Error while uploading the new file	Error while uploading the new file
+Banner:DRAFT					DRAFT

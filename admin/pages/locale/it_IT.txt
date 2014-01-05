@@ -1,0 +1,116 @@
+//PAGES
+Pages:Pages					Pagine
+Pages:Add a page			Crea una pagina
+Pages:Edit a page			Modifica una pagina
+Pages:Delete a page			Elimina una pagina
+Pages:Create a new page		Crea una nuova pagina
+Pages:Created				Creata
+Pages:Last change			Ultima modifica
+Pages:Comments				Commenti
+Pages:Comment management	Gestione Commenti
+Pages:This page is commentable	Questa pagina è commentabile
+Pages:This page has %s comments, %s of which still to moderate	Questa pagina ha %s commenti, %s dei quali ancora da moderare
+Pages:Title					Titolo
+Pages:Subtitle				Sottotitolo
+Pages:Introduction			Introduzione
+Pages:Contents				Contenuti
+Pages:Photo gallery			Galleria fotografica
+Pages:Document gallery		Documenti allegati
+Pages:SEO					SEO (<em>Ottimizzazione per i Motori di Ricerca</em>)
+Pages:Page URL				URL della pagina
+Pages:This URL already exists	Questo indirizzo esiste già
+Pages:Add to menu			Aggiungi al menù
+Pages:Visit					Visita
+Pages:Add this page to the site menu	Aggiungi questa pagina al menù di navigazione del sito
+Pages:Copy contents from the page	Copia il contenuto dalla pagina
+Pages:Errors occurred while copying contents	Si sono verificati degli errori durante la copia dei contenuti
+Pages:Errors occurred while saving	Si sono verificati degli errori durante il salvataggio
+Pages:Page saved			Pagina salvata
+Pages:Edit					Modifica
+Pages:Create a copy			Copia
+Pages:Delete				Elimina
+Pages:Change frequency		Frequenza delle modifiche
+Pages:Description			Descrizione
+Pages:Priority				Priorità
+Pages:Keywords				Parole Chiave
+Pages:No index				Non indicizzare
+Pages:No follow				Non seguire
+Pages:No archive			Non archiviare
+Pages:Always				Continuamente
+Pages:Hourly				Ogni ora
+Pages:Daily					Ogni giorno
+Pages:Weekly				Ogni settimana
+Pages:Monthly				Ogni mese
+Pages:Yearly				Ogni anno
+Pages:Never					Mai
+Pages:Meta-data				Meta-data
+Pages:Add Meta-data			Nuovo Meta-data
+Pages:Template				Template
+Pages:Layout				Layout
+Pages:Translations			Traduzioni
+Pages:You are going to delete the page "%s": are you sure?	Stai per cancellare la pagina "<em>%s</em>": sei sicuro di volerlo fare?
+Pages:Errors occurred while deleting page from database	Si sono verificati degli errori durante la rimozione della pagina dal database
+Pages:Page was successfully deleted	Pagina rimossa con successo
+Pages:Categories			Categorie
+Pages:Category				Categoria
+Pages:URL					URL
+Pages:Order					Ordine
+Pages:New category			Nuova categoria
+Pages:Pages categories		Categorie delle pagine
+Pages:Category name			Nome della categoria
+Pages:Category URL			Indirizzo della categoria
+Pages:Page categories have no URL!	Le categorie delle pagine non hanno indirizzo!
+Pages:Searching for translation		Sto cercando la traduzione
+Pages:if nothing happens, click here	se non succede niente, clicca qui
+Pages:This page is the translated version of	Questa pagina è la versione tradotta di
+Pages:DRAFT					BOZZA
+Pages:CONVERSIONS			CONVERSIONI
+Pages:Set as draft			Imposta come bozza
+Pages:Set as public			Imposta come pubblica
+Pages:Page published! Now the whole world can visit it, good luck	Pagina pubblicata! Adesso è visibile da tutto il mondo, buona fortuna
+Pages:Now the page is a draft	Adesso la pagina è una bozza
+Pages:Error occurred while inserting in menu	Errore durante l'inserimento nel men&ugrave;
+
+Pages:Conversions				Conversioni
+Pages:Conversions are active	Le conversioni sono attive
+Pages:Conversions management	Gestione delle conversioni
+Pages:Conversions Manager		Gestione delle conversioni
+Pages:None						Nessuna
+Pages:CAPTCHA					CAPTCHA
+Pages:Moderation				Moderazione
+Pages:CAPTCHA					CAPTCHA
+Pages:Moderate requests			Moderazione delle richieste
+Pages:Double opt-in				Conferma doppia (Double opt-in)
+Pages:Save as member			Salva come membro in anagrafica
+Pages:Create a private directory called as the username		Crea una cartella privata chiamata come lo username
+Pages:Subscribe to the following newsletters	Iscrivi alle seguenti newsletter
+Pages:Unsubscribe from the following newsletters	Disiscrivi dalle seguenti newsletter
+Pages:Settings					Impostazioni
+Pages:Input variables			Variabili in ingresso
+Pages:Notifications				Notifiche
+Pages:Follow-up					Risposta automatica
+Pages:Conversion code			Codice di conversione
+Pages:Fail code					Codice in caso di fallimento
+Pages:Variable name				Nome della variabile
+Pages:Correspondence			Corrispondenza
+Pages:Notifications sender		Mittente delle notifiche
+Pages:Custom sender				Mittente personalizzato
+Pages:Notify to this e-mails	Invia notifica a queste e-mail
+Pages:one for line				una per linea
+Pages:Subject					Oggetto della mail
+Pages:Sender					Mittente
+Pages:Follow-up e-mail			Testo dell'e-mail di risposta
+Pages:Placeholders				Segnaposto
+Pages:Name						Nome
+Pages:Surname					Cognome
+Pages:E-mail					E-mail
+Pages:Username					Nome utente
+Pages:Password					Password
+Pages:Affiliation				Affiliazione
+Pages:Expiration				Scadenza
+Pages:Subscriber				Sottoscrittore
+Pages:Admin						Amministratore
+Pages:Custom					Personalizzato
+Pages:Changes successfully saved	Modifiche salvate con successo
+Pages:Errors occurred while saving	Ops, si son verificati dei problemi durante il salvataggio!
+Pages:No newsletters available	Nessuna newsletter disponibile

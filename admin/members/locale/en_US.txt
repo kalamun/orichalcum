@@ -1,0 +1,43 @@
+//MEMBERS
+Members:New member			New member
+Members:Edit				Edit
+Members:Delete				Delete
+Members:Create member		Create member
+Members:Edit member			Edit member
+Members:Last login			Last login
+Members:Name				Name
+Members:E-mail				E-mail
+Members:Username			Username
+Members:Password			Password
+Members:Affiliation			Affiliation
+Members:Expiration			Expiration
+Members:Status				Status
+Members:Active				Active
+Members:Suspended			Suspended
+Members:Deleted				Deleted
+Members:Meta-data			Meta-data
+Members:Add Meta-data		Add Meta-data
+Members:Photo gallery		Photogallery
+Members:Document gallery	Document gallery
+Members:Private Area		Private Area
+Members:Subscribed newsletter lists							Subscribed newsletter lists
+Members:Error while updating newsletter subscriptions		Error while updating newsletter subscriptions
+Members:This user has access to the following directories	This user has access to the following directories
+Members:Single user			Single user
+Members:Batch creation		Batch creation
+Members:Leave empty for no expiration	Leave empty for no expiration
+Members:Filters				Filters
+Members:Newsletters			Newsletters
+Members:all					all
+Members:subscribers of one or more lists	subscribers of one or more lists
+Members:not subscribers		not subscribers
+Members:equal to			equal to
+Members:different from		different from
+Members:contains			contains
+Members:greater than		greater then
+Members:lower than			lower then
+Members:apply filters		apply filters
+Members:Create on			Created on
+Members:Latests access		Latest access
+Members:Export				Export
+Members:members in current selection	members in current selection

@@ -1,0 +1,24 @@
+//PERSONAL PROFILE
+Profile:Personal Profile Management		Gestion de profil personnel
+Profile:Personal Profile				Profil personnel
+Profile:Change your Personal Profile	Modifiez votre Profile Personnel
+Profile:Change your Password			Modifiez votre mot de passe
+Profile:Your profile was successfully saved	Votre profil a été enregistré avec succès
+Profile:Profile Picture					Image profil
+Profile:Please write your name			S'il vous plaît écrivez votre nom
+Profile:Please write your username		S'il vous plaît écrivez votre nom d'utilizateur
+Profile:Name							Nom
+Profile:E-mail							E-mail
+Profile:Username						Nom d'utilizateur
+Profile:Password						Mot de passe
+Profile:Old Password					Mot de passe vieille
+Profile:New Password					Nouvelle mot de passe
+Profile:Repeat Password					Repetit mot de passe
+Profile:Main Language					Langue principal
+Profile:Please pay attention to letter case	Veuillez prêter attention à las mottes majuscules
+Profile:About you						À propos de vous
+Profile:More infos about you			Plus d'infos sur de vous
+Profile:Insert your personal picture	Insérez votre image personnelle
+Profile:An Error occurred while saving your password	Une erreur s'est produite lors de l'enregistrement de votre mot de passe
+Profile:Password successfully updated	Mot de passe mis à jour correctement
+Profile:Password must be length at least %s chars	Mot de passe doit être de longueur au moins %s caractères

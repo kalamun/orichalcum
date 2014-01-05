@@ -1,0 +1,105 @@
+//PAGES
+Pages:Pages					Pages
+Pages:Add a page			Add a page
+Pages:Edit a page			Edit a page
+Pages:Delete a page			Delete a page
+Pages:Create a new page		Create a new page
+Pages:Created				Created
+Pages:Last change			Last change
+Pages:Comments				Comments
+Pages:Comment management	Comment management
+Pages:This page is commentable	This page is commentable
+Pages:This page has %s comments, %s of which still to moderate	This page has %s comments, %s of which still to moderate
+Pages:Title					Title
+Pages:Subtitle				Subtitle
+Pages:Introduction			Introduction
+Pages:Contents				Contents
+Pages:Photo gallery			Photo gallery
+Pages:Document gallery		Document gallery
+Pages:SEO					SEO (<em>Search Engine Optimization</em>)
+Pages:Page URL				Page URL
+Pages:This URL already exists	This URL already exists
+Pages:Add to menu			Add to menu
+Pages:Visit					Visit
+Pages:Add this page to the site menu	Add this page to the site menu
+Pages:Copy contents from the page	Copy contents from the page
+Pages:Errors occurred while copying contents	Errors occurred while copying contents
+Pages:Errors occurred while saving	Errors occurred while saving
+Pages:Page saved			Page saved
+Pages:Edit					Edit
+Pages:Create a copy			Create a copy
+Pages:Delete				Delete
+Pages:Change frequency		Change frequency
+Pages:Description			Description
+Pages:Priority				Priority
+Pages:Keywords				Keywords
+Pages:No index				No index
+Pages:No follow				No follow
+Pages:No archive			No archive
+Pages:Always				Always
+Pages:Hourly				Hourly
+Pages:Daily					Daily
+Pages:Weekly				Weekly
+Pages:Monthly				Monthly
+Pages:Yearly				Yearly
+Pages:Never					Never
+Pages:Meta-data				Meta-data
+Pages:Add Meta-data			Add Meta-data
+Pages:Template				Template
+Pages:Layout				Layout
+Pages:Translations			Translations
+Pages:You are going to delete the page "%s": are you sure?	You are going to delete the page "<em>%s</em>": are you sure?
+Pages:Errors occurred while deleting page from database	Errors occurred while deleting page from database
+Pages:Page was successfully deleted	Page was successfully deleted
+Pages:Searching for translation		Searching for translation
+Pages:if nothing happens, click here	if nothing happens, click here
+Pages:This page is the translated version of	This page is the translated version of
+Pages:DRAFT					DRAFT
+Pages:CONVERSIONS			CONVERSIONI
+Pages:Set as draft			Set as draft
+Pages:Set as public			Set as public
+Pages:Page published! Now the whole world can visit it, good luck	Page published! Now the whole world can visit it, good luck
+Pages:Now the page is a draft	Now the page is a draft
+Pages:Error occurred while inserting in menu	Error occurred while inserting in menu
+
+Pages:Conversions				Conversions
+Pages:Conversions are active	Conversions are active
+Pages:Conversions management	Conversions management
+Pages:Conversions Manager		Conversions Manager
+Pages:None						None
+Pages:Moderation				Moderation
+Pages:Moderate requests			Moderate requests
+Pages:Double opt-in				Double opt-in
+Pages:Save as member			Save as member
+Pages:Create a private directory called as the username		Create a private directory called as the username
+Pages:Subscribe to the following newsletters	Subscribe to the following newsletters
+Pages:Unsubscribe from the following newsletters	Unsubscribe from the following newsletters
+Pages:Settings					Settings
+Pages:Input variables			Input variables
+Pages:Notifications				Notifications
+Pages:Follow-up					Follow-up
+Pages:Conversion code			Covnersion code
+Pages:Fail code					Code to show in case of failure
+Pages:Variable name				Variable name
+Pages:Correspondence			Correspondence
+Pages:Notifications sender		Notifications sender
+Pages:Custom sender				Custom sender
+Pages:Notify to this e-mails	Notify to this e-mails
+Pages:one for line				one for line
+Pages:Subject					Subject
+Pages:Sender					Sender
+Pages:Follow-up e-mail			Follow-up e-mail
+Pages:Placeholders				Placeholders
+Pages:Name						Name
+Pages:Surname					Surname
+Pages:E-mail					E-mail
+Pages:Username					Username
+Pages:Password					Password
+Pages:Affiliation				Affiliation
+Pages:Expiration				Expiration
+Pages:Subscriber				Subscriber
+Pages:Admin						Admin
+Pages:Custom					Custom
+Pages:Changes successfully saved	Changes successfully saved
+Pages:Errors occurred while saving	Ops, errors occurred while saving!
+Pages:No newsletters available	Nessuna newsletter disponibile

@@ -1,0 +1,88 @@
+//SETUP
+
+Setup:Setup											Setup
+Setup:Advanced settings								Advanced settings
+Setup:General settings								General settings
+Setup:Template										Template
+Setup:E-mail template								E-mail template
+Setup:DEFAULT										DEFAULT
+Setup:Site name										Site name
+Setup:Title											Title
+Setup:Subtitle										Subtitle
+Setup:Preview										Preview
+Setup:Payoff										Payoff
+Setup:Footer										Footer
+Setup:Text											Text
+Setup:Price											Price
+Setup:Discounted									Discounted
+Setup:Quantity										Quantity
+Setup:Private area									Private area
+Setup:Categories									Categories
+Setup:Creation date									Creation date
+Setup:Visible from									Visible from
+Setup:Expiration date								Expiration date
+Setup:Weight										Weight
+Setup:Rating										Rating
+Setup:Votes											Votes
+Setup:Photogallery									Photogallery
+Setup:Document gallery								Document gallery
+Setup:Layout										Layout
+Setup:Metadata										Metadata
+Setup:SEO (Search Engine Optimization)				SEO (Search Engine Optimization)
+Setup:Custom fields									Custom fields
+Setup:Add a field									Add a field
+Setup:Edit a field									Edit a field
+Setup:Copyright										Copyright
+Setup:Timezone										Timezone
+Setup:Date format									Date format
+Setup:day											day
+Setup:month											month
+Setup:year											year
+Setup:hour											hour
+Setup:minutes										minutes
+Setup:seconds										seconds
+Setup:others										others
+Setup:%s date										%s date
+Setup:Search Engine Optimization					Search Engine Optimization
+Setup:Reserved URLs									Reserved URLs
+Setup:RSS Feed										RSS Feed
+Setup:Error while saving the %s parameter			Error while saving the %s parameter
+Setup:Successfully saved							Successfully saved
+Setup:Files											Files
+Setup:Page settings									Page settings
+Setup:News settings									News settings
+Setup:Photogallery settings							Photogallery settings
+Setup:Shop settings									Shop settings
+Setup:Fields to display in administration panel		Fields to display in administration panel
+Setup:E-mails and newsletters						E-mails and newsletters
+Setup:Images										Images
+Setup:Statistics									Statistics
+Setup:Maintenance									Maintenance
+Setup:Activity log									Activity log
+Setup:Config.inc.php								Config.inc.php
+Setup:Track sent mail								Track sent mail
+Setup:Max logged records							Max logged records
+Setup:Mail per hour limit							Mail per hour limit
+Setup:It helps to save space into database			It helps to save space into database
+Setup:A lower value helps to not be blacklisted		A lower value helps to not be blacklisted
+Setup:Successfully saved							Successfully saved
+Setup:Error saving parameters						Error saving parameters
+Setup:Error setting the new template				Error setting the new template
+Setup:On conversions, set the moderation method to CAPTCHA then use {CAPTCHA} inside forms to use it.		On conversions, set the moderation method to CAPTCHA then use {CAPTCHA} inside forms to use it.
+Setup:create a new account on reCaptcha				create a new account on reCaptcha
+Setup:Name											Name
+Setup:Type											Type
+Setup:Values										Values
+Setup:Categories									Categories
+Setup:Order											Ordeer
+Setup:Checkbox										Checkbox
+Setup:Multiple Choice								Multiple Choice
+Setup:Select										Select
+Setup:Textarea										Textarea
+Setup:One value for each line						One value for each line
+Setup:Use into the following categories				Use into the following categories
+Setup:Send via SMTP instead of mail()				Send via SMTP instead of mail()
+Setup:Host											Host
+Setup:Port											Port
+Setup:Username										Username
+Setup:Password										Password

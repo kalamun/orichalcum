@@ -1,0 +1,35 @@
+/* (c)2012 Kalamun - GPL3 */
+
+#meter {
+	width:310px;
+	height:5px;
+	background-color:#eee;
+	border-bottom:1px solid #fff;
+	border-radius:2px;
+	margin:0 1px;
+	}
+#meterStripe {
+	width:0;
+	height:5px;
+	background-color:#f00;
+	-ms-transition:width .25s linear,background-color .25s linear;
+	-o-transition:width .25s linear,background-color .25s linear;
+	-moz-transition:width .25s linear,background-color .25s linear;
+	-webkit-transition:width .25s linear,background-color .25s linear;
+	transition:width .25s linear,background-color .25s linear;
+	box-shadow:0px 0px 2px #aaa;
+	border-radius:2px;
+	}
+#meterStripe.low {
+	background-color:#b00;
+	}
+#meterStripe.mid {
+	background-color:#fa0;
+	}
+#meterStripe.high {
+	background-color:#8c0;
+	}
+
+#r_password.pwalert {
+	border-color:#f00;
+	}

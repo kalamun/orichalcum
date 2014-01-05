@@ -1,0 +1,20 @@
+table.tabella td {
+	padding-left:10px;
+	padding-right:10px;
+	}
+table.tabella .param {
+	background-color:#f8f8f8;
+	color:#888;
+	font-size:.9em;
+	}
+table.tabella .odd .param {
+	background-color:#e8e8e8;
+	}
+table.tabella tr:hover .param {
+	background-color:#F9F5C3;
+	}
+table.tabella .text {
+	}
+table.tabella .actions {
+	white-space:nowrap;
+	}

@@ -1,0 +1,30 @@
+//USERS
+Users:Users management				Users management
+Users:Create a new user				Create a new user
+Users:Edit user						Edit user
+Users:Delete user					Delete user
+Users:Create						Create
+Users:Edit							Edit
+Users:Delete						Delete
+Users:Public users					Public users
+Users:Name							Name
+Users:E-mail						E-mail
+Users:User							User
+Users:Username						Username
+Users:Password						Password
+Users:Repeat Password				Repeat Password
+Users:Language						Language
+Users:This username already exists!	This username already exists!
+Users:Grant access to the following features	Grant access to the following features
+Users:Create user					Create user
+Users:A short description of you	A short description of you
+Users:More infos					More infos
+Users:Profile picture				Profile picture
+Users:Upload a photo of you			Upload a photo of you
+Users:Change password				Change password
+Users:Created on					Created on
+Users:Last log-in					Last log-in
+Users:Name is missing				Name is missing
+Users:Username is missing			Username is missing
+Users:You can't delete yourself!	You can't delete yourself!
+Users:Are you sure you want to permanently delete this user?	Are you sure you want to permanently delete this user?

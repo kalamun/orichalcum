@@ -1,0 +1,1 @@
+<li><a href="<?= kGetNewsArchivePermalink(); ?>"><?= kTranslate(kGetNewsArchiveMetaTitle()); ?> <?= kGetNewsDate("Y"); ?></a></li>

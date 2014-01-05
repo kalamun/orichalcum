@@ -1,0 +1,15 @@
+//LANGUAGES
+Languages:Management			Gestione lingue
+Languages:Copy content			Copia i contenuti
+Languages:Copy pages			Copia le pagine
+Languages:Source language		Lingua di origine
+Languages:Destination language	Lingua di destinazione
+Languages:What do you wanto to copy?	Cosa vuoi copiare?
+Languages:What pages do you wanto to copy?	Quali pagine vuoi copiare?
+Languages:Overwrite existing ones		Sovrascrivi quelli già esistenti
+Languages:Map of translations	Mappa delle traduzioni
+
+//LOGS
+Languages:Source and destination languages can't be the same		Le lingue di origine e di destinazione non possono essere uguali
+Languages:Language successfully copied								Lingua copiata con successo
+Languages:Pages successfully copied									Pagine copiate con successo

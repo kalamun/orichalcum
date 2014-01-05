@@ -1,0 +1,166 @@
+//MENU
+Menu:Control Panel	Control Panel
+Menu:Upgrade		Upgrade
+Menu:Help			Help
+Menu:Welcome		Welcome
+Menu:Your Profile	Your Profile
+Menu:Logout			Logout
+Menu:Site Contents	Site Contents
+Menu:Home Page		Home Page
+Menu:Pages			Pages
+Menu:News			News
+Menu:Photogallery	Photogallery
+Menu:Navigation Menu	Navigation Menu
+Menu:Tools			Tools
+Menu:Members		Members
+Menu:Private Area	Private area
+Menu:Shop			Shop
+Menu:Newsletter		Newsletter
+Menu:Landing Page	Landing Page
+Menu:Tiny URLs		Tiny URLs
+Menu:Banners		Banners
+Menu:Repository		Repository
+Menu:Statistics		Statistics
+Menu:Setup			Setup
+Menu:Languages		Languages
+Menu:Dictionary		Dictionary
+Menu:Basic Setup	Basic Setup
+Menu:Advanced Setup	Advanced Setup
+Menu:Activity Log	Activity Log
+Menu:Users			Users
+Menu:Languages		Languages
+
+//UI
+UI:Username			Username
+UI:Password			Password
+UI:Automatic log-in	Automatic log-in
+UI:Enter			Enter
+UI:Save				Save
+UI:Move				Move
+UI:Edit				Edit
+UI:Delete			Delete
+UI:Cancel			Cancel
+UI:Copy				Copy
+UI:Please Wait...	Please Wait...
+UI:View				View
+UI:Search			Search
+UI:refresh			refresh
+UI:Comments			Comments
+UI:comments			comments
+UI:Comment			Comment
+UI:comment			comment
+UI:Comments management	Comments management
+UI:Forbidden		Forbidden, you can't access this page
+UI:Back to home		Back to home
+UI:Back				Back
+UI:optional			optional
+UI:mandatory		mandatory
+UI:Are you sure?	Are you sure?
+
+//IMAGE MANAGER
+Img:Browse				Browse...
+Img:Image				Image
+Img:Images				Images
+Img:Dimensions			Dimensions
+Img:Save Changes		Save Changes
+Img:Insert a picture	Insert a picture
+Img:Picture Management	Picture Management
+Img:Picture Properties	Picture Properties
+Img:Files				Files
+Img:Usage				Usage
+Img:Watch it			Watch it
+Img:Delete				Delete
+Img:No Images			No Images
+Img:Upload from computer	Upload from computer
+Img:Insert the picture	Insert the picture
+Img:Insert the thumbnail	Insert the thumbnail
+Img:Choose from repository	Choose from repository
+Img:Choose from internet	Choose from internet
+Img:Choose a picture	Choose a picture
+Img:Upload a picture	Upload a picture
+Img:Upload picture		Upload picture
+Img:Image successfully uploaded	Image successfully uploaded
+Img:Automatic resize	Automatic resize
+Img:Image URL			Image URL
+Img:Width				Width
+Img:Height				Height
+Img:Caption				Caption
+Img:Thumbnail			Thumbnail
+Img:Thumbnail successfully updated	Thumbnail successfully updated
+Img:Automatic thumbnail	Automatic thumbnail
+Img:Choose a custom thumbnail	Choose a custom thumbnail
+Img:Copy to your website	Copy to your website
+Img:Load as Hotlink		Load as Hotlink
+
+//DOCUMENT MANAGER
+Doc:Document			Document
+Doc:Documents			Documents
+Doc:Save changes		Save changes
+Doc:Insert a file		Add a file
+
+//LINK MANAGER
+Link:Link Manager		Link manager
+Link:Target URL			Target URL
+Link:Description		Description
+Link:Open mode			Open mode
+Link:Default			Default
+Link:_top				Overwrite all the frames
+Link:_blank				In a new window
+Link:Don't follow		Search engine will don't follow this link
+Link:CSS class			CSS class
+Link:Create link		Create link
+Link:Save changes		Save changes
+Link:Remove link		Remove link
+
+//COMMENTS MANAGER
+Comments:Comments management	Comments management
+Comments:Delete			Delete
+Comments:Approve		Approve
+Comments:Hide			Hide
+Comments:No comment		No comment
+
+//EDITOR
+Editor:Source Code		Source Code
+Editor:Insert Source Code	Insert Source Code
+
+//SEO
+SEO:SEO					SEO (Search Engine Optimization)
+SEO:Change frequency	Change frequency
+SEO:Description			Description
+SEO:Priority			Priority
+SEO:Keywords			Keywords
+SEO:No index			No index
+SEO:No follow			No follow
+SEO:No archive			No archive
+SEO:Always				Always
+SEO:Hourly				Hourly
+SEO:Daily				Daily
+SEO:Weekly				Weekly
+SEO:Monthly				Monthly
+SEO:Yearly				Yearly
+SEO:Never				Never
+SEO:Meta-data			Meta-data
+SEO:Add Meta-data		Add Meta-data
+SEO:A decimal included from 0 to 1		A decimal included from 0 to 1
+
+//METADATA
+Metadata:No available fields	No available fields
+
+//ERRORS
+Errors:You don't have permission to use this function	You don't have permission to use this function
+
+//HOME
+Home:Welcome to your Content Management System	Welcome to your Content Management System
+Home:pages				Pages
+Home:news				News
+Home:banner				Banner
+Home:private			Private area
+Home:shop				Shop
+Home:photogallery		Photogalleries
+Home:newsletter			Newsletter
+Home:stats				Statistics
+Home:users				Users
+Home:members			Members
+Home:License			License
+Home:read				read
+Home:Copyright			is <em>open-source</em> software released under <acronym title="Gnu General Public License v.3">GPL 3</acronym>

@@ -1,0 +1,112 @@
+.mainbkg {
+	background-color:#F0F0F0;
+	padding:0;
+	border:1px solid #ccc;
+	border-bottom:0;
+	position:relative;
+	width:100%;
+	overflow:hidden;
+	-ms-transition:top .25s linear,height .25s linear;
+	-o-transition:top .25s linear,height .25s linear;
+	-webkit-transition:top .25s linear,height .25s linear;
+	-moz-transition:top .25s linear,height .25s linear;
+	transition:top .25s linear,height .25s linear;
+	}
+.mainbkg .btn {
+	position:relative;
+	background-color:#EDEDEA;
+	width:20px;
+	height:20px;
+	margin:3px 1px;
+	float:left;
+	overflow:hidden;
+	cursor:pointer;
+	}
+.mainbkg .subbtn {
+	position:absolute;
+	top:20px;
+	left:-5px;
+	z-index:100;
+	background-color:#EDEDEA;
+	padding:0 5px;
+	border:1px solid #ccc;
+	box-shadow:0 1px 3px 0 #ccc;
+	white-space:nowrap;
+	}
+.mainbkg:hover,.mainbkg .btn:hover {
+	overflow:visible;
+	top:0;
+	left:0;
+	}
+
+.mainbkg img {
+	opacity:.3;
+	}
+.mainbkg img:hover {
+	opacity:1;
+	}
+.mainbkg .btn.separator {
+	border:0;
+	width:1px;
+	height:20px;
+	margin:0 5px;
+	opacity:1;
+	}
+.mainbkg .btn.separator img {
+	border:0;
+	width:auto;
+	height:20px;
+	}
+.mainstatus .zoom {
+	position:absolute;
+	right:0;
+	top:0;
+	background:url('../img/resize.png') bottom right transparent;
+	width:16px;
+	height:16px;
+	margin:0px;
+	float:right;
+	opacity:.3;
+	}
+.mainstatus .zoom:hover {
+	opacity:1;
+	}
+
+.mainstatus img {
+	margin:2px 4px;
+	cursor:pointer;
+	display:inline;
+	opacity:.3;
+	}
+.mainstatus img:hover {
+	opacity:1;
+	}
+.swapKeys img.sel {
+	display:none;
+	}
+
+.mainstatus {
+	position:relative;
+	background-color:#F0F0F0;
+	border:1px solid #ccc;
+	border-top:0;
+	padding:0;
+	width:100%;
+	overflow:hidden;
+	-ms-transition:top .25s linear,height .25s linear;
+	-o-transition:top .25s linear,height .25s linear;
+	-webkit-transition:top .25s linear,height .25s linear;
+	-moz-transition:top .25s linear,height .25s linear;
+	transition:top .25s linear,height .25s linear;
+	}
+
+div .RichContainer {
+	position:relative;
+	line-height:0;
+	}
+div .RichContainer iframe {
+	margin:0;
+	}
+div .RichContainer textarea {
+	margin:0;
+	}

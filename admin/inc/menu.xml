@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<adminMenu>
+	<mainNode title="{Menu:Control Panel}" id="pdc">
+		<subNode title="{Menu:Welcome}" id="." url="index.php">
+		<subNode title="{Menu:Your Profile}" id="profilo" url="">
+		<subNode title="{Menu:Logout}" id="./." url="?logout">
+		</mainNode>
+	<mainNode title="{Menu:Site Contents}" id="site">
+		<subNode title="{Menu:Pages}" id="pages" url="">
+		<subNode title="{Menu:News}" id="news" url="">
+		<subNode title="{Menu:Photogallery}" id="photogallery" url="">
+		<subNode title="{Menu:Shop}" id="shop" url="">
+		</mainNode>
+	<mainNode title="{Menu:Tools}" id="tools">
+		<subNode title="{Menu:Members}" id="members" url="">
+		<subNode title="{Menu:Private Area}" id="private" url="">
+		<subNode title="{Menu:Newsletter}" id="newsletter" url="">
+		<subNode title="{Menu:Tiny URLs}" id="shortURL" url="">
+		<subNode title="{Menu:Banners}" id="banner" url="">
+		<subNode title="{Menu:Repository}" id="repository" url="">
+		<subNode title="{Menu:Statistics}" id="stats" url="">
+		</mainNode>
+	<mainNode title="{Menu:Setup}" id="setup">
+		<subNode title="{Menu:Home Page}" id="home" url="">
+		<subNode title="{Menu:Navigation Menu}" id="menu" url="">
+		<subNode title="{Menu:Languages}" id="lingue" url="">
+		<subNode title="{Menu:Dictionary}" id="dizionario" url="">
+		<subNode title="{Menu:Activity Log}" id="log" url="">
+		<subNode title="{Menu:Users}" id="users" url="">
+		<subNode title="{Menu:Setup}" id="setup" url="">
+		</mainNode>
+	</adminMenu>

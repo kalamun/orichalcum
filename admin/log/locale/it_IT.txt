@@ -1,0 +1,12 @@
+//LOG
+Log:Activity log				Registro attività
+Log:E-mail archive				Archivio e-mail
+Log:Control-panel activity		Attività del pannello di controllo
+Log:Date						Data
+Log:To							Destinatario
+Log:From						Mittente
+Log:Keywords					Parole chiave
+Log:View e-mail					Guarda l'e-mail
+Log:Subject						Titolo
+Log:Apply						Applica
+Log:Sent the					Inviata il

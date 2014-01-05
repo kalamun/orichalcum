@@ -1,0 +1,53 @@
+//Photogalleries
+Photogalleries:Photogalleries			Photogalleries
+Photogalleries:Add a gallery			Add a gallery
+Photogalleries:Edit a gallery			Edit a gallery
+Photogalleries:Delete a gallery			Delete a gallery
+Photogalleries:Create a new gallery		Create a new gallery
+Photogalleries:Created					Created
+Photogalleries:Last change				Last change
+Photogalleries:Comments					Comments
+Photogalleries:Comment management		Comment management
+Photogalleries:This gallery is commentable	This gallery is commentable
+Photogalleries:This gallery has %s comments, %s of which still to moderate	This gallery has %s comments, %s of which still to moderate
+Photogalleries:Title					Title
+Photogalleries:Subtitle					Subtitle
+Photogalleries:Introduction				Introduction
+Photogalleries:Contents					Contents
+Photogalleries:Photo gallery			Photo gallery
+Photogalleries:Document gallery			Document gallery
+Photogalleries:SEO						SEO (<em>Search Engine Optimization</em>)
+Photogalleries:Gallery URL				Gallery URL
+Photogalleries:This URL already exists	This URL already exists
+Photogalleries:Add to menu				Add to menu
+Photogalleries:Visit					Visit
+Photogalleries:Add this gallery to the site menu	Add this gallery to the site menu
+Photogalleries:Copy contents from the gallery	Copy contents from the gallery
+Photogalleries:Errors occurred while copying contents	Errors occurred while copying contents
+Photogalleries:Errors occurred while saving	Errors occurred while saving
+Photogalleries:Gallery saved			Gallery saved
+Photogalleries:Edit						Edit
+Photogalleries:Create a copy			Create a copy
+Photogalleries:Delete					Delete
+Photogalleries:Change frequency			Change frequency
+Photogalleries:Description				Description
+Photogalleries:Priority					Priority
+Photogalleries:Keywords					Keywords
+Photogalleries:No index					No index
+Photogalleries:No follow				No follow
+Photogalleries:No archive				No archive
+Photogalleries:Always					Always
+Photogalleries:Hourly					Hourly
+Photogalleries:Daily					Daily
+Photogalleries:Weekly					Weekly
+Photogalleries:Monthly					Monthly
+Photogalleries:Yearly					Yearly
+Photogalleries:Never					Never
+Photogalleries:Meta-data				Meta-data
+Photogalleries:Add Meta-data			Add Meta-data
+Photogalleries:Template					Template
+Photogalleries:Layout					Layout
+Photogalleries:Translations				Translations
+Photogalleries:You are going to delete the gallery "%s": are you sure?	You are going to delete the gallery "<em>%s</em>": are you sure?
+Photogalleries:Errors occurred while deleting gallery from database	Errors occurred while deleting gallery from database
+Photogalleries:Gallery was successfully deleted	Gallery was successfully deleted
