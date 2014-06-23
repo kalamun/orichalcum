@@ -1,13 +1,120 @@
 <?php
 /******************************************************************************
-* *************************************************************************** *
-* * MAIN.LIB.PHP                                                            * *
-* * Libreria di funzioni PHP di utilita' generale.                          * *
-* *                                                                         * *
-* * autore: Roberto Pasini - info@kalamun.org                               * *
-* * Licenza GNU/GPL v.3                                                     * *
-* *************************************************************************** *
+* Roberto Pasini - info@kalamun.org
+* Licenza GNU/GPL v.3
 ******************************************************************************/
+
+/* functions to increase compatiblity on different configurations */
+if(!function_exists('apache_request_headers'))
+{
+	function apache_request_headers()
+	{
+		$headers = array();
+		foreach($_SERVER as $key => $value)
+		{
+			if(substr($key, 0, 5) == 'HTTP_') $headers[str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))))] = $value;
+		}
+		return $headers;
+	}
+}
+
+
+/* orichalcum generic class */
+class kaOrichalcum
+{
+
+	public function __constructor()
+	{
+	}
+
+	public function init($vars=array())
+	{
+		/* input vars
+		x-frame-options -> deny
+		*/
+		if(!isset($vars['x-frame-options'])) $vars['x-frame-options']="deny";
+		if(!isset($vars['check-permissions'])) $vars['check-permissions']=true;
+		
+		/* init default session */
+		if((!isset($_SESSION['exists'])||$_SESSION['exists']!=true)||!isset($_SESSION['ll']))
+		{
+			session_start();
+			$_SESSION['exists']=true;
+		}
+
+		/* prevent XSS */
+		if($vars['x-frame-options']!="") header('X-Frame-Options: '.$vars['x-frame-options']);
+
+		/* connect to db and set default constants */
+		require_once("config.inc.php");
+		if(!isset($db['id'])) require_once("connect.inc.php");
+		require_once("main.lib.php");
+		require_once("kalamun.lib.php");
+
+		/* set default timezone in PHP and MySQL */
+		$timezone=kaGetVar('timezone',1);
+		if($timezone=="") $timezone='Europe/Rome';
+		date_default_timezone_set($timezone);
+		$query="SET time_zone='".date("P")."'";
+		mysql_query($query);
+		mysql_query("SET NAMES utf8");
+
+		/* load setup variables */
+		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR."inc/log.lib.php");
+		$GLOBALS['kaLog']=new kaLog();
+		$GLOBALS['kaImpostazioni']=new kaImpostazioni();
+
+		/* generate PAGE_ID and additional constants */
+		if(!defined("PAGE_ID")) define("PAGE_ID",substr(dirname($_SERVER['PHP_SELF']),strpos(dirname($_SERVER['PHP_SELF']),"admin/")+6));
+		if(!defined("RICH_EDITOR"))
+		{
+			if($GLOBALS['kaImpostazioni']->getVar('admin-editor',1,"*")=="true") define("RICH_EDITOR",true);
+			else define("RICH_EDITOR",true);
+		}
+
+		/* load generic purpose classes */
+		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR."users/users.lib.php");
+		$GLOBALS['kaUsers']=new kaUsers();
+		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR."inc/metadata.lib.php");
+		$GLOBALS['kaMetadata']=new kaMetadata();
+
+		/* manage language changes */
+		if(isset($_GET['chg_lang']))
+		{
+			$_SESSION['ll']=$_GET['chg_lang'];
+			$GLOBALS['kaImpostazioni']->kaImpostazioni();
+		}
+
+		/* manage session and access based on user permissions */
+		include_once("sessionmanager.inc.php");
+		$GLOBALS['kaTranslate']=new kaAdminTranslate();
+
+		/* if user is not logged in, display login page */
+		if(!isset($_SESSION['username'])||$_SESSION['username']=="")
+		{
+			include_once("login.inc.php");
+			die();
+		}
+
+		/* if user are not allowed to access this page, display error */
+		if($vars['check-permissions']==true&&!$GLOBALS['kaUsers']->canIUse())
+		{
+			?>
+			<div class="alert"><h1><?= $GLOBALS['kaTranslate']->translate('UI:Forbidden'); ?></h1>
+			<a href="<?= ADMINDIR; ?>"><?= $GLOBALS['kaTranslate']->translate('UI:Back to home'); ?></a></div>
+			<?
+			include_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR."inc/foot.inc.php");
+			die();
+		}
+		
+		/* embed additional classes */
+		require('images.lib.php');
+		$GLOBALS['kaImages']=new kaImages();
+
+	}
+
+}
+
 
 /******************************************************************************
  HTMLIZE: converte una stringa in codice html
@@ -278,12 +385,12 @@ function b3_htmlize($string,$slashes=true,$param="*") {
 	if($param=="*"||(isset($allow_a)&&$allow_a==true)) {
 		/* AUTODETECT DI INDIRIZZI INTERNET ED E-MAIL */
 		$find=array(
-			'/&lt;a href="(http|https|ftp)(:\/\/[[:alnum:]|\.|-|_]+[[:alpha:]]{2,4}[^"]*?)"((?: +[[:alpha:]]*="[^"]*")*)&gt;(.*?)&lt;\/a&gt;/si',
-			'/(?<!="|=)(http|https|ftp)(:\/\/[[:alnum:]|\.|-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|-|_|\.|\?|=|#|&|;|:]*)/si',
-			'/(?<!:\/\/|%2F%2F|">)(www\.[[:alnum:]|\.|-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|-|_|\.|\?|=|#|&|;|:]*)/si',
+			'/&lt;a href="(http:|https:|ftp:)?(\/\/[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}[^"]*?)"((?: +[[:alpha:]]*="[^"]*")*)&gt;(.*?)&lt;\/a&gt;/si',
+			'/(?<!="|=\'|=)(http:|https:|ftp:)(\/\/[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|-|_|\.|\?|=|#|&|;|:]*)/si',
+			'/(?<!\/\/|%2F%2F|">)(www\.[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|-|_|\.|\?|=|#|&|;|:]*)/si',
 			'/&lt;a href="([[:punct:][:alnum:]]*?)"(.*?)&gt;(.*?)&lt;\/a&gt;/si',
 			'/&lt;a name="([[:punct:][:alnum:]]*?)"&gt;&lt;\/a&gt;/si',
-			'/&lt;a href="mailto:([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4})"([^&]*)&gt;(.*?)&lt;\/a&gt;/si',
+			'/&lt;a href="mailto:([[:alnum:]|\.|\-|_]+@[[:alnum:]|\.|\-|_]+[A-Z]{2,4})"([^&]*)&gt;(.*?)&lt;\/a&gt;/si',
 			'/(?<!mailto:)(\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b)/si'
 			);
 		$replace=array(
@@ -299,7 +406,6 @@ function b3_htmlize($string,$slashes=true,$param="*") {
 		}
 	
 	$string=trim($string," ");
-	//if($param=="*"||(isset($allow_p)&&$allow_p==true)) if(substr($string,0,2)!="<") $string="<p>".$string."</p>";
 	$string=preg_replace('/<a href="[^"]*"((?: +[[:alpha:]]*="[^"]*")*)>\s*<\/a>/s',"",$string); //remove empty links
 	$string=preg_replace("/<br( \/)?>\s?<br( \/)?>/s","</p><p>",$string);
 	$string=str_replace("<br />\n","<br />",$string);
@@ -619,10 +725,7 @@ function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$r
 	$random_mode?$rand=rand(1,666):$rand="";
 	$id=preg_replace("/\[|\]/","",$name).$rand;
 	if($label!="") { $string.='<label for="'.preg_replace("/\[|\]/","",$name).$rand.'">'.$label.'</label>'; }
-	$string.='<div class="RichContainer" mediatable="'.$mediatable.'" mediaid="'.$mediaid.'" style="width:'.$width.'">'
-			.'<textarea name="'.$name.'" id="'.$id.'" style="width:100%;height:'.$height.';resize:none;">'.$value.'</textarea>'
-			.'</div>';
-	$string.='<script type="text/javascript">if(!kTxtArea) var kTxtArea=Array(); kTxtArea[\''.$id.'\']=kRichTextOn(\''.$id.'\','.($rich?'true':'false').','.($kaeys?"'".$kaeys."'":"false").');</script>';
+	$string.='<textarea editor="kzen" name="'.$name.'" id="'.$id.'" style="width:'.$width.';height:'.$height.';">'.$value.'</textarea>';
 	return $string;
 	}
 

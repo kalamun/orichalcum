@@ -22,3 +22,4 @@ Menu:Add link to the private area	Ajouter un lien à l'espace privé
 Menu:Add custom item				Ajouter un article sur mesure
 Menu:Main menu						Menu principal
 Menu:Add new menu					Ajouter nouveau menu
+Menu:Select where to insert the page into the menu	Sélectionnez où insérer la page dans le menu

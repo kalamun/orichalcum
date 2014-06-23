@@ -54,6 +54,13 @@ class kImages {
 			else $size=array(0,0,0,"");
 			$output[$i]['thumb']['width']=$size[0];
 			$output[$i]['thumb']['height']=$size[1];
+
+			$output[$i]['alts']=json_decode($output[$i]['alt'],true);
+			if($output[$i]['alts']!=false)
+			{
+				if(!isset($output[$i]['alts'][$_SESSION['ll']])) $output[$i]['alts'][$_SESSION['ll']]="";
+				$output[$i]['alt']=$output[$i]['alts'][$_SESSION['ll']];
+			}
 			}
 		
 		return $output;
@@ -101,6 +108,13 @@ class kImages {
 		else $size=array(0,0,0,"");
 		$output['thumb']['width']=$size[0];
 		$output['thumb']['height']=$size[1];
+	
+		$output['alts']=json_decode($output['alt'],true);
+		if($output['alts']!=false)
+		{
+			if(!isset($output['alts'][LANG])) $output['alts'][LANG]="";
+			$output['alt']=$output['alts'][LANG];
+		}
 
 		//retrieve filesize
 		$output['filesize']=0;

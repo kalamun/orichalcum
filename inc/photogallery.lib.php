@@ -19,7 +19,7 @@ class kPhotogallery {
 
 	public function photogalleryExists($dir=false) {
 		if($dir==false) $dir=$GLOBALS['__subdir__'];
-		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND dir='".$dir."' LIMIT 1";
+		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') LIMIT 1";
 		$results=mysql_query($query);
 		if($row=mysql_fetch_array($results)) return true;
 		else return false;
@@ -37,7 +37,7 @@ class kPhotogallery {
 		$metadata['template']=kGetVar('photogallery-template',1);
 		$metadata['layout']="";
 		if(isset($dir[1])&&$dir[1]!="") {
-			$query="SELECT idphg,titolo,traduzioni,template FROM ".TABLE_PHOTOGALLERY." WHERE dir='".b3_htmlize($GLOBALS['__subdir__'],true,"")."' AND ll='".$ll."' LIMIT 1";
+			$query="SELECT idphg,titolo,traduzioni,template FROM ".TABLE_PHOTOGALLERY." WHERE (`dir`='".b3_htmlize($GLOBALS['__subdir__'],true,"")."' OR `dir`='".mysql_real_escape_string($GLOBALS['__subdir__'])."') AND ll='".$ll."' LIMIT 1";
 				$results=mysql_query($query);
 					$row=mysql_fetch_array($results);
 			$metadata['titolo'].=" &gt; ".$row['titolo'];
@@ -59,7 +59,7 @@ class kPhotogallery {
 		if(!$this->inited) $this->init();
 		if($dir==false) $dir=$GLOBALS['__subdir__'];
 		$output=array();
-		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND dir='".$dir."' LIMIT 1";
+		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') LIMIT 1";
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
 		$output=$row;

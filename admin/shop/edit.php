@@ -12,8 +12,6 @@ $pageMode=$kaImpostazioni->getVar('admin-shop-layout',2,"*");
 
 $kaShop=new kaShop();
 $kaMetadata=new kaMetadata;
-$mese=array("","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre");
-$mesebreve=array("","Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic");
 
 if(isset($_GET['m'])) $currMonth=$_GET['m'];
 else $currMonth=date("n");
@@ -24,7 +22,7 @@ else $currYear=date("Y");
 if(!isset($_GET['idsitem'])) {
 	if($kaImpostazioni->getVar('shop-order',1)=="ordine"&&isset($_POST['idsitem'])&&count($_POST['idsitem']>0)) {
 		$log="";
-		if(!$kaShop->sort($_POST['idsitem'])) $log="Errore durante il salvataggio dell'ordinamento delle gallerie";
+		if(!$kaShop->sort($_POST['idsitem'])) $log="Errore durante il salvataggio dell'ordinamento";
 
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -100,8 +98,10 @@ if(isset($_POST['update'])&&isset($_GET['idsitem'])) {
 	if(!isset($_POST['qta'])) $_POST['qta']=0;
 	if(!isset($_POST['online'])) $_POST['online']='y';
 	if(!isset($_POST['customfield'])) $_POST['customfield']=array();
+	if(!isset($_POST['featuredimage'])) $_POST["featuredimage"]=-1;
+	if(!isset($_POST['manufacturer'])) $_POST["manufacturer"]=-1;
 
-	$id=$kaShop->updateItem($_GET['idsitem'],$_POST['online'],$_POST['productcode'],$_POST['titolo'],$_POST['sottotitolo'],$_POST['anteprima'],$_POST['testo'],$categorie,$_POST['prezzo'],$_POST['scontato'],$date_date,$visible_date,$expiration_date,$_POST['qta'],$_POST['weight'],$_POST['layout'],$_POST['dir'],$privatearea,$_SESSION['ll'],$_POST['template'],$_POST['customfield']);
+	$id=$kaShop->updateItem($_GET['idsitem'],$_POST['online'],$_POST['productcode'],$_POST['titolo'],$_POST['sottotitolo'],$_POST['anteprima'],$_POST['testo'],$categorie,$_POST['prezzo'],$_POST['scontato'],$date_date,$visible_date,$expiration_date,$_POST['qta'],$_POST['weight'],$_POST['layout'],$_POST['dir'],$privatearea,$_SESSION['ll'],$_POST['template'],$_POST['customfield'],$_POST['featuredimage'],$_POST['manufacturer']);
 	if($id==false) $log="Problemi durante la modifica del database<br />";
 	else {
 		if(strpos($pageLayout,",seo,")!==false) {
@@ -138,13 +138,226 @@ if(isset($_POST['update'])&&isset($_GET['idsitem'])) {
 
 
 
+/* FILTERS AND CONDITIONS */
+
+$vars=array();
+$vars['conditions']="";
+if(!isset($_GET['p'])) $_GET['p']=1;
+$paginationLimit=intval($kaImpostazioni->getVar('shop',1));
+$vars['start']=$paginationLimit*(intval($_GET['p'])-1);
+$vars['limit']=$paginationLimit;
+$vars['orderby']=$kaImpostazioni->getVar('shop-order',1);
+if($vars['orderby']!="ordine"&&$vars['orderby']!="titolo"&&$vars['orderby']!="sottotitolo") $vars['orderby']="titolo";
+
+// when you are searching for something, do not split by first letters
+if(!isset($_GET['l'])) $_GET['l']="!";
+if(!isset($_GET['search'])||$_GET['search']=="")
+{
+	if($_GET['l']=="!")
+	{
+		$vars['conditions']="";
+		$vars['orderby']="`modified` DESC";
+	}
+	elseif($_GET['l']=="#") $vars['conditions'].="`".$vars['orderby']."` RLIKE '^[^[A-Za-z].*'";
+	else $vars['conditions'].="`".$vars['orderby']."` LIKE '".mysql_real_escape_string($_GET['l'])."%'";
+	
+} else {
+	$vars['conditions'].="(productcode LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
+	$vars['conditions'].="titolo LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
+	$vars['conditions'].="sottotitolo LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
+	$vars['conditions'].="dir LIKE '%".b3_htmlize($_GET['search'],true,"")."%')";
+}
+
+
+$numberOfItems=$kaShop->countItems();
+$numberOfItemsInThisView=$kaShop->countItems($vars['conditions']);
+
+/* END FILTERS */
 
 
 ?>
-<h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>
+<h1><?= $kaTranslate->translate(PAGE_NAME); ?> (<?= $numberOfItems; ?>)</h1>
 <br />
 <?
 if(!isset($_GET['idsitem'])) { ?>
+	<? if($kaImpostazioni->getVar('shop-order',1)=="ordine") { ?>
+		<script type="text/javascript" src="<? echo ADMINDIR; ?>js/drag_and_drop.js"></script>
+		<script type="text/javascript">
+			kDragAndDrop=new kDrago();
+			kDragAndDrop.dragClass("DragZone");
+			kDragAndDrop.dropClass("DragZone");
+			kDragAndDrop.containerTag('TR');
+			kDragAndDrop.onDrag(function (drag,target) {
+				var container=drag.parentNode.childNodes;
+				if(target.className!='DragZone'&&target!=drag) {
+					if((parseInt(target.getAttribute("ddTop"))+target.offsetHeight/2)>kWindow.mousePos.y) target.parentNode.insertBefore(drag,target);
+					else target.parentNode.insertBefore(drag,target.nextSibling);
+					}
+				kDragAndDrop.savePosition();
+				});
+			kDragAndDrop.onDrop(function (drag,target) {
+				b3_openMessage('Salvataggio in corso',false);
+				document.getElementById('orderby').submit();
+				});
+		</script>
+	<? } ?>
+		
+	<?
+	/* if there are a search key, show her */
+	if(isset($_GET['search'])&&$_GET['search']!="") { ?>
+		<div class="box pager" style="text-align:center;">
+			<?= $kaTranslate->translate('Shop:You are filtering results by').' "<strong>'.$_GET['search'].'</strong>"'; ?>
+			<small><a href="?"><?= $kaTranslate->translate('remove filter'); ?></a></small>
+		</div>
+		<br />
+		<?
+
+	/* if there are more than 50 items, split into different pages */
+	} elseif($numberOfItems>50) { ?>
+		<div class="box pager" style="text-align:center;">
+			<?
+			$append_var=$_SERVER['QUERY_STRING'];
+			foreach($_GET as $kaey => $value) {
+				if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm"||$kaey=="p"||$kaey=="l") {
+					$append_var=preg_replace("/".$kaey."=?[^&]*&?/","",$append_var);
+					}
+				}
+
+			$letters="!#ABCDEFGHIJKLMNOPQRSTUWYXZ";
+			for($i=0;isset($letters[$i]);$i++) { ?>
+				<a href="?l=<?= urlencode($letters[$i]); ?>&<?= $append_var; ?>" class="<?= $_GET['l']==$letters[$i]?'selected':''; ?>">
+					<?= ($letters[$i]=="!" ? $kaTranslate->translate('Shop:recently added') : $letters[$i]); ?>
+				</a>
+				<? }
+			?>
+		</div>
+		<br />
+		<?
+	}
+	
+	/* pagination */
+	if($numberOfItemsInThisView > $paginationLimit && $_GET['l']!="!") { ?>
+		<div class="box pager" style="text-align:center;">
+			<?
+			echo $kaTranslate->translate('Shop:Page').': ';
+			$append_var=$_SERVER['QUERY_STRING'];
+			foreach($_GET as $kaey => $value) {
+				if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm"||$kaey=="p") {
+					$append_var=preg_replace("/".$kaey."=?[^&]*&?/","",$append_var);
+					}
+				}
+
+			for($i=1;$i<ceil($numberOfItemsInThisView/$paginationLimit);$i++) { ?>
+				<a href="?p=<?= $i; ?>&<?= $append_var; ?>" class="<?= $_GET['p']==$i?'selected':''; ?>"><?= $i; ?></a>
+				<? }
+			?>
+		</div>
+		<br />
+		<?
+	}
+	
+	?>
+
+	<div class="subset">
+		<fieldset class="box"><legend><?= $kaTranslate->translate('UI:Search'); ?></legend>
+		<input type="text" name="search" id="searchQ" style="width:180px;" value="<? if(isset($_GET['search'])) echo str_replace('"','&quot;',$_GET['search']); ?>" />
+		</fieldset>
+		<br />
+		</div>
+		
+	<div class="topset">
+		<form action="" method="post" id="orderby">
+		
+		<table class="tabella">
+			<tr>
+				<? if($vars['orderby']=='ordine') { ?><th>&nbsp;</th><? } ?>
+				
+				<? if(strpos($pageLayout,",featuredimage,")!==false) { ?>
+					<th>&nbsp;</th>
+				<? } ?>
+				
+				<? if(strpos($pageLayout,",productcode,")!==false) { ?>
+					<th><?= $kaTranslate->translate('Shop:Product Code'); ?></th>
+				<? } ?>
+				
+				<th><?= $kaTranslate->translate('Shop:Title'); ?></th>
+				
+				<?php if(strpos($pageLayout,",public,")!==false) { ?>
+					<th><?= $kaTranslate->translate('Shop:Visible from'); ?></th>
+				<?php } ?>
+				
+				<th><?= $kaTranslate->translate('Shop:Price'); ?></th>
+			</tr>
+
+			<tbody class="DragZone">
+			<?php
+			foreach($kaShop->getQuickList($vars) as $row)
+			{
+				if(!isset($row['categorie'][0])) $row['categorie'][0]=array('dir'=>'tmp');
+				?>
+				<tr>
+				<?php if($vars['orderby']=='ordine') { ?>
+					<td class="move">
+						<input type="hidden" name="idsitem[]" value="<?= $row['idsitem']; ?>" />
+						<div class="grip"><?= $kaTranslate->translate('UI:Move'); ?></div>
+					</td>
+					<? } ?>
+
+				<?php if(strpos($pageLayout,",featuredimage,")!==false) { ?>
+					<td class="featuredimage">
+						<div class="container"><?php
+							if($row['featuredimage']>0)
+							{
+								$img=$kaImages->getImage($row['featuredimage']);
+								?>
+								<img src="<?= BASEDIR.$img['thumb']['url']; ?>">
+								<?
+							}
+						?></div>
+					</td>
+				<?php } ?>
+
+				<?php if(strpos($pageLayout,",productcode,")!==false) { ?>
+					<td class="productcode"><?= $row['productcode']; ?></td>
+				<?php } ?>
+
+				<td>
+					<a href="?idsitem=<?= $row['idsitem']; ?>" class="title"><?= $row['titolo']; ?></a>
+					<? if($row['online']=='n') echo '<small class="alert">'.$kaTranslate->translate('Shop:DRAFT').'</small>'; ?><br />
+					<? if($row['sottotitolo']!="") { ?><a href="?idsitem=<?= $row['idsitem']; ?>"><?= $row['sottotitolo']; ?></a><br /><? } ?>
+					<a href="?idsitem=<?= $row['idsitem']; ?>" class="url"><?= $kaTranslate->translate('Shop:URL'); ?>: <?= $row['dir']; ?></a>
+					
+					<small class="actions"><a href="?idsitem=<?= $row['idsitem']; ?>"><?= $kaTranslate->translate('UI:Edit'); ?></a> | <a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_shop',1).'/'.$row['categorie'][0]['dir'].'/'.$row['dir']; ?>"><?= $kaTranslate->translate('UI:View'); ?></a></small>
+					
+				<?php if(strpos($pageLayout,",public,")!==false) {
+					$timestamp=mktime(substr($row['public'],11,2),substr($row['public'],14,2),substr($row['public'],17,2),substr($row['public'],5,2),substr($row['public'],8,2),substr($row['public'],0,4))
+					?>
+					<td>
+						<div class="date">
+							<div class="day"><?= strftime("%d %B %Y",$timestamp); ?></div>
+							<div class="time"><?= substr($row['public'],11,5); ?></div>
+						</div>
+					</td>
+				<?php } ?>
+
+				<td class="price">
+				<?php if(strpos($pageLayout,",discounted,")!==false&&$row['scontato']>0) { ?>
+					<del><?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?></del><br />
+					<?= $row['scontato'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
+				<?php } else { ?>
+					<?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
+				<?php } ?>
+				</td>
+				
+				</tr>
+			<? } ?>
+			</tbody>
+		</table>
+
+		</div>
+		</form>
+	</div>
+
 	<script type="text/javascript">
 		function submitSearch() {
 			var q=document.getElementById('searchQ').value;
@@ -155,79 +368,8 @@ if(!isset($_GET['idsitem'])) { ?>
 		   if(KeyID==13) submitSearch(); //invio
 		   }
 		document.getElementById('searchQ').onkeyup=searchKeyUp;
-		</script>
-	<? if($kaImpostazioni->getVar('shop-order',1)=="ordine") { ?>
-	<script type="text/javascript" src="<? echo ADMINDIR; ?>js/drag_and_drop.js"></script>
-	<script type="text/javascript">
-		kDragAndDrop=new kDrago();
-		kDragAndDrop.dragClass("DragZone");
-		kDragAndDrop.dropClass("DragZone");
-		kDragAndDrop.containerTag('TR');
-		kDragAndDrop.onDrag(function (drag,target) {
-			var container=drag.parentNode.childNodes;
-			if(target.className!='DragZone'&&target!=drag) {
-				if((parseInt(target.getAttribute("ddTop"))+target.offsetHeight/2)>kWindow.mousePos.y) target.parentNode.insertBefore(drag,target);
-				else target.parentNode.insertBefore(drag,target.nextSibling);
-				}
-			kDragAndDrop.savePosition();
-			});
-		kDragAndDrop.onDrop(function (drag,target) {
-			b3_openMessage('Salvataggio in corso',false);
-			document.getElementById('orderby').submit();
-			});
-			</script>
-		<? } ?>
-		
-	<div class="subset">
-		<fieldset class="box"><legend><?= $kaTranslate->translate('UI:Search'); ?></legend>
-		<input type="text" name="search" id="searchQ" style="width:180px;" value="<? if(isset($_GET['search'])) echo str_replace('"','&quot;',$_GET['search']); ?>" />
-		</fieldset>
-		<br />
-		</div>
-		
-	<div class="topset">
-		<form action="" method="post" id="orderby">
-		<?
-		$ordine=$kaImpostazioni->getVar('shop-order',1);
-		?>
-		<table class="tabella">
-		<tr>
-		<?= (strpos($pageLayout,",productcode,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('Shop:Product Code').'</th>':''); ?>
-		<th><?= $kaTranslate->translate('Shop:Title'); ?></th><th><?= $kaTranslate->translate('Shop:URL'); ?></th>
-		<?= (strpos($pageLayout,",public,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('Shop:Visible from').'</th>':''); ?>
-		<th><?= $kaTranslate->translate('Shop:Price'); ?></th>
-		<? if($ordine=='ordine') { ?><th>&nbsp;</th><? } ?>
-		</tr>
-		<tbody class="DragZone">
-		<?php
-		$conditions="";
-		if(isset($_GET['search'])&&$_GET['search']!="") {
-			$conditions.="titolo LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
-			$conditions.="sottotitolo LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
-			$conditions.="dir LIKE '%".b3_htmlize($_GET['search'],true,"")."%'";
-			}
-		foreach($kaShop->getItemsList($conditions,$ordine) as $row) {
-			if(!isset($row['categorie'][0])) $row['categorie'][0]=array('dir'=>'tmp');
-			?><tr>
-			<?= (strpos($pageLayout,",productcode,")!==false?'<td class="productcode">'.$row['productcode'].'</td>':''); ?>
-			<td>
-				<a href="?idsitem=<?= $row['idsitem']; ?>"><?= $row['titolo']; ?></a>
-				<? if($row['online']=='n') echo '<small class="alert">'.$kaTranslate->translate('Shop:DRAFT').'</small>'; ?><br />
-				<small class="actions"><a href="?idsitem=<?= $row['idsitem']; ?>"><?= $kaTranslate->translate('UI:Edit'); ?></a> | <a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_shop',1).'/'.$row['categorie'][0]['dir'].'/'.$row['dir']; ?>"><?= $kaTranslate->translate('UI:View'); ?></a></small>
-				</div>
-			<td class="percorso"><a href="?idsitem=<?= $row['idsitem']; ?>"><?= $row['dir']; ?></a></td>
-			<?= (strpos($pageLayout,",public,")!==false?'<td><div class="data"><div class="giorno">'.substr($row['public'],8,2).' '.$mesebreve[ltrim(substr($row['public'],5,2),"0")].'</div><div class="ora">'.substr($row['public'],11,5).'</div></div></td>':''); ?>
-			<td>
-				<?= (strpos($pageLayout,",discounted,")!==false&&$row['scontato']>0?'<del>'.$row['prezzo'].'</del><br />'.$row['scontato']:$row['prezzo']); ?>
-				</td>
-			<? if($ordine=='ordine') { ?><td class="sposta"><input type="hidden" name="idsitem[]" value="<?= $row['idsitem']; ?>" /><img src="<?= ADMINRELDIR; ?>img/drag_v.gif" width="18" height="18" alt="<?= $kaTranslate->translate('UI:Move'); ?>" /> <?= $kaTranslate->translate('UI:Move'); ?></td><? } ?>
-			</tr>
-			<? } ?>
-			</tbody>
-			</table>
-			</div>
-			</form>
-		</div>
+	</script>
+
 	<? }
 
 /****** VISUALIZZAZIONE SINGOLO OGGETTO *******/
@@ -262,9 +404,10 @@ else {
 			<fieldset class="box"><legend><?= $kaTranslate->translate('Shop:Product Code'); ?></legend>
 				<?= b3_create_input("productcode","text","",$row['productcode'],"180px"); ?>
 				</fieldset>
+			<hr />
 			<? } ?>
 		<? if(strpos($pageLayout,",price,")!==false) { ?>
-			<hr /><fieldset class="box price"><legend><?= $kaTranslate->translate('Shop:Price'); ?></legend>
+			<fieldset class="box price"><legend><?= $kaTranslate->translate('Shop:Price'); ?></legend>
 				<?= b3_create_input("prezzo","text","",number_format($row['prezzo'],2,'.',''),"120px",11); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?>
 				</fieldset>
 			<? } ?>
@@ -274,16 +417,33 @@ else {
 				</fieldset>
 			<? } ?>
 		<? if(strpos($pageLayout,",weight,")!==false) { ?>
-			<hr /><fieldset class="box price"><legend><?= $kaTranslate->translate('Shop:Weight'); ?></legend>
+			<hr />
+			<fieldset class="box price"><legend><?= $kaTranslate->translate('Shop:Weight'); ?></legend>
 				<?= b3_create_input("weight","text","",$row['weight'],"120px",6); ?> Kg.
 				</fieldset>
 			<? } ?>
 		<? if(strpos($pageLayout,",qta,")!==false) { ?>
-			<hr /><fieldset class="box price"><legend><?= $kaTranslate->translate('Shop:Quantity'); ?></legend>
+			<hr />
+			<fieldset class="box price"><legend><?= $kaTranslate->translate('Shop:Quantity'); ?></legend>
 				<?= b3_create_input("qta","text","",$row['qta'],"120px",6); ?>
 				</fieldset>
 			<? } ?>
 
+		<? if(strpos($pageLayout,",manufacturers,")!==false) { ?>
+			<hr />
+			<fieldset class="box"><legend><?= $kaTranslate->translate('Shop:Manufacturer'); ?></legend>
+				<?
+				$labels=array("");
+				$options=array("");
+				foreach($kaShop->getManufacturersList() as $man)
+				{
+					$labels[]=$man['name'];
+					$options[]=$man['idsman'];
+				}
+				echo b3_create_select("manufacturer","",$labels,$options,$row['manufacturer']);
+				?>
+				</fieldset>
+			<? } ?>
 		<hr />
 		<? if(strpos($pageLayout,",date,")!==false) { ?>
 			<fieldset class="box"><legend><?= $kaTranslate->translate('Shop:Created on'); ?></legend>
@@ -307,6 +467,23 @@ else {
 			<fieldset class="box"><legend><?= $kaTranslate->translate('UI:Comments'); ?></legend>
 				<?= $kaTranslate->translate('Shop:This item has'); ?> <?= $row['commentiTot']; ?> <?= $kaTranslate->translate('UI:comments'); ?><? if($row['commentiTot']-$row['commentiOnline']>0) echo ', di cui '.($row['commentiTot']-$row['commentiOnline']).' ancora da moderare'; ?>.<br />
 				<div class="newCat"><a href="javascript:kOpenIPopUp(ADMINDIR+'inc/ajax/commentsManager.php','t=<?= TABLE_SHOP_ITEMS; ?>&id=<?= $row['idsitem']; ?>','600px','400px')" class="smallbutton"><?= $kaTranslate->translate('UI:Comments management'); ?></a></div>
+				</fieldset><br />
+			<? } ?>
+
+		<? if(strpos($pageLayout,",featuredimage,")!==false) { ?>
+			<fieldset class="box"><legend><?= $kaTranslate->translate('Shop:Featured Image'); ?></legend>
+				<div id="featuredImageContainer"><?php
+					if($row['featuredimage']>0)
+					{
+						$img=$kaImages->getImage($row['featuredimage']);
+						?>
+						<img src="<?= BASEDIR.$img['thumb']['url']; ?>">
+						<?
+					}
+					?></div>
+				<input type="hidden" name="featuredimage" id="featuredimage" value="<?= $row['featuredimage']; ?>">
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?limit=1&submitlabel=<?= urlencode($kaTranslate->translate('Pages:Set featured image')); ?>&onsubmit=setFeaturedImage','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('Shop:Choose featured image'); ?></a>
+				<small><a href="javascript:removeFeaturedImage();" id="removeFeaturedImage" class="warning" <? if($row['featuredimage']==0) echo 'style="display:none;"'; ?>><?= $kaTranslate->translate('UI:Delete'); ?></a></small>
 				</fieldset><br />
 			<? } ?>
 		</div>
@@ -610,6 +787,7 @@ else {
 			</div>
 		</div>
 	</form>
+	
 	<?
 	}
 

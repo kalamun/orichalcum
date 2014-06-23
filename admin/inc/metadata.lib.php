@@ -7,6 +7,10 @@ class kaMetadata {
 		}
 
 	public function set($tabella,$id,$param,$value) {
+		if(get_magic_quotes_gpc()) {
+			$param=stripslashes($param);
+			$value=stripslashes($value);
+			}
 		$tabella=mysql_real_escape_string($tabella);
 		$id=mysql_real_escape_string($id);
 		$param=mysql_real_escape_string($param);
@@ -33,6 +37,9 @@ class kaMetadata {
 		}
 
 	public function get($tabella,$id,$param) {
+		if(get_magic_quotes_gpc()) {
+			$param=stripslashes($param);
+			}
 		$tabella=mysql_real_escape_string($tabella);
 		$id=mysql_real_escape_string($id);
 		$param=mysql_real_escape_string($param);

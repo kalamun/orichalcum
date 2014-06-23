@@ -16,8 +16,8 @@ for($i=0;isset($submenu_label[$i]);$i++) {
 <h2><?= $kaTranslate->translate('Setup:Advanced settings'); ?></h2>
 <dl>
 <?
-$submenu_label=array("Setup:Template","Setup:Images","Setup:E-mails and newsletters","Setup:Statistics","Setup:Maintenance","Setup:Config.inc.php");
-$submenu_url=array("template.php","imgresize.php","emails.php","statistiche.php","tools.php","config.php");
+$submenu_label=array("Setup:Template","Setup:Images","Setup:E-mails and newsletters","Setup:Statistics","Setup:Config.inc.php");
+$submenu_url=array("template.php","imgresize.php","emails.php","statistiche.php","config.php");
 for($i=0;isset($submenu_label[$i]);$i++) {
 	if($submenu_url[$i]!="") {
 		echo '<dt>';

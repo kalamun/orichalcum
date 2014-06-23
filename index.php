@@ -34,13 +34,24 @@ elseif($GLOBALS['__dir__']==rtrim($__template->getVar('dir_private',1),"/")) {
 	}
 /* shop */
 elseif($GLOBALS['__dir__']==rtrim($__template->getVar('dir_shop',1),"/")) {
-	$__template->setMetaData($__shop->getMetaData());
-	if(kGetVar('shop-commenti',1)=='s'&&isset($_POST['commentSubmit'])&&isset($_POST['commentName'])&&isset($_POST['commentText'])) {
-		kSetShopItemByDir();
-		kAddComment(array("table"=>TABLE_SHOP_ITEMS,"id"=>kGetShopItemId(),"name"=>$_POST['commentName'],"email"=>$_POST['commentEmail'],"text"=>$_POST['commentText'],"public"=>kGetVar('shop-commenti',2)=="s"?"n":"s"));
-		}
-	if($__template->getVar('shop-template',2)!="") $__template->setLayout($__template->getVar('shop-template',2));
-	$__template->get($__template->getVar('shop-template',1));
+	if($GLOBALS['__subdir__']==$__template->getVar('dir_shop_manufacturers'))
+	{
+		$__template->setMetaData($__shop->getManufacturerMetaData());
+		if(kGetVar('shop-commenti',1)=='s'&&isset($_POST['commentSubmit'])&&isset($_POST['commentName'])&&isset($_POST['commentText'])) {
+			kSetShopManufacturerByDir();
+			kAddComment(array("table"=>TABLE_SHOP_MANUFACTURERS,"id"=>kGetShopManufacturerId(),"name"=>$_POST['commentName'],"email"=>$_POST['commentEmail'],"text"=>$_POST['commentText'],"public"=>kGetVar('shop-commenti',2)=="s"?"n":"s"));
+			}
+		if($__template->getVar('shop-template',2)!="") $__template->setLayout($__template->getVar('shop-template',2));
+		$__template->get($__template->getVar('shop-template',1));
+	} else {
+		$__template->setMetaData($__shop->getMetaData());
+		if(kGetVar('shop-commenti',1)=='s'&&isset($_POST['commentSubmit'])&&isset($_POST['commentName'])&&isset($_POST['commentText'])) {
+			kSetShopItemByDir();
+			kAddComment(array("table"=>TABLE_SHOP_ITEMS,"id"=>kGetShopItemId(),"name"=>$_POST['commentName'],"email"=>$_POST['commentEmail'],"text"=>$_POST['commentText'],"public"=>kGetVar('shop-commenti',2)=="s"?"n":"s"));
+			}
+		if($__template->getVar('shop-template',2)!="") $__template->setLayout($__template->getVar('shop-template',2));
+		$__template->get($__template->getVar('shop-template',1));
+	}
 	}
 /* photogallery */
 elseif($GLOBALS['__dir__']==rtrim($__template->getVar('dir_photogallery',1),"/")) {

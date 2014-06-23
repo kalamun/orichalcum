@@ -72,10 +72,11 @@ kDrago=function() {
 		return droppa;
 		};
 
-	function mouseDown() {
+	function mouseDown(e) {
 		dragging=false;
 		dragObject=theBottomItem();
 		if(dragObject) {
+			e.preventDefault();
 			dragObject.ondragstart=function() { return false; };
 			var childs=kGetAllChilds(dragObject);
 			for(var i=0;childs[i];i++) {
@@ -104,7 +105,7 @@ kDrago=function() {
 		drago.style.left=mousePos.x-mouseOffset.x+'px';
 		drago.style.width=dragObject.offsetWidth+'px';
 		drago.style.height=dragObject.offsetHeight+'px';
-		kAddEvent(document.body,"onmousemove",mouseMove);
+		kAddEvent(document.body,"mousemove",mouseMove);
 		};
 
 	function populateDropArea(obj) {
@@ -139,7 +140,7 @@ kDrago=function() {
 		obj.setAttribute('ddRight',parseInt(obj.getAttribute('ddLeft'))+parseInt(obj.offsetWidth));
 		}
 		
-	function mouseMove() {
+	function mouseMove(e) {
 		dragging=true;
 		if(dragObject) {
 			dragObject.style.visibility='hidden';
@@ -148,6 +149,14 @@ kDrago=function() {
 			drago.style.left=kWindow.mousePos.x-drago.getAttribute('mouseOffsetX')+'px';
 			flyingOver=getFlyingOver();
 			if(flyingOver) onDrag(dragObject,flyingOver);
+
+			var top=window.pageYOffset || document.documentElement.scrollTop;
+			if(e.clientY<50) {
+				window.scrollTo(0,top-10);
+				}
+			else if(e.clientY>document.documentElement.offsetHeight-50) {
+				window.scrollTo(0,top+10);
+				}
 			}
 		}
 	
@@ -182,9 +191,9 @@ kDrago=function() {
 		return null;
 		}
 
-	kAddEvent(document,"onmousedown",mouseDown);
-	kAddEvent(document,"onmouseup",mouseUp);
-	kAddEvent(window,"onload",kInitDrago);
+	kAddEvent(document,"mousedown",mouseDown);
+	kAddEvent(document,"mouseup",mouseUp);
+	kAddEvent(window,"load",kInitDrago);
 	};
 
 	

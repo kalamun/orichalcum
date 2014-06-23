@@ -24,3 +24,4 @@ Menu:Main menu						Men&ugrave; principale
 Menu:Add new menu					Crea nuovo men&ugrave;
 Menu:Menu name						Nome del men&ugrave;
 Menu:Create menu					Crea men&ugrave;
+Menu:Select where to insert the page into the menu	Scegli in quale punto del menù inserire la pagina

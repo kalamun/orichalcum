@@ -73,6 +73,12 @@ define("PAGE_NAME",$kaTranslate->translate('Shop:Transactions'));
 			}
 		else echo '<div id="MsgAlert">'.$kaTranslate->translate('Shop:Sorry, error while saving').'</div>';
 		}
+	elseif(isset($_POST['reprocess'])) {
+		if($kaShop->reprocessPayment($o['idord'])) {
+			echo '<div id="MsgSuccess">'.$kaTranslate->translate('Shop:Successfully reprocessed').'</div>';
+			$o=$kaShop->getOrderById($_GET['idord']);
+			}
+		}
 	?>
 
 	<table class="transactions"><?
@@ -103,12 +109,27 @@ define("PAGE_NAME",$kaTranslate->translate('Shop:Transactions'));
 			<tr><td><label for="method"><?= $kaTranslate->translate('Shop:Payment method'); ?></label></td><td><?= b3_create_select("method","",$option,$value,$o['idspay']); ?></td>
 				<td rowspan="3" class="submit" style="vertical-align:bottom;"><input type="submit" value="<?= $kaTranslate->translate('Shop:Report'); ?>" class="button" name="report" /></td>
 				</tr>
-			<tr><td><label for="value"><?= $kaTranslate->translate('Shop:Amount'); ?></label></td><td><?= b3_create_input("value","text","",number_format($o['totalprice']-$totalamount,2),"50px",8); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td></tr>
+			<tr><td><label for="value"><?= $kaTranslate->translate('Shop:Amount'); ?></label></td><td><?= b3_create_input("value","text","",number_format($o['totalprice']-$totalamount,2,".",""),"50px",8); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td></tr>
 			<tr><td><label for="details"><?= $kaTranslate->translate('Shop:Details'); ?></label></td><td><?= b3_create_textarea("details","","","200px","50px"); ?></td></tr>
 			</table>
 			</form>
 		</div>
-		<? } ?>
+		<? }
+
+	else { ?>
+	<div class="reportPayment">
+		<h2><?= $kaTranslate->translate('Shop:Reprocess payment'); ?></h2>
+		
+		<form action="?idord=<?= $_GET['idord']; ?>" method="post">
+			<table>
+			<tr><td class="submit" style="vertical-align:bottom;">
+				<input type="submit" value="<?= $kaTranslate->translate('Shop:Report'); ?>" class="button" name="reprocess" />
+				</td></tr>
+			</table>
+			</form>
+		</div>
+		<? }
+		?>
 
 	</div>
 

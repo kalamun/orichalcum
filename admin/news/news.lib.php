@@ -74,8 +74,8 @@ class kaNews {
 			$query="SELECT * FROM `".TABLE_NEWS."` WHERE `idnews`='".intval($values['copyfrom'])."' LIMIT 1";
 			$results=mysql_query($query);
 			if($row=mysql_fetch_array($results)) {
-				$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`data`,`pubblica`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
-					SELECT `titolo`,`sottotitolo`,`anteprima`,`testo`,`data`,`pubblica`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll` FROM `".TABLE_NEWS."` WHERE `idnews`='".$values['copyfrom']."' LIMIT 1
+				$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
+					SELECT `titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll` FROM `".TABLE_NEWS."` WHERE `idnews`='".$values['copyfrom']."' LIMIT 1
 					";
 
 				if(mysql_query($query)) {
@@ -88,6 +88,7 @@ class kaNews {
 					if(isset($values['preview'])) $query.="`anteprima`='".$values['preview']."',";
 					if(isset($values['text'])) $query.="`testo`='".$values['text']."',";
 					if(isset($values['public_date'])) $query.="`pubblica`='".$values['public_date']."',";
+					if(isset($values['starting_date'])) $query.="`starting_date`='".$values['starting_date']."',";
 					if(isset($values['expiration_date'])) $query.="`scadenza`='".$values['expiration_date']."',";
 					if(isset($values['template'])) $query.="`template`='".$values['template']."',";
 					if(isset($values['layout'])) $query.="`layout`='".$values['layout']."',";
@@ -126,6 +127,7 @@ class kaNews {
 			if(!isset($values['creation_date'])) $values['creation_date']=date("Y-m-d H:i:s");
 			if(!isset($values['public_date'])) $values['public_date']=date("Y-m-d H:i:s");
 			if(!isset($values['expiration_date'])) $values['expiration_date']=date("Y-m-d H:i:s");
+			if(!isset($values['starting_date'])) $values['starting_date']=$values['expiration_date'];
 			if(!isset($values['template'])) $values['template']="";
 			if(!isset($values['layout'])) $values['layout']="";
 			if(!isset($values['translations'])) $values['translations']="";
@@ -133,8 +135,8 @@ class kaNews {
 			if(!isset($values['dir'])) $values['dir']="";
 			if(!isset($values['home'])) $values['home']="";
 			if(!isset($values['calendar'])) $values['calendar']="";
-			$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`data`,`pubblica`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
-					VALUES('".$values['title']."','".$values['subtitle']."','".$values['preview']."','".$values['text']."','".$values['creation_date']."','".$values['public_date']."','".$values['expiration_date']."',NOW(),'".$values['template']."','".$values['layout']."','".$values['translations']."','".$values['categories']."','".$values['dir']."','".$values['home']."','".$values['calendar']."','".$values['iduser']."','".$values['ll']."')";
+			$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
+					VALUES('".$values['title']."','".$values['subtitle']."','".$values['preview']."','".$values['text']."',0,'".$values['creation_date']."','".$values['public_date']."','".$values['starting_date']."','".$values['expiration_date']."',NOW(),'".$values['template']."','".$values['layout']."','".$values['translations']."','".$values['categories']."','".$values['dir']."','".$values['home']."','".$values['calendar']."','".$values['iduser']."','".$values['ll']."')";
 			if(mysql_query($query)) return mysql_insert_id();
 			}
 
@@ -172,7 +174,6 @@ class kaNews {
 			$output[$i]=$row;
 			$output[$i]['categorie']=array();
 			foreach($this->kaCategorie->getList(TABLE_NEWS) as $cat) {
-				$cat['dir']=title2dir($cat['categoria']);
 				if(strpos($row['categorie'],','.$cat['idcat'].',')!==false) $output[$i]['categorie'][]=$cat;
 				}
 
@@ -206,7 +207,6 @@ class kaNews {
 		$output=$row;
 		$output['categorie']=array();
 		foreach($this->kaCategorie->getList(TABLE_NEWS) as $cat) {
-			$cat['dir']=title2dir($cat['categoria']);
 			if(strpos($row['categorie'],','.$cat['idcat'].',')!==false) $output['categorie'][]=$cat;
 			}
 
@@ -231,16 +231,16 @@ class kaNews {
 		return $row;
 		}
 
-	public function update($idnews,$titolo,$sottotitolo="false",$anteprima="false",$testo="false",$categorie="false",$data="false",$pubblica="false",$scadenza="false",$template="false",$layout="false",$dir="false",$home=null,$calendario="false",$iduser="false",$ll=false) {
+	public function update($idnews,$titolo,$sottotitolo="false",$anteprima="false",$testo="false",$categorie="false",$data="false",$pubblica="false",$starting_date="false",$scadenza="false",$template="false",$layout="false",$dir="false",$home=null,$calendario="false",$featuredimage=0,$iduser="false",$ll=false) {
 		if($ll==false) $ll=$_SESSION['ll'];
 
-		$titolo=addslashes($titolo);
-		$sottotitolo=addslashes($sottotitolo);
-		$anteprima=addslashes($anteprima);
-		$testo=addslashes($testo);
-		$template=addslashes($template);
-		$layout=addslashes($layout);
-		$dir=addslashes($dir);
+		$titolo=mysql_real_escape_string($titolo);
+		$sottotitolo=mysql_real_escape_string($sottotitolo);
+		$anteprima=mysql_real_escape_string($anteprima);
+		$testo=mysql_real_escape_string($testo);
+		$template=mysql_real_escape_string($template);
+		$layout=mysql_real_escape_string($layout);
+		$dir=mysql_real_escape_string($dir);
 
 		$query="UPDATE ".TABLE_NEWS." SET ";
 		if($titolo!="false") $query.="titolo='".$titolo."',";
@@ -250,6 +250,7 @@ class kaNews {
 		if($categorie!="false") $query.="categorie='".$categorie."',";
 		if($data!="false") $query.="data='".$data."',";
 		if($pubblica!="false") $query.="pubblica='".$pubblica."',";
+		if($starting_date!="false") $query.="starting_date='".$starting_date."',";
 		if($scadenza!="false") $query.="scadenza='".$scadenza."',";
 		if($template!="false") $query.="template='".$template."',";
 		if($layout!="false") $query.="layout='".$layout."',";
@@ -257,6 +258,7 @@ class kaNews {
 		if($home!=null) $query.="home='".$home."',";
 		if($calendario!="false") $query.="calendario='".$calendario."',";
 		if($iduser!="false") $query.="iduser='".$iduser."',";
+		if($featuredimage!=false) $query.="featuredimage='".intval($_POST['featuredimage'])."',";
 		$query.="modified=NOW() WHERE idnews='".$idnews."'";
 		if(mysql_query($query)) return $idnews;
 		else return false;

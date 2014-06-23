@@ -124,9 +124,9 @@ class kEmails {
 
 		$boundary_main="----=_NextPart_".rand(10000,99999).".".rand(100000000,999999999);
 		$composition=array();
-		$composition['headers']="From: ".$this->from."\r\n";
-		$composition['headers'].="MIME-Version: 1.0\r\n";
-		$composition['headers'].="Content-Type: multipart/alternative; \r\n\tboundary=\"".$boundary_main."\"\r\n";
+		$composition['headers']="From: ".$this->from."\n";
+		$composition['headers'].="MIME-Version: 1.0\n";
+		$composition['headers'].="Content-Type: multipart/alternative; \n\tboundary=\"".$boundary_main."\"\n";
 
 		$composition['subject']=mb_convert_encoding($this->subject,"UTF-8","HTML-ENTITIES");
 		$composition['subject']='=?UTF-8?B?'.base64_encode($composition['subject']).'?=';

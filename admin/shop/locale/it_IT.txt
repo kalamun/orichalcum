@@ -5,6 +5,7 @@ Shop:Manage items				Gestione degli oggetti
 Shop:Delete items from shop		Elimina un oggetto
 Shop:Categories management		Gestione delle categorie
 Shop:Add						Crea
+Shop:Create						Crea
 Shop:Edit						Modifica
 Shop:Delete						Elimina
 Shop:Categories					Categorie
@@ -20,6 +21,9 @@ Shop:Item successfully added	Oggetto inserito con successo
 Shop:Problems while adding the item to the database		Si sono verificati dei problemi durante l'inserimento dell'oggetto nel database
 Shop:Title						Oggetto
 Shop:Subtitle					Sottotitolo
+Shop:Featured Image				Immagine di presentazione
+Shop:Choose featured image		Scegli immagine
+Shop:Set featured image			Imposta immagine di presentazione
 Shop:Preview					Anteprima
 Shop:Description				Descrizione
 Shop:Categories					Categorie
@@ -109,3 +113,16 @@ Shop:Leave empty to maintain the same price of the item	Lascia vuoto per mantene
 Shop:Ops, some errors occurred while saving. Please retry.	Ops. Si &egrave; verificato qualche problema durante il salvataggio. Per favore riprova.
 Shop:There are no variations for this item	Non ci sono varianti per questo oggetto
 Shop:Do you really want to delete this variation?	Vuoi veramente cancellare questa variante?
+Shop:Manufacturers				Produttori
+Shop:Manufacturer				Produttore
+Shop:Create a new manufacturer	Crea un nuovo produttore
+Shop:Delete a manufacturer		Elimina un produttore
+Shop:Edit a manufacturer		Modifica i produttori
+Shop:Create a copy				Crea una copia
+Shop:Visit						Visita
+Shop:Add to menu				Aggiungi al menù
+Shop:Manufacturer's name		Nome del produttore
+Shop:Page URL					URL della pagina
+Shop:Create manufacturer		Crea la pagina del produttore
+Shop:Are you sure do you want to remove this manufacturer? This operation IS NOT REVERSIBLE.	Sei sicuro di voler rimuovere questo produttore? Questa operazione NON È REVERSIBILE.
+Shop:recently added				ultimi inserimenti

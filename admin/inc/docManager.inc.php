@@ -386,7 +386,7 @@ else {
 		$doc=$kaDocuments->getDocument($iddoc);
 		?>
 		<script type="text/javascript">
-			window.parent.kTxtArea['<?= $_GET['refid']; ?>'].insertDoc('<?= $doc['iddoc']; ?>','<?= addslashes($doc['alt']); ?>','<?= ($doc['hotlink']==false?BASEDIR:'').$doc['url']; ?>');
+			window.parent.txts.getArea('<?= $_GET['refid']; ?>').insertDoc('<?= $doc['iddoc']; ?>','<?= addslashes($doc['alt']); ?>','<?= ($doc['hotlink']==false?BASEDIR:'').$doc['url']; ?>');
 			window.parent.k_closeIframeWindow();
 			</script>
 		<? }

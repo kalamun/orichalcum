@@ -24,7 +24,7 @@ if(!isset($_GET['idphg'])) {
 			$id=$row['idphg'];
 			$addtomenu=explode(",",$_GET['addtomenu']);
 			if($addtomenu[1]=="after") {
-				$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
+				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
 				$results=mysql_query($query);
 				$row=mysql_fetch_array($results);
 				$ordine=$row['ordine']+1;
@@ -33,14 +33,14 @@ if(!isset($_GET['idphg'])) {
 				mysql_query($query);
 				}
 			elseif($addtomenu[1]=="inside") {
-				$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
+				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
 				$results=mysql_query($query);
 				$row=mysql_fetch_array($results);
 				$ordine=$row['ordine']+1;
 				$ref=$addtomenu[0];
 				}
 			elseif($addtomenu[1]=="before") {
-				$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
+				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
 				$results=mysql_query($query);
 				$row=mysql_fetch_array($results);
 				$ordine=$row['ordine'];
@@ -48,7 +48,7 @@ if(!isset($_GET['idphg'])) {
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
 				mysql_query($query);
 				}
-			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll) VALUES('".addslashes($titolo)."','".addslashes($dir)."','".$ref."','".$ordine."','".$_SESSION['ll']."')";
+			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection) VALUES('".addslashes($titolo)."','".addslashes($dir)."','".$ref."','".$ordine."','".$_SESSION['ll']."','".mysql_real_escape_string($row['collection'])."')";
 			if(!mysql_query($query)) $log="Problemi durante l'inserimento nel men&ugrave;";
 
 			if($log!="") {
@@ -110,16 +110,6 @@ if(!isset($_GET['idphg'])) {
 				var url=String(window.location).replace(/\?.*/,"");
 				window.location=url+'?usePage='+usePage+'&addtomenu='+id+','+where+'&'+get;
 				}
-			function showActions(td) {
-				for(var i=0;td.getElementsByTagName('DIV')[i];i++) {
-					td.getElementsByTagName('DIV')[i].style.visibility='visible';
-					}
-				}
-			function hideActions(td) {
-				for(var i=0;td.getElementsByTagName('DIV')[i];i++) {
-					td.getElementsByTagName('DIV')[i].style.visibility='hidden';
-					}
-				}
 			</script>
 
 		<? if($kaImpostazioni->getVar('photogallery-order',1)=="ordine") { ?>
@@ -165,8 +155,8 @@ if(!isset($_GET['idphg'])) {
 			$list=$kaPhotogallery->getList($conditions);
 			foreach($list as $ka=>$g) {
 				echo '<tr>';
-				echo '<td onmouseover="showActions(this)" onmouseout="hideActions(this)"><h2><a href="?idphg='.$g['idphg'].'">'.$g['titolo'].'</a></h2>';
-					echo '<div class="small" style="visibility:hidden;"><a href="?idphg='.$g['idphg'].'">'.$kaTranslate->translate('UI:Edit').'</a> | <a href="javascript:selectMenuRef('.$g['idphg'].');">'.$kaTranslate->translate('Photogalleries:Add to menu').'</a> | <a href="'.SITE_URL.'/'.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_photogallery',1)."/".$g['dir'].'">'.$kaTranslate->translate('Photogalleries:Visit').'</a></div>';
+				echo '<td><h2><a href="?idphg='.$g['idphg'].'">'.$g['titolo'].'</a></h2>';
+					echo '<small class="actions"><a href="?idphg='.$g['idphg'].'">'.$kaTranslate->translate('UI:Edit').'</a> | <a href="javascript:selectMenuRef('.$g['idphg'].');">'.$kaTranslate->translate('Photogalleries:Add to menu').'</a> | <a href="'.SITE_URL.'/'.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_photogallery',1)."/".$g['dir'].'">'.$kaTranslate->translate('Photogalleries:Visit').'</a></small>';
 					echo '</td>';
 				echo '<td class="percorso"><a href="?idphg='.$g['idphg'].'">'.$g['dir'].'</a></td>';
 				echo ($kaImpostazioni->getVar('photogallery-commenti',1)=='s'?'<td class="percorso"><strong>'.$g['commentiOnline'].'</strong> / '.$g['commentiTot'].'</td>':'');
@@ -191,6 +181,8 @@ else {
 	/* AZIONI */
 	if(isset($_POST['update'])) {
 		$log="";
+		$photogallery=$kaPhotogallery->getById($_GET['idphg']);
+
 
 		/* update translation table in all involved pages (past and current) */
 		if(isset($_POST['translation_id'])) {
@@ -235,6 +227,21 @@ else {
 			$kaLog->add("ERR",'Photogallery:Errors occured while updating <a href="'.BASEDIR.strtolower($_SESSION['ll']).'/'.$kaImpostazioni->getVar('dir_photogallery',1)."/".$dir.'">'.b3_htmlize($_POST['titolo'],true,"").'</a> <em>(ID: '.$_GET['id'].')</em>');
 			}
 		else {
+			/* SUCCESS! */
+			// update menu with permalink (if it's different)
+			if($_POST['dir']!=$photogallery['dir']||b3_htmlize($_POST['titolo'],true,"")!=$photogallery['titolo']) {
+				require_once('../menu/menu.lib.php');
+				$kaMenu=new kaMenu();
+				foreach($kaMenu->getCollections() as $c) {
+					$kaMenu->setCollection($c);
+					foreach($kaMenu->getMenuElementsByUrl(array("url"=>$photogallery['dir'])) as $m) {
+						//change the menu label only if the old page title is equal to the label of the menu element (so probably it wasn't manually changed)
+						$m['label']==$photogallery['titolo']&&b3_htmlize($_POST['titolo'],true,"")!=$photogallery['titolo']?$newtitle=$_POST['titolo']:$newtitle=false;
+						$kaMenu->updateDirAndLabel($m['idmenu'],$_POST['dir'],$newtitle);
+						}
+					}
+				}
+
 			echo '<div id="MsgSuccess">Modifiche salvate con successo</div>';
 			$kaLog->add("UPD",'Photogallery: Changed <a href="'.BASEDIR.strtolower($_SESSION['ll']).'/'.$kaImpostazioni->getVar('dir_photogallery',1)."/".$_POST['dir'].'">'.$_POST['titolo'].'</a> <em>(ID: '.$id.')</em>');
 			}

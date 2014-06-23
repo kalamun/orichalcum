@@ -9,7 +9,7 @@ if(isset($_POST['update'])) {
 	if(isset($_POST['seo']['robots'])) $_POST['seo']['robots']=implode(",",$_POST['seo']['robots']);
 	else $_POST['seo']['robots']="";
 	foreach($_POST['seo'] as $ka=>$v) {
-		$kaImpostazioni->setParam('seo_'.$ka,b3_htmlize($v,true,""),"");
+		$kaImpostazioni->setParam('seo_'.$ka,b3_htmlize($v,false,""),"");
 		}
 
 	$kaImpostazioni->setParam('sitename',b3_htmlize($_POST['sitename'][1],false,""),b3_htmlize($_POST['sitename'][2],false,""),$_SESSION['ll']);

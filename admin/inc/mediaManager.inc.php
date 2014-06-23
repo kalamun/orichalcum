@@ -408,11 +408,11 @@ elseif($_GET['mode']=='justupload') {
 				else {
 					isset($_POST['autoresize'])?$_POST['autoresize']=true:$_POST['autoresize']=false;
 					if($_POST['howtoembed']=='hotlink') {
-						$idmedia=$kaMedia->upload("","",$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['resize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
+						$idmedia=$kaMedia->upload("","",$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['autoresize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
 						$kaMedia->setHotlink($idmedia,$_POST['media']);
 						}
 					else {
-						$idmedia=$kaMedia->upload($_POST['media'],basename($_POST['media']),$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['resize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
+						$idmedia=$kaMedia->upload($_POST['media'],basename($_POST['media']),$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['autoresize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
 						if($idmedia==false) $log.="Errore durante la copia del file ".$_POST['media'].".<br />";
 						}
 					if(isset($_FILES['thumbnail']['name'])&&$_FILES['thumbnail']['name']!="") $kaMedia->setThumb($idmedia,$_FILES['thumbnail']['tmp_name'],$_FILES['thumbnail']['name'],false);
@@ -514,7 +514,7 @@ else {
 			Aspetta...
 			</div>
 		<script type="text/javascript">
-			window.parent.kTxtArea['<?= $_GET['refid']; ?>'].insertMedia('<?= $media['idmedia']; ?>','','<?= BASEDIR.$media['thumb']['url']; ?>','<?= $media['width']; ?>','<?= $media['height']; ?>');
+			window.parent.txts.getArea('<?= $_GET['refid']; ?>').insertMedia('<?= $media['idmedia']; ?>','','<?= BASEDIR.$media['thumb']['url']; ?>','<?= $media['width']; ?>','<?= $media['height']; ?>');
 			window.parent.k_closeIframeWindow();
 			</script>
 		<? }
@@ -660,11 +660,11 @@ else {
 				else {
 					isset($_POST['autoresize'])?$_POST['autoresize']=true:$_POST['autoresize']=false;
 					if($_POST['howtoembed']=='hotlink') {
-						$idmedia=$kaMedia->upload("","",$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['resize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
+						$idmedia=$kaMedia->upload("","",$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['autoresize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
 						$kaMedia->setHotlink($idmedia,$_POST['media']);
 						}
 					else {
-						$idmedia=$kaMedia->upload($_POST['media'],basename($_POST['media']),$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['resize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
+						$idmedia=$kaMedia->upload($_POST['media'],basename($_POST['media']),$_GET['mediatable'],$_GET['mediaid'],$_POST['mediatitle'],$_POST['alt'],$_POST['autoresize'],$_POST['mediawidth'],$_POST['mediaheight'],$_POST['mediaduration']);
 						if($idmedia==false) $log.="Errore durante la copia del file ".$_POST['media'].".<br />";
 						}
 					if(isset($_FILES['thumbnail']['name'])&&$_FILES['thumbnail']['name']!="") $kaMedia->setThumb($idmedia,$_FILES['thumbnail']['tmp_name'],$_FILES['thumbnail']['name'],false);

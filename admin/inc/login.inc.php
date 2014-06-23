@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?= $_SESSION['ll']; ?>" lang="<?= $_SESSION['ll']; ?>">
 <head>
-<title><?= $kaImpostazioni->getVar("sitename",1)." &gt; "; ?>Login</title>
-<meta name="description" content="<?= $kaImpostazioni->getVar("sitename",1)." Pannello di Controllo"; ?>" />
+<title><?= $GLOBALS['kaImpostazioni']->getVar("sitename",1)." &gt; "; ?>Login</title>
+<meta name="description" content="<?= $GLOBALS['kaImpostazioni']->getVar("sitename",1)." Pannello di Controllo"; ?>" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="author" content="Roberto Pasini - www.kalamun.org" />
 <meta name="copyright" content="no(c)" />
@@ -41,13 +41,13 @@ global $kaTranslate,$kaImpostazioni;
 			}
 		?>
 		<form name="login" action="?<?php echo $get; ?>" method="post">
-		<?= b3_create_input("orichalcum_admin_username","text",$kaTranslate->translate('UI:Username')."<br />","","",250,'placeholder="'.$kaTranslate->translate('UI:Username').'"'); ?><br />
+		<?= b3_create_input("orichalcum_admin_username","text",$GLOBALS['kaTranslate']->translate('UI:Username')."<br />","","",250,'placeholder="'.$GLOBALS['kaTranslate']->translate('UI:Username').'"'); ?><br />
 		<br />
-		<?= b3_create_input("orichalcum_admin_password","password",$kaTranslate->translate('UI:Password')."<br />","","",250,'placeholder="'.$kaTranslate->translate('UI:Password').'"'); ?>
+		<?= b3_create_input("orichalcum_admin_password","password",$GLOBALS['kaTranslate']->translate('UI:Password')."<br />","","",250,'placeholder="'.$GLOBALS['kaTranslate']->translate('UI:Password').'"'); ?>
 		<div class="remember"><br />
-		<?= b3_create_input("orichalcum_admin_remember","checkbox",$kaTranslate->translate('UI:Remember'),"",""); ?><br /><br /></div>
+		<?= b3_create_input("orichalcum_admin_remember","checkbox",$GLOBALS['kaTranslate']->translate('UI:Remember'),"",""); ?><br /><br /></div>
 
-		<div class="submit"><input type="submit" name="login" value="<?= $kaTranslate->translate('UI:Enter'); ?>" class="button"></div>
+		<div class="submit"><input type="submit" name="login" value="<?= $GLOBALS['kaTranslate']->translate('UI:Enter'); ?>" class="button"></div>
 		</form>
 		</div>
 	</div>

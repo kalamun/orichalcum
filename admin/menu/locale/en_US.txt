@@ -22,4 +22,4 @@ Menu:Add link to the private area	Add link to the private area
 Menu:Add custom item				Add custom item
 Menu:Main menu						Main menu
 Menu:Add new menu					Add new menu
-
+Menu:Select where to insert the page into the menu	Select where to insert the page into the menu

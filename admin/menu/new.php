@@ -63,7 +63,7 @@ if(isset($_POST['insert'])) {
 	$row=mysql_fetch_array($results);
 	$ordine=$row['ordine']+1;
 
-	$query="INSERT INTO `".TABLE_MENU."` (`label`,`url`,`ref`,`ll`,`ordine`,`collection`) VALUES('".b3_htmlize($_POST['title'],true,"")."','".b3_htmlize($_POST['dir'],true,"")."','0','".$_SESSION['ll']."','".$ordine."','".mysql_real_escape_string($_GET['collection'])."')";
+	$query="INSERT INTO `".TABLE_MENU."` (`label`,`url`,`ref`,`photogallery`,`ll`,`ordine`,`collection`) VALUES('".b3_htmlize($_POST['title'],true,"")."','".b3_htmlize($_POST['dir'],true,"")."','0','','".$_SESSION['ll']."','".$ordine."','".mysql_real_escape_string($_GET['collection'])."')";
 	if(!mysql_query($query)) {
 		$log=$kaTranslate->translate("Menu:Error occurred while saving item");
 		}
@@ -83,7 +83,7 @@ if(isset($_POST['insert'])) {
 /***/
 
 ?><h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>
-<script type="text/javascript" src="js/edit.js"></script>
+<script type="text/javascript" src="js/edit.js" charset="UTF-8"></script>
 <br />
 	<?php /* COLLECTIONS */ ?>
 	<div class="tab"><dl>

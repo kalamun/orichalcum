@@ -52,6 +52,7 @@ define("TABLE_SHOP_TRANSACTIONS","k_shop_transactions");
 define("TABLE_SHOP_VARIATIONS","k_shop_variations");
 define("TABLE_SHOP_COUPONS","k_shop_coupons");
 define("TABLE_SHOP_COUPONS_CODES","k_shop_coupons_codes");
+define("TABLE_SHOP_MANUFACTURERS","k_shop_manufacturers");
 
 define("TABLE_PAGINE","k_pagine");
 define("TABLE_CONVERSIONS","k_conversions");

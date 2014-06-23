@@ -35,6 +35,9 @@ elseif(isset($_POST['update'])) {
 		$kaLog->add("ERR",'Errore durante la modifica della categoria <em>'.b3_htmlize($_POST['categoria'],true,"").'</em> nelle News');
 		}
 	else {
+		$kaMetadata->set(TABLE_CATEGORIE,$_POST['idcat'],'width',$_POST['width']);
+		$kaMetadata->set(TABLE_CATEGORIE,$_POST['idcat'],'height',$_POST['height']);
+		$kaMetadata->set(TABLE_CATEGORIE,$_POST['idcat'],'resize',$_POST['resize']);
 		echo '<div id="MsgSuccess">Categoria modificata con successo</div>';
 		$kaLog->add("INS",'Modificata la categoria <em>'.b3_htmlize($_POST['categoria'],true,"").'</em> nelle News');
 		}
@@ -64,9 +67,16 @@ elseif(isset($_GET['delete'])) {
 if(isset($_GET['idcat'])) {
 	//modifica
 	$cat=$kaCategorie->get($_GET['idcat'],TABLE_BANNER);
+	$w=$kaMetadata->get(TABLE_CATEGORIE,$cat['idcat'],'width');
+	$h=$kaMetadata->get(TABLE_CATEGORIE,$cat['idcat'],'height');
+	$r=$kaMetadata->get(TABLE_CATEGORIE,$cat['idcat'],'resize');
+	$cat['width']=$w['value']==""?0:intval($w['value']);
+	$cat['height']=$h['value']==""?0:intval($h['value']);
+	$cat['resize']=$r['value'];
+	
 	?>
 	<script type="text/javascript" src="js/categorie.js"></script>
-	<form action="?" method="post">
+	<form action="?idcat=<?= $_GET['idcat']; ?>" method="post">
 	<input type="hidden" name="idcat" value="<?= $cat['idcat']; ?>" />
 	<div class="title"><?= b3_create_input("categoria","text","Nome della categoria<br />",b3_lmthize($cat['categoria'],"input"),"70%",250); ?></div>
 	<div class="URLBox"><?= b3_create_input("dir","text","Indirizzo della pagina: ".BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_news',1).'/[categoria]/',b3_lmthize($cat['dir'],"input"),"400px",64,'onkeyup="checkURL(this)"'); ?> <span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div>
@@ -75,8 +85,16 @@ if(isset($_GET['idcat'])) {
 		target.setAttribute("oldvalue",target.value);
 		</script>
 	<br />
-	<label for="imgallery">Immagini</label>
-	<iframe src="<?php echo ADMINDIR; ?>inc/imgallery.inc.php?refid=imgallery&mediatable=<?php echo TABLE_CATEGORIE; ?>&mediaid=<?php echo $cat['idcat']; ?>" class="imgframe" id="imgallery"></iframe>
+
+	<?= b3_create_input("width","text","Larghezza ",$cat['width'],"input","50px",4); ?><br />
+	<?= b3_create_input("height","text","Altezza ",$cat['height'],"input","50px",4); ?><br />
+	<?
+	$option=array("inside","outside","fit");
+	$value=array("Internamente","Esternamente","Adatta");
+	echo b3_create_select("resize","Ridimensionamento ",$value,$option,b3_lmthize($cat['resize'],"input"));
+	?><br />
+	
+	<br />
 
 	<div class="box closed"><h2 onclick="kBoxSwapOpening(this.parentNode);">Meta-dati</h2>
 	<div id="divMetadata"></div>

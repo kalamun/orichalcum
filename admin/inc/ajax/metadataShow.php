@@ -27,7 +27,7 @@ foreach($kaMetadata->getParams($_POST['tabella'],$_POST['id']) as $param) {
 		?><tr>
 		<th><?= htmlspecialchars($param['param']); ?></th>
 		<td><?= nl2br(htmlspecialchars($param['value'])); ?>
-			<small class="actions"><a href="javascript:kOpenIPopUp(ADMINDIR+'inc/ajax/metadataUpdate.php','t=<?= $_POST['tabella']; ?>&id=<?= $_POST['id']; ?>&p=<?= urlencode($param['param']); ?>','600px','400px')">Modifica</a></small>
+			<small class="actions"><a href="javascript:kOpenIPopUp(ADMINDIR+'inc/ajax/metadataUpdate.php','t=<?= $_POST['tabella']; ?>&id=<?= $_POST['id']; ?>&p=<?= urlencode(addslashes($param['param'])); ?>','600px','400px')">Modifica</a></small>
 			</td>
 		<?
 		$i++;

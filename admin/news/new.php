@@ -54,12 +54,16 @@ if(isset($_POST['insert'])) {
 
 	if(isset($_POST['expiration_day'])&&isset($_POST['expiration_hour'])) $expiration_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['expiration_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['expiration_hour']);
 	else $expiration_date=date("Y-m-d H:i");
-	
+
+	if(isset($_POST['starting_day'])&&isset($_POST['starting_hour'])) $starting_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['starting_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['starting_hour']);
+	else $starting_date=$expiration_date;
+
 	$values=array();
 	$values['title']=b3_htmlize($_POST['titolo'],false,"");
 	$values['categories']=$categorie;
 	$values['creation_date']=date("Y-m-d H:i");
 	$values['public_date']=$visible_date;
+	$values['starting_date']=$starting_date;
 	$values['expiration_date']=$expiration_date;
 	$values['dir']=$_POST['dir'];
 	$values['home']='s';
@@ -208,6 +212,26 @@ if(isset($_GET['copyfrom'])) $copyfrom=$kaNews->get($_GET['copyfrom']);
 				}
 			echo b3_create_input("visible_day","text","",$visible_day,"80px",250).' ';
 			echo b3_create_input("visible_hour","text",$kaTranslate->translate('News:and from time')." ",$visible_hour,"40px",250);
+			?>
+			</td>
+		</tr>
+		<? }
+
+	//starting date
+	if(strpos($pageLayout,",startingdate,")!==false) { ?>
+		<tr>
+		<th><?= $kaTranslate->translate('News:Starting date'); ?></th>
+		<td><?
+			if(isset($copyfrom['starting_date'])) {
+				$starting_day=preg_replace('/(\d{4})[^\d](\d{1,2})[^\d](\d{1,2}) (\d{1,2})[^\d](\d{1,2})[^\d](\d{1,2})/','$3-$2-$1',$copyfrom['starting_date']);
+				$starting_hour=preg_replace('/(\d{4})[^\d](\d{1,2})[^\d](\d{1,2}) (\d{1,2})[^\d](\d{1,2})[^\d](\d{1,2})/','$4:$5',$copyfrom['starting_date']);
+				}
+			else {
+				$starting_day=date('d-m-Y',time()+604800);
+				$starting_hour=date('H:i');
+				}
+			echo b3_create_input("starting_day","text","",$starting_day,"80px",250).' ';
+			echo b3_create_input("starting_hour","text",$kaTranslate->translate('News:and time')." ",$starting_hour,"40px",250);
 			?>
 			</td>
 		</tr>

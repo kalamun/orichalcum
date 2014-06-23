@@ -82,7 +82,8 @@ else {
 	for($i=0;isset($upgrdinfo[$i]);$i++) {
 		$upgrdinfo[$i]=trim($upgrdinfo[$i]);
 		}
-	if(!is_numeric($upgrdinfo[0])||substr($upgrdinfo[1],0,24)!="http://www.orichalcum.it") {
+
+	if(!is_numeric($upgrdinfo[0])||substr($upgrdinfo[1],0,29)!="http://download.orichalcum.it") {
 		echo $kaTranslate->translate('Upgrade:Error occurred reading upgrade data');
 		include_once("../inc/foot.inc.php");
 		die();

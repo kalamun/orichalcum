@@ -43,22 +43,6 @@ if(!isset($_GET['idnews'])) {
 			   if(KeyID==13) submitSearch(); //invio
 			   }
 			document.getElementById('searchQ').onkeyup=searchKeyUp;
-			
-			function selectMenuRef(usePage) {
-				document.getElementById('usePage').value=usePage;
-				k_openIframeWindow(ADMINDIR+"inc/selectMenuRef.inc.php","450px","500px");
-				}
-			function selectElement(id,where) {
-				var usePage=document.getElementById('usePage').value;
-				var get="";
-				if(String(window.location).indexOf("search=")>-1) {
-					get=String(window.location);
-					get=get.replace(/.*search=/,"");
-					get="search="+get.replace(/^[[^\d]*].*/,"");
-					}
-				var url=String(window.location).replace(/\?.*/,"");
-				window.location=url+'?usePage='+usePage+'&addtomenu='+id+','+where+'&'+get;
-				}
 			</script>
 		</fieldset>
 		<br />
@@ -110,13 +94,23 @@ if(!isset($_GET['idnews'])) {
 
 			$news=array();
 			$events=array();
-			$conditions="`".$dataRef."` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%'";
+			if($dataRef=="starting_date"||$dataRef=="scadenza") $conditions="`starting_date` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%' OR `scadenza` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%'";
+			else $conditions="`".$dataRef."` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%'";
 			foreach($kaNews->getList($conditions) as $row) {
 				if(!isset($row['categorie'][0])) $row['categorie'][0]=array('dir'=>'tmp');
 				if($row['calendario']=='n') $news[ltrim(substr($row[$dataRef],8,2),"0")][]=$row;
-				else $events[ltrim(substr($row[$dataRef],8,2),"0")][]=$row;
+				else {
+					if(($dataRef=="starting_date"||$dataRef=="scadenza")&&trim($row['starting_date'],"0-: ")!=""&&trim($row['scadenza'],"0-: ")!="") {
+						$startingts=mktime(0,0,0,substr($row['starting_date'],5,2),substr($row['starting_date'],8,2),substr($row['starting_date'],0,4));
+						$endingts=mktime(24,0,0,substr($row['scadenza'],5,2),substr($row['scadenza'],8,2),substr($row['scadenza'],0,4));
+						if($startingts>$endingts) $endingts=$startingts;
+						for($i=$startingts;$i<$endingts;$i+=86400) {
+							if(date("Y-m",$i)==substr($row[$dataRef],0,7)) $events[date("j",$i)][]=$row;
+							}
+						}
+					else $events[ltrim(substr($row[$dataRef],8,2),"0")][]=$row;
+					}
 				}
-
 			?>
 			<tr><?
 			for($i=1;$i<$daysOffset;$i++) { ?>
@@ -179,7 +173,8 @@ if(!isset($_GET['idnews'])) {
 			<tr><th><?= $kaTranslate->translate('News:Title'); ?></th><th><?= $kaTranslate->translate('News:URL'); ?></th>
 			<?= ($kaImpostazioni->getVar('news-commenti',1)=='s'?'<th>'.$kaTranslate->translate('News:Comments').'</th>':''); ?>
 			<?= (strpos($pageLayout,",date,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('News:Created').'</th>':''); ?>
-			<?= (strpos($pageLayout,",public,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('News:Visible since').'</th>':''); ?>
+			<?= (strpos($pageLayout,",public,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('News:Visible from').'</th>':''); ?>
+			<?= (strpos($pageLayout,",startingdate,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('News:Starting date').'</th>':''); ?>
 			<?= (strpos($pageLayout,",expiration,")!==false?'<th style="text-align:center;">'.$kaTranslate->translate('News:Expiration').'</th>':''); ?>
 			</tr>
 			<?php
@@ -207,6 +202,7 @@ if(!isset($_GET['idnews'])) {
 				<?= ($kaImpostazioni->getVar('news-commenti',1)=='s'?'<td class="percorso"><strong>'.$row['commentiOnline'].'</strong> / '.$row['commentiTot'].'</td>':''); ?>
 				<?= (strpos($pageLayout,",date,")!==false?'<td><div class="data"><div class="giorno">'.substr($row['data'],8,2).' '.strftime("%b",mktime(1,0,0,substr($row['data'],5,2),1,substr($row['data'],0,4))).'</div><div class="ora">'.substr($row['data'],11,5).'</div></div></td>':''); ?>
 				<?= (strpos($pageLayout,",public,")!==false?'<td><div class="data"><div class="giorno">'.substr($row['pubblica'],8,2).' '.strftime("%b",mktime(1,0,0,substr($row['pubblica'],5,2),1,substr($row['pubblica'],0,4))).'</div><div class="ora">'.substr($row['pubblica'],11,5).'</div></div></td>':''); ?>
+				<?= (strpos($pageLayout,",startingdate,")!==false?'<td><div class="data"><div class="giorno">'.substr($row['starting_date'],8,2).' '.strftime("%b",mktime(1,0,0,substr($row['pubblica'],5,2),1,substr($row['pubblica'],0,4))).'</div><div class="ora">'.substr($row['starting_date'],11,5).'</div></div></td>':''); ?>
 				<?= (strpos($pageLayout,",expiration,")!==false?'<td><div class="data"><div class="giorno">'.substr($row['scadenza'],8,2).' '.strftime("%b",mktime(1,0,0,substr($row['scadenza'],5,2),1,substr($row['scadenza'],0,4))).'</div><div class="ora">'.substr($row['scadenza'],11,5).'</div></div></td>':''); ?>
 				<?
 				echo '</tr>';
@@ -273,6 +269,8 @@ else {
 		else $visible_date="false";
 		if(isset($_POST['expiration_day'])&&isset($_POST['expiration_hour'])) $expiration_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['expiration_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['expiration_hour']);
 		else $expiration_date="false";
+		if(isset($_POST['starting_day'])&&isset($_POST['starting_hour'])) $starting_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['starting_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['starting_hour']);
+		else $starting_date=$expiration_date;
 
 		if(isset($_POST['idcat'])) {
 			$categorie=",";
@@ -291,8 +289,9 @@ else {
 		isset($_POST['dir'])?$_POST['dir']=b3_htmlize($_POST['dir'],false,""):$_POST['dir']="false";
 		if(!isset($_POST['template'])) $_POST['template']="false";
 		if(!isset($_POST['layout'])) $_POST['layout']="false";
+		if(!isset($_POST['featuredimage'])) $_POST["featuredimage"]="false";
 
-		$id=$kaNews->update($_GET['idnews'],$_POST['titolo'],$_POST['sottotitolo'],$_POST['anteprima'],$_POST['testo'],$categorie,$date_date,$visible_date,$expiration_date,$_POST['template'],$_POST['layout'],$_POST['dir'],$_POST['home'],$_POST['calendario']);
+		$id=$kaNews->update($_GET['idnews'],$_POST['titolo'],$_POST['sottotitolo'],$_POST['anteprima'],$_POST['testo'],$categorie,$date_date,$visible_date,$starting_date,$expiration_date,$_POST['template'],$_POST['layout'],$_POST['dir'],$_POST['home'],$_POST['calendario'],$_POST['featuredimage']);
 		if($id==false) $log="Problemi durante la modifica del database<br />";
 		else {
 			if(strpos($pageLayout,",seo,")!==false) {
@@ -330,6 +329,11 @@ else {
 		<? if(strpos($pageLayout,",public,")!==false) { ?>
 			<fieldset class="box"><legend><?= $kaTranslate->translate('News:Visible from'); ?></legend>
 				<?= b3_create_input("visible_day","text"," ",preg_replace('/(\d{4}).(\d{2}).(\d{2}).*/','$3-$2-$1',$row['pubblica']),"70px",250); ?> <?= b3_create_input("visible_hour","text","alle ore ",preg_replace('/.*(\d{2}):(\d{2}):(\d{2})/','$1:$2',$row['pubblica']),"40px",250); ?>
+				</fieldset>
+			<? } ?>
+		<? if(strpos($pageLayout,",startingdate,")!==false) { ?>
+			<fieldset class="box"><legend><?= $kaTranslate->translate('News:Starting date'); ?></legend>
+				<?= b3_create_input("starting_day","text"," ",preg_replace('/(\d{4}).(\d{2}).(\d{2}).*/','$3-$2-$1',$row['starting_date']),"70px",250); ?> <?= b3_create_input("starting_hour","text","alle ore ",preg_replace('/.*(\d{2}):(\d{2}):(\d{2})/','$1:$2',$row['starting_date']),"40px",250); ?>
 				</fieldset>
 			<? } ?>
 		<? if(strpos($pageLayout,",expiration,")!==false) { ?>
@@ -373,6 +377,23 @@ else {
 		if($kaImpostazioni->getVar('facebook',1)=='s') { ?>
 			<fieldset class="box"><legend>Facebook</legend>
 				<div class="newCat"><a href="javascript:k_openIframeWindow('ajax/facebook.php?id=<?= $row['idnews']; ?>','600px','500px')" class="smallbutton">Crea un evento da questa notizia</a></div>
+				</fieldset><br />
+			<? } ?>
+
+		<? if(strpos($pageLayout,",featuredimage,")!==false) { ?>
+			<fieldset class="box"><legend><?= $kaTranslate->translate('News:Featured Image'); ?></legend>
+				<div id="featuredImageContainer"><?php
+					if($row['featuredimage']>0)
+					{
+						$img=$kaImages->getImage($row['featuredimage']);
+						?>
+						<img src="<?= BASEDIR.$img['thumb']['url']; ?>">
+						<?
+					}
+					?></div>
+				<input type="hidden" name="featuredimage" id="featuredimage" value="<?= $row['featuredimage']; ?>">
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?limit=1&submitlabel=<?= urlencode($kaTranslate->translate('Pages:Set featured image')); ?>&onsubmit=setFeaturedImage','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('News:Choose featured image'); ?></a>
+				<small><a href="javascript:removeFeaturedImage();" id="removeFeaturedImage" class="warning" <? if($row['featuredimage']==0) echo 'style="display:none;"'; ?>><?= $kaTranslate->translate('UI:Delete'); ?></a></small>
 				</fieldset><br />
 			<? } ?>
 		</div>

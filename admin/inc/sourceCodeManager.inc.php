@@ -54,7 +54,7 @@ define("PAGE_NAME",$kaTranslate->translate('Link:Source Code manager'));
 			?>
 			<script type="text/javascript">
 				var code="<?= addslashes($code); ?>";
-				window.parent.kTxtArea['<?= $_GET['refid']; ?>'].insertSourceCode(code);
+				window.parent.txts.getArea('<?= $_GET['refid']; ?>').insertSourceCode(code);
 				window.parent.k_closeIframeWindow();
 				</script>
 			<? }

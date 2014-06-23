@@ -29,6 +29,7 @@ Menu:Advanced Setup	Advanced Setup
 Menu:Activity Log	Activity Log
 Menu:Users			Users
 Menu:Languages		Languages
+Menu:Maintenance	Maintenance
 
 //UI
 UI:Username			Username
@@ -56,6 +57,19 @@ UI:Back				Back
 UI:optional			optional
 UI:mandatory		mandatory
 UI:Are you sure?	Are you sure?
+
+//UPLOAD MANAGER
+Uploads:search for name, caption, id...		search for name, caption, id...
+Uploads:Order by							Order by
+Uploads:Date								Date
+Uploads:Caption								Caption
+Uploads:File name							File name
+Uploads:saving								saving
+Uploads:write caption here					write caption here
+Uploads:Click here to choose one or more files from your computer		Click here to choose one or more files from your computer
+Uploads:or drag and drop them here										or drag and drop them here
+Uploads:Confirm								Confirm
+Uploads:Add selected images to gallery		Add selected images to gallery
 
 //IMAGE MANAGER
 Img:Browse				Browse...
@@ -164,3 +178,7 @@ Home:members			Members
 Home:License			License
 Home:read				read
 Home:Copyright			is <em>open-source</em> software released under <acronym title="Gnu General Public License v.3">GPL 3</acronym>
+
+//JAVASCRIPT
+Javascript:Insertimage		Insert full-size image
+Javascript:Insertthumbnail	Insert thumbnail

@@ -2,7 +2,8 @@
 /* (c) Kalamun.org - GPL v3 */
 
 class kaShop {
-	protected $ll='',$kaComments,$kaCategorie,$kaImgallery,$kaDocgallery,$kaImpostazioni;
+	protected $ll='',$kaComments,$kaCategorie,$kaImgallery,$kaDocgallery,$kaImpostazioni,
+			$categoriesList;
 	
 	public function kaShop() {
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/comments.lib.php');
@@ -16,6 +17,7 @@ class kaShop {
 		$this->kaDocgallery=new kaDocgallery();
 		$this->kaImpostazioni=new kaImpostazioni();
 		$this->ll=$_SESSION['ll'];
+		$this->categoriesList=$this->kaCategorie->getList(TABLE_SHOP_ITEMS);
 		}
 
 	public function addItem($dir,$categorie,$titolo,$sottotitolo,$anteprima,$testo,$prezzo,$scontato,$created,$public,$expired,$qta=false,$weight=false,$layout=false,$ll=false) {
@@ -41,28 +43,38 @@ class kaShop {
 		$row=mysql_fetch_array($results);
 		$ordine=$row['tot']+1;
 
-		$query="INSERT INTO ".TABLE_SHOP_ITEMS." (`online`,`dir`,`categorie`,`productcode`,`titolo`,`sottotitolo`,`anteprima`,`testo`,`prezzo`,`scontato`,`created`,`public`,`expired`,`modified`,`qta`,`weight`,`layout`,`privatearea`,`rating`,`votes`,`customfields`,`ordine`,`traduzioni`,`ll`) VALUES('n','".$dir."','".$categorie."','','".$titolo."','".$sottotitolo."','".$anteprima."','".$testo."','".$prezzo."','".$scontato."','".$created."','".$public."','".$expired."',NOW(),'".$qta."','".$weight."','".$layout."','','0','0','','".$ordine."','','".$ll."')";
+		$query="INSERT INTO ".TABLE_SHOP_ITEMS." (`online`,`dir`,`categorie`,`productcode`,`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`prezzo`,`scontato`,`created`,`public`,`expired`,`modified`,`qta`,`weight`,`layout`,`privatearea`,`rating`,`votes`,`customfields`,`manufacturer`,`ordine`,`traduzioni`,`ll`) VALUES('n','".$dir."','".$categorie."','','".$titolo."','".$sottotitolo."','".$anteprima."','".$testo."',0,'".$prezzo."','".$scontato."','".$created."','".$public."','".$expired."',NOW(),'".$qta."','".$weight."','".$layout."','','0','0','',0,'".$ordine."','','".$ll."')";
 		if(mysql_query($query)) return mysql_insert_id();
 		else return false;
 		}
 		
+	public function countItems($conditions="",$lang=false)
+	{
+		if($lang==false) $lang=$this->ll;
+		
+		$query="SELECT count(`idsitem`) as `tot` FROM `".TABLE_SHOP_ITEMS."` WHERE ";
+		if($conditions!="") $query.="(".$conditions.") AND ";
+		$query.="`ll`='".$lang."'";
+		$results=mysql_query($query);
+		if($row=mysql_fetch_array($results)) return $row['tot'];
+		return 0;
+	}
+
 	public function getItemsList($conditions="",$ordine=false,$lang=false) {
 		if($ordine==false) {
 			$ordine=$this->kaImpostazioni->getVar('shop-order',1);
 			}
 		if($lang==false) $lang=$this->ll;
 		$output=array();
-		if($conditions!="") $conditions="(".$conditions.")";
 
 		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE ";
 		if($conditions!="") $query.="(".$conditions.") AND ";
-		$query.="ll='".$lang."' ORDER BY ".$ordine;
+		$query.="`ll`='".$lang."' ORDER BY ".$ordine;
 		$results=mysql_query($query);
 		for($i=0;$row=mysql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['categorie']=array();
-			foreach($this->kaCategorie->getList(TABLE_SHOP_ITEMS) as $cat) {
-				$cat['dir']=title2dir($cat['categoria']);
+			foreach($this->categoriesList as $cat) {
 				if(strpos($row['categorie'],','.$cat['idcat'].',')!==false) $output[$i]['categorie'][]=$cat;
 				}
 
@@ -75,15 +87,22 @@ class kaShop {
 	public function getQuickList($vars) {
 		if(!isset($vars['start'])) $vars['start']=0;
 		if(!isset($vars['limit'])) $vars['limit']=999;
+		if(!isset($vars['ll'])) $vars['ll']=$this->ll;
+		if(!isset($vars['orderby'])) $vars['orderby']='`titolo`';
 		$output=array();
-		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE `idsitem`>0 ";
+		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE `idsitem`>0 ";
+		if($vars['conditions']!="") $query.=" AND (".$vars['conditions'].") ";
 		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".mysql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".mysql_real_escape_string($vars['match'])."%')";
 		if(isset($vars['ll'])) $query.=" AND `ll`='".mysql_real_escape_string($vars['ll'])."' ";
 		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".mysql_real_escape_string($vars['exclude_ll'])."' ";
-		$query.=" ORDER BY `titolo` LIMIT ".$vars['start'].",".$vars['limit'];
+		$query.=" ORDER BY ".$vars['orderby']." LIMIT ".$vars['start'].",".$vars['limit'];
 		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
-			$output[]=$row;
+		for($i=0;$row=mysql_fetch_array($results);$i++) {
+			$output[$i]=$row;
+			$output[$i]['categorie']=array();
+			foreach($this->categoriesList as $cat) {
+				if(strpos($row['categorie'],','.$cat['idcat'].',')!==false) $output[$i]['categorie'][]=$cat;
+				}
 			}
 		return $output;
 		}
@@ -100,7 +119,6 @@ class kaShop {
 
 			$output['categorie']=array();
 			foreach($this->kaCategorie->getList(TABLE_SHOP_ITEMS) as $cat) {
-				$cat['dir']=title2dir($cat['categoria']);
 				if(strpos($row['categorie'],','.$cat['idcat'].',')!==false) $output['categorie'][]=$cat;
 				}
 
@@ -145,7 +163,7 @@ class kaShop {
 		return $row;
 		}
 
-	public function updateItem($idsitem,$online,$productcode,$titolo,$sottotitolo="false",$anteprima="false",$testo="false",$categorie="false",$prezzo=0,$scontato=0,$created="false",$public="false",$expired="false",$qta=0,$weight=0,$layout=false,$dir=false,$privatearea="false",$ll=false,$template="",$customfields=array()) {
+	public function updateItem($idsitem,$online,$productcode,$titolo,$sottotitolo="false",$anteprima="false",$testo="false",$categorie="false",$prezzo=0,$scontato=0,$created="false",$public="false",$expired="false",$qta=0,$weight=0,$layout=false,$dir=false,$privatearea="false",$ll=false,$template="",$customfields=array(),$featuredimage=-1,$manufacturer=-1) {
 		if($ll==false) $ll=$_SESSION['ll'];
 		$productcode=mysql_real_escape_string($productcode);
 		$titolo=mysql_real_escape_string($titolo);
@@ -185,6 +203,8 @@ class kaShop {
 		if($layout!="false") $query.="`layout`='".$layout."',";
 		if($dir!="false") $query.="`dir`='".$dir."',";
 		if($privatearea!="false") $query.="`privatearea`='".$privatearea."',";
+		if($featuredimage>-1) $query.="featuredimage='".intval($featuredimage)."',";
+		if($manufacturer>-1) $query.="manufacturer='".intval($manufacturer)."',";
 		$query.="`customfields`='".$cf."',`modified`=NOW() WHERE `idsitem`='".$idsitem."'";
 		if(mysql_query($query)) return $idsitem;
 		else return false;
@@ -275,30 +295,8 @@ class kaShop {
 			else $output['deliverer']=array('name'=>$output['deliverer']);
 			$output['transactions']=$this->getTransactionsByOrderId($row['idord']);
 			
-			// the items list has this format:
-			// idsitem-idsvar-idsvar...:quantity:price
-			// the id of the item, separated by a dash from the list of the id of the variations (optionals), separated by : from quantity, separated by : from price
-			$output['items']=array();
-			foreach(explode(",",trim($row['items'],",")) as $item) {
-				$id=count($output['items']);
-				list($variations,$qta,$price)=explode(":",$item."::");
-				$variations=explode("-",$variations);
-				$idsitem=$variations[0];
-				unset($variations[0]);
-				$output['items'][$id]=$this->getItem($idsitem);
-
-				//replace the list of variations with the ones selected for the bought item
-				$variationstmp=$this->getVariations(array("idsitem"=>$idsitem));
-				$output['items'][$id]['variations']=array();
-				foreach($variations as $idsvar) {
-					foreach($variationstmp as $v) {
-						if($v['idsvar']==$idsvar) $output['items'][$id]['variations'][]=$v;
-						}
-					}
-
-				$output['items'][$id]['qta']=$qta;
-				$output['items'][$id]['realprice']=$price;
-				}
+			// the items list is json encoded
+			$output['items']=json_decode($row['items'],true);
 			}
 		return $output;
 		}
@@ -331,6 +329,24 @@ class kaShop {
 				}
 			return true;
 			}
+		}
+	public function reprocessPayment($idord) {
+		$o=$this->getOrderById($idord);
+		$totalamount=0;
+		if(count($o['transactions'])>0) {
+			foreach($o['transactions'] as $t) {
+				$totalamount+=$t['value'];
+				}
+			}
+		if($totalamount>=$o['totalprice']) {
+			$query="UPDATE `".TABLE_SHOP_ORDERS."` SET payed='s' WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
+			if(!mysql_query($query)) return false;
+			if($o['member']['email']!="") $this->sendEmail('payed',$o['idord']);
+			
+			//set permissions for private area folders
+			if(!$this->applyPrivatePermissions($idord)) return false;
+			}
+		return true;
 		}
 	public function reportShipment($idord,$iddel,$tracking_number,$tracking_url) {
 		$d=$this->getDelivererById($iddel);
@@ -378,7 +394,7 @@ class kaShop {
 				foreach($p['members'] as $m) {
 					$armembers[$m['idmember']]=true;
 					}
-				$kaPrivate->setPermissions($dir,'restricted',$armembers);
+				$kaPrivate->setPermissions($dir,'restricted',$armembers,'private',array());
 				}
 			}
 
@@ -532,7 +548,7 @@ class kaShop {
 		if($row=mysql_fetch_array($results)) $vars['order']=$row['order']+1;
 		else $vars['order']=1;
 
-		$query="INSERT INTO ".TABLE_SHOP_CUSTOMFIELDS." (`name`,`type`,`values`,`categories`,`order`) VALUES('".b3_htmlize($vars['name'],true,"")."','".b3_htmlize($vars['type'],true,"")."','".b3_htmlize($vars['values'],true,"")."','".b3_htmlize($vars['categories'],true,"")."','".b3_htmlize($vars['order'],true,"")."')";
+		$query="INSERT INTO ".TABLE_SHOP_CUSTOMFIELDS." (`name`,`type`,`values`,`categories`,`order`) VALUES('".mysql_real_escape_string($vars['name'])."','".mysql_real_escape_string($vars['type'])."','".mysql_real_escape_string($vars['values'])."','".b3_htmlize($vars['categories'],true,"")."','".intval($vars['order'])."')";
 		if(mysql_query($query)) return true;
 		else return false;
 		}
@@ -545,7 +561,7 @@ class kaShop {
 		if(!isset($vars['values'])) $vars['values']="";
 		if(!isset($vars['categories'])) $vars['categories']=",";
 
-		$query="UPDATE ".TABLE_SHOP_CUSTOMFIELDS." SET `name`='".b3_htmlize($vars['name'],true,"")."',`type`='".b3_htmlize($vars['type'],true,"")."',`values`='".b3_htmlize($vars['values'],true,"")."',`categories`='".b3_htmlize($vars['categories'],true,"")."' WHERE `idsfield`='".$vars['idsfield']."' LIMIT 1";
+		$query="UPDATE ".TABLE_SHOP_CUSTOMFIELDS." SET `name`='".mysql_real_escape_string($vars['name'])."',`type`='".mysql_real_escape_string($vars['type'])."',`values`='".mysql_real_escape_string($vars['values'])."',`categories`='".mysql_real_escape_string($vars['categories'])."' WHERE `idsfield`='".intval($vars['idsfield'])."' LIMIT 1";
 		if(mysql_query($query)) return true;
 		else return false;
 		}
@@ -741,6 +757,192 @@ class kaShop {
 
 		return $output;
 		}
+
 	
+	/**************************************************
+	* MANUFACTURERS
+	**************************************************/
+	
+	// create a new manufacturer
+	public function createManufacturer($vars)
+	{
+		if(!isset($vars['name'])) $vars['name']="";
+		if(!isset($vars['dir'])) $vars['dir']=preg_replace("/[^\w\/\.\-\x{C0}-\x{D7FF}\x{2C00}-\x{D7FF}]+/","-",strtolower($vars['name']));
+		$vars['dir']=preg_replace("/[\?|#|'|\"]+/","-",$vars['dir']);
+
+		$query="INSERT INTO `".TABLE_SHOP_MANUFACTURERS."` (
+			`name`,
+			`dir`,
+			`subtitle`,
+			`preview`,
+			`description`,
+			`featuredimage`,
+			`created`,
+			`modified`,
+			`translations`,
+			`ll`
+			) VALUES(
+			'".b3_htmlize($vars['name'],true,"")."',
+			'".mysql_real_escape_string($vars['dir'])."',
+			'',
+			'',
+			'',
+			0,
+			NOW(),
+			NOW(),
+			'',
+			'".$_SESSION['ll']."'
+			)";
+		
+		if(mysql_query($query)) return mysql_insert_id();
+		else return false;
 	}
+
+	// it returns an array with the list of the manufacturers' entries on database
+	public function getManufacturersList($vars=array())
+	{
+		$output=array();
+		
+		if(!isset($vars['ll'])) $vars['ll']=$_SESSION['ll'];
+		if(!isset($vars['orderby'])) $vars['orderby']='`name`';
+		$conditions='';
+		if(isset($vars['conditions'])) $conditions.="(".$vars['conditions'].") AND ";
+		if(isset($vars['search']))
+		{
+			$conditions.="(";
+			$conditions.="`name` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
+			$conditions.="`subtitle` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
+			$conditions.="`dir` LIKE '%".mysql_real_escape_string($_GET['search'])."%'";
+			$conditions.=") AND ";
+		}
+
+		$conditions.="ll='".$vars['ll']."'";
+		$query="SELECT `idsman`,`name`,`dir`,`featuredimage` FROM ".TABLE_SHOP_MANUFACTURERS." WHERE ".$conditions." ORDER BY ".$vars['orderby'];
+		$results=mysql_query($query);
+
+		while($page=mysql_fetch_array($results))
+		{
+			$output[]=$page;
+		}
+		
+		return $output;
+	}
+
+	// it returns the entries of a single manufacturer, selected by id
+	public function getManufacturer($idsman)
+	{
+
+		if(!isset($idsman)) return false;
+		$query="SELECT * FROM ".TABLE_SHOP_MANUFACTURERS." WHERE `idsman`='".intval($idsman)."' LIMIT 1";
+		$results=mysql_query($query);
+
+		if($page=mysql_fetch_array($results))
+		{
+			$page['imgallery']=$this->kaImgallery->getList(TABLE_SHOP_MANUFACTURERS,$page['idsman']);
+			$page['docgallery']=$this->kaDocgallery->getList(TABLE_SHOP_MANUFACTURERS,$page['idsman']);
+			return $page;
+		}
+		
+		return false;
+	}
+	
+	// update a manufacturer by idsman (mandatory field)
+	public function updateManufacturer($vars)
+	{
+		if(!isset($vars['idsman'])) return false;
+
+		$page=$this->getManufacturer($vars['idsman']);
+		if($page==false) return false;
+		
+		/* update translation table in all involved pages (past and current) */
+		if(isset($vars['translation_id']))
+		{
+			// translation has this format: |LL=idsman|LL=idsman|...
+			$translations="";
+			$vars['translation_id'][$_SESSION['ll']]=$_GET['idsman'];
+			foreach($vars['translation_id'] as $k=>$v) {
+				if($v!="") {
+					$translations.=$k.'='.$v.'|';
+					$kaShop->removeManufacturerFromTranslations($v);
+					}
+				}
+			// first of all, clear translations from previous+current pages
+			foreach($page['traduzioni'] as $k=>$v) {
+				if($v!="") $kaShop->removeManufacturerFromTranslations($v);
+			}
+			// then set the new translations in the current pages
+			foreach($vars['translation_id'] as $k=>$v) {
+				if($v!="") {
+					$kaShop->setManufacturerTranslations($v,$translations);
+				}
+			}
+		}
+
+		/* clean permalink */
+		if(isset($vars['dir'])) $vars['dir']=preg_replace("/[\?|#|'|\"]+/","-",$vars['dir']);
+
+		/* categories */
+		if(isset($vars['idcat']))
+		{
+			$categorie=",";
+			foreach($vars['idcat'] as $idcat) { $categorie.=intval($idcat).','; }
+		} else $categorie=",,";
+
+		//modifico o inserisco il record
+		$query="UPDATE ".TABLE_SHOP_MANUFACTURERS." SET ";
+		if(isset($vars['name'])) $query.="`name`='".b3_htmlize($vars['name'],true,"")."',";
+		if(isset($vars['subtitle'])) $query.="`subtitle`='".b3_htmlize($vars['subtitle'],true,"")."',";
+		if(isset($vars['preview'])) $query.="`preview`='".b3_htmlize($vars['preview'],true)."',";
+		if(isset($vars['description'])) $query.="`description`='".b3_htmlize($vars['description'],true)."',";
+		if(isset($vars['dir'])) $query.="`dir`='".mysql_real_escape_string($vars['dir'])."',";
+		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".intval($vars['featuredimage'])."',";
+		$query.="`modified`=NOW() WHERE `idsman`=".mysql_real_escape_string($vars['idsman'])." LIMIT 1";
+		
+		if(!mysql_query($query)) return false;
+
+		foreach($vars as $ka=>$v)
+		{
+			if(substr($ka,0,4)=="seo_") $GLOBALS['kaMetadata']->set(TABLE_SHOP_MANUFACTURERS,$vars['idsman'],$ka,$v);
+		}
+		
+		return $vars['idsman'];
+	}
+
+	// delete a manufacturer
+	public function deleteManufacturer($idsman)
+	{
+		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/imgallery.lib.php');
+		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/docgallery.lib.php');
+		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/metadata.lib.php');
+		$kaImgallery=new kaImgallery();
+		$kaDocgallery=new kaDocgallery();
+		$kaMetadata=new kaMetadata();
+		
+		$query="DELETE FROM `".TABLE_SHOP_MANUFACTURERS."` WHERE `idsman`='".intval($idsman)."' LIMIT 1";
+		
+		if(mysql_query($query))
+		{
+			// remove from image gallery
+			foreach($kaImgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $img)
+			{
+				$kaImgallery->del($img['idimga']);
+			}
+
+			// remove from document gallery
+			foreach($kaDocgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $doc)
+			{
+				$kaDocgallery->del($doc['iddocg']);
+			}
+
+			// remove from metadata
+			foreach($kaMetadata->getList(array("table"=>TABLE_SHOP_MANUFACTURERS,"id"=>intval($idsman))) as $md)
+			{
+				$kaMetadata->set($md['tabella'],$md['id'],$md['param'],"");
+			}
+
+			return true;
+		} else return false;
+	}
+
+}
 ?>

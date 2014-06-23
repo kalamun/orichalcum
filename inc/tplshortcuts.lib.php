@@ -82,9 +82,22 @@ function kGetAdminEmail() {
 function kGetBaseDir() {
 	return BASEDIR;
 	}
+function kGetBasePath() {
+	return $_SESSION['DOCUMENT_ROOT'].BASEDIR;
+	}
+function kGetCurrentLanguageDir() {
+	return BASEDIR.strtolower(LANG).'/';
+	}
+function kGetCurrentLanguagePath() {
+	return $_SESSION['DOCUMENT_ROOT'].BASEDIR.strtolower(LANG).'/';
+	}
 function kGetTemplateDir($basedir=false) {
 	if($basedir==false) $basedir=BASEDIR;
 	return $basedir.$GLOBALS['__template']->getTemplateDir();
+	}
+function kGetTemplatePath($basedir=false) {
+	if($basedir==false) $basedir=BASEDIR;
+	return $_SERVER['DOCUMENT_ROOT'].$basedir.$GLOBALS['__template']->getTemplateDir();
 	}
 function kGetFeedDir($basedir=false) {
 	if($basedir==false) $basedir=BASEDIR;
@@ -118,6 +131,9 @@ function kIsNews() {
 function kIsShop() {
 	return $GLOBALS['__template']->isShop();
 	}
+function kIsShopCart() {
+	return $GLOBALS['__template']->isShopCart();
+	}
 function kIsPhotogallery() {
 	return $GLOBALS['__template']->isPhotogallery();
 	}
@@ -126,6 +142,9 @@ function kIsFeed() {
 	}
 function kIsSearch() {
 	return $GLOBALS['__template']->isSearch();
+	}
+function kIsPrivate() {
+	return $GLOBALS['__template']->isPrivate();
 	}
 function kGetHomeDir($ll=false) {
 	return kGetVar('home_page',1,$ll);
@@ -138,6 +157,12 @@ function kGetPrivateDir($ll=false) {
 	}
 function kGetShopDir($ll=false) {
 	return kGetVar('dir_shop',1,$ll);
+	}
+function kGetShopCartDir($ll=false) {
+	return kGetVar('dir_shop_cart',1,$ll);
+	}
+function kGetShopManufacturersDir($ll=false) {
+	return kGetVar('dir_shop_cart',1,$ll);
 	}
 function kGetPhotogalleriesDir($ll=false) {
 	return kGetVar('dir_photogallery',1,$ll);
@@ -170,6 +195,7 @@ function kGetTitle() {
 		if(kHavePage()) $metadata=$GLOBALS['__pages']->getMetadata();
 		elseif(kHaveNews()) $metadata=$GLOBALS['__news']->getMetadata();
 		elseif(kHavePhotogallery()) $metadata=$GLOBALS['__photogallery']->getMetadata();
+		elseif(kHaveManufacturer()) $metadata=$GLOBALS['__shop']->getManufacturerMetadata();
 		elseif(kHaveShop()) $metadata=$GLOBALS['__shop']->getMetadata();
 		else return strip_tags($GLOBALS['__template']->getMenuCrumbs());
 
@@ -192,6 +218,8 @@ function kGetSeoMetadata($dir=null,$ll=null) {
 	if($GLOBALS['__pages']->pageExists($dir,$ll)) { $metadata=$GLOBALS['__pages']->getMetadata($dir); }
 	elseif($GLOBALS['__news']->newsExists($dir,$ll)) { $metadata=$GLOBALS['__news']->getMetadata($dir); }
 	elseif($GLOBALS['__photogallery']->photogalleryExists($dir)) { $metadata=$GLOBALS['__photogallery']->getMetadata($dir,$ll); }
+	elseif($GLOBALS['__shop']->shopItemExists($dir)) { $metadata=$GLOBALS['__shop']->getMetadata($dir,$ll); }
+	elseif($GLOBALS['__shop']->shopManufacturerExists($dir)) { $metadata=$GLOBALS['__shop']->getManufacturerMetadata($dir,$ll); }
 	if(isset($metadata['seo_title'])&&$metadata['seo_title']!="") $seometadata['title']=$metadata['seo_title'];
 	if(isset($metadata['seo_description'])&&$metadata['seo_description']!="") $seometadata['description']=$metadata['seo_description'];
 	if(isset($metadata['seo_keywords'])&&$metadata['seo_keywords']!="") $seometadata['keywords']=$metadata['seo_keywords'];
@@ -227,6 +255,42 @@ function kGetLanguages($translations=null) {
 			$n=kGetShopItem();
 			$translations=$n['traduzioni'];
 			}
+		elseif(kIsNews()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_news',1,$ll);
+				}
+			}
+		elseif(kIsPhotogallery()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_photogallery',1,$ll);
+				}
+			}
+		elseif(kIsShop()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_shop',1,$ll);
+				}
+			}
+		elseif(kIsSearch()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_search',1,$ll);
+				}
+			}
+		elseif(kIsPrivate()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_private',1,$ll);
+				}
+			}
+		elseif(kIsFeed()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_feed',1,$ll);
+				}
+			}
 		}
 	return $GLOBALS['__template']->getLanguages($translations);
 	}
@@ -252,6 +316,42 @@ function kPrintLanguages($vars=null,$mode="flags") {
 		elseif(kHaveShopItem()) {
 			$n=kGetShopItem();
 			$vars['translations']=$n['traduzioni'];
+			}
+		elseif(kIsNews()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_news',1,$ll);
+				}
+			}
+		elseif(kIsPhotogallery()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_photogallery',1,$ll);
+				}
+			}
+		elseif(kIsShop()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_shop',1,$ll);
+				}
+			}
+		elseif(kIsSearch()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_search',1,$ll);
+				}
+			}
+		elseif(kIsPrivate()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_private',1,$ll);
+				}
+			}
+		elseif(kIsFeed()) {
+			$vars['translations']=array();
+			foreach($GLOBALS['__template']->getLanguages(array()) as $ll=>$lang) {
+				$vars['translations'][$ll]=SITE_URL.BASEDIR.strtolower($ll).'/'.$GLOBALS['__template']->getVar('dir_feed',1,$ll);
+				}
 			}
 		}
 	echo $GLOBALS['__template']->printLanguages($vars);
@@ -355,6 +455,9 @@ function kGetImageHeight() {
 function kGetImageURL() {
 	return $GLOBALS['__template']->imgDB['url'];
 	}
+function kGetImageClass() {
+	return $GLOBALS['__template']->imgDB['class'];
+	}
 function kGetImageAlt() {
 	return $GLOBALS['__template']->imgDB['alt'];
 	}
@@ -378,6 +481,9 @@ function kGetThumbAlt() {
 	}
 function kGetThumbCaption() {
 	return $GLOBALS['__template']->imgDB['caption'];
+	}
+function kGetThumbClass() {
+	return $GLOBALS['__template']->imgDB['class'];
 	}
 
 /* documents */
@@ -538,7 +644,7 @@ function kGetEmailFooter() {
 	return $GLOBALS['__emails']->getVar('footer');
 	}
 function kSendEmail($from,$to,$subject,$message,$template=false) {
-	$GLOBALS['__emails']->send($from,$to,$subject,$message,$template);
+	return $GLOBALS['__emails']->send($from,$to,$subject,$message,$template);
 	}
 
 /* search engine */
@@ -609,6 +715,9 @@ function kGetPagePreview() {
 	}
 function kGetPageText() {
 	return $GLOBALS['__pages']->getPageVar('testo');
+	}
+function kGetPageFeaturedImage() {
+	return $GLOBALS['__pages']->getPageVar('featuredimage');
 	}
 function kGetPagePhotogallery() {
 	return $GLOBALS['__pages']->getPageVar('imgs');
@@ -740,6 +849,9 @@ function kGetNewsPreview() {
 function kGetNewsText() {
 	return $GLOBALS['__news']->getNewsVar('testo');
 	}
+function kGetNewsFeaturedImage() {
+	return $GLOBALS['__news']->getNewsVar('featuredimage');
+	}
 function kGetNewsPhotogallery() {
 	return $GLOBALS['__news']->getNewsVar('imgs');
 	}
@@ -754,6 +866,12 @@ function kGetNewsDateCreated() {
 	}
 function kGetNewsDateModified() {
 	return $GLOBALS['__news']->getNewsVar('modified');
+	}
+function kGetNewsStartingDate() {
+	return $GLOBALS['__news']->getNewsVar('starting_date');
+	}
+function kGetNewsExpirationDate() {
+	return $GLOBALS['__news']->getNewsVar('scadenza');
 	}
 function kGetNewsArchivePermalink() {
 	$type=$GLOBALS['__template']->pageDB;
@@ -773,11 +891,12 @@ function kGetNewsDate($format=false,$d=false) {
 	if($format==false) $format=kGetVar('timezone',2);
 	if($d=='creation') $date=$GLOBALS['__news']->getNewsVar('data');
 	elseif($d=='expiration') $date=$GLOBALS['__news']->getNewsVar('scadenza');
+	elseif($d=='starting') $date=$GLOBALS['__news']->getNewsVar('starting_date');
 	elseif($d=='publish') $date=$GLOBALS['__news']->getNewsVar('pubblica');
 	else {
 		if($orderby=="") $orderby=kGetVar('news-order',1);
 		if($orderby=="") $orderby="pubblica DESC";
-		if($orderby=="data DESC"||$orderby=="pubblica DESC"||$orderby=="scadenza DESC") $dataRef=substr($orderby,0,-5); else $dataRef='pubblica';
+		if(strpos($orderby,"data ")!==false||strpos($orderby,"pubblica ")!==false||strpos($orderby,"starting_date ")!==false||strpos($orderby,"scadenza ")!==false) $dataRef=trim(substr($orderby,0,-4)); else $dataRef='pubblica';
 		$date=$GLOBALS['__news']->getNewsVar($dataRef);
 		}
 	return utf8_encode(strftime($format,mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4))));
@@ -993,6 +1112,7 @@ function kGetLatestNews($vars=false,$limit=1,$home=true) {
 	if(isset($vars['home'])&&(($vars['home']==true&&kIsHome())||(string)$vars['home']=="force")) $vars['conditions']="`home`='s'";
 	if(isset($vars['category'])&&$vars['category']==false&&$GLOBALS['__subdir__']!="") $vars['category']=$GLOBALS['__subdir__'];
 	if(!isset($vars['limit'])||$vars['limit']==false) $limit=kGetVar('news',1);
+	if(!isset($vars['category'])) $vars['category']="";
 	$GLOBALS['__news']->setCatByDir($vars['category']);
 	
 	if(!isset($vars['from'])) $vars['from']=0;
@@ -1274,6 +1394,9 @@ function kHaveShop() {
 function kHaveShopItem() {
 	return $GLOBALS['__shop']->shopItemExists();
 	}
+function kHaveManufacturer() {
+	return $GLOBALS['__shop']->shopManufacturerExists();
+	}
 function kSetShopTemplate($dir=false) {
 	$n=$GLOBALS['__shop']->getShopTemplate($dir);
 	$GLOBALS['__template']->setTemplate($n['template']);
@@ -1342,6 +1465,9 @@ function kGetShopPaymentById($idspay) {
 function kGetShopPaymentsByZone($zone) {
 	return $GLOBALS['__shop']->getPaymentsByZone($zone);
 	}
+function kGetShopPaymentsByCountryCode($ll) {
+	return $GLOBALS['__shop']->getPaymentsByCountryCode($ll);
+	}
 function kSetShopPaymentById($idspay) {
 	return $GLOBALS['__shop']->setPaymentById($idspay);
 	}
@@ -1350,6 +1476,9 @@ function kGetShopZoneByCountryCode($ll) {
 	}
 function kGetShopDelivererById($iddel) {
 	return $GLOBALS['__shop']->getDelivererById($iddel);
+	}
+function kGetShopDeliverersByCountryCode($ll) {
+	return $GLOBALS['__shop']->getDeliverersByCountryCode($ll);
 	}
 function kGetShopDeliverersByZone($zone) {
 	return $GLOBALS['__shop']->getDeliverersByZone($zone);
@@ -1360,8 +1489,19 @@ function kSetShopDelivererById($iddel) {
 function kGetShopDelivererPriceByKg($kg,$zone=1) {
 	return $GLOBALS['__shop']->getDelivererPriceByKg($kg,$zone);
 	}
-function kGetShopItemList($from=0,$limit=10,$conditions="",$options="",$orderby="",$ll=null) {
-	return $GLOBALS['__shop']->getItemList($from,$limit,$conditions,$options,$orderby,$ll);
+function kGetShopItemsCount($vars) {
+	return $GLOBALS['__shop']->countItems($vars);
+	}
+function kGetShopItemList($vars=0,$limit=10,$conditions="",$options="",$orderby="",$ll=null) {
+	if(!is_array($vars)) {
+		$vars=array("from"=>$vars);
+		$vars['limit']=$limit;
+		$vars['conditions']=$conditions;
+		$vars['options']=$options;
+		$vars['orderby']=$orderby;
+		$vars['ll']=$ll;
+		}
+	return $GLOBALS['__shop']->getItemList($vars);
 	}
 function kGetShopItemQuickList($vars=0,$limit=10,$conditions="",$options="",$orderby="",$ll=null) {
 	if(!is_array($vars)) {
@@ -1380,13 +1520,16 @@ function kSetShopCartVar($param,$value) {
 function kGetShopCartVar($param) {
 	return $GLOBALS['__shop']->getCartVar($param);
 	}
+function kSetShopItemById($idsitem) {
+	$GLOBALS['__shop']->setItemById($idsitem);
+	}
 function kSetShopItemByDir($dir=false) {
 	if($dir==false) $dir=$GLOBALS['__subsubdir__'];
 	$GLOBALS['__shop']->setItemByDir($dir);
 	}
 function kGetShopItem($dir=false) {
 	if($dir==false) $dir=$GLOBALS['__subsubdir__'];
-	$GLOBALS['__shop']->getItemByDir($dir);
+	return $GLOBALS['__shop']->getItemByDir($dir);
 	}
 function kGetShopItemId() {
 	return $GLOBALS['__shop']->getItemVar('idsitem');
@@ -1406,11 +1549,19 @@ function kGetShopItemPreview() {
 function kGetShopItemText() {
 	return $GLOBALS['__shop']->getItemVar('testo');
 	}
+function kGetShopItemFeaturedImage() {
+	return $GLOBALS['__shop']->getItemVar('featuredimage');
+	}
 function kGetShopItemFullPrice() {
 	return $GLOBALS['__shop']->getItemVar('prezzo');
 	}
-function kGetShopItemPrice() {
-	return $GLOBALS['__shop']->getItemVar('realprice');
+function kGetShopItemPrice($vars=array()) {
+	/*
+	allowed vars
+	- idsitem = id of the item
+	- variations = array with the id of the active variations
+	*/
+	return $GLOBALS['__shop']->getItemPrice($vars);
 	}
 function kGetShopCurrency($mode="") {
 	if($mode=="symbol") return kGetVar('shop-currency',2);
@@ -1449,7 +1600,7 @@ function kGetShopItemDate($format=false,$d=false) {
 	return strftime($format,mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4)));
 	}
 function kGetShopItemCategories() {
-	return $GLOBALS['__shop']->getItemVar('categorie');
+	return $GLOBALS['__shop']->getItemVar('categories');
 	}
 function kGetShopItemEmbeddedImages() {
 	return $GLOBALS['__shop']->getItemVar('embeddedimgs');
@@ -1518,8 +1669,12 @@ function kGetShopCart() {
 		}
 	return $output;
 	}
-function kGetShopCartItemsCount() {
-	return $GLOBALS['__shop']->getCartItemsCount();
+function kGetShopCartItemsCount($vars=array()) {
+	/* input vars
+	[idsitem] -> the id of the item (optional)
+	[variations] -> an array of variation ids (optional)
+	*/
+	return $GLOBALS['__shop']->getCartItemsCount($vars);
 	}
 function kGetShopCartItemsAmount() {
 	return $GLOBALS['__shop']->getCartItemsPrice();
@@ -1540,7 +1695,6 @@ function kGetShopCartTotalAmount($vars,$iddel=null,$country=null) {
 	}
 function kShopCouponsMarkAsUsed($coupons) {
 	return $GLOBALS['__shop']->couponsMarkAsUsed($coupons);
-	
 	}
 function kGetShopCartShippingPrice($iddel=false,$country=false) {
 	return $GLOBALS['__shop']->getCartShippingPrice($iddel,$country);
@@ -1548,11 +1702,18 @@ function kGetShopCartShippingPrice($iddel=false,$country=false) {
 function kGetShopCartPaymentPrice($price=false,$idspay=false,$iddel=false,$country=false) {
 	return $GLOBALS['__shop']->getCartPaymentPrice($price,$idspay,$iddel,$country);
 	}
-function kShopAddToCart($idsitem,$qty=1,$variations=array()) {
-	$GLOBALS['__shop']->addItemToCart($idsitem,$qty,$variations);
+function kShopAddToCart($idsitem,$qty=1,$variations=array(),$customvariations=array()) {
+	if(intval($idsitem)<=0) return false;
+	$GLOBALS['__shop']->addItemToCart(intval($idsitem),$qty,$variations,$customvariations);
 	}
-function kShopRemoveFromCart($idsitem,$qty=1,$variations=array()) {
-	$GLOBALS['__shop']->removeItemFromCart($idsitem,$qty,$variations);
+function kShopRemoveFromCart($idsitem,$qty=1,$variations=array(),$customvariations=array()) {
+	$GLOBALS['__shop']->removeItemFromCart($idsitem,$qty,$variations,$customvariations);
+	}
+function kShopIncreaseCartItem($uid,$qty=1) {
+	$GLOBALS['__shop']->addItemToCartByUniqueID($uid,$qty);
+	}
+function kShopDecreaseCartItem($uid,$qty=1) {
+	$GLOBALS['__shop']->removeItemFromCartByUniqueID($uid,$qty);
 	}
 function kShopEmptyCart() {
 	$GLOBALS['__shop']->emptyCart();
@@ -1598,6 +1759,71 @@ function kGetShopOrders($vars=array()) {
 	*/
 	return $GLOBALS['__shop']->getOrders($vars);
 	}
+
+/*****************/
+/* manufacturers */
+/*****************/
+
+function kSetManufacturer($dir="",$ll=false)
+{
+	if($ll==false) $ll=LANG;
+	if($dir==""&&kHaveManufacturer()) $dir=$GLOBALS['__subsubdir__'];
+	$GLOBALS['__shop']->setManufacturer($dir,$ll);
+}
+
+function kGetManufacturerId()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('idsman');
+}
+function kGetManufacturerPermalink()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('permalink');
+}
+function kGetManufacturerDir()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('dir');
+}
+function kGetManufacturerName()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('name');
+}
+function kGetManufacturerSubtitle()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('subtitle');
+}
+function kGetManufacturerPreview()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('preview');
+}
+function kGetManufacturerDescription()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('description');
+}
+function kGetManufacturerPhotogallery()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('imgs');
+}
+function kGetManufacturerDocuments()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('docs');
+}
+function kGetManufacturerFeaturedImage()
+{
+	return $GLOBALS['__shop']->getManufacturerVar('featuredimage');
+}
+function kGetManufacturerMetadata($param=false,$dir=false,$ll=false)
+{
+	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," /");
+	if($ll==false) $ll=$_GET['lang'];
+	$metadata=$GLOBALS['__shop']->getManufacturerMetadata($dir,$ll);
+	if($param!=false)
+	{
+		if(isset($metadata[$param])) return $metadata[$param];
+		else return false;
+	}
+	return $metadata;
+}
+
 
 	
 /* private */

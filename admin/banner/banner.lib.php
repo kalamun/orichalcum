@@ -60,15 +60,26 @@ class kaBanner {
 			}
 		return false;
 		}
-	function updateFile($idbanner,$file,$title=null) {
+	function updateFile($idbanner,$file,$title=null,$width=0,$height=0,$resize="") {
 		$log="";
 		$banner=$this->get($idbanner);
 		if($log==""&&$file['tmp_name']!=""&&$banner['idbanner']!="") {
+			$ext=strtolower(substr($file['name'],strrpos($file['name'],".")+1));
 			if(isset($banner['banner']['iddoc'])) {
 				if(!$this->kaDocuments->update($banner['banner']['iddoc'],$file['tmp_name'],$file['name'],$title)) $log.="Errore durante il caricamento del file ".$file['name'].".<br />";
 				}
 			else {
 				if(!$this->kaDocuments->upload($file['tmp_name'],$file['name'],TABLE_BANNER,$banner['idbanner'],$title)) $log.="Errore durante il caricamento del file ".$file['name'].".<br />";
+				}
+			// if image, resize
+			if(($ext=="jpg"||$ext=="png"||$ext=="gif")&&$log==""&&$width>0&&$height>0) {
+				require_once('../inc/images.lib.php');
+				$this->kaImages=new kaImages;
+				if($resize=="") $resize="inside";
+				$docs=$this->kaDocuments->getList(TABLE_BANNER,$banner['idbanner']);
+				if(isset($docs[0])) {
+					$this->kaImages->resize(BASERELDIR.'/'.$docs[0]['url'],$width,$height,100,$resize);
+					}
 				}
 			}
 		if($log!="") return false;

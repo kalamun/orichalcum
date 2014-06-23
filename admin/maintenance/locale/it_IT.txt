@@ -1,0 +1,9 @@
+//MAINTENANCE
+
+Maintenance:Maintenance			Manutenzione
+Maintenance:Backup				Backup
+Maintenance:Check mailserver	Verifica il funzionamento del mailserver
+Maintenance:Fix duplicated or invalid permalinks	Correggi i permalink doppi o non validi
+Maintenance:Search for orphan images				Trova le immagini orfane
+Maintenance:Set UTF-8 as charset on database tables	Imposta in UTF-8 il charset delle tabelle del database
+

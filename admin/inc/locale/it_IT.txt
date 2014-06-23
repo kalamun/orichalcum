@@ -29,6 +29,7 @@ Menu:Advanced Setup	Setup Avanzato
 Menu:Activity Log	Registro Attività
 Menu:Users			Utenti
 Menu:Languages		Lingue
+Menu:Maintenance	Manutenzione
 
 //UI
 UI:Username			Nome utente
@@ -57,7 +58,20 @@ UI:optional			facoltativo
 UI:mandatory		obbligatorio
 UI:Are you sure?	Sei sicuro?
 
-//IMAGE MANAGER
+//UPLOAD MANAGER
+Uploads:search for name, caption, id...		cerca per nome, didascalia, id...
+Uploads:Order by							Ordina per
+Uploads:Date								Data
+Uploads:Caption								Didascalia
+Uploads:File name							Nome del file
+Uploads:saving								salvataggio
+Uploads:write caption here					scrivi qui la didascalia
+Uploads:Click here to choose one or more files from your computer		Clicca qui per caricare uno o più file dal tuo computer
+Uploads:or drag and drop them here										o trascinali qui
+Uploads:Confirm								Conferma
+Uploads:Add selected images to gallery		Aggiungi le immagini selezionate alla galleria
+
+//IMAGE MANAGER (deprecated)
 Img:Browse				Sfoglia...
 Img:Image				Immagine
 Img:Images				Immagini
@@ -165,3 +179,7 @@ Home:members			Anagrafica
 Home:License			Licenza d'utilizzo
 Home:read				leggi
 Home:Copyright			&egrave; un software <em>open-source</em> rilasciato sotto licenza <acronym title="Gnu General Public License v.3">GPL 3</acronym>
+
+//JAVASCRIPT
+Javascript:Insertimage		Inserisci l'immagine
+Javascript:Insertthumbnail	Inserisci la miniatura

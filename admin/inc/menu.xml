@@ -28,5 +28,6 @@
 		<subNode title="{Menu:Activity Log}" id="log" url="">
 		<subNode title="{Menu:Users}" id="users" url="">
 		<subNode title="{Menu:Setup}" id="setup" url="">
+		<subNode title="{Menu:Maintenance}" id="maintenance" url="">
 		</mainNode>
 	</adminMenu>

@@ -83,19 +83,6 @@ if(isset($_GET['idcat'])) {
 	<script type="text/javascript">kaMetadataReload('<?= TABLE_CATEGORIE; ?>',<?= $cat['idcat']; ?>);</script>
 	<a href="javascript:kOpenIPopUp(ADMINDIR+'inc/ajax/metadataNew.php','t=<?= TABLE_CATEGORIE; ?>&id=<?= $cat['idcat']; ?>','600px','400px')" class="smallbutton">Nuovo meta-dato</a>
 	</div>
-	<script type="text/javascript">
-		function showActions(td) {
-			for(var i=0;td.getElementsByTagName('DIV')[i];i++) {
-				td.getElementsByTagName('DIV')[i].style.visibility='visible';
-				}
-			}
-		function hideActions(td) {
-			for(var i=0;td.getElementsByTagName('DIV')[i];i++) {
-				td.getElementsByTagName('DIV')[i].style.visibility='hidden';
-				}
-			}
-		</script>
-
 	<br />
 	<br />
 
@@ -140,8 +127,8 @@ else { ?>
 			$categorie=$kaCategorie->getList(TABLE_NEWS);
 			foreach($categorie as $cat) {
 				?><tr>
-					<td onmouseover="showActions(this)" onmouseout="hideActions(this)"><h2><a href="?idcat=<? echo $cat['idcat']; ?>"><? echo $cat['categoria']; ?></a></h2>
-					<div class="small" style="visibility:hidden;"><a href="?idcat=<? echo $cat['idcat']; ?>">Modifica</a> | <a href="<?= SITE_URL.'/'.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_news',1)."/".$cat['dir']; ?>">Visita</a> | <a href="?delete=<? echo $cat['idcat']; ?>" onclick="return confirm('Sei sicuro di voler rimuovere questa categoria?');">Elimina</a></div>
+					<td><h2><a href="?idcat=<? echo $cat['idcat']; ?>"><? echo $cat['categoria']; ?></a></h2>
+					<small class="actions"><a href="?idcat=<? echo $cat['idcat']; ?>">Modifica</a> | <a href="<?= SITE_URL.'/'.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_news',1)."/".$cat['dir']; ?>">Visita</a> | <a href="?delete=<? echo $cat['idcat']; ?>" onclick="return confirm('Sei sicuro di voler rimuovere questa categoria?');">Elimina</a></small>
 					<td class="percorso"><?= $cat['dir']; ?></td>
 					<td class="sposta"><input type="hidden" name="categorie[]" value="<?= $cat['idcat']; ?>" /><img src="<?= ADMINRELDIR; ?>img/drag_v.gif" width="18" height="18" alt="Sposta" /> Sposta</td>
 					</tr>

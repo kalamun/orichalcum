@@ -21,6 +21,22 @@ if(!isset($_SESSION['iduser'])) die($kaTranslate->translate('You don\'t have per
 <script type="text/javascript">var ADMINDIR='<?php echo str_replace("'","\'",ADMINDIR); ?>';</script>
 <script type="text/javascript" src="<?php echo ADMINDIR; ?>js/main.lib.js"></script>
 <script type="text/javascript" src="<?php echo ADMINDIR; ?>js/kalamun.js"></script>
+<script type="text/javascript">
+	window.parent.addImages=function(ids)
+	{
+		var form=this.document.getElementById('formAggiunta');
+		for(var i=0;ids[i];i++)
+		{
+			var inpt=this.document.createElement('INPUT');
+			inpt.type='hidden';
+			inpt.name='img[]';
+			inpt.value=ids[i].id;
+			form.appendChild(inpt);
+		}
+		form.submit();
+		window.parent.k_closeIframeWindow();
+	}
+</script>
 </head>
 
 <body>
@@ -37,8 +53,15 @@ if(!isset($_SESSION['iduser'])) die($kaTranslate->translate('You don\'t have per
 	$kaImages=new kaImages();
 	$kaImgallery=new kaImgallery();
 
+	if(isset($_GET['action'])&&$_GET['action']=='add')
+	{
+		foreach($_POST['img'] as $idimg)
+		{
+			$kaImgallery->add($_GET['mediatable'],$_GET['mediaid'],$idimg,$_GET['start'],$_GET['max']);
+		}
+	}
 
-	if(isset($_POST['img'])) {
+	elseif(isset($_POST['img'])) {
 		$kaImgallery->sort($_GET['mediatable'],$_GET['mediaid'],$_POST['img'],$_GET['start'],$_GET['max']);
 		}
 
@@ -55,8 +78,10 @@ if(!isset($_SESSION['iduser'])) die($kaTranslate->translate('You don\'t have per
 		}
 
 	if(count($immagini)<$_GET['max']||$_GET['max']==0) { ?>
-		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/imgalleryManager.inc.php?refid=<?php echo $_GET['refid']; ?>&mediatable=<?php echo $_GET['mediatable']; ?>&mediaid=<?php echo $_GET['mediaid']; ?>&start=<?php echo $_GET['start']; ?>&max=<?php echo $_GET['max']; ?>','800px','500px');" class="smallbutton"><img src="<?= ADMINRELDIR; ?>img/upload.png" width="16" height="16" /> <?php echo $_GET['label']; ?></a>
+		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/uploadsManager.inc.php?limit=<?= $_GET['max']; ?>&submitlabel=<?= urlencode($kaTranslate->translate('Uploads:Add selected images to gallery')); ?>&onsubmit=addImages');" class="smallbutton"><img src="<?= ADMINRELDIR; ?>img/upload.png" width="16" height="16" /> <?php echo $_GET['label']; ?></a>
 		<?php } ?>
+
+	<form action="?action=add&refid=<?php echo $_GET['refid']; ?>&mediatable=<?php echo $_GET['mediatable']; ?>&mediaid=<?php echo $_GET['mediaid']; ?>&start=<?php echo $_GET['start']; ?>&max=<?php echo $_GET['max']; ?>&label=<?php echo str_replace('"','\"',$_GET['label']); ?>" method="post" id="formAggiunta"></form>
 
 	<form action="?refid=<?php echo $_GET['refid']; ?>&mediatable=<?php echo $_GET['mediatable']; ?>&mediaid=<?php echo $_GET['mediaid']; ?>&start=<?php echo $_GET['start']; ?>&max=<?php echo $_GET['max']; ?>&label=<?php echo str_replace('"','\"',$_GET['label']); ?>" method="post" id="formOrdinamento">
 	<div id="wait" style="display:none;"><h3><?= $kaTranslate->translate('UI:Please Wait...'); ?></h3></div>

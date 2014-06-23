@@ -10,8 +10,11 @@ Pages:Comments				Commentaires
 Pages:Comment management	Gestion de Commentaires
 Pages:This page is commentable	Cette page est commentable
 Pages:This page has %s comments, %s of which still to moderate	Cette page ai %s commentaires, %s qui restent à modérer
-Pages:Title					Titre
+Pages:Title					Titre de la page
 Pages:Subtitle				Sous-titre
+Pages:Featured Image		Image de présentation
+Pages:Choose featured image	Choisir l'image
+Pages:Set featured image	Utiliser comme image de présentation
 Pages:Introduction			Introduction
 Pages:Contents				Contenu
 Pages:Photo gallery			Gallerie de photos

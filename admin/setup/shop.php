@@ -39,6 +39,14 @@ if(isset($_POST['update'])) {
 		}
 	$kaImpostazioni->setParam('admin-shop-layout',$layout,"","*");
 
+	$layoutmanufacturers=",";
+	if(isset($_POST['layoutmanufacturers'])) {
+		foreach($_POST['layoutmanufacturers'] as $ka=>$v) {
+			$layout.=$ka.",";
+			}
+		}
+	$kaImpostazioni->setParam('admin-manufacturers-layout',$layout,"","*");
+
 	foreach(file('../shop/currencies.txt') as $line) {
 		$line=trim($line);
 		if(substr($line,0,1)!="#") {
@@ -120,6 +128,7 @@ $v['shop-paypal-return1']="";
 $v['shop-paypal-return2']="";
 $v['shop-currency1']="";
 $layout=$kaImpostazioni->getParam('admin-shop-layout',"*");
+$layoutmanufacturers=$kaImpostazioni->getParam('admin-manufacturers-layout',"*");
 
 $query="SELECT * FROM ".TABLE_CONFIG." WHERE param LIKE 'shop%' AND ll='".$_SESSION['ll']."'";
 $results=mysql_query($query);
@@ -211,19 +220,22 @@ $v['shop-pagonline1b']=substr($v['shop-pagonline1'],strpos($v['shop-pagonline1']
 	$option=array("");
 	$value=array("-default-");
 	//scandaglio la directory per i template
-	if($handle=opendir(BASERELDIR.DIR_TEMPLATE.$v['shop-template1'].'/layouts/')) {
-		while(false!==($file=readdir($handle))) {
-			if(trim($file,".")!="") {
-				$option[]=$file;
-				$value[]=str_replace("_"," ",$file);
+	if(file_exists(BASERELDIR.DIR_TEMPLATE.$v['shop-template1'].'/layouts/') && is_dir(BASERELDIR.DIR_TEMPLATE.$v['shop-template1'].'/layouts/'))
+	{
+		if($handle=opendir(BASERELDIR.DIR_TEMPLATE.$v['shop-template1'].'/layouts/')) {
+			while(false!==($file=readdir($handle))) {
+				if(trim($file,".")!="") {
+					$option[]=$file;
+					$value[]=str_replace("_"," ",$file);
+					}
 				}
-			}
-		closedir($handle);
+			closedir($handle);
 		}
+	}
 	echo b3_create_select("shop-template2","Layout di default per il negozio ",$value,$option,$v['shop-template2']).'<br /><br />';
 
-	$option=array("ordine","titolo","created","public","expired");
-	$value=array("Ordinamento manuale","Nome dell'oggetto","Data di inserimento","Data di pubblicazione","Data di scadenza");
+	$option=array("ordine","titolo","sottotitolo","created","public","expired");
+	$value=array("Ordinamento manuale","Nome dell'oggetto","Sottotitolo dell'oggetto","Data di inserimento","Data di pubblicazione","Data di scadenza");
 	echo b3_create_select("shop-order1","Ordina il negozio per ",$value,$option,$v['shop-order1']).'<br />';
 	
 	$option=array("","nascondi");
@@ -261,10 +273,19 @@ $v['shop-pagonline1b']=substr($v['shop-pagonline1'],strpos($v['shop-pagonline1']
 <table style="width:100%;"><tr><td>
 	<h3><?= $kaTranslate->translate('Setup:Fields to display in administration panel'); ?></h3>
 		<?
-		$elm=array("productcode"=>"Product code","title"=>"Title","subtitle"=>"Subtitle","preview"=>"Preview","text"=>"Text","price"=>"Price","discounted"=>"Discounted","qta"=>"Quantity","privatearea"=>"Private area","categories"=>"Categories","created"=>"Creation date","public"=>"Visible from","expiration"=>"Expiration date","weight"=>"Weight","rating"=>"Rating","votes"=>"Votes","variations"=>"Variazioni","photogallery"=>"Photogallery","documentgallery"=>"Document gallery","layout"=>"Layout","translate"=>"Translations","metadata"=>"Metadata","seo"=>"SEO (Search Engine Optimization)","ordersummary"=>"Orders Summary (opened, closed, canceled)");
+		$elm=array("productcode"=>"Product code","title"=>"Title","subtitle"=>"Subtitle","featuredimage"=>"Shop:Featured Image","preview"=>"Preview","text"=>"Text","price"=>"Price","discounted"=>"Discounted","qta"=>"Quantity","privatearea"=>"Private area","categories"=>"Categories","created"=>"Creation date","public"=>"Visible from","expiration"=>"Expiration date","weight"=>"Weight","rating"=>"Rating","votes"=>"Votes","variations"=>"Variazioni","photogallery"=>"Photogallery","documentgallery"=>"Document gallery","layout"=>"Layout","translate"=>"Translations","metadata"=>"Metadata","seo"=>"SEO (Search Engine Optimization)","manufacturers"=>"Manufacturers","ordersummary"=>"Orders Summary (opened, closed, canceled)");
 		$elmobl=array("title"=>true,"text"=>true);
 		foreach($elm as $ka=>$v) {
 			echo b3_create_input("layout[".$ka."]","checkbox",$kaTranslate->translate('Setup:'.$v),"s","","",(strpos($layout['value1'],",".$ka.",")!==false||isset($elmobl[$ka])?'checked':'').' '.(isset($elmobl[$ka])?'disabled':''),true).'<br />';
+			}
+		?>
+	<br>
+	<h3><?= $kaTranslate->translate('Setup:Fields to display for manufacturers'); ?></h3>
+		<?
+		$elm=array("name"=>"Name","subtitle"=>"Subtitle","featuredimage"=>"Shop:Featured Image","preview"=>"Preview","description"=>"Description","created"=>"Creation date","photogallery"=>"Photogallery","documentgallery"=>"Document gallery","translate"=>"Translations","metadata"=>"Metadata","seo"=>"SEO (Search Engine Optimization)");
+		$elmobl=array("name"=>true,"description"=>true);
+		foreach($elm as $ka=>$v) {
+			echo b3_create_input("layoutmanufacturers[".$ka."]","checkbox",$kaTranslate->translate('Setup:'.$v),"s","","",(strpos($layoutmanufacturers['value1'],",".$ka.",")!==false||isset($elmobl[$ka])?'checked':'').' '.(isset($elmobl[$ka])?'disabled':''),true).'<br />';
 			}
 		?>
 	</td>

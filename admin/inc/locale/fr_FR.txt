@@ -29,6 +29,7 @@ Menu:Advanced Setup	Configuration avancée
 Menu:Activity Log	Journal d'activité
 Menu:Users			Utilisateurs
 Menu:Languages		Langues
+Menu:Maintenance	Entretien
 
 //UI
 UI:Username			Nom d'utilisateur
@@ -57,6 +58,20 @@ UI:optional			facultatif
 UI:mandatory		obligatoire
 UI:Are you sure?	êtes-vous sûr?
 
+//UPLOAD MANAGER
+Uploads:search for name, caption, id...		recherche pour nom, légende, id ... 
+Uploads:Order by							Ordre
+Uploads:Date								Date
+Uploads:Caption								Légende
+Uploads:File name							Nom du fichier
+Uploads:saving								sauvetage
+Uploads:write caption here					écrire la légende ici 
+Uploads:Click here to choose one or more files from your computer		Cliquez ici pour choisir un ou plusieurs fichiers à partir de votre ordinateur
+Uploads:or drag and drop them here										ou déposez-les ici 
+Uploads:Confirm								Confirmer
+Uploads:Add selected images to gallery		Ajouter les images sélectionnées à la galerie
+
+
 //IMAGE MANAGER
 Img:Browse				Parcourir...
 Img:Image				Image
@@ -73,7 +88,7 @@ Img:Delete				Effacer
 Img:No Images			Aucune Image
 Img:Upload from computer	Envoie depuis l'ordinateur
 Img:Insert the picture	Insérez l'image
-Img:Insert the thumbnail	Insérer la vignette
+Img:Insert the thumbnail	Insérer la miniature
 Img:Choose from repository	Choisissez à partir du l'archive
 Img:Choose from internet	Choisissez à partir d'internet
 Img:Choose a picture	Choisissez une photo
@@ -85,10 +100,10 @@ Img:Image URL			URL de l'image
 Img:Width				Largeur
 Img:Height				Hauteur
 Img:Caption				Légende
-Img:Thumbnail			Vignette
-Img:Thumbnail successfully updated	Vignette mis à jour
-Img:Automatic thumbnail	Vignette automatique
-Img:Choose a custom thumbnail	Choisissez une vignette personnalisée
+Img:Thumbnail			Miniature
+Img:Thumbnail successfully updated	Miniature mis à jour
+Img:Automatic thumbnail	Miniature automatique
+Img:Choose a custom thumbnail	Choisissez une miniature personnalisée
 Img:Copy to your website	Copier sur votre site web
 Img:Load as Hotlink		Chargez comme Hotlink
 
@@ -165,3 +180,7 @@ Home:members			Utilisateurs
 Home:License			License
 Home:read				lire
 Home:Copyright			est un logiciel <em>open-source</em> publié sous licence <acronym title="Gnu General Public License v.3">GPL 3</acronym>
+
+//JAVASCRIPT
+Javascript:Insertimage		Ajouter l'image
+Javascript:Insertthumbnail	Ajouter la miniature

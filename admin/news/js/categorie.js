@@ -21,7 +21,7 @@ var markURLfield=function(success) {
 function checkURL(field) {
 	var target=document.getElementById('dir')
 	//cancello i caratteri non ammessi
-	target.value=target.value.replace(/[^\w^\/]+/g,"-").toLowerCase();
+	target.value=target.value.replace(/[^\w\/\.\-\u00C0-\uD7FF\u2C00-\uD7FF]+/g,"-");
 	if(typeof(ajaxTimer)!=='undefined') clearTimeout(ajaxTimer);
 	t=setTimeout(function() {
 		var aj=new kAjax();

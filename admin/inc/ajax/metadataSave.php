@@ -19,7 +19,6 @@ if($timezone!="") {
 	mysql_query($query);
 	}
 
-$_POST['v']=mb_convert_encoding($_POST['v'],'UTF-8');
 if(get_magic_quotes_gpc()) $_POST['v']=stripslashes($_POST['v']);
 if(get_magic_quotes_gpc()) $_POST['p']=stripslashes($_POST['p']);
 

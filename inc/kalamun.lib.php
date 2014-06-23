@@ -1,6 +1,22 @@
 <?php
 /* (c) Kalamun.org - GNU/GPL 3 */
 
+
+/* functions to increase compatiblity on different configurations */
+if(!function_exists('apache_request_headers'))
+{
+	function apache_request_headers()
+	{
+		$headers = array();
+		foreach($_SERVER as $key => $value)
+		{
+			if(substr($key, 0, 5) == 'HTTP_') $headers[str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))))] = $value;
+		}
+		return $headers;
+	}
+}
+
+
 function kInit() {
 	if(!defined("BASERELDIR")||!defined("ADMINDIR")) {
 		$reldir="";
@@ -106,6 +122,7 @@ class kText {
 			strpos($images[$id]['html'],' height=')!==false?$images[$id]['height']=preg_replace("/^.*height=[\"']?(\d+)[\"'].*$/","$1",$images[$id]['html']):$images[$id]['height']="";
 			if($images[$id]['width']=="") strpos($images[$id]['html'],'width:')!==false?$images[$id]['width']=preg_replace("/^.*width: ?([^;]+);.*$/","$1",$images[$id]['html']):$images[$id]['width']="";
 			if($images[$id]['height']=="") strpos($images[$id]['html'],'height:')!==false?$images[$id]['height']=preg_replace("/^.*height: ?([^;]+);.*$/","$1",$images[$id]['html']):$images[$id]['height']="";
+			strpos($images[$id]['html'],' class=')!==false?$images[$id]['class']=preg_replace("/^.*class=[\"']?([^\"]+)[\"'].*$/","$1",$images[$id]['html']):$images[$id]['class']="";
 			$offset=$images[$id]['end']+1;
 			}
 
@@ -115,6 +132,7 @@ class kText {
 				$__template->imgDB=$kImage->getImage($images[$i]['idimg']);
 				if($images[$i]['width']!="") $__template->imgDB['width']=$images[$i]['width'];
 				if($images[$i]['height']!="") $__template->imgDB['height']=$images[$i]['height'];
+				if($images[$i]['class']!="") $__template->imgDB['class']=$images[$i]['class'];
 				$embeddedimages[]=$__template->imgDB;
 				if($images[$i]['type']=="img") $tpl=$__template->getSubTemplate('image');
 				else $tpl=$__template->getSubTemplate('thumbnail');

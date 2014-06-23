@@ -169,31 +169,31 @@ class kaStats {
 		if(strpos($s,"MSIE")!==false) {
 			$output['browser']='Microsoft Internet Explorer';
 			preg_match_all("/MSIE ([0-9\.]*)/",$s,$tmp);
-			$output['browserVersion']=$tmp[1][0];
+			$output['browserVersion']=isset($tmp[1][0])?$tmp[1][0]:'unknow';
 			}
 		//Firefox
 		elseif(strpos($s,"Firefox")!==false) {
 			$output['browser']='Mozilla Firefox';
 			preg_match_all("/Firefox\/([0-9\.]*)/",$s,$tmp);
-			$output['browserVersion']=$tmp[1][0];
+			$output['browserVersion']=isset($tmp[1][0])?$tmp[1][0]:'unknow';
 			}
 		//Chrome
 		elseif(strpos($s,"Chrome")!==false) {
 			$output['browser']='Google Chrome';
 			preg_match_all("/Chrome\/([0-9\.]*)/",$s,$tmp);
-			$output['browserVersion']=$tmp[1][0];
+			$output['browserVersion']=isset($tmp[1][0])?$tmp[1][0]:'unknow';
 			}
 		//Safari
 		elseif(strpos($s,"Safari")!==false) {
 			$output['browser']='Apple Safari';
 			preg_match_all("/Safari\/([0-9\.]*)/",$s,$tmp);
-			$output['browserVersion']=$tmp[1][0];
+			$output['browserVersion']=isset($tmp[1][0])?$tmp[1][0]:'unknow';
 			}
 		//Opera
 		elseif(strpos($s,"Opera")!==false) {
 			$output['browser']='Opera';
 			preg_match_all("/Opera\/([0-9\.]*)/",$s,$tmp);
-			$output['browserVersion']=$tmp[1][0];
+			$output['browserVersion']=isset($tmp[1][0])?$tmp[1][0]:'unknow';
 			}
 		
 		/* detect os */

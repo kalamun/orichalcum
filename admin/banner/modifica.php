@@ -13,7 +13,10 @@ if(isset($_POST['update'])) {
 	$_POST['online']=!isset($_POST['online'])?'s':'n';
 	if(!$kaBanner->update($_POST['idbanner'],$_POST['alt'],$_POST['description'],$_POST['url'],$_POST['idcat'],$_POST['online'])) $log=$kaTranslate->translate('Banner:Error while updating database');
 	if(isset($_FILES['banner']['tmp_name'])) {
-		if(!$kaBanner->updateFile($_POST['idbanner'],$_FILES['banner'],$_POST['alt'])) $log=$kaTranslate->translate('Banner:Error while uploading the new file');
+		$w=$kaMetadata->get(TABLE_CATEGORIE,$_POST['idcat'],'width');
+		$h=$kaMetadata->get(TABLE_CATEGORIE,$_POST['idcat'],'height');
+		$r=$kaMetadata->get(TABLE_CATEGORIE,$_POST['idcat'],'resize');
+		if(!$kaBanner->updateFile($_POST['idbanner'],$_FILES['banner'],$_POST['alt'],intval($w['value']),intval($h['value']),$r['value'])) $log=$kaTranslate->translate('Banner:Error while uploading the new file');
 		}
 
 	if($log!="") {
@@ -104,8 +107,15 @@ else { ?>
 		<form action="" method="post" enctype="multipart/form-data">
 			<?
 			$banner=$kaBanner->get($_GET['idbanner']);
+			$w=$kaMetadata->get(TABLE_CATEGORIE,$banner['categoria'],'width');
+			$h=$kaMetadata->get(TABLE_CATEGORIE,$banner['categoria'],'height');
+			$r=$kaMetadata->get(TABLE_CATEGORIE,$banner['categoria'],'resize');
+			$banner['width']=intval($w['value']);
+			$banner['height']=intval($h['value']);
+			$banner['resize']=intval($r['value']);
+
 			if(isset($banner['banner']['url'])) {
-				$ext=substr($banner['banner']['url'],strrpos($banner['banner']['url'],"."));
+				$ext=strtolower(substr($banner['banner']['url'],strrpos($banner['banner']['url'],".")));
 				if($ext=='.jpg'||$ext=='.gif'||$ext=='.png') {
 					$size=getimagesize(BASERELDIR.$banner['banner']['url']);
 					?><div class="bannerPreview"><img src="<?= BASEDIR.$banner['banner']['url']; ?>" width="<?= $size[0]; ?>" alt="" /></div><br /><br /><?
@@ -127,7 +137,9 @@ else { ?>
 				?></td></tr>
 			<tr><th><label for="alt"><?= $kaTranslate->translate('Banner:Title'); ?></label></th><td><?= b3_create_input("alt","text","",$banner['title'],"300px"); ?></td></tr>
 			<tr><th><label for="description"><?= $kaTranslate->translate('Banner:Short description'); ?></label></th><td><?= b3_create_textarea("description","",b3_lmthize($banner['description'],"textarea"),"99%","100px",RICH_EDITOR,false,TABLE_BANNER,$banner['idbanner']); ?></td></tr>
-			<tr><th><label for="banner"><?= $kaTranslate->translate('Banner:New File'); ?></label></th><td><?= b3_create_input("banner","file","",""); ?></td></tr>
+			<tr><th><label for="banner"><?= $kaTranslate->translate('Banner:New File'); ?></label></th><td><?= b3_create_input("banner","file","",""); ?>
+				<? if($banner['width']>0) { ?><small>(<?= $banner['width']; ?> x <?= $banner['height']; ?> px)</small><? } ?>
+				</td></tr>
 			<tr><th><label for="url"><?= $kaTranslate->translate('Banner:Target URL'); ?></label></th><td><?= b3_create_input("url","text","",$banner['url'],"300px"); ?></td></tr>
 			<tr><th><label><?= $kaTranslate->translate('Banner:Views'); ?></label></th><td><?= $banner['views']; ?></td></tr>
 			</table>

@@ -3,42 +3,57 @@ define("PAGE_NAME","Menu:Dictionary");
 include_once("../inc/head.inc.php");
 
 /* ACTIONS */
-if(isset($_POST['insert'])) {
+
+/* clean terms */
+function cleanTerm($term)
+{
+	$term=trim($term);
+	// convert to html
+	$term=b3_htmlize($term,true);
+	$term=trim($term);
+	// if term is <p>something</p>, strip p
+	if(substr_count($term,"<p>")==1) $term=preg_replace("/<\/?p>/is","",$term);
+	$term=trim($term);
+	// remove ending <br>
+	$term=preg_replace("/(<br ?\/?>)+$/is","",$term);
+	$term=trim($term);
+	
+	return $term;
+}
+
+if(isset($_POST['insert']))
+{
 	$log="";
-	if(get_magic_quotes_gpc()==true) {
-		$_POST['param']=stripslashes($_POST['param']);
-		$_POST['testo']=stripslashes($_POST['testo']);
-		}
-	$query="INSERT INTO ".TABLE_DIZIONARIO." (param,testo,ll) VALUES('".mysql_real_escape_string($_POST['param'])."','".b3_htmlize(trim($_POST['testo']),true,"")."','".$_SESSION['ll']."')";
+	if(get_magic_quotes_gpc()==true) $_POST['param']=stripslashes($_POST['param']);
+	$term=cleanTerm($_POST['testo']);
+	
+	$query="INSERT INTO `".TABLE_DIZIONARIO."` (`param`,`testo`,`ll`) VALUES('".mysql_real_escape_string($_POST['param'])."','".$term."','".$_SESSION['ll']."')";
 	if(!mysql_query($query)) $log="Problemi durante il salvataggio nel database";
 
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine salvato con successo</div>';
-	}
-elseif(isset($_POST['update'])) {
+
+} elseif(isset($_POST['update'])) {
 	$log="";
-	if(get_magic_quotes_gpc()==true) {
-		$_POST['param']=stripslashes($_POST['param']);
-		$_POST['testo']=stripslashes($_POST['testo']);
-		}
-	$query="UPDATE ".TABLE_DIZIONARIO." SET param='".mysql_real_escape_string($_POST['param'])."',testo='".b3_htmlize(trim($_POST['testo']),true,"")."' WHERE iddiz=".$_POST['iddiz'];
+	if(get_magic_quotes_gpc()==true) $_POST['param']=stripslashes($_POST['param']);
+	$term=cleanTerm($_POST['testo']);
+	
+	$query="UPDATE `".TABLE_DIZIONARIO."` SET `param`='".mysql_real_escape_string($_POST['param'])."',`testo`='".$term."' WHERE `iddiz`=".$_POST['iddiz'];
 	if(!mysql_query($query)) $log="Problemi durante il salvataggio nel database";
 
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine salvato con successo</div>';
-	}
-elseif(isset($_GET['delete'])) {
+
+} elseif(isset($_GET['delete'])) {
 	$log="";
-	if(get_magic_quotes_gpc()==true) {
-		$_GET['delete']=stripslashes($_GET['delete']);
-		}
-	$query="DELETE FROM ".TABLE_DIZIONARIO." WHERE param='".mysql_real_escape_string($_GET['delete'])."'";
+	if(get_magic_quotes_gpc()==true) $_GET['delete']=stripslashes($_GET['delete']);
+	$query="DELETE FROM `".TABLE_DIZIONARIO."` WHERE `param`='".mysql_real_escape_string($_GET['delete'])."'";
 	if(!mysql_query($query)) $log="Problemi durante la rimozione dal database";
 
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine eliminato con successo</div>';
-	}
-elseif(isset($_GET['import'])) {
+
+} elseif(isset($_GET['import'])) {
 	$log="";
 
 	// parse every file in the default template and default mobile template
@@ -79,7 +94,7 @@ elseif(isset($_GET['import'])) {
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine salvato con successo</div>';
 
-	}
+}
 /* END ACTIONS */
 
 
@@ -92,7 +107,7 @@ elseif(isset($_GET['import'])) {
 /* New term GUI */
 if(isset($_GET['addnew'])) { ?>
 	<form action="?" method="post">
-		<?= b3_create_input("param","text",$kaTranslate->translate('Dictionary:Term')." ",b3_lmthize($_GET['addnew'],"input"),"200px",50); ?><br /><br />
+		<?= b3_create_input("param","text",$kaTranslate->translate('Dictionary:Term')." ",b3_lmthize($_GET['addnew'],"input"),"200px",255); ?><br /><br />
 		<?= b3_create_textarea("testo",$kaTranslate->translate('Dictionary:Translation')." ","","99%","100px"); ?><br /><br />
 		<div class="submit"><input type="submit" name="insert" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" /> <input type="submit" name="" value="<?= $kaTranslate->translate('UI:Cancel'); ?>" class="button" /></div>
 		</form><br />
@@ -106,8 +121,8 @@ elseif(isset($_GET['iddiz'])) {
 	?>
 	<form action="?" method="post">
 		<input type="hidden" name="iddiz" value="<?= $row['iddiz']; ?>" />
-		<?= b3_create_input("param","text",$kaTranslate->translate('Dictionary:Term')." ",b3_lmthize($row['param'],"input"),"200px",50); ?><br /><br />
-		<?= b3_create_textarea("testo",$kaTranslate->translate('Dictionary:Translation')." ",b3_lmthize(b3_unhtmlize($row['testo']),"textarea"),"99%","100px",false); ?><br /><br />
+		<?= b3_create_input("param","text",$kaTranslate->translate('Dictionary:Term')." ",b3_lmthize($row['param'],"input"),"200px",255); ?><br /><br />
+		<?= b3_create_textarea("testo",$kaTranslate->translate('Dictionary:Translation')." ",b3_lmthize($row['testo'],"textarea"),"99%","100px",false); ?><br /><br />
 		<div class="submit"><input type="submit" name="update" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" /> <input type="submit" name="" value="<?= $kaTranslate->translate('UI:Cancel'); ?>" class="button" /></div>
 		</form><br />
 	<? }

@@ -15,6 +15,15 @@ include_once("../inc/head.inc.php");
 </ul>
 
 <?
+if(strpos($pageLayout,",manufacturers,")!==false) { ?>
+<ul class="mainopt">
+<li><a href="manufacturers-add.php"><?= $kaTranslate->translate('Shop:Create a new manufacturer'); ?></a></li>
+<li><a href="manufacturers-edit.php"><?= $kaTranslate->translate('Shop:Edit a manufacturer'); ?></a></li>
+<li><a href="manufacturers-delete.php"><?= $kaTranslate->translate('Shop:Delete a manufacturer'); ?></a></li>
+</ul>
+<?
+}
+
 $pageLayout=$kaImpostazioni->getVar('admin-shop-layout',1,"*");
 if(strpos($pageLayout,",ordersummary,")!==false) { ?>
 <ul class="mainopt">

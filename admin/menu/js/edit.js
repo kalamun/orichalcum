@@ -11,6 +11,7 @@ var kAutocomplete=function() {
 		input=document.getElementById(titleid);
 		inputID=document.getElementById(dirid);
 		input.addEventListener('keypress',onKeyPress,true);
+		input.addEventListener('keyup',onKeyUp,true);
 		input.addEventListener('blur',off,true);
 		input.setAttribute("autocomplete","off");
 		if(timer) clearTimeout(timer);
@@ -18,9 +19,9 @@ var kAutocomplete=function() {
 	this.init=init;
 
 	var onKeyPress=function(e) {
+        if(!e) var e = window.event;
 		var k=e.keyCode;
 		var sel=ulGetSelectedId();
-        if(!e) var e = window.event;
 
 		//arrow down = 40 or 98
 		if(k==40||k==98) {
@@ -72,8 +73,14 @@ var kAutocomplete=function() {
 		if(k==9) {
 			return false;
 			}
+		}
+	var onKeyUp=function(e) {
+        if(!e) var e=window.event;
+		var k=e.keyCode;
+		if(k==40||k==98||k==38||k==104||k==13||k==9) return false;
+
 		//show suggestions
-		if(input.value.length>3) {
+		if(input.value.length>=2) {
 			timer=setTimeout(loadSuggestions,500);
 			}
 		}

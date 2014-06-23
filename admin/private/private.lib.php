@@ -270,7 +270,7 @@ class kaPrivate {
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
 		header('Content-Length: '.filesize($filename));
-		ob_clean();
+		ob_get_level() and ob_clean();
 		flush();
 		$this->readfile_chunked($filename);
 		//$this->log($_SESSION['magazzino']['iduser'],$_SESSION['magazzino']['name'],"MDW","[".$dir."] ".$filename);

@@ -112,8 +112,8 @@ class kaNewsletter {
 		$message=str_replace("{EXPIRATION}",$member['expiration'],$message);
 
 		$sender=$GLOBALS['kaImpostazioni']->getParam('newsletter_mittente');
-		if($sender['value1']=="") $sender['value1']=ADMIN_NAME;
-		if($sender['value2']=="") $sender['value2']=ADMIN_MAIL;
+		if(!isset($sender['value1'])||$sender['value1']=="") $sender['value1']=ADMIN_NAME;
+		if(!isset($sender['value2'])||$sender['value2']=="") $sender['value2']=ADMIN_MAIL;
 		$from=$sender['value1'].' <'.$sender['value2'].'>';
 
 		if($GLOBALS['__emails']->send($from,$to,$subject,$message)) return true;

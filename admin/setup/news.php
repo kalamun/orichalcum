@@ -89,7 +89,8 @@ $facebook['page']=$kaImpostazioni->getParam('facebook-page');
 	<tr>
 		<td><label for="news-template2">Layout di default per le news</label></td>
 		<td><?
-			if($template['value1']=="") $template['value1']=$kaImpostazioni->getVar('template_default',1);
+			if(!isset($template['value1'])||$template['value1']=="") $template['value1']=$kaImpostazioni->getVar('template_default',1);
+			if(!isset($template['value2'])||$template['value2']=="") $template['value2']=$kaImpostazioni->getVar('template_default',1);
 			$option=array("");
 			$value=array("-default-");
 			//scandaglio la directory per i template
@@ -121,8 +122,8 @@ $facebook['page']=$kaImpostazioni->getParam('facebook-page');
 	<tr>
 		<td><label for="news-order1">Ordina le news per</label></td>
 		<td><?
-			$option=array("data DESC","pubblica DESC","scadenza DESC");
-			$value=array("Data di inserimento","Data di pubblicazione","Data di scadenza");
+			$option=array("data DESC","pubblica DESC","starting_date DESC","scadenza DESC");
+			$value=array("Data di inserimento","Data di pubblicazione","Data di inizio","Data di scadenza");
 			echo b3_create_select("news-order[1]","",$value,$option,$order['value1']);
 			?></td>
 		</tr>
@@ -184,7 +185,7 @@ $facebook['page']=$kaImpostazioni->getParam('facebook-page');
 
 <h3><?= $kaTranslate->translate('Setup:Fields to display in administration panel'); ?></h3>
 	<?
-	$elm=array("title"=>"News:Title","subtitle"=>"News:Subtitle","preview"=>"News:Preview","text"=>"News:Text","categories"=>"News:Categories","home"=>"News:Show in home page","calendario"=>"News:Show in calendar","date"=>"News:Created","public"=>"News:Visible from","expiration"=>"News:Expiration date","photogallery"=>"News:Photo gallery","documentgallery"=>"News:Document gallery","template"=>"News:Template","layout"=>"News:Layout","translate"=>"News:Translations","metadata"=>"News:Metadata","seo"=>"News:SEO");
+	$elm=array("title"=>"News:Title","subtitle"=>"News:Subtitle","featuredimage"=>"News:Featured Image","preview"=>"News:Preview","text"=>"News:Text","categories"=>"News:Categories","home"=>"News:Show in home page","calendario"=>"News:Show in calendar","date"=>"News:Created","public"=>"News:Visible from","startingdate"=>"News:Starting date","expiration"=>"News:Expiration date","photogallery"=>"News:Photo gallery","documentgallery"=>"News:Document gallery","template"=>"News:Template","layout"=>"News:Layout","translate"=>"News:Translations","metadata"=>"News:Metadata","seo"=>"News:SEO");
 	$elmobl=array("title"=>true,"text"=>true);
 	foreach($elm as $ka=>$v) {
 		echo b3_create_input("layout[".$ka."]","checkbox",$kaTranslate->translate($v),"s","","",(strpos($layout['value1'],",".$ka.",")!==false||isset($elmobl[$ka])?'checked':'').' '.(isset($elmobl[$ka])?'disabled':''),true).'<br />';

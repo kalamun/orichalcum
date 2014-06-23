@@ -54,6 +54,8 @@ elseif(isset($_POST['setPermissions'])) {
 	$_POST['dir']=trim($_POST['dir']," ./");
 	if(!isset($_POST['members'])) $_POST['members']=array();
 	if(!isset($_POST['canWrite'])) $_POST['canWrite']=false;
+	if(!isset($_POST['members'])) $_POST['members']=array();
+	if(!isset($_POST['membersw'])) $_POST['membersw']=array();
 	$kaPrivate->setPermissions($_POST['dir'],$_POST['permissions'],$_POST['members'],$_POST['permissionsw'],$_POST['membersw']);
 	$kaPrivate->kaPrivate();
 	}

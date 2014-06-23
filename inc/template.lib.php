@@ -450,6 +450,8 @@ class kTemplate {
 		else {
 			if($this->isHome()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/home.php')) $file="home.php";
 			elseif($this->isNews()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/news.php')) $file="news.php";
+			elseif($this->isShopCart()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/cart.php')) $file="cart.php";
+			elseif($this->isShopManufacturer()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/manufacturers.php')) $file="manufacturers.php";
 			elseif($this->isShop()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/shop.php')) $file="shop.php";
 			elseif($this->isPrivate()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/private.php')) $file="private.php";
 			elseif($this->isPhotogallery()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/photogallery.php')) $file="photogallery.php";
@@ -550,6 +552,18 @@ class kTemplate {
 		if(is_array($GLOBALS['__dir__'])) $dir=$GLOBALS['__dir__'];
 		else $dir=explode("/",trim($GLOBALS['__dir__'],"/"));
 		if($GLOBALS['__dir__']==$this->getVar('dir_shop',1)) return true;
+		else return false;
+		}
+	public function isShopCart() {
+		if(is_array($GLOBALS['__dir__'])) $dir=$GLOBALS['__dir__'];
+		else $dir=explode("/",trim($GLOBALS['__dir__'],"/"));
+		if($GLOBALS['__dir__']==$this->getVar('dir_shop',1)&&$GLOBALS['__subdir__']==$this->getVar('dir_shop_cart',1)) return true;
+		else return false;
+		}
+	public function isShopManufacturer() {
+		if(is_array($GLOBALS['__dir__'])) $dir=$GLOBALS['__dir__'];
+		else $dir=explode("/",trim($GLOBALS['__dir__'],"/"));
+		if($GLOBALS['__dir__']==$this->getVar('dir_shop',1)&&$GLOBALS['__subdir__']==$this->getVar('dir_shop_manufacturers',1)) return true;
 		else return false;
 		}
 	public function isPrivate() {

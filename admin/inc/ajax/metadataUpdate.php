@@ -30,5 +30,5 @@ $p=$kaMetadata->get($_POST['t'],$_POST['id'],$_POST['p']);
 	<label for="newMDvalue">Valore</label><br />
 	<textarea name="newMDvalue" id="newMDvalue" style="width:100%;height:180px;"><?= $p['value']; ?></textarea><br />
 	<br />
-	<div class="submit"><input type="button" value="Salva" class="button" onclick="kaMetadataSave('<?= $_POST['t']; ?>',<?= $_POST['id']; ?>,'<?= $_POST['p']; ?>',document.getElementById('newMDvalue').value)" /></div>
+	<div class="submit"><input type="button" value="Salva" class="button" onclick="kaMetadataSave('<?= $_POST['t']; ?>',<?= $_POST['id']; ?>,'<?= addslashes($_POST['p']); ?>',document.getElementById('newMDvalue').value)" /></div>
 	</div>

@@ -6,7 +6,7 @@
 class kaImages {
 	protected $img,$thumb;
 
-	function kaImages() {
+	public function __construct() {
 		require_once('kalamun.lib.php');
 
 		//carico i valori predefiniti
@@ -72,9 +72,7 @@ class kaImages {
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
 
-		$query="SELECT count(*) AS tot FROM ".TABLE_IMG." WHERE idimg>0 ";
-		if($tabella!="") $query.=" AND tabella='".$tabella."' ";
-		if($id!="") $query.=" AND id='".$id."' ";
+		$query="SELECT count(*) AS tot FROM `".TABLE_IMG."` WHERE `idimg`>0 ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 
 		$results=mysql_query($query);
@@ -82,23 +80,22 @@ class kaImages {
 		return $row['tot'];
 		}
 
-	function getList($tabella=false,$id=false,$orderby='ordine',$conditions='',$offset=false,$rowcount=false) {
+	function getList($orderby='`creation_date` DESC',$conditions='',$offset=false,$rowcount=false) {
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
 
-		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg>0 ";
-		if($tabella!="") $query.=" AND tabella='".$tabella."' ";
-		if($id!="") $query.=" AND id='".$id."' ";
+		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`>0 ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 		if($offset==false) $offset=0;
 		if($offset!=""||$rowcount!="") {
-			$query.=" LIMIT ".$offset;
-			if($rowcount!="") $query.=",".$rowcount;
+			$query.=" LIMIT ".intval($offset);
+			if($rowcount!="") $query.=",".intval($rowcount);
 			}
 
 		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		for($i=0;$row=mysql_fetch_array($results);$i++)
+		{
 			$output[$i]=$row;
 			if($output[$i]['hotlink']!=""&&$row['filename']!="") {
 				$output[$i]['filename']=basename($output[$i]['hotlink']);
@@ -119,74 +116,85 @@ class kaImages {
 			else $size=array(0,0,0,"");
 			$output[$i]['thumb']['width']=$size[0];
 			$output[$i]['thumb']['height']=$size[1];
+			
+			$output[$i]['alts']=json_decode($output[$i]['alt'],true);
+			if($output[$i]['alts']!=false)
+			{
+				if(!isset($output[$i]['alts'][$_SESSION['ll']])) $output[$i]['alts'][$_SESSION['ll']]="";
+				$output[$i]['alt']=$output[$i]['alts'][$_SESSION['ll']];
 			}
+			
+		}
 		
 		return $output;
-		}
+	}
 
-	function getImage($idimg) {
+	function getImage($idimg)
+	{
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
 
-		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg=".$idimg." LIMIT 1";
+		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg)." LIMIT 1";
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
-		$output=$row;
-		$output['url']=ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['filename'];
-		if(isset($output['hotlink'])&&$output['hotlink']!=""&&$row['filename']!="") {
-			$output['filename']=basename($output['hotlink']);
-			$output['url']=$output['hotlink'];
-			$output['hotlink']=true;
+		if(isset($row['idimg']))
+		{
+			$output=$row;
+			$output['url']=ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['filename'];
+			if(isset($output['hotlink'])&&$output['hotlink']!=""&&$row['filename']!="") {
+				$output['filename']=basename($output['hotlink']);
+				$output['url']=$output['hotlink'];
+				$output['hotlink']=true;
+				}
+			else $row['hotlink']=false;
+			if(isset($output['filename'])&&$output['filename']!=""&&file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'])) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']);
+			else $size=array(0,0,0,"");
+			$output['width']=$size[0];
+			$output['height']=$size[1];
+			$output['thumb']['filename']=isset($output['thumbnail'])?$output['thumbnail']:array();
+			$output['thumb']['url']=(isset($row['idimg'])&&isset($row['thumbnail']))?ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['thumbnail']:'';
+			if(isset($output['thumbnail'])&&$output['thumbnail']!=""&&file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'])) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail']);
+			else $size=array(0,0,0,"");
+			$output['thumb']['width']=$size[0];
+			$output['thumb']['height']=$size[1];
+			$output['alts']=json_decode($output['alt'],true);
+			if($output['alts']!=false)
+			{
+				if(!isset($output['alts'][$_SESSION['ll']])) $output['alts'][$_SESSION['ll']]="";
+				$output['alt']=$output['alts'][$_SESSION['ll']];
 			}
-		else $row['hotlink']=false;
-		if(isset($output['filename'])&&$output['filename']!=""&&file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'])) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']);
-		else $size=array(0,0,0,"");
-		$output['width']=$size[0];
-		$output['height']=$size[1];
-		$output['thumb']['filename']=isset($output['thumbnail'])?$output['thumbnail']:array();
-		$output['thumb']['url']=(isset($row['idimg'])&&isset($row['thumbnail']))?ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['thumbnail']:'';
-		if(isset($output['thumbnail'])&&$output['thumbnail']!=""&&file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'])) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail']);
-		else $size=array(0,0,0,"");
-		$output['thumb']['width']=$size[0];
-		$output['thumb']['height']=$size[1];
 		
-		return $output;
-		}		
-	
-	function upload($file,$filename,$tabella,$id,$alt,$resize=true,$width=0,$height=0) {
+			return $output;
+
+		} else {
+			return false;
+		}
+	}		
+
+	/* INSERT AN IMAGE INTO DB, THEN CREATE A DIRECTORY WITH THE ID AND UPLOAD THE FILE INSIDE */
+	function upload($file,$filename) {
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
 		if(substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-5)!='.php3') {
 			if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
-			$id=intval($id);
 			
-			/* indice dell'ordine */
-			$query="SELECT ordine FROM ".TABLE_IMG." WHERE tabella='".$tabella."' AND id='".$id."' ORDER BY ordine DESC LIMIT 0,1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
-			if($row['ordine']==false) $row['ordine']=0;
-			$ordine=$row['ordine']+1;
+			$query="INSERT INTO `".TABLE_IMG."` (`filename`,`thumbnail`,`hotlink`,`alt`,`creation_date`) VALUES('".mysql_real_escape_string($filename)."','','','',NOW())";
+			if(mysql_query($query)) $idimg=mysql_insert_id();
+			else return false;
 			
-			$query="INSERT INTO ".TABLE_IMG." (filename,thumbnail,hotlink,tabella,id,alt,ordine) VALUES('".addslashes($filename)."','','','".$tabella."','".$id."','".b3_htmlize($alt,true,"strong,em,u,a,acronym")."',".$ordine.")";
-			if(mysql_query($query)) { $idimg=mysql_insert_id(); }
-			else { return false; }
-			
+			//copy on the right dir
 			mkdir(BASERELDIR.DIR_IMG.$idimg);
-			//copio nella dir assegnata
-			if(!copy($file,BASERELDIR.DIR_IMG.$idimg.'/'.$filename)) return false;
-			//resize
-			if($resize==true) {
-				$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
-				if($this->needToResize($size[0],$size[1])==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->img['width'],$this->img['height'],$this->img['quality'],$this->img['mode']);
-				}
-			else {
-				if($width>0||$height>0) {
-					$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
-					if($width==0) $width=$size[0]/$size[1]*$height;
-					elseif($height==0) $height=$size[1]/$size[0]*$width;
-					$this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$width,$height,$this->img['quality'],'fit');
-					}
-				}
+			if(copy($file,BASERELDIR.DIR_IMG.$idimg.'/'.$filename)) unlink($file);
+			else return false;
 			
+			//another copy before risize, to preserve the original version
+			copy(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,BASERELDIR.DIR_IMG.$idimg.'/-originalsize');
+
+			//resize
+			$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
+			if($this->needToResize($size[0],$size[1])==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->img['width'],$this->img['height'],$this->img['quality'],$this->img['mode']);
+			
+			$this->setThumb($idimg);
+
 			return $idimg;
 			}
 		return false;
@@ -200,26 +208,49 @@ class kaImages {
 		}
 	function setThumb($idimg,$file=null,$filename=null,$resize=true) {
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
-		if(substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-4)!='.php3') {
-			$img=$this->getImage($idimg);
-			if($img['idimg']>0) {
-				if($file==null) $file=BASERELDIR.$img['url'];
-				if($filename==null||$filename==$img['filename']) $filename='t_'.$img['filename'];
-				if($img['thumb']['filename']!="") unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$img['thumb']['filename']);
-				copy($file,BASERELDIR.DIR_IMG.$img['idimg'].'/'.$filename);
-				$query="UPDATE ".TABLE_IMG." SET thumbnail='".$filename."' WHERE idimg='".$img['idimg']."' LIMIT 1";
-				if(!mysql_query($query)) return false;
-				if($resize==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->thumb['width'],$this->thumb['height'],$this->thumb['quality'],$this->thumb['mode']);
-				}
-			return true;
+		$img=$this->getImage($idimg);
+		if($img['idimg']>0) {
+			if($file==null) $file=BASERELDIR.$img['url'];
+			if($filename==null||$filename==$img['filename']) $filename='t_'.$img['filename'];
+			if($img['thumb']['filename']!="") unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$img['thumb']['filename']);
+			copy($file,BASERELDIR.DIR_IMG.$img['idimg'].'/'.$filename);
+			$query="UPDATE `".TABLE_IMG."` SET `thumbnail`='".mysql_real_escape_string($filename)."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
+			if(!mysql_query($query)) return false;
+			if($resize==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->thumb['width'],$this->thumb['height'],$this->thumb['quality'],$this->thumb['mode']);
 			}
-		return false;
+		return true;
 		}
+
 	function updateAlt($idimg,$alt) {
-		$query="UPDATE ".TABLE_IMG." SET alt='".b3_htmlize($alt,true,"strong,em,u,a,acronym")."' WHERE idimg=".$idimg;
+		/*
+		Updates captions.
+		It stores the caption of an image, encoded in JSON as an array where each element is the caption in a different language
+		*/
+		$query="SELECT `alt` FROM `".TABLE_IMG."` WHERE `idimg`=".$idimg." LIMIT 1";
+		$results=mysql_query($query);
+		$row=mysql_fetch_array($results);
+		$caption=json_decode($row['alt'],true);
+		$defaultCaption="";
+		if($caption==false)
+		{
+			$defaultCaption=b3_lmthize($row['alt']);
+			$caption=array();
+		}
+		
+		$kaAdminMenu=new kaAdminMenu();
+		foreach($kaAdminMenu->getLanguages() as $l)
+		{
+			if(!isset($caption[$l['ll']])) $caption[$l['ll']]=$defaultCaption;
+		}
+		
+		$caption[$_SESSION['ll']]=$alt;
+		$caption=json_encode($caption);
+
+		$query="UPDATE ".TABLE_IMG." SET alt='".mysql_real_escape_string($caption)."' WHERE `idimg`=".$idimg." LIMIT 1";
 		if(!mysql_query($query)) return false;
 		return true;
 		}
+
 	function updateImage($idimg,$file,$filename,$resize=true,$width=0,$height=0) {
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 
@@ -259,7 +290,7 @@ class kaImages {
 		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg=".$idimg;
 		$results=mysql_query($query);
 		if($row=mysql_fetch_array($results)) {
-			$query="UPDATE FROM ".TABLE_IMG." SET ordine=ordine-1 WHERE tabella='".$row['tabella']."' AND id='".$row['id']."' AND ordine>".$row['ordine'];
+			$query="UPDATE FROM ".TABLE_IMG." SET ordine=ordine-1 WHERE ordine>".$row['ordine'];
 			mysql_query($query);
 			$query="DELETE FROM ".TABLE_IMG." WHERE idimg=".$idimg;
 			if(!mysql_query($query)) return false;
@@ -275,8 +306,8 @@ class kaImages {
 
 	function usage($idimg) {
 		$output=array();
-		$id=array(TABLE_CONFIG=>"idconf",TABLE_USERS=>"iduser",TABLE_BANNER=>"idbanner",TABLE_PAGINE=>"idpag",TABLE_LANDINGPAGE=>"idlp",TABLE_LANDINGPAGE_T=>"idlpt",TABLE_THANKYOUPAGE=>"idlpt",TABLE_NEWS=>"idnews",TABLE_PHOTOGALLERY=>"idphg");
-		$type=array(TABLE_CONFIG=>"Configurazione",TABLE_USERS=>"Utenti",TABLE_BANNER=>"Banner",TABLE_PAGINE=>"Pagina",TABLE_LANDINGPAGE=>"Landing-page",TABLE_LANDINGPAGE_T=>"Landing-page",TABLE_THANKYOUPAGE=>"Thankyou-page",TABLE_NEWS=>"News",TABLE_PHOTOGALLERY=>"Gallerie Fotografiche");
+		$id=array(TABLE_CONFIG=>"idconf",TABLE_USERS=>"iduser",TABLE_BANNER=>"idbanner",TABLE_PAGINE=>"idpag",TABLE_NEWS=>"idnews",TABLE_PHOTOGALLERY=>"idphg");
+		$type=array(TABLE_CONFIG=>"Configurazione",TABLE_USERS=>"Utenti",TABLE_BANNER=>"Banner",TABLE_PAGINE=>"Pagina",TABLE_NEWS=>"News",TABLE_PHOTOGALLERY=>"Gallerie Fotografiche");
 
 		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg=".$idimg;
 		$results=mysql_query($query);
@@ -295,9 +326,6 @@ class kaImages {
 		$search=array();
 		$search[]=array(TABLE_PAGINE,'anteprima');
 		$search[]=array(TABLE_PAGINE,'testo');
-		$search[]=array(TABLE_LANDINGPAGE,'testo');
-		$search[]=array(TABLE_LANDINGPAGE_T,'testo');
-		$search[]=array(TABLE_THANKYOUPAGE,'testo');
 		$search[]=array(TABLE_NEWS,'anteprima');
 		$search[]=array(TABLE_NEWS,'testo');
 		

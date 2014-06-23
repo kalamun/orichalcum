@@ -60,23 +60,21 @@ if(isset($_GET['delImage'])&&isset($_GET['idmenu'])) {
 		?>
 		<form action="?collection=<?= urlencode($_GET['collection']); ?>&idmenu=<?= $_GET['idmenu']; ?>" method="post" enctype="multipart/form-data">
 		<?
-		$query="SELECT * FROM ".TABLE_MENU." WHERE idmenu=".$_GET['idmenu'];
+		$query="SELECT * FROM `".TABLE_MENU."` WHERE `idmenu`=".intval($_GET['idmenu']);
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
-		echo b3_create_input("label","text","Titolo: ",b3_lmthize($row['label'],"input"),"300px",64).'<br /><br />';
-		echo b3_create_input("url","text","URL: ",b3_lmthize($row['url'],"input"),"400px",250,'onkeyup="checkURL(this)"').' <span class="help">assoluto o riferito alla <em>root</em></span><br /><br />';
 		?>
-		
-		<fieldset class="box">
-		<?
-		$img=$kaImages->getList(TABLE_MENU,$_GET['idmenu']);
-		if(count($img)>0) { ?>
-			<img src="<?= BASEDIR.DIR_IMG.$img[0]['idimg'].'/'.$img[0]['filename']; ?>" alt="<?= str_replace('"','&quot;',$img[0]['alt']); ?>" /><br />
-			<a href="?delImage&collection=<?= urlencode($_GET['collection']); ?>&idmenu=<?= $_GET['idmenu']; ?>" class="smallbutton" onclick="return confirm('Sei sicuro di voler cancellare questa immagine?');"><?= $kaTranslate->translate('UI:Delete'); ?></a><br />
-			<? }
-		echo b3_create_input("img","file","Scegli immagine: ","").'<br />';
-		?>
-		</fieldset><br />
+		<div class="title"><?= b3_create_input("label","text","Titolo: ",b3_lmthize($row['label'],"input"),"300px",64); ?></div><br />
+		<?= b3_create_input("url","text","URL: ",b3_lmthize($row['url'],"input"),"400px",250,'onkeyup="checkURL(this)"'); ?> <span class="help">assoluto o riferito alla <em>root</em></span><br />
+		<br /><br>
+
+		<div class="box closed"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('UI:Photogallery'); ?></h2>
+			<div id="photogallery"></div>
+			<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?submitlabel=<?= urlencode($kaTranslate->translate('UI:Add selected images to the list')); ?>&onsubmit=addImagesToPhotogallery','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('UI:Add images'); ?></a>
+			<script type="text/javascript">
+				kLoadPhotogallery('<?= $row['photogallery']; ?>');
+			</script>
+		</div>
 
 		<div class="box closed"><h2 onclick="kBoxSwapOpening(this.parentNode);">Meta-dati</h2>
 		<div id="divMetadata"></div>

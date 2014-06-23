@@ -13,16 +13,13 @@ var kBrowser={
 	FF:navigator.userAgent.indexOf('Gecko')>-1&&navigator.userAgent.indexOf('Safari')==-1
 	};
 
-kAddEvent=function(obj,event,func,where) {
-	if(!where) var where="after";
-	if(!obj) return false;
-	if(typeof obj[event]!='function') obj[event]=func;
-	else {
-		var oldfunc=obj[event];
-		if(where=="before") obj[event]=function() { func(); if(oldfunc) oldfunc(); };
-		else obj[event]=function() { if(oldfunc) oldfunc(); func(); };
-		}
+kAddEvent=function(obj,event,func,model) {
+	if(!model) model=true;
+	if(obj.addEventListener) return obj.addEventListener(event,func,model);
+	if(obj.attachEvent) return obj.attachEvent('on'+event,func);
+	return false;
 	}
+
 kGetPosition=function(obj) {
 	var pos=Array();
 	pos['left']=0;
@@ -102,7 +99,7 @@ kMouseMove=function(e) {
 	kWindow.elementOver=(e.target)?e.target:e.srcElement;
 	return false;
 	}
-kAddEvent(document,"onmousemove",kMouseMove);
+kAddEvent(document,"mousemove",kMouseMove);
 
 /* AJAX */
 kAjax=function() {

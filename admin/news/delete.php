@@ -122,11 +122,22 @@ if(!isset($_GET['idnews'])) {
 
 			$news=array();
 			$events=array();
-			$conditions="`".$dataRef."` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%'";
+			if($dataRef=="starting_date"||$dataRef=="scadenza") $conditions="`starting_date` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%' OR `scadenza` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%'";
+			else $conditions="`".$dataRef."` LIKE '".$currYear."-".($currMonth<10?'0':'').$currMonth."%'";
 			foreach($kaNews->getList($conditions) as $row) {
 				if(!isset($row['categorie'][0])) $row['categorie'][0]=array('dir'=>'tmp');
-				if($row['calendario']=='n') $news[ltrim(substr($row['data'],8,2),"0")][]=$row;
-				else $events[ltrim(substr($row['data'],8,2),"0")][]=$row;
+				if($row['calendario']=='n') $news[ltrim(substr($row[$dataRef],8,2),"0")][]=$row;
+				else {
+					if(($dataRef=="starting_date"||$dataRef=="scadenza")&&trim($row['starting_date'],"0-: ")!=""&&trim($row['scadenza'],"0-: ")!="") {
+						$startingts=mktime(0,0,0,substr($row['starting_date'],5,2),substr($row['starting_date'],8,2),substr($row['starting_date'],0,4));
+						$endingts=mktime(24,0,0,substr($row['scadenza'],5,2),substr($row['scadenza'],8,2),substr($row['scadenza'],0,4));
+						if($startingts>$endingts) $endingts=$startingts;
+						for($i=$startingts;$i<$endingts;$i+=86400) {
+							if(date("Y-m",$i)==substr($row[$dataRef],0,7)) $events[date("j",$i)][]=$row;
+							}
+						}
+					else $events[ltrim(substr($row[$dataRef],8,2),"0")][]=$row;
+					}
 				}
 
 			?>

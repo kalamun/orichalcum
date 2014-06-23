@@ -23,7 +23,6 @@ include_once("../inc/head.inc.php");
 <li><a href="imgresize.php">Impostazioni per le immagini</a></li>
 <li><a href="emails.php"><?= $kaTranslate->translate('Setup:E-mails and newsletters'); ?></a></li>
 <li><a href="statistiche-esterne.php">Statistiche</a></li>
-<li><a href="tools.php">Manutenzione</a></li>
 <li><a href="config.php">Config.inc.php</a></li>
 </ul>
 

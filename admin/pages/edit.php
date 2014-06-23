@@ -9,7 +9,7 @@ $kaPages=new kaPages;
 $kaMetadata=new kaMetadata;
 $pageLayout=$kaImpostazioni->getVar('admin-page-layout',1,"*");
 
-?><script type="text/javascript" src="./js/edit.js"></script><?
+?><script type="text/javascript" src="./js/edit.js" charset="UTF-8"></script><?
 
 
 /**************************************/
@@ -31,31 +31,34 @@ if(!isset($_GET['idpag'])) {
 			$id=$page['idpag'];
 			$addtomenu=explode(",",$_GET['addtomenu']);
 			if($addtomenu[1]=="after") {
-				$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
+				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
 				$results=mysql_query($query);
 				$page=mysql_fetch_array($results);
 				$ordine=$page['ordine']+1;
 				$ref=$page['ref'];
+				$collection=$page['collection'];
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
 				mysql_query($query);
 				}
 			elseif($addtomenu[1]=="inside") {
-				$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
+				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
 				$results=mysql_query($query);
 				$page=mysql_fetch_array($results);
 				$ordine=$page['ordine']+1;
 				$ref=$addtomenu[0];
+				$collection=$page['collection'];
 				}
 			elseif($addtomenu[1]=="before") {
-				$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
+				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
 				$results=mysql_query($query);
 				$page=mysql_fetch_array($results);
 				$ordine=$page['ordine'];
 				$ref=$page['ref'];
+				$collection=$page['collection'];
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
 				mysql_query($query);
 				}
-			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll) VALUES('".addslashes($titolo)."','".addslashes($dir)."','".$ref."','".$ordine."','".$_SESSION['ll']."')";
+			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection,photogallery) VALUES('".addslashes($titolo)."','".addslashes($dir)."','".$ref."','".$ordine."','".$_SESSION['ll']."','".mysql_real_escape_string($collection)."','')";
 			if(!mysql_query($query)) $log=$kaTranslate->translate('Pages: Error occurred while inserting in menu');
 
 			if($log!="") {
@@ -143,7 +146,7 @@ if(!isset($_GET['idpag'])) {
 					<a href="?draft=<?= $page['idpag']; ?>"><?= $page['riservata']=='s'?$kaTranslate->translate('Pages:Set as public'):$kaTranslate->translate('Pages:Set as draft'); ?></a> |
 					<a href="new.php?copyfrom=<?= $page['idpag']; ?>"><?= $kaTranslate->translate('Pages:Create a copy'); ?></a> |
 					<a href="javascript:selectMenuRef(<?= $page['idpag']; ?>);"><?= $kaTranslate->translate('Pages:Add to menu'); ?></a> |
-					<a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$page['dir']; ?>"><?= $kaTranslate->translate('Pages:Visit'); ?></a>
+					<a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$page['dir']; ?>" target="_blank"><?= $kaTranslate->translate('Pages:Visit'); ?></a>
 					</small>
 				</td>
 			<td class="percorso"><a href="?idpag=<?= $page['idpag']; ?>"><?= $page['dir']; ?></a></td>
@@ -213,7 +216,7 @@ else {
 			}
 
 		/* clean permalink */
-		if(isset($_POST['dir'])) $_POST['dir']=preg_replace("/[^[:alnum:]^[:punct:]]+/","-",$_POST['dir']);
+		//if(isset($_POST['dir'])) $_POST['dir']=preg_replace("/[^\w\/\.\-\x{C0}-\x{D7FF}\x{2C00}-\x{D7FF}]+/","-",$_POST['dir']);
 
 		/* categories */
 		if(isset($_POST['idcat'])) {
@@ -234,6 +237,7 @@ else {
 			if(isset($_POST['dir'])) $query.="dir='".mysql_real_escape_string($_POST['dir'])."',";
 			if(isset($_POST['template'])) $query.="template='".mysql_real_escape_string($_POST['template'])."',";
 			if(isset($_POST['layout'])) $query.="layout='".mysql_real_escape_string($_POST['layout'])."',";
+			if(isset($_POST['featuredimage'])) $query.="featuredimage='".intval($_POST['featuredimage'])."',";
 			if($kaImpostazioni->getVar('pages-commenti',1)=='s') {
 				if(isset($_POST['allowcomments'])) $query.="allowcomments='s',";
 				else $query.="allowcomments='n',";
@@ -264,10 +268,13 @@ else {
 			if($_POST['dir']!=$page['dir']||b3_htmlize($_POST['titolo'],true,"")!=$page['titolo']) {
 				require_once('../menu/menu.lib.php');
 				$kaMenu=new kaMenu();
-				foreach($kaMenu->getMenuElementsByUrl(array("url"=>$page['dir'])) as $m) {
-					//change the menu label only if the old page title is equal of the label of the menu element (so probably it wasn't manually changed)
-					$m['label']==$page['titolo']&&b3_htmlize($_POST['titolo'],true,"")!=$page['titolo']?$newtitle=$_POST['titolo']:$newtitle=false;
-					$kaMenu->updateDirAndLabel($m['idmenu'],$_POST['dir'],$newtitle);
+				foreach($kaMenu->getCollections() as $c) {
+					$kaMenu->setCollection($c);
+					foreach($kaMenu->getMenuElementsByUrl(array("url"=>$page['dir'])) as $m) {
+						//change the menu label only if the old page title is equal to the label of the menu element (so probably it wasn't manually changed)
+						$m['label']==$page['titolo']&&b3_htmlize($_POST['titolo'],true,"")!=$page['titolo']?$newtitle=$_POST['titolo']:$newtitle=false;
+						$kaMenu->updateDirAndLabel($m['idmenu'],$_POST['dir'],$newtitle);
+						}
 					}
 				}
 
@@ -314,6 +321,23 @@ else {
 				<a href="javascript:k_openIframeWindow('ajax/conversionsManager.inc.php?idpag=<?= $page['idpag']; ?>','1000px','500px');" class="smallbutton"><?= $kaTranslate->translate('Pages:Conversions management'); ?></a>
 				</fieldset><br />
 			<? } ?>
+
+		<? if(strpos($pageLayout,",featuredimage,")!==false) { ?>
+			<fieldset class="box"><legend><?= $kaTranslate->translate('Pages:Featured Image'); ?></legend>
+				<div id="featuredImageContainer"><?php
+					if($page['featuredimage']>0)
+					{
+						$img=$kaImages->getImage($page['featuredimage']);
+						?>
+						<img src="<?= BASEDIR.$img['thumb']['url']; ?>">
+						<?
+					}
+					?></div>
+				<input type="hidden" name="featuredimage" id="featuredimage" value="<?= $page['featuredimage']; ?>">
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?limit=1&submitlabel=<?= urlencode($kaTranslate->translate('Pages:Set featured image')); ?>&onsubmit=setFeaturedImage','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('Pages:Choose featured image'); ?></a>
+				<small><a href="javascript:removeFeaturedImage();" id="removeFeaturedImage" class="warning" <? if($page['featuredimage']==0) echo 'style="display:none;"'; ?>><?= $kaTranslate->translate('UI:Delete'); ?></a></small>
+				</fieldset><br />
+			<? } ?>
 		</div>
 
 	<div class="topset">
@@ -321,8 +345,8 @@ else {
 			echo '<div class="title">'.b3_create_input("titolo","text",$kaTranslate->translate('Pages:Title')."<br />",b3_lmthize($page['titolo'],"input"),"70%",250).'</div>';
 			} ?>
 		<div class="URLBox"><?= b3_create_input("dir","text",$kaTranslate->translate('Pages:Page URL').": ".BASEDIR.strtolower($_SESSION['ll'])."/",b3_lmthize($page['dir'],"input"),"400px",64,'onkeyup="checkURL(this)"'); ?>
-							<a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$page['dir']; ?>"><?= $kaTranslate->translate('Pages:Visit'); ?></a>
-							<span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div>
+			<a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$page['dir']; ?>" target="_blank"><?= $kaTranslate->translate('Pages:Visit'); ?></a>
+			<span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div>
 		<script type="text/javascript">
 			var target=document.getElementById('dir');
 			target.setAttribute("oldvalue",target.value);

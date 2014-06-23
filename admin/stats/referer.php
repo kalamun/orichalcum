@@ -108,8 +108,9 @@ elseif($_GET['mode']=='facebook') {
 	foreach($kaStats->getRecords() as $r) {
 		if(trim($r['referer'])!=""&&preg_match('/^https?:\/\/.*?\.facebook\.com.*/',$r['referer'])) {
 			preg_match("/[&|\?]u=([^&]+)/",$r['referer'],$match);
-			$searchkey=urldecode($match[1]);
+			$searchkey=isset($match[1])?urldecode($match[1]):'';
 			if(trim($searchkey)!="") {
+				if(!isset($referer[$searchkey])) $referer[$searchkey]=0;
 				$referer[$searchkey]++;
 				$tot++;
 				}
@@ -197,8 +198,9 @@ elseif($_GET['mode']=='yahoo') {
 	foreach($kaStats->getRecords() as $r) {
 		if(trim($r['referer'])!=""&&preg_match('/^https?:\/\/.*?\.yahoo\.com.*/',$r['referer'])) {
 			preg_match("/[&|\?]p=([^&]+)/",$r['referer'],$match);
-			$searchkey=urldecode($match[1]);
+			$searchkey=isset($match[1])?urldecode($match[1]):'';
 			if(trim($searchkey)!=""&&strtolower($searchkey)!="yahoo") {
+				if(!isset($referer[$searchkey])) $referer[$searchkey]=0;
 				$referer[$searchkey]++;
 				$tot++;
 				}
@@ -237,8 +239,9 @@ elseif($_GET['mode']=='bing') {
 	foreach($kaStats->getRecords() as $r) {
 		if(trim($r['referer'])!=""&&preg_match('/^https?:\/\/.*?\.bing\.com.*/',$r['referer'])) {
 			preg_match("/[&|\?]q=([^&]+)/",$r['referer'],$match);
-			$searchkey=urldecode($match[1]);
+			$searchkey=isset($match[1])?urldecode($match[1]):'';
 			if(trim($searchkey)!=""&&strtolower($searchkey)!="bing") {
+				if(!isset($referer[$searchkey])) $referer[$searchkey]=0;
 				$referer[$searchkey]++;
 				$tot++;
 				}

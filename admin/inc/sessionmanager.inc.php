@@ -57,7 +57,7 @@ if($row=mysql_fetch_array($results)) {
 			}
 
 		$_SESSION['loggedin']=true;
-		$kaLog->add("GEN","Log-in"); //report log-in in the events archive
+		$GLOBALS['kaLog']->add("GEN","Log-in"); //report log-in in the events archive
 		}
 	}
 else {
@@ -67,7 +67,7 @@ else {
 
 // log out
 if(isset($_GET['logout'])) {
-	if(isset($_SESSION['iduser'])) $kaLog->add("GEN","Log-out");
+	if(isset($_SESSION['iduser'])) $GLOBALS['kaLog']->add("GEN","Log-out");
 	session_unset();
 	if(isset($_COOKIE['admin_username'])) setcookie("admin_username",$admin_username,time()-3600,BASEDIR);
 	if(isset($_COOKIE['admin_password'])) setcookie("admin_password",$admin_password,time()-3600,BASEDIR);

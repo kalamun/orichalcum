@@ -4,7 +4,7 @@
 /* PAGINE */
 class kPages {
 	protected $inited;
-	protected $imgallery,$docgallery,$kText,$loadedPage,$page,$currentConversion,$type;
+	protected $imgs,$imgallery,$docgallery,$kText,$loadedPage,$page,$currentConversion,$type;
 
 	public function __construct() {
 		$this->inited=false;
@@ -19,6 +19,7 @@ class kPages {
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/kalamun.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/tplshortcuts.lib.php");
 		$this->kText=new kText();
+		$this->imgs=new kImages();
 		$this->imgallery=new kImgallery();
 		$this->docgallery=new kDocgallery();
 		}
@@ -27,7 +28,7 @@ class kPages {
 		if(!$this->inited) $this->init();
 		if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__'],"/");
 		if($ll==false) $ll=LANG;
-		$query="SELECT * FROM ".TABLE_PAGINE." WHERE dir='".b3_htmlize($dir,true,"")."' AND ll='".$ll."' LIMIT 1";
+		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') AND ll='".$ll."' LIMIT 1";
 		$results=mysql_query($query);
 		if(!mysql_fetch_array($results)) return false;
 		else return true;
@@ -44,7 +45,7 @@ class kPages {
 		$metadata['template']=kGetVar('template',1);
 		$metadata['layout']="";
 		if(isset($dir)&&$dir!="") {
-			$query="SELECT idpag,titolo,traduzioni,template,layout FROM ".TABLE_PAGINE." WHERE dir='".b3_htmlize($dir,true,"")."' AND ll='".$ll."' LIMIT 1";
+			$query="SELECT idpag,titolo,traduzioni,template,layout FROM ".TABLE_PAGINE." WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND ll='".$ll."' LIMIT 1";
 			$results=mysql_query($query);
 			$row=mysql_fetch_array($results);
 			$metadata['titolo']=$row['titolo'];
@@ -105,7 +106,7 @@ class kPages {
 		if(!$this->inited) $this->init();
 		if($ll==null) $ll=LANG;
 		$output=array();
-		$query="SELECT `dir` FROM `".TABLE_PAGINE."` WHERE `ll`='".LANG."' AND `riservata`='n' ORDER BY `titolo`";
+		$query="SELECT `dir` FROM `".TABLE_PAGINE."` WHERE `ll`='".$ll."' AND `riservata`='n' ORDER BY `titolo`";
 		$results=mysql_query($query);
 		while($row=mysql_fetch_array($results)) {
 			$output[]=$row;
@@ -120,7 +121,7 @@ class kPages {
 
 		$output=array();
 
-		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `dir`='".b3_htmlize($dir,true,"")."' AND `riservata`='n' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
+		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND `riservata`='n' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
 		$results=mysql_query($query);
 		if($row=mysql_fetch_array($results)) {
 			$output=$row;
@@ -148,6 +149,8 @@ class kPages {
 				$output['testo']=$tmp[0];
 				$output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
 
+			if($row['featuredimage']==0) $output['featuredimage']=false;
+			else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
 			$output['imgs']=$this->imgallery->getList(TABLE_PAGINE,$row['idpag']);
 			$output['docs']=$this->docgallery->getList(TABLE_PAGINE,$row['idpag']);
 			$output['commenti']=$this->getComments($row['idpag']);
@@ -378,84 +381,87 @@ class kPages {
 			($correspondence['name']!=""&&isset($_POST[$correspondence['name']]))||
 			($correspondence['surname']!=""&&isset($_POST[$correspondence['surname']]))||
 			($correspondence['password']!=""&&isset($_POST[$correspondence['password']]))) {
+			
+			/* COLLECT DATA */
+
+			//email
+			if($correspondence['email']!=""&&isset($_POST[$correspondence['email']])) $m_email=$_POST[$correspondence['email']];
+			else $m_email="";
+			
+			//name
+			if($correspondence['name']!=""&&isset($_POST[$correspondence['name']])) $m_name=$_POST[$correspondence['name']];
+			elseif($correspondence['username']!=""&&isset($_POST[$correspondence['username']])) $m_name=$_POST[$correspondence['username']];
+			elseif($m_email!="") $m_name=substr($m_email,0,strpos($m_email,"@"));
+			else $m_name="";
+			
+			//surname
+			if($correspondence['surname']!=""&&isset($_POST[$correspondence['surname']])) $m_surname=$_POST[$correspondence['surname']];
+			else $m_surname="";
+			
+			//fullname
+			$m_fullname=trim($m_name.' '.$m_surname);
+			
+			//username
+			$m_username="";
+			if($correspondence['username']!=""&&isset($_POST[$correspondence['username']])) $m_username=$_POST[$correspondence['username']];
+			elseif($conv['create_member_username']!="") {
+				$m_username=$conv['create_member_username'];
+				$m_username=str_replace("%n",$correspondence['name']!=""?strtolower($_POST[$correspondence['name']]):'',$m_username);
+				$m_username=str_replace("%N",$correspondence['name']!=""?strtolower(substr($_POST[$correspondence['name']],0,1)):'',$m_username);
+				$m_username=str_replace("%u",$correspondence['surname']!=""?strtolower($_POST[$correspondence['surname']]):'',$m_username);
+				$m_username=str_replace("%U",$correspondence['surname']!=""?strtolower(substr($_POST[$correspondence['surname']],0,1)):'',$m_username);
+				$m_username=str_replace("%e",$correspondence['email']!=""?strtolower($_POST[$correspondence['email']]):'',$m_username);
+				$allowedchars="qwertyuiopasdfghjklzxcvbnm";
+				while(strpos($m_username,"%d")!==false) {
+					$m_username=preg_replace("/%d/",rand(0,9),$m_username,1);
+					}
+				while(strpos($m_username,"%s")!==false) {
+					$m_username=preg_replace("/%s/",substr($allowedchars,rand(0,strlen($allowedchars)-1),1),$m_username,1);
+					}
+				}
+			elseif($correspondence['name']!=""&&isset($_POST[$correspondence['name']])) {
+				$m_username=$_POST[$correspondence['name']];
+				if($correspondence['surname']!=""&&isset($_POST[$correspondence['surname']])) $m_username.=$_POST[$correspondence['surname']];
+				$m_username=strtolower(str_replace(" ","",$m_username));
+				}
+			elseif($m_email!="") $m_username=$m_email;
+			else $m_username=rand(10000000,99999999);
+			//check if username exists yet. in case, add a random number at the end
+			while($GLOBALS['__members']->getByUsername($m_username,true)!=false) {
+				$m_username.=rand(0,9);
+				}
+			
+			//password
+			if($correspondence['password']!=""&&isset($_POST[$correspondence['password']])) $m_password=$_POST[$correspondence['password']];
+			elseif($conv['create_member_password']!="") {
+				$m_password=$conv['create_member_password'];
+				$m_password=str_replace("%n",$correspondence['name']!=""?strtolower($_POST[$correspondence['name']]):'',$m_password);
+				$m_password=str_replace("%N",$correspondence['name']!=""?strtolower(substr($_POST[$correspondence['name']],0,1)):'',$m_password);
+				$m_password=str_replace("%u",$correspondence['surname']!=""?strtolower($_POST[$correspondence['surname']]):'',$m_password);
+				$m_password=str_replace("%U",$correspondence['surname']!=""?strtolower(substr($_POST[$correspondence['surname']],0,1)):'',$m_password);
+				$m_password=str_replace("%e",$correspondence['email']!=""?strtolower($_POST[$correspondence['email']]):'',$m_password);
+				$allowedchars="qwertyuiopasdfghjklzxcvbnm";
+				while(strpos($m_password,"%d")!==false) {
+					$m_password=preg_replace("/%d/",rand(0,9),$m_password,1);
+					}
+				while(strpos($m_password,"%s")!==false) {
+					$m_password=preg_replace("/%s/",substr($allowedchars,rand(0,strlen($allowedchars)-1),1),$m_password,1);
+					}
+				}
+			else $m_password=false;
+			
+			//affiliation
+			if($correspondence['affiliation']!=""&&isset($_POST[$correspondence['affiliation']])) $m_affiliation=$_POST[$correspondence['affiliation']];
+			elseif($conv['create_member_affiliation']!="") $m_affiliation=$conv['create_member_affiliation'];
+			else $m_affiliation="";
+			
+			//expiration
+			if($correspondence['expiration']!=""&&isset($_POST[$correspondence['expiration']])) $m_expiration=$_POST[$correspondence['expiration']];
+			elseif($conv['create_member_expiration']!="") $m_expiration=date("Y-m-d",time()+($conv['create_member_expiration']*86400));
+			else $m_expiration="";
+
 			/* CREATE A MEMBER */
 			if($conv['create_member']==1||count($conv['newsletters_add'])>0||$conv['private_dir']==1) {
-				
-				//email
-				if($correspondence['email']!=""&&isset($_POST[$correspondence['email']])) $m_email=$_POST[$correspondence['email']];
-				else $m_email="";
-				
-				//name
-				if($correspondence['name']!=""&&isset($_POST[$correspondence['name']])) $m_name=$_POST[$correspondence['name']];
-				elseif($correspondence['username']!=""&&isset($_POST[$correspondence['username']])) $m_name=$_POST[$correspondence['username']];
-				elseif($m_email!="") $m_name=substr($m_email,0,strpos($m_email,"@"));
-				else $m_name="";
-				
-				//surname
-				if($correspondence['surname']!=""&&isset($_POST[$correspondence['surname']])) $m_surname=$_POST[$correspondence['surname']];
-				else $m_surname="";
-				
-				//fullname
-				$m_fullname=trim($m_name.' '.$m_surname);
-				
-				//username
-				$m_username="";
-				if($correspondence['username']!=""&&isset($_POST[$correspondence['username']])) $m_username=$_POST[$correspondence['username']];
-				elseif($conv['create_member_username']!="") {
-					$m_username=$conv['create_member_username'];
-					$m_username=str_replace("%n",$correspondence['name']!=""?strtolower($_POST[$correspondence['name']]):'',$m_username);
-					$m_username=str_replace("%N",$correspondence['name']!=""?strtolower(substr($_POST[$correspondence['name']],0,1)):'',$m_username);
-					$m_username=str_replace("%u",$correspondence['surname']!=""?strtolower($_POST[$correspondence['surname']]):'',$m_username);
-					$m_username=str_replace("%U",$correspondence['surname']!=""?strtolower(substr($_POST[$correspondence['surname']],0,1)):'',$m_username);
-					$m_username=str_replace("%e",$correspondence['email']!=""?strtolower($_POST[$correspondence['email']]):'',$m_username);
-					$allowedchars="qwertyuiopasdfghjklzxcvbnm";
-					while(strpos($m_username,"%d")!==false) {
-						$m_username=preg_replace("/%d/",rand(0,9),$m_username,1);
-						}
-					while(strpos($m_username,"%s")!==false) {
-						$m_username=preg_replace("/%s/",substr($allowedchars,rand(0,strlen($allowedchars)-1),1),$m_username,1);
-						}
-					}
-				elseif($correspondence['name']!=""&&isset($_POST[$correspondence['name']])) {
-					$m_username=$_POST[$correspondence['name']];
-					if($correspondence['surname']!=""&&isset($_POST[$correspondence['surname']])) $m_username.=$_POST[$correspondence['surname']];
-					$m_username=strtolower(str_replace(" ","",$m_username));
-					}
-				elseif($m_email!="") $m_username=$m_email;
-				else $m_username=rand(10000000,99999999);
-				//check if username exists yet. in case, add a random number at the end
-				while($GLOBALS['__members']->getByUsername($m_username,true)!=false) {
-					$m_username.=rand(0,9);
-					}
-				
-				//password
-				if($correspondence['password']!=""&&isset($_POST[$correspondence['password']])) $m_password=$_POST[$correspondence['password']];
-				elseif($conv['create_member_password']!="") {
-					$m_password=$conv['create_member_password'];
-					$m_password=str_replace("%n",$correspondence['name']!=""?strtolower($_POST[$correspondence['name']]):'',$m_password);
-					$m_password=str_replace("%N",$correspondence['name']!=""?strtolower(substr($_POST[$correspondence['name']],0,1)):'',$m_password);
-					$m_password=str_replace("%u",$correspondence['surname']!=""?strtolower($_POST[$correspondence['surname']]):'',$m_password);
-					$m_password=str_replace("%U",$correspondence['surname']!=""?strtolower(substr($_POST[$correspondence['surname']],0,1)):'',$m_password);
-					$m_password=str_replace("%e",$correspondence['email']!=""?strtolower($_POST[$correspondence['email']]):'',$m_password);
-					$allowedchars="qwertyuiopasdfghjklzxcvbnm";
-					while(strpos($m_password,"%d")!==false) {
-						$m_password=preg_replace("/%d/",rand(0,9),$m_password,1);
-						}
-					while(strpos($m_password,"%s")!==false) {
-						$m_password=preg_replace("/%s/",substr($allowedchars,rand(0,strlen($allowedchars)-1),1),$m_password,1);
-						}
-					}
-				else $m_password=false;
-				
-				//affiliation
-				if($correspondence['affiliation']!=""&&isset($_POST[$correspondence['affiliation']])) $m_affiliation=$_POST[$correspondence['affiliation']];
-				elseif($conv['create_member_affiliation']!="") $m_affiliation=$conv['create_member_affiliation'];
-				else $m_affiliation="";
-				
-				//expiration
-				if($correspondence['expiration']!=""&&isset($_POST[$correspondence['expiration']])) $m_expiration=$_POST[$correspondence['expiration']];
-				elseif($conv['create_member_expiration']!="") $m_expiration=date("Y-m-d",time()+($conv['create_member_expiration']*86400));
-				else $m_expiration="";
 
 				//registration
 				require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/utenti.lib.php");

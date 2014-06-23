@@ -49,7 +49,7 @@ $layout=$kaImpostazioni->getParam('admin-page-layout',"*");
 
 <h3><?= $kaTranslate->translate('Setup:Fields to display in administration panel'); ?></h3>
 	<?
-	$elm=array("title"=>"Pages:Title","subtitle"=>"Pages:Subtitle","preview"=>"Pages:Preview","text"=>"Pages:Text","categories"=>"Pages:Categories","photogallery"=>"Pages:Photo gallery","documentgallery"=>"Pages:Document gallery","template"=>"Pages:Template","layout"=>"Pages:Layout","traduzioni"=>"Pages:Translations","metadata"=>"Pages:Metadata","commenti"=>"Pages:Comments","seo"=>"Pages:SEO","conversion"=>"Pages:Conversions");
+	$elm=array("title"=>"Pages:Title","subtitle"=>"Pages:Subtitle","featuredimage"=>"Pages:Featured Image","preview"=>"Pages:Preview","text"=>"Pages:Text","categories"=>"Pages:Categories","photogallery"=>"Pages:Photo gallery","documentgallery"=>"Pages:Document gallery","template"=>"Pages:Template","layout"=>"Pages:Layout","traduzioni"=>"Pages:Translations","metadata"=>"Pages:Metadata","commenti"=>"Pages:Comments","seo"=>"Pages:SEO","conversion"=>"Pages:Conversions");
 	$elmobl=array("title"=>true,"text"=>true);
 	foreach($elm as $ka=>$v) {
 		echo b3_create_input("layout[".$ka."]","checkbox",$kaTranslate->translate($v),"s","","",(strpos($layout['value1'],",".$ka.",")!==false||isset($elmobl[$ka])?'checked':'').' '.(isset($elmobl[$ka])?'disabled':''),true).'<br />';

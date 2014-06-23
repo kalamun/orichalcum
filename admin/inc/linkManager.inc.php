@@ -27,7 +27,7 @@ $kaLog=new kaLog();
 
 define("PAGE_NAME",$kaTranslate->translate('Link:Link Manager'));
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
 <head>
 <title><?php echo ADMIN_NAME." - ".PAGE_NAME; ?></title>
@@ -55,21 +55,21 @@ define("PAGE_NAME",$kaTranslate->translate('Link:Link Manager'));
 	 if(isset($_POST['save'])) {
 		?>
 		<script type="text/javascript">
-			window.parent.kTxtArea['<?= $_GET['refid']; ?>'].setLink('<?= $_POST['addBefore']; ?>','','<?= str_replace("'","\'",$_POST['href']); ?>','<?= str_replace("'","\'",$_POST['title']); ?>','<?= str_replace("'","\'",$_POST['target']); ?>','<?= str_replace("'","\'",$_POST['class']); ?>','<?= str_replace("'","\'",$_POST['nofollow']); ?>');
+			window.parent.txts.getArea('<?= $_GET['refid']; ?>').setLink('<?= $_POST['addBefore']; ?>','','<?= str_replace("'","\'",$_POST['href']); ?>','<?= str_replace("'","\'",$_POST['title']); ?>','<?= str_replace("'","\'",$_POST['target']); ?>','<?= str_replace("'","\'",$_POST['class']); ?>','<?= str_replace("'","\'",$_POST['nofollow']); ?>');
 			window.parent.k_closeIframeWindow();
 			</script>
 		<? }
 	elseif(isset($_POST['remove'])) {
 		?>
 		<script type="text/javascript">
-			window.parent.kTxtArea['<?= $_GET['refid']; ?>'].removeLink();
+			window.parent.txts.getArea('<?= $_GET['refid']; ?>').removeLink();
 			window.parent.k_closeIframeWindow();
 			</script>
 		<? }
 	elseif(isset($_POST['update'])) {
 		?>
 		<script type="text/javascript">
-			window.parent.kTxtArea['<?= $_GET['refid']; ?>'].updateLink('<?= $_POST['addBefore']; ?>','','<?= str_replace("'","\'",$_POST['href']); ?>','<?= str_replace("'","\'",$_POST['title']); ?>','<?= str_replace("'","\'",$_POST['target']); ?>','<?= str_replace("'","\'",$_POST['class']); ?>','<?= str_replace("'","\'",$_POST['nofollow']); ?>');
+			window.parent.txts.getArea('<?= $_GET['refid']; ?>').updateLink('<?= $_POST['addBefore']; ?>','','<?= str_replace("'","\'",$_POST['href']); ?>','<?= str_replace("'","\'",$_POST['title']); ?>','<?= str_replace("'","\'",$_POST['target']); ?>','<?= str_replace("'","\'",$_POST['class']); ?>','<?= str_replace("'","\'",$_POST['nofollow']); ?>');
 			window.parent.k_closeIframeWindow();
 			</script>
 		<? }

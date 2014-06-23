@@ -1,6 +1,6 @@
 <?php
 /* (c) Kalamun.org - GNU/GPL 3 */
-error_reporting(0);
+
 session_start();
 if(!isset($_SESSION['iduser'])) die("You don't have permissions to access this informations");
 if(!isset($_GET['idord'])) die('Error selecting order');
@@ -38,7 +38,7 @@ function kXmlParser($string) {
 	}
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
 <head>
 <title><?php echo ADMIN_NAME." - ".PAGE_NAME; ?></title>
@@ -98,16 +98,15 @@ function kXmlParser($string) {
 		}
 	?>
 
-	<table style="width:100%;">
-	<tr>
-	<td class="sheetCell">
+	<div class="column left">
 		<h2><?= $kaTranslate->translate('Shop:Order number'); ?> <?= $o['uid']; ?></h2>
 		<table>
 			<tr><th><?= $kaTranslate->translate('Shop:Date'); ?></th><td><?= str_replace(" ",' <img src="../../img/clock10.png" width="10" height="10" /> ',$o['friendlydate']); ?></td></tr>
 			<tr><th><?= $kaTranslate->translate('Shop:Total amount'); ?></th><td><?= $o['totalprice']; ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td></tr>
 			</table>
-		</td>
-	<td class="sheetCell">
+	</div>
+	
+	<div class="column right">
 		<h2><?= $kaTranslate->translate('Shop:Personal data'); ?></h2>
 		<table>
 			<tr><th><?= $kaTranslate->translate('Shop:Name'); ?></th><td><?= $o['member']['name']; ?></td></tr>
@@ -119,34 +118,52 @@ function kXmlParser($string) {
 				<? }
 			?>
 			</table>
-		</td>
-		</tr>
-	<tr>
-	<td class="sheetCell" colspan="2">
+	</div>
+	
+	<div class="clearBoth"></div>
+
+	<div class="column">
 		<h2><?= $kaTranslate->translate('Shop:Order details'); ?></h2>
-		<table>
+		<table class="orderDetails tabella">
+			<tr>
+				<th><?= $kaTranslate->translate('Shop:Qty'); ?></th>
+				<th><?= $kaTranslate->translate('Shop:Item'); ?></th>
+				<th><?= $kaTranslate->translate('Shop:Total price'); ?></th>
+				<th>&nbsp;</th>
+			</tr>
 			<?
 			foreach($o['items'] as $item) { ?>
-				<tr><td><?= $item['qta']; ?></td>
-					<td><?
-						echo $item['titolo'];
+				<tr id="item<?= $item['uid']; ?>"><td class="qty"><?= $item['qty']; ?></td>
+					<td class="item"><strong><?= $item['productcode']; ?></strong>
+						<?
+						echo $item['title'];
 						if(isset($item['variations'])&&is_array($item['variations'])) {
 							foreach($item['variations'] as $v) {
 								echo ', '.$v['collection'].' '.$v['name'];
 								}
 							}
+						if(isset($item['customvariations'])&&is_array($item['customvariations']))
+						{
+							echo '<br><small>';
+							$i=0;
+							foreach($item['customvariations'] as $k=>$v)
+							{
+								if($i>0) echo ', ';
+								echo $k.' '.$v;
+								$i++;
+							}
+							echo '</small>';
+						}
 						?></td>
-					<td><?= $item['realprice']; ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td>
-					<td><small><a href="<?= ADMINRELDIR; ?>shop/edit.php?idsitem=<?= $item['idsitem']; ?>" target="_blank"><?= $kaTranslate->translate('Shop:Sheet'); ?></a></small></td>
+					<td class="price"><?= number_format($item['totalprice'],2); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td>
+					<td class="actions"><small><a href="<?= ADMINRELDIR; ?>shop/edit.php?idsitem=<?= $item['idsitem']; ?>" target="_blank"><?= $kaTranslate->translate('Shop:Sheet'); ?></a></small></td>
 					</tr>
 				<? }
 			?>
-			</table>
+		</table>
+	</div>
 		
-		</td>
-		</tr>
-	<tr>
-	<td class="sheetCell">
+	<div class="column left">
 		<h2><?= $kaTranslate->translate('Shop:Payment details'); ?></h2>
 		<table class="transactions"><?
 		if(count($o['transactions'])>0) {
@@ -161,7 +178,7 @@ function kXmlParser($string) {
 
 		<? if($o['payed']=='n') { ?>
 		<div class="reportPayment">
-			<h3 onclick="javascript:document.getElementById('reportPayment').style.display='block';" style="cursor:pointer;"><?= $kaTranslate->translate('Shop:Mark as payed'); ?></h3>
+			<div class="button" onclick="javascript:document.getElementById('reportPayment').style.display='block';"><?= $kaTranslate->translate('Shop:Mark as payed'); ?></div>
 			<form action="?idord=<?= $_GET['idord']; ?>" method="post">
 			<div id="reportPayment" style="display:none;">
 				<table>
@@ -178,8 +195,9 @@ function kXmlParser($string) {
 				</div>
 			</div>
 			<? } ?>
-		</td>
-	<td class="sheetCell">
+	</div>
+
+	<div class="column right">
 		<h2><?= $kaTranslate->translate('Shop:Invoice data'); ?></h2>
 		<table>
 		<?
@@ -187,10 +205,11 @@ function kXmlParser($string) {
 			<tr><th><?= $ka; ?></th><td><?= $v; ?></td></tr>
 			<? }
 		?></table>
-		</td>
-	</tr>
-	<tr>
-	<td class="sheetCell">
+	</div>
+	
+	<div class="clearBoth"></div>
+
+	<div class="column left">
 		<h2><?= $kaTranslate->translate('Shop:Shipment details'); ?></h2>
 		<div class="shipped <?= $o['shipped']; ?>" style="margin:10px 0;"><?= $o['shipped']=='n'?$kaTranslate->translate('Shop:Not yet shipped'):$kaTranslate->translate('Shop:Shipped'); ?></div>
 		<table>
@@ -206,7 +225,7 @@ function kXmlParser($string) {
 		<?
 		if($o['shipped']=='n') { ?>
 		<div class="reportPayment">
-			<h3 onclick="javascript:document.getElementById('reportShipment').style.display='block';" style="cursor:pointer;"><?= $kaTranslate->translate('Shop:Report shipment'); ?></h3>
+			<div class="button" onclick="javascript:document.getElementById('reportShipment').style.display='block';" style="cursor:pointer;"><?= $kaTranslate->translate('Shop:Report shipment'); ?></div>
 			
 			<div id="reportShipment" style="display:none;">
 				<form action="?idord=<?= $_GET['idord']; ?>" method="post">
@@ -224,8 +243,9 @@ function kXmlParser($string) {
 				</div>
 			</div>
 			<? } ?>
-		</td>
-	<td class="sheetCell">
+	</div>
+
+	<div class="column right">
 		<h2><?= $kaTranslate->translate('Shop:Shipment data'); ?></h2>
 		<table>
 		<?
@@ -233,11 +253,11 @@ function kXmlParser($string) {
 			<tr><th><?= $ka; ?></th><td><?= $v; ?></td></tr>
 			<? }
 		?></table>
-		</td>
-	</tr>
-	</table>
-
 	</div>
+	
+	<div class="clearBoth"></div>
+	
+</div>
 
 </body>
 </html>

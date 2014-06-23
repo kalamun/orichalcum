@@ -33,7 +33,7 @@ function showSelectedFiles(input) {
 
 /*insert images into page*/
 function insertImg(refid,idimg,type,url) {
-	window.parent.kTxtArea[refid].insertImg(idimg,type,url);
+	window.parent.txts.getArea(refid).insertImg(idimg,type,url);
 	window.parent.k_closeIframeWindow();
 	}
 

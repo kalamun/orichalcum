@@ -98,7 +98,7 @@ if(isset($_POST['save'])) {
 		$addtomenu=explode(",",$_POST['addtomenu']);
 		if($addtomenu[0]=="") $addtomenu[0]="0";
 		if($addtomenu[1]=="after") {
-			$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
+			$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
 			$results=mysql_query($query);
 			$row=mysql_fetch_array($results);
 			$ordine=$row['ordine']+1;
@@ -107,14 +107,14 @@ if(isset($_POST['save'])) {
 			mysql_query($query);
 			}
 		elseif($addtomenu[1]=="inside") {
-			$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
+			$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
 			$results=mysql_query($query);
 			$row=mysql_fetch_array($results);
 			$ordine=$row['ordine']+1;
 			$ref=$addtomenu[0];
 			}
 		elseif($addtomenu[1]=="before") {
-			$query="SELECT ordine,ref FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
+			$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
 			$results=mysql_query($query);
 			$row=mysql_fetch_array($results);
 			$ordine=$row['ordine'];
@@ -122,7 +122,7 @@ if(isset($_POST['save'])) {
 			$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
 			mysql_query($query);
 			}
-		$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll) VALUES('".b3_htmlize($_POST['titolo'],true,"")."','".addslashes(stripslashes($_POST['dir']))."','".$ref."','".$ordine."','".$_SESSION['ll']."')";
+		$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection) VALUES('".b3_htmlize($_POST['titolo'],true,"")."','".addslashes(stripslashes($_POST['dir']))."','".$ref."','".$ordine."','".$_SESSION['ll']."','".mysql_real_escape_string($row['collection'])."')";
 		if(!mysql_query($query)) $log="Problemi durante l'inserimento nel men&ugrave;";
 		}
 

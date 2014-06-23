@@ -35,4 +35,7 @@ else {
 <?
 if($o['payed']=='n') { ?>
 	<input type="button" class="smallbutton" value="<?= $kaTranslate->translate('Shop:Mark as payed'); ?>" onclick="k_openIframeWindow('ajax/paymentManager.php?idord=<?= $o['idord']; ?>','600px','400px');" />
+	<? }
+else { ?>
+	<input type="button" class="smallbutton" value="<?= $kaTranslate->translate('Shop:Reprocess payment'); ?>" onclick="k_openIframeWindow('ajax/paymentManager.php?idord=<?= $o['idord']; ?>','600px','400px');" />
 	<? } ?>

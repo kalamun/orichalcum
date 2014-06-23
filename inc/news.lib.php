@@ -6,7 +6,7 @@ class kNews {
 	$allowedDate = date (year or month or day) to show. if ="" allow any date
 	*/
 	protected $inited;
-	protected $allowedDate,$categoriesList,$allowedCategories,$kText,$__usersList,$loadedNews,$dir_news,$orderby,$if_expired,$newsTemplate,$newsLayout,$imgallery,$docgallery;
+	protected $allowedDate,$categoriesList,$allowedCategories,$kText,$__usersList,$loadedNews,$dir_news,$orderby,$if_expired,$newsTemplate,$newsLayout,$imgs,$imgallery,$docgallery;
 	
 	public function __construct() {
 		$this->inited=false;
@@ -22,6 +22,7 @@ class kNews {
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/kalamun.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/tplshortcuts.lib.php");
 		$this->kText=new kText();
+		$this->imgs=new kImages();
 		$this->imgallery=new kImgallery();
 		$this->docgallery=new kDocgallery();
 
@@ -204,7 +205,7 @@ class kNews {
 		if(!isset($dir[2])) $dir[2]="";
 
 		if($this->orderby=="") $this->orderby="data";
-		$query="SELECT * FROM ".TABLE_NEWS." WHERE `dir`='".mysql_real_escape_string($dir[2])."' AND `ll`='".mysql_real_escape_string($ll)."' ";
+		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".mysql_real_escape_string($dir[2])."') AND `ll`='".mysql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
 		$query.=" LIMIT 1";
@@ -213,7 +214,7 @@ class kNews {
 		else return false;
 		}
 
-	public function setNewsByDir($dir,$ll) {
+	public function setNewsByDir($dir=false,$ll=false) {
 		if(!$this->inited) $this->init();
 		$this->loadedNews=$this->getNews($dir,$ll);
 		}
@@ -235,7 +236,7 @@ class kNews {
 			}
 
 		// else get from database
-		$query="SELECT `template`,`layout` FROM ".TABLE_NEWS." WHERE `dir`='".mysql_real_escape_string($dir)."' AND `ll`='".mysql_real_escape_string(LANG)."' ";
+		$query="SELECT `template`,`layout` FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') AND `ll`='".mysql_real_escape_string(LANG)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
 		if(count($this->allowedCategories)>0) {
@@ -306,6 +307,7 @@ class kNews {
 		$output=$row;
 		if($orderby=="") $orderby=$this->orderby;
 		if(strpos($orderby,"scadenza")!==false) $dataRef="scadenza";
+			elseif(strpos($orderby,"starting_date")!==false) $dataRef="starting_date";
 			elseif(strpos($orderby,"data")!==false) $dataRef="data";
 			else $dataRef="pubblica";
 
@@ -351,6 +353,8 @@ class kNews {
 			$output['testo']=$tmp[0];
 			if(is_array($tmp[1])) $output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
 
+		if($row['featuredimage']==0) $output['featuredimage']=false;
+		else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
 		$output['imgs']=$GLOBALS['__images_gallery']->getList(TABLE_NEWS,$row['idnews']);
 		$output['docs']=$GLOBALS['__documents_gallery']->getList(TABLE_NEWS,$row['idnews']);
 
@@ -372,7 +376,7 @@ class kNews {
 		if($dir==false) $dir=$GLOBALS['url'][2];
 		if($this->orderby=="") $orderby="data DESC";
 
-		$query="SELECT * FROM ".TABLE_NEWS." WHERE `dir`='".b3_htmlize($dir,true,"")."' AND `ll`='".mysql_real_escape_string($ll)."' ";
+		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') AND `ll`='".mysql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND scaduta<=NOW() ";
 		$query.="ORDER BY ".$this->orderby." LIMIT 1";
@@ -386,12 +390,13 @@ class kNews {
 		if(!$this->inited) $this->init();
 		if($orderby=="") $orderby=$this->orderby;
 		if(strpos($orderby,"scadenza")!==false) $dataRef="scadenza";
+			elseif(strpos($orderby,"starting_date")!==false) $dataRef="starting_date";
 			elseif(strpos($orderby,"data")!==false) $dataRef="data";
 			else $dataRef="pubblica";
 		if($cat=="*") $this->setCatByDir();
 		$limit=intval($limit);
 
-		$query="SELECT `".$dataRef."` FROM `".TABLE_NEWS."` WHERE `dir`='".b3_htmlize($dir,true,"")."' LIMIT 1";
+		$query="SELECT `".$dataRef."` FROM `".TABLE_NEWS."` WHERE `dir`='".mysql_real_escape_string($dir)."' LIMIT 1";
 			$results=mysql_query($query);
 				if($row=mysql_fetch_array($results)) {
 			$output=array();
@@ -418,10 +423,11 @@ class kNews {
 		if($orderby=="") $orderby=$GLOBALS['__template']->getVar('news-order',1);
 		if($orderby=="") $orderby="pubblica DESC";
 		if(strpos($orderby,"scadenza")!==false) $dataRef="scadenza";
+			elseif(strpos($orderby,"starting_date")!==false) $dataRef="starting_date";
 			elseif(strpos($orderby,"data")!==false) $dataRef="data";
 			else $dataRef="pubblica";
 		$orderby=preg_replace('/ desc$/i',' ASC',$orderby);
-		$query="SELECT `".$dataRef."` FROM ".TABLE_NEWS." WHERE `dir`='".b3_htmlize($dir,true,"")."' LIMIT 1";
+		$query="SELECT `".$dataRef."` FROM ".TABLE_NEWS." WHERE `dir`='".mysql_real_escape_string($dir)."' LIMIT 1";
 		$results=mysql_query($query);
 		if($row=mysql_fetch_array($results)) {
 			$output=array();
@@ -474,10 +480,10 @@ class kNews {
 	public function getList($vars=array()) {
 		if(!$this->inited) $this->init();
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
-		//if(!isset($vars['offset'])||$vars['offset']=="") $vars['offset']=0;
-		//if(!isset($vars['limit'])||$vars['limit']=="") $vars['limit']=10;
 		if(!isset($vars['orderby'])||$vars['orderby']=="") $vars['orderby']=$this->orderby;
+		if(strpos($vars['orderby'],"`")===false) $vars['orderby']=$vars['orderby'];
 		if(strpos($vars['orderby'],"scadenza")!==false) $dataRef="scadenza";
+			elseif(strpos($vars['orderby'],"starting_date")!==false) $dataRef="starting_date";
 			elseif(strpos($vars['orderby'],"data")!==false) $dataRef="data";
 			else $dataRef="pubblica";
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
@@ -528,6 +534,7 @@ class kNews {
 		if(!isset($vars['orderby'])||$vars['orderby']=="") $vars['orderby']=$this->orderby;
 		if($vars['orderby']=="") $vars['orderby']="pubblica";
 		if(strpos($vars['orderby'],"scadenza")!==false) $dataRef="scadenza";
+			elseif(strpos($vars['orderby'],"starting_date")!==false) $dataRef="starting_date";
 			elseif(strpos($vars['orderby'],"data")!==false) $dataRef="data";
 			else $dataRef="pubblica";
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
@@ -578,31 +585,6 @@ class kNews {
 			}
 		return $output;
 		}
-
-/*	public function getNewsId($dir=false) {
-		if($dir==false) $dir=$GLOBALS['url'][2];
-		$orderby=$GLOBALS['__template']->getVar('news-order',1);
-		$this->if_expired=$GLOBALS['__template']->getVar('news-order',2);
-		$query="SELECT idnews FROM ".TABLE_NEWS." WHERE dir='".addslashes($dir)."' AND ll='".LANG."' ";
-		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND pubblica<=NOW() ";
-		if($dir!="") $query.="AND dir='".$dir."' ";
-		if($this->if_expired=="nascondi") $query.="AND scaduta<=NOW() ";
-		if(count($this->cat)>0) {
-			$query.="AND (categorie='' ";
-			foreach($this->allowedCategories as $cat=>$true) {
-				$query.="OR categorie LIKE '%,".$cat.",%' ";
-				}
-			$query.=") ";
-			}
-		$query.=" LIMIT 1";
-		 $GLOBALS['microseconds']=microtime();
-		$results=mysql_query($query);
-		 $GLOBALS['microseconds']=microtime()-$GLOBALS['microseconds'];
-		 kTxtLog($query);
-		if($row=mysql_fetch_array($results)) {
-			return $row['idnews'];
-			}
-		}*/
 
 	public function countNews($conditions="") {
 		if(!$this->inited) $this->init();

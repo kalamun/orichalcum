@@ -26,6 +26,7 @@ News:URL					URL
 News:Comments				Comments
 News:Created				Created
 News:Visible from			Visible from
+News:Starting date			Starting date
 News:Expiration				Expiration
 News:This URL already exists!	This URL already exists!
 News:News successfully updated	News successfully updated
@@ -36,6 +37,9 @@ News:Yes, delete it			Yes, delete it
 News:No, don't delete it	No, don't delete it
 
 News:Subtitle				Subtitle
+News:Featured Image			Featured image
+News:Choose featured image	Choose featured image
+News:Set featured image		Set featured image
 News:Introduction			Introduction
 News:Contents				Contents
 News:Photo gallery			Photo gallery

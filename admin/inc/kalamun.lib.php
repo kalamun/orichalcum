@@ -183,30 +183,27 @@ class kaAdminMenu {
 
 		/****** LANGUAGES *******/
 		$languages=$this->getLanguages();
-		/* if there are more than one language, show them */
-		if(count($languages)>1) {
-			if(!defined("TRANSLATIONS")) define("TRANSLATIONS",true);
+		if(!defined("TRANSLATIONS")) define("TRANSLATIONS",true);
 
-			$output.='<div class="lingue">';
-			$output.=$this->kTranslate->translate('Menu:Languages').' <ul>';
-			
-			//maintain GET variables
-			$append_var=$_SERVER['QUERY_STRING'];
-			foreach($_GET as $kaey => $value) {
-				if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm") {
-					$append_var=preg_replace("/".$kaey."=?[^&]*&?/","",$append_var);
-					}
+		$output.='<div class="lingue">';
+		$output.=$this->kTranslate->translate('Menu:Languages').' <ul>';
+		
+		//maintain GET variables
+		$append_var=$_SERVER['QUERY_STRING'];
+		foreach($_GET as $kaey => $value) {
+			if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm") {
+				$append_var=preg_replace("/".$kaey."=?[^&]*&?/","",$append_var);
 				}
-
-			foreach($languages as $row) {
-				$output.='<a href="'.ADMINDIR.PAGE_ID.'/'.basename($_SERVER['PHP_SELF']).'?chg_lang='.$row['ll'].'&'.$append_var.'" class="lingua';
-				if($row['ll']==$_SESSION['ll']) { $output.=' sel'; }
-				$output.='">';
-				if(file_exists(BASERELDIR.'img/lang/'.strtolower($row['ll']).'.gif')) $output.='<img src="'.BASERELDIR.'img/lang/'.strtolower($row['ll']).'.gif'.'" width="16" height="11" title="'.$row['lingua'].'" /> ';
-				$output.=$row['ll'].'</a>';
-				}
-			$output.='</ul></div>';
 			}
+
+		foreach($languages as $row) {
+			$output.='<a href="'.ADMINDIR.PAGE_ID.'/'.basename($_SERVER['PHP_SELF']).'?chg_lang='.$row['ll'].'&'.$append_var.'" class="lingua';
+			if($row['ll']==$_SESSION['ll']) { $output.=' sel'; }
+			$output.='">';
+			if(file_exists(BASERELDIR.'img/lang/'.strtolower($row['ll']).'.gif')) $output.='<img src="'.BASERELDIR.'img/lang/'.strtolower($row['ll']).'.gif'.'" width="16" height="11" title="'.$row['lingua'].'" /> ';
+			$output.=$row['ll'].'</a>';
+			}
+		$output.='</ul></div>';
 		if(!defined("TRANSLATIONS")) define("TRANSLATIONS",false);
 		
 		// get selected language

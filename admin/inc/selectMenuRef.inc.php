@@ -7,6 +7,14 @@ require_once('./sessionmanager.inc.php');
 require_once('./main.lib.php');
 if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
 
+require_once(ADMINRELDIR.'menu/menu.lib.php');
+$kaMenu=new kaMenu();
+if(!isset($_GET['c'])) $_GET['c']='';
+$kaMenu->setCollection($_GET['c']);
+
+$kaTranslate=new kaAdminTranslate();
+$kaTranslate->import('menu');
+
 define("PAGE_NAME","Men&ugrave;");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -28,15 +36,23 @@ define("PAGE_NAME","Men&ugrave;");
 </head>
 
 <body>
-<h1>Men&ugrave;</h1>
+<h1><?= $kaTranslate->translate("Menu:Select where to insert the page into the menu"); ?></h1>
 <a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><img src="<?= ADMINRELDIR; ?>img/closeWindow.gif" alt="Close" width="9" height="9" /></a>
-<div class="help">Seleziona il punto in cui vuoi inserire la pagina</div>
+<div class="smenu sel" id="tabs">
+	<ul>
+	<?
+	$menu=array();
+	foreach($kaMenu->getCollections() as $k=>$c) { ?>
+		<li><a href="?c=<?= $c; ?>" class="<?= ($_GET['c']==$c?'sel':''); ?>"><?= $c==""?$kaTranslate->translate('Menu:Main menu'):$c; ?></a></li>
+		<? }
+	?>
+	</ul>
+	</div>
+
 
 
 <div class="padding" id="DragZone">
 	<div class="selectElm"><?php
-		require_once(ADMINRELDIR.'menu/menu.lib.php');
-		$kaMenu=new kaMenu();
 		$menuC=$kaMenu->getMenuContents();
 		$menuS=$kaMenu->getMenuStructure(0);
 		

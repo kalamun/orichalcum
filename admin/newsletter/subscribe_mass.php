@@ -25,6 +25,7 @@ if(isset($_POST['insert'])) {
 	if(count($lists)>0&&count($emails)>0) {
 
 		foreach($emails as $line) {
+			echo $line;
 			$line=trim($line);
 			if(preg_match("/.*<.*@.*>/",$line)) {
 				preg_match("/(.*)<(.*@.*)>/",$line,$match);
@@ -41,7 +42,6 @@ if(isset($_POST['insert'])) {
 				}
 
 			if($email!=""&&$name!="") {
-
 				//if member not exists, register it
 				$members=$kaMembers->getUsersList(array("email"=>$email));
 				if(count($members)==0) {

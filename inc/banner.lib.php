@@ -56,6 +56,7 @@ class kBanners {
 		for($i=0;$row=mysql_fetch_array($results);$i++) {
 			$banners[$i]=$row;
 			$b=$this->kDocuments->getList(TABLE_BANNER,$row['idbanner']);
+			if(!isset($b[0])) $b[0]=array();
 			$banners[$i]['banner']=$b[0];
 			$banners[$i]['permalink']=SITE_URL.BASEDIR.DIR_DOCS.$banners[$i]['banner']['iddoc'].'/'.$banners[$i]['banner']['filename'];
 			$banners[$i]['width']=0;

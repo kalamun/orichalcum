@@ -44,42 +44,6 @@ ul.dragdrop li span {
 	vertical-align:middle;
 	}
 
-table.tabella td {
-	padding:10px 15px;
-	}
-table.tabella {
-	border:0;
-	}
-table.tabella h2 {
-	font-size:1em;
-	}
-table.tabella h2 a {
-	color:#000;
-	font-weight:normal;
-	}
-table.tabella .percorso {
-	background-color:#f0f0f0;
-	font-size:.8em;
-	}
-table.tabella .percorso a {
-	color:#888;
-	}
-.data {
-	text-align:center;
-	background-color:#fff;
-	border:1px solid #ccc;
-	padding:1px 3px;
-	}
-.data .giorno {
-	color:#ca0000;
-	font-size:1em;
-	font-weight:bold;
-	}
-.data .ora {
-	font-size:.8em;
-	color:#888;
-	}
-
 table.catList {
 	border-collapse:collapse;
 	width:100%;
@@ -97,36 +61,6 @@ table.catList td {
 	width:70px;
 	}
 
-
-table.tabella td, #drago  td {
-	padding:10px 15px;
-	}
-table.tabella, #drago  {
-	border:0;
-	}
-table.tabella h2, #drago  h2 {
-	font-size:1em;
-	}
-table.tabella h2 a, #drago  h2 a {
-	color:#000;
-	font-weight:normal;
-	}
-table.tabella .productcode, #drago  .productcode {
-	font-weight:bold;
-	}
-table.tabella .percorso, #drago  .percorso {
-	background-color:#f0f0f0;
-	font-size:.8em;
-	}
-table.tabella .percorso a, #drago  .percorso a {
-	color:#888;
-	}
-table.tabella .sposta, #drago  .sposta {
-	background-color:#f0f0f0;
-	color:#888;
-	font-size:.8em;
-	cursor:move;
-	}
 
 .box.price {
 	}
@@ -182,18 +116,26 @@ table.transactions td {
 	text-align:right;
 	}
 
-table .sheetCell {
-	width:48%;
-	text-align:left;
-	padding:0;
-	margin:1%;
-	padding-bottom:20px;
+.column {
+	padding-bottom:40px;
 	}
-table .sheetCell h2 {
+.column.left {
+	width:48%;
+	float:left;
+	}
+.column.right {
+	width:48%;
+	float:right;
+	}
+.column h2 {
 	background-color:#333;
 	color:#eee;
 	text-align:left;
 	padding:4px 10px;
+	margin:0 0 10px 0;
+	}
+.clearBoth {
+	clear:both;
 	}
 
 .privateDirs {
@@ -249,3 +191,18 @@ table .sheetCell h2 {
 	padding:3px;
 	background-color:#e8e6e4;
 	}
+	
+	
+table.orderDetails {
+	border-collapse:collapse;
+}
+table.orderDetails td {
+	border:1px solid #eee;
+}
+table.orderDetails td.qty {
+	font-weight:bold;
+	text-align:right;
+}
+table.orderDetails td.price {
+	text-align:right;
+}
