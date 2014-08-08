@@ -32,7 +32,7 @@ class kaNewsletter {
 		$dir=$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$template.'/email';
 		if($template!=""&&file_exists($dir)) {
 			foreach(scandir($dir) as $filename) {
-				if(trim($filename,".")!="") {
+				if(trim($filename,".")!="" && !is_dir($dir.'/'.$filename)) {
 					$tmp=array();
 					$tmp['filename']=$filename;
 					$tmp['label']=str_replace(".php","",$filename);
@@ -185,6 +185,7 @@ class kaNewsletter {
 		$results=mysql_query($query);
 		while($row=mysql_fetch_array($results)) {
 			$row['inqueue']=$this->getQueueCount(array("idarch"=>$row['idarch']));
+			$row['readed']=$this->getLogCount(array("idarch"=>$row['idarch'], "readed"=>true));
 			$output[]=$row;
 			}
 
@@ -268,6 +269,16 @@ class kaNewsletter {
 		if(mysql_query($query)) return true;
 		else return false;
 		}
-	}
 
+	//count how many emails are in log
+	public function getLogCount($vars=array()) {
+		$query="SELECT count(*) AS `tot` FROM `".TABLE_EMAIL_LOG."` WHERE `ideml`>0";
+		if(isset($vars['idarch'])) $query.=" AND `idarch`='".intval($vars['idarch'])."' ";
+		if(isset($vars['readed']) && $vars['readed']==true) $query.=" AND `readed`>'0000-00-00 00:00:00' ";
+		$results=mysql_query($query);
+		$row=mysql_fetch_array($results);
+		return $row['tot'];
+		}
+	
+	}
 ?>

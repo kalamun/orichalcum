@@ -432,7 +432,6 @@ class kTemplate {
 		$__template=$this;
 		if($tpl=="") $tpl=$this->tpl;
 		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/inc/'.$f.'.php')) $tpl='bettino';
-		//return implode(file($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.DIR_TEMPLATE.$tpl.'/'.$f.'.html'));
 		if(is_file($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/inc/'.$f.'.php')) {
 			ob_start();
 			include($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/inc/'.$f.'.php');

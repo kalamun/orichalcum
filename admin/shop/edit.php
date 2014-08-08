@@ -157,6 +157,7 @@ if(!isset($_GET['search'])||$_GET['search']=="")
 	{
 		$vars['conditions']="";
 		$vars['orderby']="`modified` DESC";
+		$numberOfItemsInThisView=$vars['limit']*2;
 	}
 	elseif($_GET['l']=="#") $vars['conditions'].="`".$vars['orderby']."` RLIKE '^[^[A-Za-z].*'";
 	else $vars['conditions'].="`".$vars['orderby']."` LIKE '".mysql_real_escape_string($_GET['l'])."%'";
@@ -170,7 +171,7 @@ if(!isset($_GET['search'])||$_GET['search']=="")
 
 
 $numberOfItems=$kaShop->countItems();
-$numberOfItemsInThisView=$kaShop->countItems($vars['conditions']);
+if(!isset($numberOfItemsInThisView)) $numberOfItemsInThisView=$kaShop->countItems($vars['conditions']);
 
 /* END FILTERS */
 
@@ -236,7 +237,7 @@ if(!isset($_GET['idsitem'])) { ?>
 	}
 	
 	/* pagination */
-	if($numberOfItemsInThisView > $paginationLimit && $_GET['l']!="!") { ?>
+	if($numberOfItemsInThisView > $paginationLimit) { ?>
 		<div class="box pager" style="text-align:center;">
 			<?
 			echo $kaTranslate->translate('Shop:Page').': ';
@@ -247,7 +248,7 @@ if(!isset($_GET['idsitem'])) { ?>
 					}
 				}
 
-			for($i=1;$i<ceil($numberOfItemsInThisView/$paginationLimit);$i++) { ?>
+			for($i=1;$i<=ceil($numberOfItemsInThisView/$paginationLimit);$i++) { ?>
 				<a href="?p=<?= $i; ?>&<?= $append_var; ?>" class="<?= $_GET['p']==$i?'selected':''; ?>"><?= $i; ?></a>
 				<? }
 			?>
@@ -356,6 +357,30 @@ if(!isset($_GET['idsitem'])) { ?>
 
 		</div>
 		</form>
+
+	<?php
+	/* pagination */
+	if($numberOfItemsInThisView > $paginationLimit) { ?>
+		<br>
+		<div class="box pager" style="text-align:center;">
+			<?
+			echo $kaTranslate->translate('Shop:Page').': ';
+			$append_var=$_SERVER['QUERY_STRING'];
+			foreach($_GET as $kaey => $value) {
+				if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm"||$kaey=="p") {
+					$append_var=preg_replace("/".$kaey."=?[^&]*&?/","",$append_var);
+					}
+				}
+
+			for($i=1;$i<=ceil($numberOfItemsInThisView/$paginationLimit);$i++) { ?>
+				<a href="?p=<?= $i; ?>&<?= $append_var; ?>" class="<?= $_GET['p']==$i?'selected':''; ?>"><?= $i; ?></a>
+				<? }
+			?>
+		</div>
+		<br />
+		<?
+	}
+	?>
 	</div>
 
 	<script type="text/javascript">

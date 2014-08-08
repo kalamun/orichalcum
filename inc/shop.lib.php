@@ -238,8 +238,17 @@ class kShop {
 		return $row['tot'];
 		}
 
-	public function getItemList($vars) {
+	public function getItemList($vars)
+	{
 		if(!$this->inited) $this->init();
+		
+		if(!isset($vars['photogallery'])) $vars['photogallery']=true;
+		if(!isset($vars['documentgallery'])) $vars['documentgallery']=true;
+		if(!isset($vars['comments'])) $vars['comments']=true;
+		if(!isset($vars['translations'])) $vars['translations']=true;
+		if(!isset($vars['customfields'])) $vars['customfields']=true;
+		if(!isset($vars['variations'])) $vars['variations']=true;
+		
 		if(!isset($vars['from'])&&isset($vars['page'])) $vars['from']=(intval($vars['page'])-1)*$GLOBALS['__template']->getVar('shop',1);
 		if(!isset($vars['from'])||$vars['from']=="") $vars['from']=0;
 		if(!isset($vars['limit'])||$vars['limit']=="") $vars['limit']=$GLOBALS['__template']->getVar('shop',1);
@@ -274,76 +283,22 @@ class kShop {
 		$query.="ORDER BY ".$vars['orderby'].",`titolo`,`idsitem` DESC LIMIT ".$vars['from'].",".$vars['limit']."";
 		$results=mysql_query($query);
 		for($i=0;$row=mysql_fetch_array($results);$i++) {
-			$output[$i]=$this->row2output($row,$vars['orderby']);
+			$output[$i]=$this->row2output($row,$vars);
 			}
 		return $output;
-		}
+	}
 
-	public function getItemQuickList($vars) {
-		if(!$this->inited) $this->init();
-		if(!isset($vars['orderby'])||$vars['orderby']=="") $vars['orderby']=$GLOBALS['__template']->getVar('shop-order',1);
-		if($vars['orderby']=="") $orderby="public";
-		$vars['orderby']=="created"||$vars['orderby']=="public"||$vars['orderby']=="expired" ? $dataRef=$vars['orderby'] : $dataRef='public';
-		
-		if(!isset($vars['expired'])||$vars['expired']=="") $vars['expired']=$GLOBALS['__template']->getVar('shop-order',2);
-		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
+	public function getItemQuickList($vars=array())
+	{
+		if(!isset($vars['photogallery'])) $vars['photogallery']=false;
+		if(!isset($vars['documentgallery']))$vars['documentgallery']=false;
+		if(!isset($vars['comments']))$vars['comments']=false;
+		if(!isset($vars['variations']))$vars['variations']=false;
+		if(!isset($vars['customfields']))$vars['customfields']=false;
+		if(!isset($vars['translations']))$vars['translations']=false;
 
-		$output=array();
-		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE `ll`='".mysql_real_escape_string($vars['ll'])."' AND `online`='y' AND `public`<=NOW() ";
-		if($vars['expired']=="nascondi") $query.=" AND expired<NOW() ";
-		if(isset($vars['conditions'])&&$vars['conditions']!="") $query.=" AND (".$vars['conditions'].") ";
-		if(isset($vars['manufacturer'])&&$vars['manufacturer']!="") $query.=" AND `manufacturer`='".intval($vars['manufacturer'])."' ";
-		
-		if(isset($vars['category'])) $query.=" AND categorie LIKE '%,".intval($vars['category']).",%'";
-		elseif(count($this->cats)>0&&$vars['category']!="*") {
-			$query.="AND (categorie=',' ";
-			foreach($this->cats as $cat=>$true) {
-				$query.="OR categorie LIKE '%,".$cat.",%' ";
-				}
-			$query.=") ";
-			}
-
-		if(isset($vars['options'])&&$vars['options']!="") $query.=" ".$vars['options']." ";
-		$query.="ORDER BY ".$vars['orderby'].",idsitem DESC ";
-		if(!isset($vars['from'])&&isset($vars['page'])) $vars['from']=(intval($vars['page'])-1)*$GLOBALS['__template']->getVar('shop',1);
-		if(isset($vars['from'])&&isset($vars['limit'])) $query.=" LIMIT ".$vars['from'].",".$vars['limit']."";
-		elseif(isset($vars['from'])) $query.=" LIMIT ".$vars['from'].",9999";
-		elseif(isset($vars['limit'])) $query.=" LIMIT ".$vars['limit'];
-
-		$results=mysql_query($query);
-
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
-			$output[$i]=$row;
-			$output[$i]['categories']=array();
-			$subdir="";
-			foreach($this->cats as $cat=>$true) {
-				if(strpos($row['categorie'],','.$cat.',')!==false) {
-					$output[$i]['categories'][]=$cat;
-					if($GLOBALS['__dir__']==$GLOBALS['__template']->getVar('dir_shop',1)&&$GLOBALS['__subdir__']==$this->allthecats[$cat]['dir']) $subdir=$GLOBALS['__subdir__'];
-					elseif($subdir=="") $subdir=$this->allthecats[$cat]['dir'];
-					}
-				}
-			if($subdir==""&&isset($output[$i]['categories'][0])) $subdir=$output[$i]['categories'][0]['dir'];
-			$output[$i]['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
-			$output[$i]['catpermalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir;
-			
-			$output[$i]['customfields']=array();
-			foreach($this->getCustomFields(explode(",",trim($row['categorie'],","))) as $field) {
-				$output[$i]['customfields'][]=$field;
-				}
-			foreach(explode("</field>",trim($row['customfields'])) as $f) {
-				$f=trim($f);
-				if(!empty($f)) {
-					preg_match('/^<field id="(\d+)">(.*)/s',$f,$match);
-					for($j=0;isset($output[$i]['customfields'][$j]);$j++) {
-						if($output[$i]['customfields'][$j]['idsfield']==$match[1]) $output[$i]['customfields'][$j]['value']=$match[2];
-						}
-					}
-				}
-			}
-
-		return $output;
-		}
+		return $this->getItemList($vars);
+	}
 
 	public function getCategoryByDir($dir) {
 		if(!$this->inited) $this->init();
@@ -372,7 +327,7 @@ class kShop {
 		if($ll==false) $ll=LANG;
 		$expired=$GLOBALS['__template']->getVar('shop-order',2);
 
-		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE `online`='y' AND (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND `ll`='".$ll."' ";
+		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE `online`='y' AND (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND `ll`='".mysql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) {
 			$query.="AND public<='".date("Y-m-d H:i:s")."' ";
 			if($expired=="nascondi") $query.="AND expired>'".date("Y-m-d H:i:s")."' ";
@@ -425,14 +380,14 @@ class kShop {
 		if($dir==false) $dir=$GLOBALS['__subsubdir__'];
 		$orderby=kGetVar('shop-order',1);
 		$expired=kGetVar('shop-order',2);
-		$query="SELECT layout FROM ".TABLE_SHOP_ITEM." WHERE dir='".addslashes($dir)."' AND ll='".LANG."' AND online='y' ";
-		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND public<=NOW() ";
-		if($dir!="") $query.="AND dir='".$dir."' ";
-		if($expired=="nascondi") $query.="AND expired<=NOW() ";
+		$query="SELECT `layout` FROM `".TABLE_SHOP_ITEM."` WHERE `ll`='".LANG."' AND `online`='y' ";
+		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND `public`<=NOW() ";
+		if($dir!="") $query.="AND `dir`='".mysql_real_escape_string($dir)."' ";
+		if($expired=="nascondi") $query.="AND `expired`<=NOW() ";
 		if(count($this->cat)>0) {
-			$query.="AND (categorie='' ";
+			$query.="AND (`categorie`='' ";
 			foreach($this->cat as $cat=>$true) {
-				$query.="OR categorie LIKE '%,".$cat.",%' ";
+				$query.="OR `categorie` LIKE '%,".$cat.",%' ";
 				}
 			$query.=") ";
 			}
@@ -602,17 +557,24 @@ class kShop {
 		}
 		
 	public function briciole() {
-		///GUARDARCI!!!
-		if(!$this->inited) $this->init();
-		$cat=$this->cat;
-		$briciole='<a href="'.BASEDIR.'/index.php">Home page</a>';
-		if($geo>0) $briciole.=' &gt; <a href="'.BASEDIR.'/notizie/'.title2dir($this->geoList[$geo]).'">'.$this->geoList[$geo].'</a>';
-		if($cat>0) $briciole.=' &gt; <a href="'.BASEDIR.'/notizie/'.title2dir($this->geoList[$geo]).'/'.title2dir($this->catList[$cat]).'">'.$this->catList[$cat].'</a>';
-		return $briciole;
+		// TODO.
+		return "";
 		}
 
-	private function row2output($row,$orderby="titolo") {
+	private function row2output($row,$vars=array()) {
 		if(!$this->inited) $this->init();
+
+		if(!isset($vars['photogallery'])) $vars['photogallery']=true;
+		if(!isset($vars['documentgallery'])) $vars['documentgallery']=true;
+		if(!isset($vars['comments'])) $vars['comments']=true;
+		if(!isset($vars['translations'])) $vars['translations']=true;
+		if(!isset($vars['customfields'])) $vars['customfields']=true;
+		if(!isset($vars['variations'])) $vars['variations']=true;
+		
+		$orderby="";
+		if(isset($vars['orderby'])) $orderby=$vars['orderby'];
+		if(!isset($vars['ll'])) $vars['ll']=LANG;
+
 		$output=$row;
 		if($orderby=="") $orderby=$GLOBALS['__template']->getVar('shop-order',1);
 		if($orderby=="") $orderby="titolo";
@@ -625,9 +587,9 @@ class kShop {
 				elseif($subdir=="") $subdir=$this->allthecats[$cat]['dir'];
 				}
 			}
-		if($subdir==""&&isset($output[$i]['categories'][0])) $subdir=$output[$i]['categories'][0]['dir'];
-		$output['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
-		$output['catpermalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir;
+		if($subdir==""&&isset($output['categories'][0])) $subdir=$output['categories'][0]['dir'];
+		$output['permalink']=BASEDIR.strtolower($vars['ll']).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
+		$output['catpermalink']=BASEDIR.strtolower($vars['ll']).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir;
 		$kText=new kText();
 		$output['testo']=$row['testo'];
 		$output['embeddedimgs']=array();
@@ -654,39 +616,60 @@ class kShop {
 			$output['testo']=$tmp[0];
 			if(is_array($tmp[1])) $output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
 
+		$output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
 		if($row['featuredimage']==0) $output['featuredimage']=false;
-		else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
-		$output['imgs']=$this->imgallery->getList(TABLE_SHOP_ITEMS,$row['idsitem']);
-		$output['docs']=$this->docgallery->getList(TABLE_SHOP_ITEMS,$row['idsitem']);
-		$output['commenti']=$this->getComments($row['idsitem']);
+		
+		$output['imgs']=array();
+		if($vars['photogallery']==true) $output['imgs']=$this->imgallery->getList(TABLE_SHOP_ITEMS,$row['idsitem']);
+		
+		$output['docs']=array();
+		if($vars['documentgallery']==true) $output['docs']=$this->docgallery->getList(TABLE_SHOP_ITEMS,$row['idsitem']);
+
+		$output['commenti']=array();
+		if($vars['comments']==true) $output['commenti']=$this->getComments($row['idsitem']);
+		
 		$output['traduzioni']=array();
-		foreach(explode("|",trim($row['traduzioni'],"|")) as $trad) {
-			if(substr($trad,0,2)!="") $output['traduzioni'][substr($trad,0,2)]=$this->getPermalinkById(substr($trad,3));
+		if($vars['translations']==true)
+		{
+			foreach(explode("|",trim($row['traduzioni'],"|")) as $trad)
+			{
+				if(substr($trad,0,2)!="") $output['traduzioni'][substr($trad,0,2)]=$this->getPermalinkById(substr($trad,3));
 			}
+		}
 
 		$output['privatearea']=explode("\n",trim($output['privatearea']));
 
-		$output['customfields']=array();
-		foreach($this->getCustomFields(explode(",",trim($row['categorie'],","))) as $field) {
-			$output['customfields'][]=$field;
+		if($vars['customfields']==true)
+		{
+			$output['customfields']=array();
+			foreach($this->getCustomFields(explode(",",trim($row['categorie'],","))) as $field)
+			{
+				$output['customfields'][]=$field;
 			}
-		foreach(explode("</field>",trim($row['customfields'])) as $f) {
-			$f=trim($f);
-			if(!empty($f)) {
-				preg_match('/^<field id="(\d+)">(.*)/s',$f,$match);
-				for($i=0;isset($output['customfields'][$i]);$i++) {
-					if($output['customfields'][$i]['idsfield']==$match[1]) $output['customfields'][$i]['value']=$match[2];
+			foreach(explode("</field>",trim($row['customfields'])) as $f)
+			{
+				$f=trim($f);
+				if(!empty($f))
+				{
+					preg_match('/^<field id="(\d+)">(.*)/s',$f,$match);
+					for($i=0;isset($output['customfields'][$i]);$i++)
+					{
+						if($output['customfields'][$i]['idsfield']==$match[1]) $output['customfields'][$i]['value']=$match[2];
 					}
 				}
 			}
-		$output['variations']=$this->getVariations($row['idsitem']);
+		}
+		
+		$output['variations']=array();
+		if($vars['variations']==true) $output['variations']=$this->getVariations($row['idsitem']);
 
 		/* price calc */
 		$output['realprice']=$output['prezzo'];
 		if(kGetVar('shop-discount',1)=='always') $output['realprice']=$output['scontato']>0?$output['scontato']:$output['prezzo'];
 		elseif(kGetVar('shop-discount',1)=='qty') {
 			if(kGetVar('shop-discount',2)<=$this->getCartItemsCount()) $output['realprice']=$output['scontato']>0?$output['scontato']:$output['prezzo'];
-			}
+		}
+
 		return $output;
 		}
 		
@@ -1076,6 +1059,7 @@ class kShop {
 	/* create a string that identifies the item with his variations */
 	private function getItemUID($idsitem,$variations=array(),$customvariations=array())
 	{
+		if(!is_array($variations)) $variations=array();
 		asort($variations);
 		$string=$idsitem;
 		foreach($variations as $k=>$v)
@@ -1380,6 +1364,7 @@ class kShop {
 				"customvariations"=>$item['customvariations'],
 				"realprice"=>$item['realprice'],
 				"totalprice"=>$item['totalprice'],
+				"privatearea"=>$item['privatearea'],
 				"qty"=>$item['qty']
 			);
 		}
@@ -1391,7 +1376,7 @@ class kShop {
 		}
 
 		/* idzone */
-		$country=$vars['delivery']['country'];
+		$country=isset($vars['delivery']['country']) ? $vars['delivery']['country'] : '';
 		$idzone=4;
 		foreach($this->getCountries() as $c)
 		{
@@ -1399,7 +1384,7 @@ class kShop {
 		}
 
 		/* deliverer */
-		$iddel=$vars['delivery']['carrier'];
+		$iddel=isset($vars['delivery']['carrier']) ? $vars['delivery']['carrier'] : '';
 		if($iddel=="")
 		{
 			$carriers=$this->getDeliverersByZone($idzone);
@@ -1413,7 +1398,7 @@ class kShop {
 		$deliverer=$this->getDelivererById($iddel);
 
 		/* payments */
-		$idspay=$vars['payment']['method'];
+		$idspay=isset($vars['payment']['method']) ? $vars['payment']['method'] : '';
 		if($idspay=="")
 		{
 			$payments=$this->getPaymentsByZone($idzone);
@@ -1458,26 +1443,53 @@ class kShop {
 
 		/* generate mail, and insert order summary into mail body */
 		$tmp=$__config->getParam("shop-mail_checkout");
-		$tmp['address']=$vars['customer']['address']."<br />\n".$vars['customer']['zipcode']." ".$vars['customer']['city']." (".$vars['customer']['country'].")";
-
-		$tmp['items']="<table><tr><th>".$__template->translate('Item')."</th><th>".$__template->translate('Price')."</th><th>".$__template->translate('Qty')."</th></tr>";
-		foreach($this->getCart() as $item)
+		$tmp['address']=$GLOBALS['__emails']->getMailSubTemplate('shop_order_address');
+		if($tmp['address']==false)
 		{
-			$tmp['items'].="<tr>";
-			$tmp['items'].="<td>".$item['titolo'];
-				$variations=" -";
-				foreach($item['variations'] as $v) {
-					$variations.=' '.$v['collection'].': '.$v['name'].',';
-					}
-				$variations=rtrim($variations,",-");
-				$tmp['items'].=$variations."</td>";
-			$tmp['items'].="<td>".$item['realprice'].' '.$GLOBALS['__template']->getVar('shop-currency',2)."</td>";
-			$tmp['items'].="<td>".$item['qty']."</td>";
-			$tmp['items'].="</tr>";
+			$tmp['address']=$vars['customer']['name']."<br />\n".$vars['customer']['address']."<br />\n".$vars['customer']['zipcode']." ".$vars['customer']['city']." (".$vars['customer']['country'].")";
 		}
-		$tmp['items'].="</table>";
 
-		$tmp['shipping_address']=$vars['delivery']['address']."<br />\n".$vars['delivery']['zipcode']." ".$vars['delivery']['city']." (".$vars['delivery']['country'].")";
+		$tmp['items']=$GLOBALS['__emails']->getMailSubTemplate('shop_order_items_list');
+		if($tmp['items']==false)
+		{
+			$tmp['items']='<table class="items"><tr><th>'.$__template->translate('Item')."</th><th>".$__template->translate('Price')."</th><th>".$__template->translate('Qty')."</th></tr>";
+			foreach($this->getCart() as $item)
+			{
+				$tmp['items'].="<tr>";
+				$tmp['items'].='<td><a href="'.SITE_URL.$item['permalink'].'"><strong>'.$item['titolo'].'</strong>';
+					if($item['productcode']!="") $tmp['items'].=' ('.$item['productcode'].')';
+					$tmp['items'].='</a><br>';
+					if($item['sottotitolo']!="") $tmp['items'].="".$item['sottotitolo']."<br>";
+					
+					$variations="";
+					foreach($item['variations'] as $v)
+					{
+						$variations.=' '.$v['collection'].': '.$v['name'].',';
+					}
+					$variations=rtrim($variations,",-");
+					if($variations!="") $tmp['items'].="<em>".$variations."</em><br>";
+						
+					$customvariations="";
+					foreach($item['customvariations'] as $k=>$v) {
+						$customvariations.=' '.$k.': '.$v.',';
+						}
+					$customvariations=rtrim($customvariations,",");
+					if($customvariations!="") { $tmp['items'].="<small>".$customvariations."</small><br>"; }
+					
+					$tmp['items'].="</td>";
+				$tmp['items'].="<td>".number_format($item['realprice']*$item['qty'],2).' '.$GLOBALS['__template']->getVar('shop-currency',2)."</td>";
+				$tmp['items'].="<td>".$item['qty']."</td>";
+				$tmp['items'].="</tr>";
+			}
+			$tmp['items'].="</table>";
+		}
+
+		$tmp['shipping_address']=$GLOBALS['__emails']->getMailSubTemplate('shop_order_shipping_address');
+		if($tmp['shipping_address']==false)
+		{
+			$tmp['shipping_address']=$vars['delivery']['name']."<br />\n".$vars['delivery']['address']."<br />\n".$vars['delivery']['zipcode']." ".$vars['delivery']['city']." (".$vars['delivery']['country'].")";
+		}
+
 		$tmp['billing_data']=$vars['payment']['address']."<br />\n".$vars['payment']['zipcode']." ".$vars['payment']['city']." (".$vars['payment']['country'].")";
 		$tmp['payment_method']='<strong>'.$payment_method['name'].'</strong>'.$payment_method['mail_instructions'];
 
@@ -1568,14 +1580,7 @@ class kShop {
 		if(isset($tmp['iddel'])) $output['deliverer']=$tmp;
 		else $output['deliverer']=array('name'=>$output['deliverer']);
 		$output['transactions']=$this->getTransactionsByOrderId($row['idord']);
-		$output['items']=array();
-		foreach(explode(",",trim($row['items'],",")) as $item) {
-			$id=count($output['items']);
-			list($idsitem,$qta,$price)=explode(":",$item);
-			$output['items'][$id]=$this->getItemById($idsitem);
-			$output['items'][$id]['qta']=$qta;
-			$output['items'][$id]['realprice']=$price;
-			}
+		$output['items']=json_decode($row['items']);
 		return $output;
 		}
 	
@@ -1737,6 +1742,33 @@ class kShop {
 		return $metadata;
 	}
 	
+	public function getManufacturersList($vars)
+	{
+		if(!$this->inited) $this->init();
+		if(!isset($vars['from'])||$vars['from']=="") $vars['from']=0;
+		if(!isset($vars['limit'])||$vars['limit']=="") $vars['limit']=10000;
+		if(!isset($vars['orderby'])||$vars['orderby']=="") $vars['orderby']="`name`";
+		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
+		if(!isset($vars['haveitems'])) $vars['haveitems']=false;
+
+		$output=array();
+		$query="SELECT a.* ";
+		if($vars['haveitems']) $query.=", count(b.`idsitem`) AS `numberofitems` ";
+		$query.=" FROM `".TABLE_SHOP_MANUFACTURERS."` AS `a` ";
+		if($vars['haveitems']) $query.=" INNER JOIN `".TABLE_SHOP_ITEMS."` AS b ON a.idsman=b.manufacturer ";
+		$query.=" WHERE a.`ll`='".mysql_real_escape_string($vars['ll'])."' ";
+		if($vars['haveitems']) $query.=" AND b.`ll`='".mysql_real_escape_string($vars['ll'])."' AND b.`public`< NOW() AND b.`online`='y' AND b.`idsitem` IS NOT NULL ";
+		if(isset($vars['conditions'])&&$vars['conditions']!="") $query.="AND (".$vars['conditions'].") ";
+		if(isset($vars['options'])&&$vars['options']!="") $query.=" ".$vars['options']." ";
+		$query.="GROUP BY a.`idsman` ORDER BY ".$vars['orderby']." LIMIT ".mysql_real_escape_string($vars['from']).",".mysql_real_escape_string($vars['limit'])."";
+
+		$results=mysql_query($query);
+		for($i=0;$row=mysql_fetch_array($results);$i++)
+		{
+			$output[$i]=$this->manufacturerRowToOutput($row);
+		}
+		return $output;
+	}
 
 	public function setManufacturer($dir="",$ll=false)
 	{

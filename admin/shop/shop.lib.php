@@ -69,7 +69,7 @@ class kaShop {
 
 		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE ";
 		if($conditions!="") $query.="(".$conditions.") AND ";
-		$query.="`ll`='".$lang."' ORDER BY ".$ordine;
+		$query.="`ll`='".$lang."' ORDER BY ".$ordine.",`titolo`,`productcode`,`idsitem`";
 		$results=mysql_query($query);
 		for($i=0;$row=mysql_fetch_array($results);$i++) {
 			$output[$i]=$row;
@@ -95,7 +95,7 @@ class kaShop {
 		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".mysql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".mysql_real_escape_string($vars['match'])."%')";
 		if(isset($vars['ll'])) $query.=" AND `ll`='".mysql_real_escape_string($vars['ll'])."' ";
 		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".mysql_real_escape_string($vars['exclude_ll'])."' ";
-		$query.=" ORDER BY ".$vars['orderby']." LIMIT ".$vars['start'].",".$vars['limit'];
+		$query.=" ORDER BY ".$vars['orderby'].",`titolo`,`productcode`,`idsitem` LIMIT ".$vars['start'].",".$vars['limit'];
 		$results=mysql_query($query);
 		for($i=0;$row=mysql_fetch_array($results);$i++) {
 			$output[$i]=$row;
@@ -381,22 +381,31 @@ class kaShop {
 		$o=$this->getOrderById($idord);
 
 		$dirlist=array();
-		foreach($o['items'] as $items) {
-			foreach($items['privatearea'] as $dir) {
-				if($items['privatearea']!="") $dirlist[$dir]=true;
+		foreach($o['items'] as $items)
+		{
+			if(isset($items['privatearea']) && is_array($items['privatearea']))
+			{
+				foreach($items['privatearea'] as $dir)
+				{
+					if($items['privatearea']!="") $dirlist[$dir]=true;
 				}
 			}
+		}
+		
 		/* grant access to private area */
-		foreach($dirlist as $dir=>$true) {
+		foreach($dirlist as $dir=>$true)
+		{
 			$p=$kaPrivate->getPermissions($dir);
-			if($p['permissions']=='restricted') {
+			if($p['permissions']=='restricted')
+			{
 				$armembers=array($o['idmember']=>true);
-				foreach($p['members'] as $m) {
+				foreach($p['members'] as $m)
+				{
 					$armembers[$m['idmember']]=true;
-					}
-				$kaPrivate->setPermissions($dir,'restricted',$armembers,'private',array());
 				}
+				$kaPrivate->setPermissions($dir,'restricted',$armembers,'private',array());
 			}
+		}
 
 		return true;
 		}

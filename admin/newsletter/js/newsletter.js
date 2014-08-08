@@ -12,10 +12,10 @@ function processQueue() {
 	}
 
 function openPreviewPopup() {
-	kTxtArea['message'].swapDesignMode();
-	kTxtArea['message'].swapDesignMode();
+	txts.getArea(0).swapDesignMode();
+	txts.getArea(0).swapDesignMode();
 	var template=document.getElementById('template').value;
 	var subject=document.getElementById('subject').value;
 	var message=document.getElementById('message').value;
-	kOpenIPopUp('ajax/previewManager.php','&subject='+escape(subject),'700px','400px');
+	kOpenIPopUp('ajax/previewManager.php','&subject='+encodeURIComponent(subject),'700px','80%');
 	}

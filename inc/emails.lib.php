@@ -6,7 +6,7 @@
 
 class kEmails {
 	protected $inited;
-	private $from,$to,$subject,$message,$footer,$template,$attachments,$log,$smtp;
+	private $from,$to,$subject,$message,$footer,$template,$uid,$attachments,$log,$smtp;
 
 	public function __construct() {
 		$this->inited=false;
@@ -14,22 +14,25 @@ class kEmails {
 	
 	public function init() {
 		$this->inited=true;
-		global $__template;
-		if(!isset($__template)) {
+		if(!isset($GLOBALS['__template']))
+		{
 			require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/template.lib.php');
-			$__template=new kTemplate();
-			}
-		$this->template=$__template->getVar('email_template_default',1);
+			$GLOBALS['__template']=new kTemplate();
+		}
+		$this->template=$GLOBALS['__template']->getVar('email_template_default',1);
 		if($this->template=="") $this->template="default.php";
-		$this->log=$__template->getVar('email_log',1);
+		
+		$this->footer=$GLOBALS['__template']->getVar('newsletter_footer',1);
+		
+		$this->log=$GLOBALS['__template']->getVar('email_log',1);
 		$this->smtp=array('on'=>false);
-		$this->smtp['on']=$__template->getVar('email_smtp_on',1);
+		$this->smtp['on']=$GLOBALS['__template']->getVar('email_smtp_on',1);
 		if($this->smtp['on']=="true") {
-			$this->smtp['host']=$__template->getVar('email_smtp_server',1);
-			$this->smtp['port']=$__template->getVar('email_smtp_server',2);
+			$this->smtp['host']=$GLOBALS['__template']->getVar('email_smtp_server',1);
+			$this->smtp['port']=$GLOBALS['__template']->getVar('email_smtp_server',2);
 			if($this->smtp['port']=="") $this->smtp['port']=25;
-			$this->smtp['username']=$__template->getVar('email_smtp_account',1);
-			$this->smtp['password']=$__template->getVar('email_smtp_account',2);
+			$this->smtp['username']=$GLOBALS['__template']->getVar('email_smtp_account',1);
+			$this->smtp['password']=$GLOBALS['__template']->getVar('email_smtp_account',2);
 			}
 		}
 	
@@ -37,14 +40,15 @@ class kEmails {
 		return $this->$var;
 		}
 
-	public function send($from,$to,$subject,$message,$template="") {
+	public function send($from,$to,$subject,$message,$template="",$idarch=0) {
 		if(!$this->inited) $this->init();
 		$this->from=$from;
 		$this->to=$to;
 		$this->subject=$subject;
 		$this->message=$message;
-	
-		$composition=$this->preview($from,$to,$subject,$message,$template="");
+		$this->uid=$this->generateUID();
+		
+		$composition=$this->preview($from,$to,$subject,$message,$template,$this->uid);
 
 		$sent=false;
 		if($this->smtp['on']!="true") {
@@ -90,7 +94,7 @@ class kEmails {
 					$tmp=$talk["data"];
 					while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["data"].="\n".$tmp; }
 					}
-				fputs($smtpConn,"To: ".$this->to."\r\nSubject:".$composition['subject']."\r\n".$composition['headers']."\r\n\r\n".$composition['message']."\r\n.\r\n");
+				fputs($smtpConn,"To: ".$this->to."\r\nSubject:".$composition['subject']."\r\n".$composition['headers']."\n\n".$composition['message']."\r\n.\r\n");
 				if($talk["send"]=fgets($smtpConn)) {
 					$tmp=$talk["send"];
 					while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["send"].="\n".$tmp; }
@@ -106,21 +110,21 @@ class kEmails {
 			}
 
 		if($sent==true) {
-			if($this->log=="true") $this->archiveMail($this->from,$this->to,$subject,$composition['headers'],$composition['html'],$composition['plain']);
+			if($this->log=="true") $this->archiveMail($this->uid,$this->from,$this->to,$subject,$composition['headers'],$composition['html'],$composition['plain'],$idarch);
 			return true;
 			}
 		else return false;
 		}
 	
-	public function preview($from,$to,$subject,$message,$template="") {
+	public function preview($from,$to,$subject,$message,$template="",$uid="") {
 		if(!$this->inited) $this->init();
-		global $__template;
 		if($template=="") $template=$this->template;
 
 		$this->from=$this->fixEmailSyntax($from);
 		$this->to=$this->fixEmailSyntax($to);
 		$this->subject=$subject;
 		$this->message=$message;
+		$this->uid=$uid;
 
 		$boundary_main="----=_NextPart_".rand(10000,99999).".".rand(100000000,999999999);
 		$composition=array();
@@ -130,9 +134,9 @@ class kEmails {
 
 		$composition['subject']=mb_convert_encoding($this->subject,"UTF-8","HTML-ENTITIES");
 		$composition['subject']='=?UTF-8?B?'.base64_encode($composition['subject']).'?=';
-		
+
 		/* pure HTML -> import template */
-		$composition['html']=$this->getMailTemplate($__template->getTemplateDir().'email/'.$template);
+		$composition['html']=$this->getMailTemplate($GLOBALS['__template']->getTemplateDir().'email/'.$template);
 
 		/* pure PLAIN -> clean HTML */
 		$composition['plain']=mb_convert_encoding($composition['html'],"UTF-8","HTML-ENTITIES");
@@ -147,25 +151,20 @@ class kEmails {
 		$composition['plain']=strip_tags($composition['plain']);
 		$composition['plain']=trim($composition['plain']);
 
-		/* CHUNK versions, conforming to quoted-printable standard */
-		$composition['chunked-plain']=chunk_split(mb_convert_encoding($composition['plain'],"UTF-8","HTML-ENTITIES"),74,"=\r\n");
-		$composition['chunked-plain']=str_replace("==\r\n3D","=\r\n=3D",$composition['plain']);
-		$composition['chunked-plain']=str_replace("=3=\r\nD","=\r\n=3D",$composition['plain']);
-		$composition['chunked-html']=str_replace("=","=3D",$composition['html']);
-		$composition['chunked-html']=chunk_split($composition['chunked-html'],74,"=\r\n");
-		$composition['chunked-html']=str_replace("==\r\n3D","=\r\n=3D",$composition['chunked-html']);
-		$composition['chunked-html']=str_replace("=3=\r\nD","=\r\n=3D",$composition['chunked-html']);
+		/* conform to quoted-printable */
+		$composition['chunked-plain']=quoted_printable_encode($composition['plain']);
+		$composition['chunked-html']=quoted_printable_encode($composition['html']);
 
-		$composition['message']="\r\n";
-		$composition['message'].="--".$boundary_main."\r\n";
-		$composition['message'].="Content-Type: text/plain; charset=\"UTF-8\"\r\n";
-		$composition['message'].="Content-Transfer-Encoding: quoted-printable\r\n";
-		$composition['message'].="\r\n".$composition['chunked-plain']."\r\n\r\n";
-		$composition['message'].="--".$boundary_main."\r\n";
-		$composition['message'].="Content-Type: text/html; charset=\"UTF-8\"\r\n";
-		$composition['message'].="Content-Transfer-Encoding: quoted-printable\r\n";
-		$composition['message'].="\r\n".$composition['chunked-html'];
-		$composition['message'].="\r\n\r\n--".$boundary_main."--\r\n\r\n";
+		$composition['message']="\n";
+		$composition['message'].="--".$boundary_main."\n";
+		$composition['message'].="Content-Type: text/plain; charset=\"utf-8\"\n";
+		$composition['message'].="Content-Transfer-Encoding: quoted-printable\n";
+		$composition['message'].="\n".$composition['chunked-plain']."\n\n";
+		$composition['message'].="--".$boundary_main."\n";
+		$composition['message'].="Content-Type: text/html; charset=\"utf-8\"\n";
+		$composition['message'].="Content-Transfer-Encoding: quoted-printable\n";
+		$composition['message'].="\n".$composition['chunked-html'];
+		$composition['message'].="\n\n--".$boundary_main."--\n\n";
 
 		return $composition;
 		}
@@ -176,7 +175,7 @@ class kEmails {
 	
 	public function getMailTemplate($template='') {
 		if(!$this->inited) $this->init();
-		if($template=="") $template=$__template->getTemplateDir().'email/'.$this->template;
+		if($template=="") $template=$GLOBALS['__template']->getTemplateDir().'email/'.$this->template;
 		if(!file_exists($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) $template="template/bettino/email/default.php";
 		if(!file_exists($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) return false;
 		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) {
@@ -189,7 +188,21 @@ class kEmails {
 		return false;
 		}
 
-	public function archiveMail($from,$to,$title,$header,$html,$plain) {
+	public function getMailSubTemplate($f) {
+		if(!$this->inited) $this->init();
+		$template=$GLOBALS['__template']->getTemplateDir().'email/inc/'.$f.'.php';
+		if(!file_exists($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) return false;
+		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) {
+			ob_start();
+			include($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template);
+			$contents=ob_get_contents();
+			ob_end_clean();
+			return $contents;
+			}
+		return false;
+		}
+
+	public function archiveMail($uid,$from,$to,$title,$header,$html,$plain,$idarch=0) {
 		if(!$this->inited) $this->init();
 		$from=mysql_real_escape_string($from);
 		$to=mysql_real_escape_string($to);
@@ -197,20 +210,33 @@ class kEmails {
 		$header=mysql_real_escape_string($header);
 		$html=mysql_real_escape_string($html);
 		$plain=mysql_real_escape_string($plain);
-		$uid=$this->generateUID();
-		$query="INSERT INTO ".TABLE_EMAIL_LOG." (`date`,`from`,`to`,`title`,`header`,`html`,`plain`,`uid`,`readed`) VALUES(NOW(),'".$from."','".$to."','".$title."','".$header."','".$html."','".$plain."','".$uid."','0000-00-00 00:00:00')";
+		if($uid=="") $uid=$this->generateUID();
+		$uid=mysql_real_escape_string($uid);
+		$idarch=intval($idarch);
+		
+		$query="INSERT INTO ".TABLE_EMAIL_LOG." (`date`,`from`,`to`,`title`,`header`,`html`,`plain`,`uid`,`readed`,`idarch`) VALUES(NOW(),'".$from."','".$to."','".$title."','".$header."','".$html."','".$plain."','".$uid."','0000-00-00 00:00:00','".$idarch."')";
 		mysql_query($query);
+		return $uid;
 		}
+	
+	public function setAsRead($uid)
+	{
+		$query="UPDATE `".TABLE_EMAIL_LOG."` SET `readed`=NOW() WHERE `uid`='".mysql_real_escape_string($uid)."' LIMIT 1";
+		if(mysql_query($query)) return true;
+		return false;
+	}
 
-	public function generateUID() {
-		$chars="QERTYUIOPASDFGHKLZXCVBNM987654321MNBVCXZLKHGFDSAPOIUTREQ123456789";
-		$num="";
-		for($i=1;$i<=16;$i++) {
+	public function generateUID()
+	{
+		$chars="QWERTYUIOPASDFGHKLZXCVBNM987654321MNBVCXZLKHGFDSAPOIUTREQ123456789";
+		$num=dechex(date("yzHis"));
+		while(strlen($num)<16)
+		{
 			$start=rand(0,strlen($chars)-1);
 			$num.=substr($chars,$start,1);
-			}
-		return $num;
 		}
+		return $num;
+	}
 
 	private function fixEmailSyntax($email) {
 		// verify the syntax of the e-mail and correct it

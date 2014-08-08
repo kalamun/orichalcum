@@ -7,7 +7,8 @@ class kImages {
 	function __construct() {
 		}
 
-	function getList($tabella=false,$id=false,$orderby='ordine',$conditions='') {
+	function getList($tabella=false,$id=false,$orderby='ordine',$conditions='')
+	{
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
 
@@ -18,10 +19,9 @@ class kImages {
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 
 		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		for($i=0;$row=mysql_fetch_array($results);$i++)
+		{
 			$output[$i]=$row;
-			$output[$i]['alt']=strip_tags(trim(str_replace("\n","",$output[$i]['alt'])));
-			$output[$i]['caption']=$row['alt'];
 			if($row['filename']!=""||$output[$i]['hotlink']=="") {
 				$row['filename']=str_replace(" ","%20",$row['filename']);
 				$row['filename']=str_replace("#","%23",$row['filename']);
@@ -61,12 +61,15 @@ class kImages {
 				if(!isset($output[$i]['alts'][$_SESSION['ll']])) $output[$i]['alts'][$_SESSION['ll']]="";
 				$output[$i]['alt']=$output[$i]['alts'][$_SESSION['ll']];
 			}
-			}
+			$output[$i]['caption']=$output[$i]['alt'];
+			$output[$i]['alt']=strip_tags(trim(str_replace("\n","",$output[$i]['alt'])));
+		}
 		
 		return $output;
-		}
+	}
 
-	function getImage($idimg) {
+	function getImage($idimg)
+	{
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
 
@@ -74,8 +77,6 @@ class kImages {
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
 		$output=$row;
-		$output['alt']=strip_tags(trim(str_replace("\n","",$output['alt'])));
-		$output['caption']=$row['alt'];
 		if($row['filename']!=""||$output['hotlink']=="") {
 			$row['filename']=str_replace(" ","%20",$row['filename']);
 			$row['filename']=str_replace("#","%23",$row['filename']);
@@ -115,24 +116,26 @@ class kImages {
 			if(!isset($output['alts'][LANG])) $output['alts'][LANG]="";
 			$output['alt']=$output['alts'][LANG];
 		}
+		$output['caption']=$output['alt'];
+		$output['alt']=strip_tags(trim(str_replace("\n","",$output['alt'])));
 
 		//retrieve filesize
 		$output['filesize']=0;
-		if($output['hotlink']==false) {
+		if($output['hotlink']==false)
+		{
 			if(file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename'])) $output['filesize']=filesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename']);
-			}
-		else {
+		} else {
 			if(substr($output['url'],0,4)=='http') {
 				$x=array_change_key_case(get_headers($output['url'],1),CASE_LOWER);
 				if(strcasecmp($x[0],'HTTP/1.1 200 OK')!=0) $output['filesize']=$x['content-length'][1];
 				else $output['filesize']=$x['content-length'];
-				}
 			}
+		}
 				
 		return $output;
-		}		
+	}		
 		
-	}
+}
 
 
 class kImgallery {

@@ -76,6 +76,7 @@ Faroe Islands	FO
 France	FR
 Gabon	GA
 United Kingdom	GB
+United Kingdom / England	EN
 Grenada	GD
 Georgia	GE
 French Guiana	GF

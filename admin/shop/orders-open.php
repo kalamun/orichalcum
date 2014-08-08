@@ -89,10 +89,9 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 				}
 			}
 		function markPayment(uid) {
-			for(var i=0;document.getElementById('order'+uid).getElementsByTagName('TD')[i];i++) {
-				var td=document.getElementById('order'+uid).getElementsByTagName('TD')[i];
-				if(td.className=='payment') {
-					td.getElementsByTagName('DIV')[0].className='payed s';
+			for(var i=0,td=document.getElementById('order'+uid).getElementsByTagName('TD');td[i];i++) {
+				if(td[i].className=='payment') {
+					td[i].getElementsByTagName('DIV')[0].className='payed s';
 					}
 				}
 			}

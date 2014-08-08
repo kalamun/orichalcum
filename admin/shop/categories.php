@@ -20,6 +20,10 @@ if(isset($_POST['save'])&&count($_POST['cat'])>0) {
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	}
 
+elseif(isset($_POST['sortAZ'])) {
+	$log=$kaCategorie->sortby('`categoria` ASC',TABLE_SHOP_ITEMS);
+	}
+
 elseif(isset($_POST['insert'])) {
 	$log=$kaCategorie->add($_POST['titolo'],$_POST['dir'],TABLE_SHOP_ITEMS);
 	if($log==false) {
@@ -176,6 +180,7 @@ else { ?>
 		
 		<div class="submit" id="submit">
 			<input type="submit" name="save" class="button" value="<?= $kaTranslate->translate('Shop:Save order'); ?>" />
+			<input type="submit" name="sortAZ" class="smallbutton" value="<?= $kaTranslate->translate('Shop:Sort A-Z'); ?>" />
 			</div>
 	</form>
 
@@ -185,13 +190,13 @@ else { ?>
 	
 	<script type="text/javascript" src="js/categorie.js"></script>
 	<table><tr>
-	<td><input type="button" class="button" value="Nuova categoria" onclick="showReq('nuovaCat');" /></td>
+	<td><input type="button" class="button" value="<?= $kaTranslate->translate('Shop:New category'); ?>" onclick="showReq('nuovaCat');" /></td>
 	<td><div id="nuovaCat" style="display:none;">
-		<fieldset class="box"><legend>Aggiungi una Nuova Categoria</legend>
+		<fieldset class="box"><legend><?= $kaTranslate->translate('Shop:Add a new category'); ?></legend>
 		<form action="" method="post">
-		<div class="title"><?= b3_create_input("titolo","text","Nome<br />","","95%",250,'autocomplete="off" onkeyup="title2url()" onblur="titleBlur()"'); ?></div>
-		<div class="URLBox"><?= b3_create_input("dir","text","Indirizzo della categoria: ".BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_shop',1).'/',(isset($copyfrom['dir'])?$copyfrom['dir'].'-'.date("Ymd"):''),"400px",64,'onkeyup="checkURL(this)"'); ?> <span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div><br />
-		<div class="submit"><input type="submit" name="insert" value="Salva" class="button" /></div>
+		<div class="title"><?= b3_create_input("titolo","text",$kaTranslate->translate('Shop:Category name')."<br />","","95%",250,'autocomplete="off" onkeyup="title2url()" onblur="titleBlur()"'); ?></div>
+		<div class="URLBox"><?= b3_create_input("dir","text",$kaTranslate->translate('Shop:Category URL').": ".BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_shop',1).'/',(isset($copyfrom['dir'])?$copyfrom['dir'].'-'.date("Ymd"):''),"400px",64,'onkeyup="checkURL(this)"'); ?> <span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div><br />
+		<div class="submit"><input type="submit" name="insert" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" /></div>
 		</form>
 		</fieldset>
 		</div></td>

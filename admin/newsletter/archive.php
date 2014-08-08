@@ -49,6 +49,7 @@ if(isset($_GET['delete'])) {
 	<th><?= $kaTranslate->translate('Newsletter:Submission date'); ?></th>
 	<th><?= $kaTranslate->translate('Newsletter:Subject'); ?></th>
 	<th><?= $kaTranslate->translate('Newsletter:Recipients number'); ?></th>
+	<th><?= $kaTranslate->translate('Newsletter:Open rate'); ?></th>
 	<th></th>
 	</tr>
 	<?
@@ -70,6 +71,9 @@ if(isset($_GET['delete'])) {
 			elseif($row['inqueue']==intval($row['destinatari'])) echo $kaTranslate->translate('Newsletter:On queue');
 			else echo $kaTranslate->translate('Newsletter:Processing');
 			?></small></td>
+		<td class="readed"><?= $row['readed']; ?><br />
+			<small><?= round(100/$row['destinatari']*$row['readed'],2); ?> %</small>
+			</td>
 		<td nowrap>
 			<a href="write.php?import=<?= $row['idarch']; ?>" class="smallbutton"><?= $kaTranslate->translate('Newsletter:Edit as new'); ?></a>
 			<a href="?delete=<?= $row['idarch']; ?>'" class="smallalertbutton" onclick="return confirm('<?= addslashes($kaTranslate->translate('Newsletter:Do you really want to delete this entry and all his e-mails still in queue?')); ?>')"><?= $kaTranslate->translate('UI:Delete'); ?></a>

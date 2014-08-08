@@ -79,7 +79,7 @@ $percentCompleted=100-round($_GET['count']/100*$mailInQueue);
 	/***************************/
 	if($mailInQueue>0) {	
 		foreach($kaNewsletter->getQueueList(array("limit"=>$mailLimitCycle)) as $mail) {
-			$results=$GLOBALS['__emails']->send($mail['from'],$mail['to'],$mail['subject'],$mail['message'],$mail['template']);
+			$results=$GLOBALS['__emails']->send($mail['from'],$mail['to'],$mail['subject'],$mail['message'],$mail['template'],$mail['idarch']);
 			if($results==true) {
 				if($kaNewsletter->removeFromQueueById($mail['idemlq'])) $mailInQueue--;
 				$percentCompleted=100-round(100/$_GET['count']*$mailInQueue);

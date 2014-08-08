@@ -39,10 +39,7 @@ else {
 	}
 
 $query="SELECT * FROM `".TABLE_LINGUE."` WHERE `online`='s' AND `ll`='".mysql_real_escape_string(LANG)."' LIMIT 1";
-/**/ $GLOBALS['microseconds']=microtime();
 $results=mysql_query($query);
-/**/ $GLOBALS['microseconds']=microtime()-$GLOBALS['microseconds'];
-/**/ kTxtLog($query);
 $row=mysql_fetch_array($results);
 setlocale(LC_TIME,$row['code']);
 

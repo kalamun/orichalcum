@@ -133,10 +133,11 @@ function kXmlParser($string) {
 			</tr>
 			<?
 			foreach($o['items'] as $item) { ?>
-				<tr id="item<?= $item['uid']; ?>"><td class="qty"><?= $item['qty']; ?></td>
+				<tr><td class="qty"><?= $item['qty']; ?></td>
 					<td class="item"><strong><?= $item['productcode']; ?></strong>
 						<?
 						echo $item['title'];
+						echo $item['subtitle']!="" ? '<br>'.$item['subtitle'] : '';
 						if(isset($item['variations'])&&is_array($item['variations'])) {
 							foreach($item['variations'] as $v) {
 								echo ', '.$v['collection'].' '.$v['name'];

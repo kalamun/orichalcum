@@ -162,7 +162,7 @@ function kGetShopCartDir($ll=false) {
 	return kGetVar('dir_shop_cart',1,$ll);
 	}
 function kGetShopManufacturersDir($ll=false) {
-	return kGetVar('dir_shop_cart',1,$ll);
+	return kGetVar('dir_shop_manufacturers',1,$ll);
 	}
 function kGetPhotogalleriesDir($ll=false) {
 	return kGetVar('dir_photogallery',1,$ll);
@@ -178,6 +178,15 @@ function kPrintFooter($file=false) {
 	if($file==false) $file="footer.php";
 	include($_SERVER['DOCUMENT_ROOT'].kGetTemplateDir().'inc/'.$file);
 	}
+function kGetCountryNameByCode($ll) {
+	foreach(file($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/shop/countries.txt') as $line)
+	{
+		$tmp=explode("\t",$line);
+		$tmp[1]=trim($tmp[1]);
+		if($tmp[1]==$ll) return trim($tmp[0]);
+	}
+	return false;
+}
 	
 /* site layout */
 function kGetSiteURL() {
@@ -641,7 +650,15 @@ function kGetEmailMessage() {
 	return $GLOBALS['__emails']->getVar('message');
 	}
 function kGetEmailFooter() {
-	return $GLOBALS['__emails']->getVar('footer');
+	$footer=$GLOBALS['__emails']->getVar('footer');
+	if($footer=="") $footer=kGetVar('footer',1);
+	return $footer;
+	}
+function kGetEmailUID() {
+	return $GLOBALS['__emails']->getVar('uid');
+	}
+function kGetEmailLoggerURL() {
+	return SITE_URL.BASEDIR.'inc/email_logger.php?uid='.$GLOBALS['__emails']->getVar('uid');;
 	}
 function kSendEmail($from,$to,$subject,$message,$template=false) {
 	return $GLOBALS['__emails']->send($from,$to,$subject,$message,$template);
@@ -782,7 +799,7 @@ function kAddPageComment($name,$email,$text,$idpag,$public="n") {
 	}
 function kGetPageMetadata($param=false,$dir=false,$ll=false) {
 	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," /");
-	if($ll==false) $ll=$_GET['lang'];
+	if($ll==false) $ll=LANG;
 	$metadata=$GLOBALS['__pages']->getMetadata($dir,$ll);
 	if($param!=false) {
 		if(isset($metadata[$param])) return $metadata[$param];
@@ -915,7 +932,7 @@ function kGetNewsEmbeddedMedias() {
 	}
 function kGetNewsMetadata($param=false,$dir=false,$ll=false) {
 	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," /");
-	if($ll==false) $ll=isset($_GET['lang'])?$_GET['lang']:DEFAULT_LANG;
+	if($ll==false) $ll=LANG;
 	$metadata=$GLOBALS['__news']->getMetadata($dir,$ll);
 	if($param!=false) {
 		if(isset($metadata[$param])) return $metadata[$param];
@@ -1142,7 +1159,8 @@ function kGetNewsCount($conditions="") {
 function kGetNewsCategoryById($idcat) {
 	return $GLOBALS['__news']->getCatById($idcat);
 	}
-function kGetNewsCategoryByDir($dir) {
+function kGetNewsCategoryByDir($dir=null) {
+	if($dir==null&&kIsNews()) $dir=$GLOBALS['__subdir__'];
 	return $GLOBALS['__news']->getCatByDir($dir);
 	}
 function kGetNewsCategories() {
@@ -1206,7 +1224,7 @@ function kPrintPhotogallery($dir=false) {
 	}
 function kGetPhotogalleryMetadata($param=false,$dir=false,$ll=false) {
 	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," /");
-	if($ll==false) $ll=$_GET['lang'];
+	if($ll==false) $ll=LANG;
 	$metadata=$GLOBALS['__photogallery']->getMetadata($dir,$ll);
 	if($param!=false) {
 		if(isset($metadata[$param])) return $metadata[$param];
@@ -1409,7 +1427,7 @@ function kGetShopCurrentCategoryName() {
 	return false;
 	}
 function kGetShopCategoryByDir($dir=null) {
-	if($dir==null) $dir=$GLOBALS['__subdir__'];
+	if($dir==null&&kIsShop()) $dir=$GLOBALS['__subdir__'];
 	return $GLOBALS['__template']->getCategory(array("table"=>TABLE_SHOP_ITEMS,"dir"=>$dir));
 	}
 function kGetShopParentCategories($dir=null) {
@@ -1613,7 +1631,7 @@ function kGetShopItemEmbeddedMedias() {
 	}
 function kGetShopItemMetadata($param=false,$dir=false,$ll=false) {
 	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," /");
-	if($ll==false) $ll=$_GET['lang'];
+	if($ll==false) $ll=LANG;
 	$metadata=$GLOBALS['__shop']->getMetadata($dir,$ll);
 	if($param!=false) {
 		if(isset($metadata[$param])) return $metadata[$param];
@@ -1764,6 +1782,12 @@ function kGetShopOrders($vars=array()) {
 /* manufacturers */
 /*****************/
 
+function kGetManufacturersList($vars=array())
+{
+	if(!isset($vars['ll'])) $vars['ll']=LANG;
+	return $GLOBALS['__shop']->getManufacturersList($vars);
+}
+
 function kSetManufacturer($dir="",$ll=false)
 {
 	if($ll==false) $ll=LANG;
@@ -1814,7 +1838,7 @@ function kGetManufacturerFeaturedImage()
 function kGetManufacturerMetadata($param=false,$dir=false,$ll=false)
 {
 	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," /");
-	if($ll==false) $ll=$_GET['lang'];
+	if($ll==false) $ll=LANG;
 	$metadata=$GLOBALS['__shop']->getManufacturerMetadata($dir,$ll);
 	if($param!=false)
 	{
