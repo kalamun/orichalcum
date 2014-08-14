@@ -224,6 +224,7 @@ function kGetSeoMetadata($dir=null,$ll=null) {
 	$seometadata['revisit_after']=$revisit_after;
 	$seometadata['priority']=kGetVar('seo_priority',1,$ll);
 	$seometadata['robots']=kGetVar('seo_robots',1,$ll);
+	$seometadata['featuredimage']=array();
 	if($GLOBALS['__pages']->pageExists($dir,$ll)) { $metadata=$GLOBALS['__pages']->getMetadata($dir); }
 	elseif($GLOBALS['__news']->newsExists($dir,$ll)) { $metadata=$GLOBALS['__news']->getMetadata($dir); }
 	elseif($GLOBALS['__photogallery']->photogalleryExists($dir)) { $metadata=$GLOBALS['__photogallery']->getMetadata($dir,$ll); }
@@ -237,6 +238,7 @@ function kGetSeoMetadata($dir=null,$ll=null) {
 	if(isset($metadata['seo_robots'])&&$metadata['seo_robots']!="") $seometadata['robots']=$metadata['seo_robots'];
 	if(isset($metadata['seo_canonical'])&&$metadata['seo_canonical']!="") $seometadata['canonical']=$metadata['seo_canonical'];
 	if(isset($metadata['seo_changefreq'])&&$metadata['seo_changefreq']!="") $seometadata['revisit_after']=$revisit_after[$seometadata['changefreq']];
+	if(isset($metadata['featuredimage'])&&$metadata['featuredimage']!="") $seometadata['featuredimage']=$metadata['featuredimage'];
 	return $seometadata;
 	}
 

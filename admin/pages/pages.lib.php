@@ -114,6 +114,9 @@ class kaPages {
 		foreach(explode("\n",trim($row['variables'])) as $line) {
 			if(trim($line)!="") {
 				$line=explode("\t",trim($line));
+				if(!isset($line[0])) continue;
+				if(!isset($line[1])) $line[1]="";
+				if(!isset($line[2])) $line[2]="";
 				$output['variables'][]=array("variable_name"=>$line[0],"correspondence"=>$line[1],"mandatory"=>$line[2]);
 				}
 			}

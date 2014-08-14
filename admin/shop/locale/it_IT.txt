@@ -126,3 +126,8 @@ Shop:Page URL					URL della pagina
 Shop:Create manufacturer		Crea la pagina del produttore
 Shop:Are you sure do you want to remove this manufacturer? This operation IS NOT REVERSIBLE.	Sei sicuro di voler rimuovere questo produttore? Questa operazione NON È REVERSIBILE.
 Shop:recently added				ultimi inserimenti
+Shop:You are deleting this order					Stai per eliminare quest'ordine
+Shop:No recovery will be possible once deleted		Dopo averlo cancellato non sarà più possibile recuperarlo
+Shop:Do you really want to proceed?					Vuoi veramente procedere?
+Shop:Delete order									Elimina l'ordine
+Shop:This order was definitely DELETED. No recovery is possible.		Questo ordine è stato CANCELLATO definitivamente. Non potrà più essere recuperato.

@@ -4,6 +4,7 @@ Menu:Upgrade		Aggiorna
 Menu:Help			Aiuto
 Menu:Welcome		Benvenuto
 Menu:Your Profile	Profilo Personale
+Menu:Welcome page setup	Impostazioni della pagina di benvenuto
 Menu:Logout			Esci
 Menu:Site Contents	Contenuti del sito
 Menu:Home Page		Prima pagina
@@ -39,6 +40,7 @@ UI:Enter			Entra
 UI:Save				Salva
 UI:Move				Sposta
 UI:Edit				Modifica
+UI:Change			Cambia
 UI:Delete			Elimina
 UI:Cancel			Annulla
 UI:Copy				Copia
@@ -105,6 +107,17 @@ Img:Automatic thumbnail	Miniatura automatica
 Img:Choose a custom thumbnail	Scegli una miniatura personalizzata
 Img:Copy to your website	Copia nel tuo sito
 Img:Load as Hotlink		Carica come Hotlink
+Img:Upload thumbnail	Carica la miniatura
+Img:Update hotlink		Aggiorna l'hotlink
+Img:Import to your website	Importa nel tuo sito
+Img:Warning: changes will be applied to all the instances of this picture	Attenzione: le modifiche verranno applicate ovunque sia stata utilizzata questa immagine
+Img:Image successfully updated					Modifiche salvate con successo
+Img:An error occurred while saving				Si è verificato un errore durante il salvataggio
+Img:Image successfully deleted					Immagine cancellata con successo
+Img:An error occurred while deleting the image	Si è verificato un errore durante la cancellazione
+Img:You are deleting this image from server		Stai per cancellare questa immagine dal server
+Img:No recovery will be possible after deletion	Non sarà più possibile recuperare l'immagine dopo che l'avrai cancellata
+Img:Are you sure that it is what you want?		Sei proprio sicuro sia quello che vuoi?
 
 //DOCUMENT MANAGER
 Doc:Document			Documento
@@ -180,6 +193,9 @@ Home:License			Licenza d'utilizzo
 Home:read				leggi
 Home:Copyright			&egrave; un software <em>open-source</em> rilasciato sotto licenza <acronym title="Gnu General Public License v.3">GPL 3</acronym>
 
-//JAVASCRIPT
+//JAVASCRIPT (spaces denied in names)
 Javascript:Insertimage		Inserisci l'immagine
 Javascript:Insertthumbnail	Inserisci la miniatura
+Javascript:WriteCaptionHere	scrivi qui la didascalia
+Javascript:Saving			salvataggio
+Javascript:Edit				Modifica

@@ -24,6 +24,8 @@
 	box-sizing:border-box;
 	padding:20px;
 	font-family:Courier,'Courier New',fixed;
+	background-color:#444;
+	color:#e6e4e2;
 	border:0;
 	font-size:14px;
 	z-index:1;
@@ -50,6 +52,9 @@
 	border-radius:3px;
 	padding:0 5px;
 	}
+.kZenEditorContainer .charAlternatives.sans {
+	font-family:OpenSans,Arial,Helvetica,Tahoma,sans-serif;
+	}
 .kZenEditorContainer .charAlternatives:after {
 	content:'';
 	position:absolute;
@@ -62,6 +67,7 @@
 .kZenEditorContainer .charAlternatives div {
 	display:inline-block;
 	padding:5px 3px;
+	cursor:pointer;
 	}
 .kZenEditorContainer .charAlternatives div.selected {
 	color:#fff;

@@ -4,6 +4,7 @@ Menu:Upgrade		Upgrade
 Menu:Help			Help
 Menu:Welcome		Welcome
 Menu:Your Profile	Your Profile
+Menu:Welcome page setup	Welcome page setup
 Menu:Logout			Logout
 Menu:Site Contents	Site Contents
 Menu:Home Page		Home Page
@@ -39,6 +40,7 @@ UI:Enter			Enter
 UI:Save				Save
 UI:Move				Move
 UI:Edit				Edit
+UI:Change			Change
 UI:Delete			Delete
 UI:Cancel			Cancel
 UI:Copy				Copy
@@ -105,6 +107,17 @@ Img:Automatic thumbnail	Automatic thumbnail
 Img:Choose a custom thumbnail	Choose a custom thumbnail
 Img:Copy to your website	Copy to your website
 Img:Load as Hotlink		Load as Hotlink
+Img:Upload thumbnail	Upload thumbnail
+Img:Update hotlink		Update hotlink
+Img:Import to your website	Import to your website
+Img:Warning: changes will be applied to all the instances of this picture	Warning: changes will be applied to all the instances of this picture
+Img:Image successfully updated		Image successfully updated
+Img:An error occurred while saving	An error occurred while saving
+Img:Image successfully deleted					Image successfully deleted
+Img:An error occurred while deleting the image	An error occurred while deleting the image
+Img:You are deleting this image from server		You are deleting this image from server
+Img:No recovery will be possible after deletion	No recovery will be possible after deletion
+Img:Are you sure that it is what you want?		Are you sure that it is what you want?
 
 //DOCUMENT MANAGER
 Doc:Document			Document

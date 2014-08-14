@@ -35,11 +35,11 @@ define("PAGE_NAME",$kaTranslate->translate('Pages:Conversions Manager'));
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="author" content="Roberto Pasini - www.kalamun.org" />
 <meta name="copyright" content="no(c)" />
-<style type="text/css">
-	@import "<?= ADMINDIR; ?>css/screen.css";
-	@import "<?= ADMINDIR; ?>css/main.lib.css";
-	@import "<?= ADMINDIR; ?>css/imgmanager.css";
-	</style>
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/init.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/screen.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/main.lib.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/imgmanager.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/kzeneditor.css?<?= SW_VERSION; ?>" type="text/css" />
 
 <script type="text/javascript">var ADMINDIR='<?= str_replace("'","\'",ADMINDIR); ?>';</script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/main.lib.js"></script>
@@ -83,11 +83,18 @@ define("PAGE_NAME",$kaTranslate->translate('Pages:Conversions Manager'));
 			}
 
 		$variables="";
-		if(isset($_POST['variable_name'][0])) {
-			for($i=0;isset($_POST['variable_name'][$i]);$i++) {
-				if($_POST['variable_name'][$i]!="") $variables.=$_POST['variable_name'][$i]."\t".$_POST['variable_correspondence'][$i]."\t".$_POST['variable_mandatory'][$i]."\n";
+		if(isset($_POST['variable_name'][0]))
+		{
+			for($i=0;isset($_POST['variable_name'][$i]);$i++)
+			{
+				if(isset($_POST['variable_name'][$i]) && $_POST['variable_name'][$i]!="")
+				{
+					if(!isset($_POST['variable_correspondence'][$i])) $_POST['variable_correspondence'][$i]="";
+					if(!isset($_POST['variable_mandatory'][$i])) $_POST['variable_mandatory'][$i]="n";
+					$variables.=$_POST['variable_name'][$i]."\t".$_POST['variable_correspondence'][$i]."\t".$_POST['variable_mandatory'][$i]."\n";
 				}
 			}
+		}
 		$vars['variables']=$variables;
 
 		if(isset($_POST['notification_emails'])) $vars['notification_emails']=$_POST['notification_emails'];
@@ -129,7 +136,7 @@ define("PAGE_NAME",$kaTranslate->translate('Pages:Conversions Manager'));
 
 <div id="imgcontents">
 	<br />
-	<form action="?idpag=<?= $_GET['idpag']; ?>" method="post" onsubmit="return kCheckForm(this);" id="checkthis">
+	<form action="?idpag=<?= $_GET['idpag']; ?>" method="post" id="checkthis">
 	<input type="hidden" name="activetab" value="<?= $_POST['activetab']; ?>" id="activetab" />
 	<?
 	/*******************************/
@@ -327,5 +334,11 @@ define("PAGE_NAME",$kaTranslate->translate('Pages:Conversions Manager'));
 		</div>
 	</form>
 	</div>
+
+<script type="text/javascript">
+	var txts=new kInitZenEditor;
+	txts.init('<?= addslashes(ADMINDIR); ?>');
+	</script>
+
 </body>
 </html>

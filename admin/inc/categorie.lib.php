@@ -92,9 +92,9 @@ class kaCategorie {
 		$row=mysql_fetch_array($results);
 		$ordine=$row['ordine'];
 		
-		$query="DELETE FROM ".TABLE_CATEGORIE." WHERE idcat=".$idcat." ";
+		$query="DELETE FROM ".TABLE_CATEGORIE." WHERE (`idcat`=".intval($idcat)." OR `ref`=".intval($idcat).") ";
 		if($tabella!=false) $query.=" AND tabella='".$tabella."' ";
-		$query.=" AND ll='".$lang."' LIMIT 1";
+		$query.=" AND ll='".$lang."'";
 		if(!mysql_query($query)) return false;
 		else {
 			$query="UPDATE ".TABLE_CATEGORIE." SET ordine=ordine-1 WHERE ordine>".$ordine." ";
@@ -122,6 +122,25 @@ class kaCategorie {
 			$query.=" AND ll='".$lang."' LIMIT 1";
 			if(!mysql_query($query)) $output=false;
 			}
+		return $output;
+		}
+
+	function sortby($orderby,$tabella,$lang=false,$ref=0) {
+		$output=true;
+		if($lang==false&&isset($_SESSION['ll'])) $lang=$_SESSION['ll'];
+		elseif($lang==false&&defined(LANG)) $lang=LANG;
+		elseif($lang==false) return false;
+
+		$i=1;
+		$q="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `tabella`='".mysql_real_escape_string($tabella)."' AND `ll`='".mysql_real_escape_string($lang)."' AND `ref`='".intval($ref)."' ORDER BY ".$orderby."";
+		$rs=mysql_query($q);
+		while($r=mysql_fetch_array($rs))
+		{
+			$query="UPDATE ".TABLE_CATEGORIE." SET `ordine`=".($i+1)." WHERE `idcat`=".$r['idcat']." LIMIT 1";
+			if(!mysql_query($query)) $output=false;
+			if($this->sortby($orderby,$tabella,$lang,$r['idcat'])==false) $output=false;
+			$i++;
+		}
 		return $output;
 		}
 

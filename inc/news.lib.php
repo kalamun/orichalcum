@@ -282,6 +282,7 @@ class kNews {
 			$metadata['traduzioni']=$news['traduzioni'];
 			if($metadata['template']!="") $metadata['template']=$news['template'];
 			if($metadata['layout']!="") $metadata['layout']=$news['layout'];
+			$metadata['featuredimage']=($news['featuredimage']>0 ? $this->imgs->getImage($news['featuredimage']) : array());
 			}
 		if(isset($news['idnews'])) {
 			if(isset($this->loadedNews['idnews'])&&$news['idnews']==$this->loadedNews['idnews']&&isset($news['metadata'])) {

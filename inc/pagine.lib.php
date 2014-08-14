@@ -45,17 +45,18 @@ class kPages {
 		$metadata['template']=kGetVar('template',1);
 		$metadata['layout']="";
 		if(isset($dir)&&$dir!="") {
-			$query="SELECT idpag,titolo,traduzioni,template,layout FROM ".TABLE_PAGINE." WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND ll='".$ll."' LIMIT 1";
+			$query="SELECT `idpag`,`titolo`,`traduzioni`,`template`,`layout`,`featuredimage` FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND ll='".mysql_real_escape_string($ll)."' LIMIT 1";
 			$results=mysql_query($query);
 			$row=mysql_fetch_array($results);
 			$metadata['titolo']=$row['titolo'];
 			$metadata['traduzioni']=$row['traduzioni'];
 			$metadata['template']=$row['template'];
 			$metadata['layout']=$row['layout'];
+			$metadata['featuredimage']=($row['featuredimage']>0 ? $this->imgs->getImage($row['featuredimage']) : array());
 			$idpag=$row['idpag'];
 			}
 		if(isset($idpag)) {
-			$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_PAGINE."' AND id='".$idpag."'";
+			$query="SELECT * FROM `".TABLE_METADATA."` WHERE `tabella`='".TABLE_PAGINE."' AND `id`='".$idpag."'";
 				$results=mysql_query($query);
 					while($row=mysql_fetch_array($results)) {
 				$metadata[$row['param']]=$row['value'];
@@ -70,12 +71,12 @@ class kPages {
 		$output=array();
 		if(!is_array($keywords)) $keywords=array($keywords);
 		
-		$query="SELECT `titolo`,`dir`,`anteprima` FROM ".TABLE_PAGINE." WHERE ";
+		$query="SELECT `titolo`,`dir`,`anteprima` FROM `".TABLE_PAGINE."` WHERE ";
 		foreach($keywords as $k) {
 			$k=trim($k);
 			if($k!=""&&strlen($k)>3) {
 				$k=b3_htmlize($k,true,"");
-				$query.="(`titolo` LIKE '%".$k."%' OR `sottotitolo` LIKE '%".$k."%' OR `anteprima` LIKE '%".$k."%' OR `testo` LIKE '%".$k."%') AND ";
+				$query.="(`titolo` LIKE '%".mysql_real_escape_string($k)."%' OR `sottotitolo` LIKE '%".mysql_real_escape_string($k)."%' OR `anteprima` LIKE '%".mysql_real_escape_string($k)."%' OR `testo` LIKE '%".mysql_real_escape_string($k)."%') AND ";
 				}
 			}
 		if(substr($query,-6)=="WHERE ") return $output; //if no valid keywords return the empty array (prevent to return all pages)

@@ -10,18 +10,24 @@ function kUploads()
 	var counter=0,isLoading=false,objectArchive=Array();
 
 	var maxFileSize=25000000,isLoading=false,searchKey="",orderKey="";
-	var form=null,fileList=null,formData=null,queue=Array(),currentFile=0,uploadFileProgress=null,search=null,orderby=null,onsubmit=null,onsubmit2=null,limit=1000,lastSelectedItem=null;
+	var form=null,fileList=null,formData=null,queue=Array(),currentFile=0,uploadFileProgress=null,search=null,orderby=null,onsubmit=null,onsubmit2=null,limit=1000,lastSelectedItem=null,editDialog=null;
 	
-	var init=function(formObject,dropObject,browseObject,fileListContainer,searchContainer,orderbyContainer,onsubmitContainer,onsubmitContainer2,onsubmitAction,onsubmitAction2,limitNumber) {
+	var init=function(formObject,dropObject,browseObject,editorObject,fileListContainer,searchContainer,orderbyContainer,onsubmitContainer,onsubmitContainer2,onsubmitAction,onsubmitAction2,limitNumber) {
 		if(!formObject) return false;
 		if(!dropObject) return false;
 		if(!browseObject) return false;
+		if(!editorObject) return false;
 		form=formObject;
 		fileList=fileListContainer;
+
+		editDialog=editorObject;
+		kAddEvent(editDialog.querySelector('.closeWindow'),"click",closeEditDialog);
+		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsmanager_loading.inc.php';
+
 		if(limitNumber) limit=parseInt(limitNumber);
 		if(onsubmitAction) onsubmit=onsubmitAction;
 		if(onsubmitAction2) onsubmit2=onsubmitAction2;
-		
+
 		kAddEvent(dropObject,"dragenter",onOver);
 		kAddEvent(dropObject,"dragleave",onOut);
 		kAddEvent(dropObject,"dragover",onOver);
@@ -87,6 +93,7 @@ function kUploads()
 		aj.onFail( function() { alert('loading error :-('); } );
 		aj.send('post','../inc/ajax/uploadHandler.php','&action=getImageList&start='+parseInt(start)+'&limit='+parseInt(limit)+'&orderby='+orderKey+'&search=&conditions='+encodeURIComponent(conditions));
 	}
+	this.reloadImage=reloadImage;
 	
 	// add ajax-loaded images to the list
 	var printImages=function(html,xml,select)
@@ -144,14 +151,20 @@ function kUploads()
 		var h3=document.createElement('H3');
 		h3.appendChild(document.createTextNode(filename));
 		
+		edit=document.createElement('DIV');
+		kAddEvent(edit,"click",openEditDialog);
+		edit.appendChild(document.createTextNode(kaDictionary.Edit));
+		edit.className='edit';
+		
 		var inpt=document.createElement('INPUT');
 		inpt.id='caption'+id;
-		inpt.placeholder=STRING_NOCAPTION;
+		inpt.placeholder=kaDictionary.WriteCaptionHere;
 		inpt.value=caption;
 		kAddEvent(inpt,"keypress",onCaptionKeypress);
 		
 		li.appendChild(div);
 		li.appendChild(h3);
+		li.appendChild(edit);
 		li.appendChild(inpt);
 		kAddEvent(li,"click",selectImage);
 
@@ -239,7 +252,7 @@ function kUploads()
 				var saving=document.createElement('DIV');
 				saving.className='status';
 				saving.id='saving'+id;
-				saving.appendChild(document.createTextNode(STRING_SAVING));
+				saving.appendChild(document.createTextNode(kaDictionary.Saving));
 				this.parentNode.appendChild(saving);
 				var aj=new kAjax();
 				aj.onSuccess(captionSaved);
@@ -359,4 +372,20 @@ function kUploads()
 		}
 		if(selected.length>0) onsubmit2(selected);
 		}
+	
+	/* EDIT */
+	var openEditDialog=function()
+	{
+		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsmanager_edit.inc.php?id='+this.parentNode.id;
+		editDialog.className='open';
+	}
+	this.openEditDialog=openEditDialog;
+
+	var closeEditDialog=function()
+	{
+		editDialog.className='';
+		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsmanager_loading.inc.php';
+	}
+	this.closeEditDialog=closeEditDialog;
+
 }

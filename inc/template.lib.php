@@ -444,20 +444,22 @@ class kTemplate {
 		
 	function get($tpl=false) {
 		$__template=$this;
+		$file="";
 		if($tpl==false||trim($tpl)=="") $tpl=$this->tpl;
 		if($this->layout!=false) $file='layouts/'.$this->layout;
 		else {
-			if($this->isHome()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/home.php')) $file="home.php";
-			elseif($this->isNews()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/news.php')) $file="news.php";
-			elseif($this->isShopCart()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/cart.php')) $file="cart.php";
-			elseif($this->isShopManufacturer()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/manufacturers.php')) $file="manufacturers.php";
-			elseif($this->isShop()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/shop.php')) $file="shop.php";
-			elseif($this->isPrivate()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/private.php')) $file="private.php";
-			elseif($this->isPhotogallery()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/photogallery.php')) $file="photogallery.php";
-			elseif($this->isUsers()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/users.php')) $file="users.php";
-			elseif($this->isFeed()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/feed.php')) $file="feed.php";
-			elseif($this->isSearch()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/search.php')) $file="search.php";
-			elseif($this->isSitemap()&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/sitemap.php')) $file="sitemap.php";
+			if($this->isHome()) $file="home.php";
+			elseif($this->isNews()) $file="news.php";
+			elseif($this->isShopCart()) $file="cart.php";
+			elseif($this->isShopManufacturer()) $file="manufacturers.php";
+			elseif($this->isShop()) $file="shop.php";
+			elseif($this->isPrivate()) $file="private.php";
+			elseif($this->isPhotogallery()) $file="photogallery.php";
+			elseif($this->isUsers()) $file="users.php";
+			elseif($this->isFeed()) $file="feed.php";
+			elseif($this->isSearch()) $file="search.php";
+			elseif($this->isSitemap()) $file="sitemap.php";
+			elseif(!$GLOBALS['__pages']->pageExists(trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__'],"/"))) { header("HTTP/1.0 404 Not Found"); $file="404.php"; }
 			else $file="index.php";
 			}
 		set_include_path(get_include_path().PATH_SEPARATOR.$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl);
@@ -465,6 +467,7 @@ class kTemplate {
 			if(file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/index.php')) $file="index.php";
 			else $tpl=$this->tpl;
 			}
+		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file)) $file="index.php";
 		if(is_file($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file)) {
 			$this->setTemplate($tpl);
 			if(ob_get_length()>0) { ob_clean(); }

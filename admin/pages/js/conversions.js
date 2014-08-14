@@ -44,5 +44,5 @@ function kCheckForm(f) {
 			input[i].checked=true;
 			}
 		}
-	return false;
+	return true;
 	}

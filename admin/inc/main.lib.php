@@ -386,12 +386,12 @@ function b3_htmlize($string,$slashes=true,$param="*") {
 		/* AUTODETECT DI INDIRIZZI INTERNET ED E-MAIL */
 		$find=array(
 			'/&lt;a href="(http:|https:|ftp:)?(\/\/[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}[^"]*?)"((?: +[[:alpha:]]*="[^"]*")*)&gt;(.*?)&lt;\/a&gt;/si',
-			'/(?<!="|=\'|=)(http:|https:|ftp:)(\/\/[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|-|_|\.|\?|=|#|&|;|:]*)/si',
-			'/(?<!\/\/|%2F%2F|">)(www\.[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|-|_|\.|\?|=|#|&|;|:]*)/si',
+			'/(?<!="|=\'|=)(http:|https:|ftp:)(\/\/[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|\-|_|\.|\?|=|#|&|;|:]*)/si',
+			'/(?<!\/\/|%2F%2F|">)(www\.[[:alnum:]|\.|\-|_]+[[:alpha:]]{2,4}\/?[[:alnum:]|\/|\-|_|\.|\?|=|#|&|;|:]*)/si',
 			'/&lt;a href="([[:punct:][:alnum:]]*?)"(.*?)&gt;(.*?)&lt;\/a&gt;/si',
 			'/&lt;a name="([[:punct:][:alnum:]]*?)"&gt;&lt;\/a&gt;/si',
 			'/&lt;a href="mailto:([[:alnum:]|\.|\-|_]+@[[:alnum:]|\.|\-|_]+[A-Z]{2,4})"([^&]*)&gt;(.*?)&lt;\/a&gt;/si',
-			'/(?<!mailto:)(\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b)/si'
+			'/(?<!mailto:|="|=\'|=)(\b[A-Z0-9\._%+\-]+@[A-Z0-9\.\-]+\.[A-Z]{2,4}\b)/si'
 			);
 		$replace=array(
 			"<a href=\"$1$2\"$3>$4</a>",

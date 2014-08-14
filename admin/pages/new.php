@@ -54,7 +54,7 @@ if(isset($_POST['save'])) {
 	if(strlen($_POST['dir'])>64) $_POST['dir']=substr(str_replace(".html","",$_POST['dir']),0,64).".html";
 
 	//insert page
-	$query="INSERT INTO ".TABLE_PAGINE." (created,modified,titolo,sottotitolo,anteprima,testo,categorie,ll,dir,template,layout,traduzioni,riservata,allowcomments,allowconversions) VALUES(NOW(),NOW(),'".b3_htmlize($_POST['titolo'],true,"")."','','<p></p>','<p></p>','".mysql_real_escape_string($categorie)."','".$_SESSION['ll']."','".mysql_real_escape_string($_POST['dir'])."','','','','s','n',false)";
+	$query="INSERT INTO ".TABLE_PAGINE." (created,modified,titolo,sottotitolo,anteprima,testo,categorie,ll,dir,template,layout,traduzioni,riservata,allowcomments,allowconversions,featuredimage) VALUES(NOW(),NOW(),'".b3_htmlize($_POST['titolo'],true,"")."','','<p></p>','<p></p>','".mysql_real_escape_string($categorie)."','".$_SESSION['ll']."','".mysql_real_escape_string($_POST['dir'])."','','','','s','n',false,0)";
 	if(!mysql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while saving');
 	else $id=mysql_insert_id();
 

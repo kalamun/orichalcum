@@ -306,38 +306,93 @@ class kaImages {
 
 	function usage($idimg) {
 		$output=array();
-		$id=array(TABLE_CONFIG=>"idconf",TABLE_USERS=>"iduser",TABLE_BANNER=>"idbanner",TABLE_PAGINE=>"idpag",TABLE_NEWS=>"idnews",TABLE_PHOTOGALLERY=>"idphg");
-		$type=array(TABLE_CONFIG=>"Configurazione",TABLE_USERS=>"Utenti",TABLE_BANNER=>"Banner",TABLE_PAGINE=>"Pagina",TABLE_NEWS=>"News",TABLE_PHOTOGALLERY=>"Gallerie Fotografiche");
+		$id=array(TABLE_CONFIG=>"idconf",TABLE_USERS=>"iduser",TABLE_BANNER=>"idbanner",TABLE_PAGINE=>"idpag",TABLE_NEWS=>"idnews",TABLE_PHOTOGALLERY=>"idphg",TABLE_SHOP_ITEMS=>"idsitem",TABLE_SHOP_MANUFACTURERS=>"idsman",TABLE_MENU=>"idmenu");
+		$type=array(TABLE_CONFIG=>"Configurazione",TABLE_USERS=>"Utenti",TABLE_BANNER=>"Banner",TABLE_PAGINE=>"Pagina",TABLE_NEWS=>"News",TABLE_PHOTOGALLERY=>"Gallerie Fotografiche",TABLE_SHOP_ITEMS=>"Oggetti del negozio",TABLE_SHOP_MANUFACTURERS=>"Produttori",TABLE_MENU=>"Menù di navigazione");
 
-		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg=".$idimg;
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
-		$descr=$type[$row['tabella']].' ';
-		$query2="SELECT * FROM ".$row['tabella']." WHERE ".$id[$row['tabella']]."=".$row['id']." LIMIT 1";
-		$results2=mysql_query($query2);
-		$row2=mysql_fetch_array($results2);
-		if(!isset($row2['ll'])) $row2['ll']="";
-		if(!isset($row2['dir'])) $row2['dir']="";
-		$descr.='<strong>'.strtolower($row2['ll']).'/'.($row['tabella']==TABLE_NEWS?'news/':'').$row2['dir'].'</strong>';
-		$url=BASEDIR.strtolower($row2['ll']).'/'.($row['tabella']==TABLE_NEWS?'news/':'').$row2['dir'];
-
-		$output[]=array("table"=>$row['tabella'],"id"=>$row['id'],"descr"=>$descr,"url"=>$url);
+		$output=array();
 		
+		// search for embedded images
 		$search=array();
+		$search[]=array(TABLE_CONFIG,'value1');
+		$search[]=array(TABLE_CONFIG,'value2');
 		$search[]=array(TABLE_PAGINE,'anteprima');
 		$search[]=array(TABLE_PAGINE,'testo');
 		$search[]=array(TABLE_NEWS,'anteprima');
 		$search[]=array(TABLE_NEWS,'testo');
+		$search[]=array(TABLE_PHOTOGALLERY,'testo');
+		$search[]=array(TABLE_SHOP_ITEMS,'anteprima');
+		$search[]=array(TABLE_SHOP_ITEMS,'testo');
+		$search[]=array(TABLE_SHOP_MANUFACTURERS,'preview');
+		$search[]=array(TABLE_SHOP_MANUFACTURERS,'description');
 		
-		foreach($search as $s) {
-			$query2="SELECT * FROM ".$s[0]." WHERE ".$s[1]." LIKE '%id=\"img".$idimg."\"%' OR ".$s[1]." LIKE '%id=\"thumb".$idimg."\"%' LIMIT 1";
-			$results2=mysql_query($query2);
-			while($row2=mysql_fetch_array($results2)) {
-				$descr=$type[$s[0]].' <strong>'.strtolower($row2['ll']).'/'.($s[0]==TABLE_NEWS?'news/':'').$row2['dir'].'</strong>';
-				$url=BASEDIR.strtolower($row2['ll']).'/'.($s[0]==TABLE_NEWS?'news/':'').$row2['dir'];
-				if($url!=$output[0]['url']) $output[]=array("table"=>$s[0],"id"=>$row2[$id[$s[0]]],"descr"=>$descr,"url"=>$url);
-				}
+		foreach($search as $s)
+		{
+			$query="SELECT * FROM ".$s[0]." WHERE ".$s[1]." LIKE '%id=\"img".$idimg."\"%' OR ".$s[1]." LIKE '%id=\"thumb".$idimg."\"%'";
+			$results=mysql_query($query);
+			while($row=mysql_fetch_array($results))
+			{
+				if(!isset($row['dir'])) $row['dir']='';
+				$output[]=array(
+					"table"=>$s[0],
+					"id"=>$row[$id[$s[0]]],
+					"descr"=>$type[$s[0]],
+					"lang"=>$row['ll'],
+					"dir"=>$row['dir']
+					);
 			}
+		}
+			
+		// search for id
+		$searchID=array();
+		$searchID[]=array(TABLE_PAGINE,'featuredimage');
+		$searchID[]=array(TABLE_NEWS,'featuredimage');
+		$searchID[]=array(TABLE_SHOP_ITEMS,'featuredimage');
+		$searchID[]=array(TABLE_SHOP_MANUFACTURERS,'featuredimage');
+
+		foreach($searchID as $s)
+		{
+			$query="SELECT * FROM ".$s[0]." WHERE ".$s[1]."='".intval($idimg)."'";
+			$results=mysql_query($query);
+			while($row=mysql_fetch_array($results))
+			{
+				$output[]=array(
+					"table"=>$s[0],
+					"id"=>$row[$id[$s[0]]],
+					"descr"=>$type[$s[0]],
+					"lang"=>$row['ll'],
+					"dir"=>$row['dir']
+					);
+			}
+		}
+		
+		// search into gallery
+		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE `idimg`='".intval($idimg)."'";
+		$results=mysql_query($query);
+		while($row=mysql_fetch_array($results))
+		{
+			$output[]=array(
+				"table"=>$row['tabella'],
+				"id"=>$row['id'],
+				"descr"=>$type[$row['tabella']],
+				"lang"=>"",
+				"dir"=>""
+				);
+		}
+		
+		// search into menus
+		$query="SELECT * FROM ".TABLE_MENU." WHERE `photogallery` LIKE '%,".intval($idimg).",%'";
+		$results=mysql_query($query);
+		while($row=mysql_fetch_array($results))
+		{
+			$output[]=array(
+				"table"=>TABLE_MENU,
+				"id"=>$row[$row['idmenu']],
+				"descr"=>$type[$row['tabella']].': '.$row['label'],
+				"lang"=>$row['ll'],
+				"dir"=>$row['url']
+				);
+		}
+		
 		
 		return $output;
 		}

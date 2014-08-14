@@ -129,3 +129,8 @@ Shop:Page URL					Page URL
 Shop:Create manufacturer		Create manufacturer
 Shop:Are you sure do you want to remove this manufacturer? This operation IS NOT REVERSIBLE.	Are you sure do you want to remove this manufacturer? This operation IS NOT REVERSIBLE.
 Shop:recently added				recently added
+Shop:You are deleting this order					You are deleting this order
+Shop:No recovery will be possible once deleted		No recovery will be possible once deleted
+Shop:Do you really want to proceed?					Do you really want to proceed?
+Shop:Delete order									Delete order
+Shop:This order was definitely DELETED. No recovery is possible.		This order was definitely DELETED. No recovery is possible.

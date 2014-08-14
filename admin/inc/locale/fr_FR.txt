@@ -4,6 +4,7 @@ Menu:Upgrade		Upgrade
 Menu:Help			Aide
 Menu:Welcome		Accueil
 Menu:Your Profile	Votre profil
+Menu:Welcome page setup	Configuration de la page d'accueil
 Menu:Logout			Déconnexion
 Menu:Site Contents	Contenu du site
 Menu:Home Page		Page d'accueil
@@ -36,9 +37,10 @@ UI:Username			Nom d'utilisateur
 UI:Password			Mot de passe
 UI:Automatic log-in	Log-in automatique
 UI:Enter			Entrer
-UI:Save				Sauver
+UI:Save				Enregistrer
 UI:Move				Déplacer
 UI:Edit				Éditer
+UI:Change			Changer
 UI:Delete			Supprimer
 UI:Cancel			Annuler
 UI:Copy				Copier
@@ -83,13 +85,13 @@ Img:Picture Management	Gestion d'image
 Img:Picture Properties	Propriétés de l'image
 Img:Files				Fichiers
 Img:Usage				Usage
-Img:Watch it			Regardez
-Img:Delete				Effacer
+Img:Watch it			Regarder
+Img:Delete				Supprimer
 Img:No Images			Aucune Image
 Img:Upload from computer	Envoie depuis l'ordinateur
 Img:Insert the picture	Insérez l'image
 Img:Insert the thumbnail	Insérer la miniature
-Img:Choose from repository	Choisissez à partir du l'archive
+Img:Choose from repository	Choisissez à partir de l'archive
 Img:Choose from internet	Choisissez à partir d'internet
 Img:Choose a picture	Choisissez une photo
 Img:Upload a picture	Envoie une photo
@@ -106,6 +108,17 @@ Img:Automatic thumbnail	Miniature automatique
 Img:Choose a custom thumbnail	Choisissez une miniature personnalisée
 Img:Copy to your website	Copier sur votre site web
 Img:Load as Hotlink		Chargez comme Hotlink
+Img:Upload thumbnail	Chargez la miniature
+Img:Update hotlink		Mettre à jour l'hotlink
+Img:Import to your website	Importer dans ton site
+Img:Warning: changes will be applied to all the instances of this picture	Avertissement: les modifications seront appliquées à toutes les instances de cette image
+Img:Image successfully updated		Image bien modifiée
+Img:An error occurred while saving	Une erreur s'est produite lors de l'enregistrement
+Img:Image successfully deleted					Image supprimée avec succès
+Img:An error occurred while deleting the image	Une erreur s'est produite lors de la suppression de l'image
+Img:You are deleting this image from server		tu es en train de supprimer cette image de serveur 
+Img:No recovery will be possible after deletion	Ne sera pas possible de la reprendre après la suppression 
+Img:Are you sure that it is what you want?		Es-tu sûr que c'est ce que tu veux?
 
 //DOCUMENT MANAGER
 Doc:Document			Document

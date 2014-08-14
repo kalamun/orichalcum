@@ -460,15 +460,14 @@ body {
 	margin:0px;
 	}
 
-.homeicons {
-	text-align:center;
+.siteboard .homeicons {
+	width:35%;
+	float:left;
 	}
 .homeicon {
 	display:block;
-	margin:5px;
+	margin:5px 0;
 	border:1px solid #eee;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
 	border-radius:5px;
 	background-color:#fff;
 	text-align:left;
@@ -484,6 +483,34 @@ body {
 	}
 .homeicon a:hover img {
 	opacity:1;
+	}
+.siteboard .sitenotes {
+	width:60%;
+	padding:2%;
+	float:right;
+	margin:5px 0;
+	border:1px solid #eee;
+	border-radius:5px;
+	background-color:#fff;
+	text-align:left;
+	font-size:12px;
+	height:700px;
+	overflow:auto;
+	color:#444;
+	}
+#contents .siteboard .sitenotes h1:first-child {
+	margin-top:0;
+	}
+#contents .siteboard .sitenotes h1,
+#contents .siteboard .sitenotes h2,
+#contents .siteboard .sitenotes h3,
+#contents .siteboard .sitenotes h4,
+#contents .siteboard .sitenotes h5,
+#contents .siteboard .sitenotes h6
+	{
+	margin:20px 0 5px 0;
+	color:#416689;
+	font-weight:bold;
 	}
 #lastTwit {
 	color:#416689;
@@ -1186,5 +1213,12 @@ ul.suggestions li:hover,ul.suggestions li.sel {
 	}
 .suggestionsClear {
 	cursor:pointer;
+	}
+
+/* frames */
+.frameheader {
+	}
+.padding {
+	padding:30px;
 	}
 

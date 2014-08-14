@@ -465,7 +465,7 @@ else {
 					$labels[]=$man['name'];
 					$options[]=$man['idsman'];
 				}
-				echo b3_create_select("manufacturer","",$labels,$options,$row['manufacturer']);
+				echo b3_create_select("manufacturer","",$labels,$options,$row['manufacturer'],"100%");
 				?>
 				</fieldset>
 			<? } ?>

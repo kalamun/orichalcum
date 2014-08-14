@@ -45,6 +45,15 @@ body {
 	margin:0 20px;
 	}
 
+#uploadcontainer {
+	position:fixed;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	z-index:2;
+	overflow:auto;
+	}
 #uploadheader {
 	position:fixed;
 	top:0;
@@ -55,6 +64,29 @@ body {
 #uploadcontents {
 	padding:50px 10px 80px 10px;
 	}
+#uploadeditor {
+	position:fixed;
+	top:0;
+	left:100%;
+	width:100%;
+	height:100%;
+	background-color:#FBF7C5;
+	z-index:100;
+	transition:left .5s ease-in-out;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+	padding-top:28px;
+	}
+#uploadeditor.open {
+	left:0;
+	}
+#uploadeditor iframe {
+	width:100%;
+	height:100%;
+	border:0;
+	background-color:#fff;
+	}
 
 .closeWindow {
 	position:absolute;
@@ -64,6 +96,7 @@ body {
 	background-color:#EAE2AB;
 	border-radius:5px;
 	line-height:0;
+	cursor:pointer;
 	}
 .closeWindow:hover {
 	background-color:#c2d8ed;
@@ -155,6 +188,25 @@ ul#uploadedFileList>li h3 {
 ul#uploadedFileList>li:hover h3 {
 	display:block;
 	}
+ul#uploadedFileList>li .edit {
+	position:absolute;
+	font-size:.8em;
+	top:10px;
+	right:10px;
+	padding:5px;
+	background:url('../img/edit_w.png') center center no-repeat #000;
+	color:transparent;
+	display:none;
+	cursor:pointer;
+	z-index:10;
+	width:24px;
+	height:24px;
+	overflow:hidden;
+	box-shadow:0 0 3px #fff;
+	}
+ul#uploadedFileList>li:hover .edit {
+	display:block;
+	}
 ul#uploadedFileList>li input {
 	position:absolute;
 	bottom:0;
@@ -200,3 +252,4 @@ ul#uploadedFileList>li input {
 	opacity:0;
 	cursor:pointer;
 	}
+

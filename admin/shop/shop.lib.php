@@ -374,6 +374,14 @@ class kaShop {
 		if(!$this->applyPrivatePermissions($idord)) return false;
 		return true;
 		}
+	public function deleteOrder($idord) {
+		$o=$this->getOrderById($idord);
+		if($o['idord']=="") return false;
+		$query="DELETE FROM `".TABLE_SHOP_ORDERS."` WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
+		if(!mysql_query($query)) return false;
+		return true;
+		}
+
 	public function applyPrivatePermissions($idord) {
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'private/private.lib.php');
 		$kaPrivate=new kaPrivate();
@@ -413,6 +421,8 @@ class kaShop {
 	public function sendEmail($type,$idord) {
 		$o=$this->getOrderById($idord);
 		if(trim(strip_tags($this->kaImpostazioni->getVar('shop-mail_'.$type,1),"<img>"))!="") {
+			$orderDateTimestamp=mktime(substr($o['date'],11,2),substr($o['date'],14,2),substr($o['date'],17,2),substr($o['date'],5,2),substr($o['date'],8,2),substr($o['date'],0,4));
+			
 			$mail=array();
 			$mail['from']=$this->kaImpostazioni->getVar('shop-mail_from',1).' <'.$this->kaImpostazioni->getVar('shop-mail_from',2).'>';
 			if(trim($mail['from']," <>")=="") $mail['from']="";
@@ -432,7 +442,10 @@ class kaShop {
 			if(isset($o['member']['ZipCode'])) $address.=$o['member']['ZipCode'].' ';
 			if(isset($o['member']['City'])) $address.=$o['member']['City'];
 
+			$mail['message']=str_replace("{ORDER_DATE}",strftime($this->kaImpostazioni->getVar('timezone',2),$orderDateTimestamp),$mail['message']);
+			$mail['message']=str_replace("{CURRENT_DATE}",strftime($this->kaImpostazioni->getVar('timezone',2)),$mail['message']);
 			$mail['message']=str_replace("{ADDRESS}",$address,$mail['message']);
+			$mail['message']=str_replace("{CARRIER}",$o['deliverer']['name'],$mail['message']);
 			$mail['message']=str_replace("{DELIVERER}",$o['deliverer']['name'],$mail['message']);
 			$mail['message']=str_replace("{TRACKING_URL}",$o['tracking_url'],$mail['message']);
 			$mail['message']=str_replace("{TRACKING_NUMBER}",$o['tracking_number'],$mail['message']);

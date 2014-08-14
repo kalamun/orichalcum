@@ -3,6 +3,7 @@
 	<mainNode title="{Menu:Control Panel}" id="pdc">
 		<subNode title="{Menu:Welcome}" id="." url="index.php">
 		<subNode title="{Menu:Your Profile}" id="profilo" url="">
+		<subNode title="{Menu:Welcome page setup}" id="welcome" url="">
 		<subNode title="{Menu:Logout}" id="./." url="?logout">
 		</mainNode>
 	<mainNode title="{Menu:Site Contents}" id="site">

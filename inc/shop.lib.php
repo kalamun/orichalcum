@@ -403,29 +403,30 @@ class kShop {
 		if($dir!=null) $dir=explode("/",$dir);
 		else $dir=array($GLOBALS['__dir__'],$GLOBALS['__subdir__'],$GLOBALS['__subsubdir__']);
 		$metadata=array();
-		$metadata['titolo']=$dir[0];
+		$metadata['titolo']="";
 		$metadata['traduzioni']="";
 		foreach(kGetLanguages() as $code=>$lang) { $metadata['traduzioni'].=$code."|".kGetVar('dir_shop',1,$code)."\n"; }
 		$metadata['template']=kGetVar('shop-template',1);
 		$metadata['layout']="";
-		if(isset($dir[1])&&$dir[1]!="") {
-			$cat=$this->getCatByDir($dir[1]);
-			$metadata['titolo'].=" &gt; ".$cat['categoria'];
-			}
 		if(isset($dir[2])&&$dir[2]!="") {
-			$query="SELECT idsitem,titolo,layout FROM ".TABLE_SHOP_ITEMS." WHERE dir='".b3_htmlize($dir[2],true,"")."' AND ll='".$ll."' LIMIT 1";
-				$results=mysql_query($query);
-					$row=mysql_fetch_array($results);
-			$metadata['titolo'].=" &gt; ".$row['titolo'];
+			$query="SELECT `idsitem`,`titolo`,`layout`,`featuredimage` FROM `".TABLE_SHOP_ITEMS."` WHERE `dir`='".b3_htmlize($dir[2],true,"")."' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
+			$results=mysql_query($query);
+			$row=mysql_fetch_array($results);
+			$metadata['titolo'].=$row['titolo'];
 			$metadata['traduzioni']="";
+			$metadata['featuredimage']=($row['featuredimage']>0 ? $this->imgs->getImage($row['featuredimage']) : array());
 			if($metadata['template']!="") $metadata['template']="";
 			if($metadata['layout']!="") $metadata['layout']=$row['layout'];
 			$idsitem=$row['idsitem'];
 			}
+		if(isset($dir[1])&&$dir[1]!="") {
+			$cat=$this->getCatByDir($dir[1]);
+			$metadata['titolo'].=" [".$cat['categoria']."]";
+			}
 		if(isset($idsitem)) {
-			$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_SHOP_ITEMS."' AND id='".$idsitem."'";
-				$results=mysql_query($query);
-					while($row=mysql_fetch_array($results)) {
+			$query="SELECT * FROM `".TABLE_METADATA."` WHERE `tabella`='".TABLE_SHOP_ITEMS."' AND `id`='".$idsitem."'";
+			$results=mysql_query($query);
+			while($row=mysql_fetch_array($results)) {
 				$metadata[$row['param']]=$row['value'];
 				}
 			}
@@ -1713,7 +1714,7 @@ class kShop {
 		if($dir!=null) $dir=explode("/",$dir);
 		else $dir=array($GLOBALS['__dir__'],$GLOBALS['__subdir__'],$GLOBALS['__subsubdir__']);
 		$metadata=array();
-		$metadata['titolo']=$dir[0];
+		$metadata['titolo']="";
 		$metadata['traduzioni']="";
 		foreach(kGetLanguages() as $code=>$lang) { $metadata['traduzioni'].=$code."|".kGetVar('dir_shop',1,$code)."\n"; }
 		$metadata['template']="";
@@ -1721,11 +1722,12 @@ class kShop {
 		
 		if(isset($dir[2])&&$dir[2]!="")
 		{
-			$query="SELECT `idsman`,`name`,`translations` FROM `".TABLE_SHOP_MANUFACTURERS."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".mysql_real_escape_string($dir[2])."') AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
+			$query="SELECT `idsman`,`name`,`translations`,`featuredimage` FROM `".TABLE_SHOP_MANUFACTURERS."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".mysql_real_escape_string($dir[2])."') AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
 			$results=mysql_query($query);
 			$row=mysql_fetch_array($results);
-			$metadata['titolo'].=" &gt; ".$row['name'];
+			$metadata['titolo'].=$row['name'];
 			$metadata['traduzioni']=$row['translations'];
+			$metadata['featuredimage']=($row['featuredimage']>0 ? $this->imgs->getImage($row['featuredimage']) : array());
 			$idsman=$row['idsman'];
 		}
 		
