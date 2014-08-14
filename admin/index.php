@@ -5,9 +5,13 @@ define("PAGE_ID",".");
 define("PAGE_NAME","Home:Welcome to your Content Management System");
 
 include_once("inc/head.inc.php");
-?>
 
-<h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>
+$siteboard=array();
+$siteboard['active']=false;
+$siteboard['title']=$kaImpostazioni->getVar('siteboard',1,"*");
+$siteboard['text']=$kaImpostazioni->getVar('siteboard',2,"*");
+if($siteboard['title']!="" || $siteboard['text']!="") $siteboard['active']=true;
+?>
 
 <div class="subset">
 	<?
@@ -23,8 +27,7 @@ include_once("inc/head.inc.php");
 		</fieldset>
 	</div>
 
-<div class="topset">
-	<br />
+<div class="topset <?= $siteboard['active']==true ? 'siteboard' : ''?>">
 	<div class="homeicons">
 		<?
 		$count=array();
@@ -43,9 +46,21 @@ include_once("inc/head.inc.php");
 			}
 
 		?>
-		</div>
-	<div style="clear:both;"></div>
 	</div>
+
+
+	<?
+	if($siteboard['active']==true)
+	{ ?>
+		<div class="sitenotes">
+			<h1><?= $siteboard['title']; ?></h1>
+			<?= $siteboard['text']; ?>
+		</div>
+	<? }
+	?>
+
+	<div style="clear:both;"></div>
+</div>
 	
 <?
 include_once("inc/foot.inc.php");

@@ -86,3 +86,5 @@ Setup:Host											Host
 Setup:Port											Port
 Setup:Username										Username
 Setup:Password										Password
+Setup:Welcome page									Welcome page
+Setup:Welcome page setup							Welcome page setup

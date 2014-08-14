@@ -4,7 +4,6 @@ Menu:Upgrade		Aggiorna
 Menu:Help			Aiuto
 Menu:Welcome		Benvenuto
 Menu:Your Profile	Profilo Personale
-Menu:Welcome page setup	Impostazioni della pagina di benvenuto
 Menu:Logout			Esci
 Menu:Site Contents	Contenuti del sito
 Menu:Home Page		Prima pagina

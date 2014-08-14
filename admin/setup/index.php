@@ -14,6 +14,7 @@ include_once("../inc/head.inc.php");
 <li><a href="news.php"><?= $kaTranslate->translate('Setup:News settings'); ?></a></li>
 <li><a href="photogallery.php"><?= $kaTranslate->translate('Setup:Photogallery settings'); ?></a></li>
 <li><a href="shop.php"><?= $kaTranslate->translate('Setup:Shop settings'); ?></a></li>
+<li><a href="welcomepage.php"><?= $kaTranslate->translate('Setup:Welcome page setup'); ?></a></li>
 </ul>
 
 <h1><?= $kaTranslate->translate('Setup:Advanced settings'); ?></h1>

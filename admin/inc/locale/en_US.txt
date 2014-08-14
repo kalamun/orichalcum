@@ -4,7 +4,6 @@ Menu:Upgrade		Upgrade
 Menu:Help			Help
 Menu:Welcome		Welcome
 Menu:Your Profile	Your Profile
-Menu:Welcome page setup	Welcome page setup
 Menu:Logout			Logout
 Menu:Site Contents	Site Contents
 Menu:Home Page		Home Page

@@ -1,7 +1,7 @@
 <dl>
 <?
-$submenu_label=array("Setup:General settings","Setup:Reserved URLs","Setup:Page settings","Setup:News settings","Setup:Photogallery settings","Setup:Shop settings");
-$submenu_url=array("general.php","directories.php","pages.php","news.php","photogallery.php","shop.php");
+$submenu_label=array("Setup:General settings","Setup:Reserved URLs","Setup:Page settings","Setup:News settings","Setup:Photogallery settings","Setup:Shop settings","Setup:Welcome page");
+$submenu_url=array("general.php","directories.php","pages.php","news.php","photogallery.php","shop.php","welcomepage.php");
 for($i=0;isset($submenu_label[$i]);$i++) {
 	if($submenu_url[$i]!="") {
 		echo '<dt>';

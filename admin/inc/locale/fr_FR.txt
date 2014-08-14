@@ -4,7 +4,6 @@ Menu:Upgrade		Upgrade
 Menu:Help			Aide
 Menu:Welcome		Accueil
 Menu:Your Profile	Votre profil
-Menu:Welcome page setup	Configuration de la page d'accueil
 Menu:Logout			Déconnexion
 Menu:Site Contents	Contenu du site
 Menu:Home Page		Page d'accueil
