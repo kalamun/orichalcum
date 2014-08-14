@@ -22,7 +22,7 @@ function kUploads()
 
 		editDialog=editorObject;
 		kAddEvent(editDialog.querySelector('.closeWindow'),"click",closeEditDialog);
-		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsmanager_loading.inc.php';
+		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsManager_loading.inc.php';
 
 		if(limitNumber) limit=parseInt(limitNumber);
 		if(onsubmitAction) onsubmit=onsubmitAction;
@@ -376,7 +376,7 @@ function kUploads()
 	/* EDIT */
 	var openEditDialog=function()
 	{
-		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsmanager_edit.inc.php?id='+this.parentNode.id;
+		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsManager_edit.inc.php?id='+this.parentNode.id;
 		editDialog.className='open';
 	}
 	this.openEditDialog=openEditDialog;
@@ -384,7 +384,7 @@ function kUploads()
 	var closeEditDialog=function()
 	{
 		editDialog.className='';
-		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsmanager_loading.inc.php';
+		editDialog.getElementsByTagName('iframe')[0].src=ADMINDIR+'inc/uploadsManager_loading.inc.php';
 	}
 	this.closeEditDialog=closeEditDialog;
 
