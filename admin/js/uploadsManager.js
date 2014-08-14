@@ -191,9 +191,9 @@ function kUploads()
 	
 	var onScrollHandler=function()
 	{
-		var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-		var clientHeight = window.innerHeight;
-		var pageHeight = document.body.offsetHeight;
+		var scrollTop = fileList.scrollTop;
+		var clientHeight = fileList.offsetHeight;
+		var pageHeight = fileList.scrollHeight;
 		if(pageHeight-clientHeight-scrollTop<100) loadImages();
 	}
 	kAddEvent(window,"scroll",onScrollHandler);
