@@ -5,6 +5,8 @@
 /* DB CONNECTION TEST */
 error_reporting(0);
 
+date_default_timezone_set('Europe/Paris');
+
 if(isset($_POST['mysqlcheck'])) {
 	/* CONNETTI AL DATABASE */
 	$id=mysql_connect($_POST['host'],$_POST['user'],$_POST['pass']);
@@ -12,7 +14,7 @@ if(isset($_POST['mysqlcheck'])) {
 		echo 'Error connecting to the server. Check host, user and password then retry';
 		}
 	elseif(!mysql_select_db($_POST['dbname'],$id)) {
-		echo 'The database don\'t exists. Please create it and retry.';
+		echo 'The database doesn\'t exists. Please create it and retry.';
 		}
 	else {
 		echo 'Yes! The database is well configured!';
@@ -23,7 +25,7 @@ if(isset($_POST['mysqlcheck'])) {
 <html lang="IT">
 
 <head>
-<title>Orichalcum 2.50 Installer</title>
+<title>Orichalcum 2.60 Installer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css" media="screen">
 	body {
@@ -176,12 +178,12 @@ if(isset($_POST['mysqlcheck'])) {
 	c-2.017,0.727-4.928,0.463-7.13-2.849C92.661,80.19,93.638,63.728,95.061,62.861z" style="fill:#D9DDDC;" />
 </svg>
 
-	<h1>Orichalcum 2.50 installation</h1>
+	<h1>Orichalcum 2.60 installation</h1>
 	<div style="clear:both;"></div>
 	</div>
 </div>
 
-<div class="help">Do you need some help? <a href="http://help.orichalcum.it">Click here</a> for assistance.</div>
+<div class="help">You need help? <a href="http://help.orichalcum.it/how-to-install.html">Check the on-line manual</a>.</div>
 
 <div id="container">
 <?php
@@ -198,7 +200,7 @@ function kCheckModRewrite() {
 
 /* check PHP */
 if(phpversion()<5.3) {
-	?><h2>Error: your PHP version is too old! You need at leas PHP 5.3</h2><?php
+	?><h2>Error: your PHP version is too old! You need at least PHP 5.3</h2><?php
 	}
 /* check GD library */
 elseif(!function_exists("gd_info")) {
@@ -215,7 +217,7 @@ elseif(ini_get("short_open_tag")==0) {
 	}
 /* check mod_rewrite support */
 elseif(kCheckModRewrite()==false) {
-	?><h2>Error: your webserver don't support <em>mod_rewrite</em>.</h2><?php
+	?><h2>Error: your webserver doesn't support <em>mod_rewrite</em>.</h2><?php
 	}
 /* FILE CHECK */
 elseif(!file_exists('orichalcum.tar.gz')) {
@@ -384,6 +386,8 @@ else {
 		}
 
 	else {
+		error_reporting(E_ALL);
+
 		function kGzDecode($data) {
 			$flags=ord(substr($data,3,1));
 			$headerlen=10;
@@ -503,7 +507,7 @@ else {
 			$query=trim($query);
 			$query=str_replace('{VAR_USER_NAME}',mysql_real_escape_string($_POST['admin_name']),$query);
 			$query=str_replace('{VAR_USER_USERNAME}',mysql_real_escape_string($_POST['user_username']),$query);
-			$query=str_replace('{VAR_USER_EMAIL}',mysql_real_escape_string($_POST['admin_email']),$query);
+			$query=str_replace('{VAR_USER_EMAIL}',mysql_real_escape_string($_POST['admin_mail']),$query);
 			$query=str_replace('{VAR_USER_PASSWORD}',md5($_POST['user_password']),$query);
 			$query=str_replace('{VAR_SITE_NAME}',mysql_real_escape_string($_POST['site_name']),$query);
 			$query=str_replace('{VAR_DEFAULT_LANG}',mysql_real_escape_string($_POST['lang']),$query);
@@ -523,9 +527,9 @@ else {
 			}
 		
 		//fine installazione
-		echo "<h2>Well done! Your website is ready to rock!</h2><br />Now you can start using Orichalcum:<br />";
-		echo '<a href="index.php">go to your brand new website</a><br />';
-		echo '<a href="admin/">go to the control panel</a><br />';
+		echo "<h2>Well done! Your website is ready to rock!</h2><br />Now you can use Orichalcum:<br />";
+		echo '<a href="index.php">Visit your website</a><br />';
+		echo '<a href="admin/">Configure your website using the control panel and start to add great contents!</a><br />';
 
 		//cancello il tar.gz e l'sql
 		unlink('orichalcum.tar.gz');

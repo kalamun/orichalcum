@@ -1557,6 +1557,9 @@ function kGetShopItemId() {
 function kGetShopItemDir() {
 	return $GLOBALS['__shop']->getItemVar('dir');
 	}
+function kGetShopItemCode() {
+	return $GLOBALS['__shop']->getItemVar('productcode');
+	}
 function kGetShopItemTitle() {
 	return $GLOBALS['__shop']->getItemVar('titolo');
 	}

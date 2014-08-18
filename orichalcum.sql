@@ -173,6 +173,7 @@ CREATE TABLE IF NOT EXISTS `k_documenti` (
 CREATE TABLE IF NOT EXISTS `k_email_log` (
   `ideml` int(16) NOT NULL AUTO_INCREMENT,
   `date` datetime NOT NULL,
+  `idarch` INT( 6 ) NOT NULL DEFAULT '0',
   `from` varchar(255) NOT NULL,
   `to` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
@@ -213,10 +214,8 @@ CREATE TABLE IF NOT EXISTS `k_immagini` (
   `filename` varchar(255) DEFAULT NULL,
   `thumbnail` varchar(255) NOT NULL,
   `hotlink` varchar(255) NOT NULL,
-  `tabella` varchar(50) DEFAULT NULL,
-  `id` int(8) NOT NULL DEFAULT '0',
   `alt` text,
-  `ordine` int(3) NOT NULL DEFAULT '0',
+  `creation_date` datetime NOT NULL,
   PRIMARY KEY (`idimg`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
@@ -38357,6 +38356,7 @@ CREATE TABLE IF NOT EXISTS `k_log` (
 INSERT INTO `k_log` (`idlog`, `iduser`, `username`, `data`, `ll`, `type`, `descr`) VALUES
 (1, 1, '{VAR_USER_USERNAME}', NOW(), '{VAR_DEFAULT_LANG}', 'GEN', 'Orichalcum installed');
 
+CREATE TABLE IF NOT EXISTS `k_shop_manufacturers` (`idsman` int(4) NOT NULL AUTO_INCREMENT, `dir` varchar(255) NOT NULL, `name` varchar(255) NOT NULL, `subtitle` varchar(255) NOT NULL, `preview` text NOT NULL, `description` text NOT NULL, `featuredimage` int(6) NOT NULL, `created` datetime NOT NULL, `modified` datetime NOT NULL, `translations` text NOT NULL, `ll` varchar(2) NOT NULL, PRIMARY KEY (`idsman`)) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `k_media` (
   `idmedia` int(8) NOT NULL AUTO_INCREMENT,
@@ -38398,6 +38398,7 @@ CREATE TABLE IF NOT EXISTS `k_menu` (
   `label` varchar(64) DEFAULT NULL,
   `url` varchar(250) DEFAULT NULL,
   `ref` int(2) NOT NULL,
+  `photogallery` VARCHAR(255) NOT NULL DEFAULT ',',
   `ll` varchar(2) DEFAULT NULL,
   `ordine` int(2) NOT NULL,
   PRIMARY KEY (`idmenu`)
@@ -38433,9 +38434,11 @@ CREATE TABLE IF NOT EXISTS `k_news` (
   `sottotitolo` varchar(250) DEFAULT NULL,
   `data` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `pubblica` datetime NOT NULL,
+  `starting_date` datetime NOT NULL,
   `scadenza` datetime NOT NULL,
   `modified` datetime NOT NULL,
   `allowcomments` enum('s','n') NOT NULL,
+  `featuredimage` INT( 6 ) NOT NULL,
   `home` enum('s','n') NOT NULL DEFAULT 's',
   `calendario` enum('s','n') NOT NULL DEFAULT 's',
   `template` varchar(255) NOT NULL,
@@ -38494,6 +38497,7 @@ CREATE TABLE IF NOT EXISTS `k_pagine` (
   `categorie` varchar(255) NOT NULL,
   `allowcomments` enum('s','n') NOT NULL DEFAULT 'n',
   `allowconversions` tinyint(1) NOT NULL DEFAULT '0',
+  `featuredimage` INT( 6 ) NOT NULL,
   `template` varchar(250) DEFAULT NULL,
   `layout` varchar(64) NOT NULL,
   `traduzioni` text,
@@ -38502,7 +38506,7 @@ CREATE TABLE IF NOT EXISTS `k_pagine` (
 
 
 INSERT INTO `k_pagine` (`idpag`, `created`, `modified`, `titolo`, `sottotitolo`, `anteprima`, `testo`, `ll`, `dir`, `riservata`, `categorie`, `allowcomments`, `allowconversions`, `template`, `layout`, `traduzioni`) VALUES
-(1, NOW(), NOW(), 'Home Page', '', '', 'Write "/admin" to enter into your control panel', '{VAR_DEFAULT_LANG}', 'index.html', 'n', ',,', 'n', 1, '', '', 'IT=1|');
+(1, NOW(), NOW(), 'Home Page', '', '', 'Write <a href="admin">/admin</a> to enter into your control panel', '{VAR_DEFAULT_LANG}', 'index.html', 'n', ',,', 'n', 0, '', '', 'IT=1|');
 
 
 CREATE TABLE IF NOT EXISTS `k_photogallery` (
@@ -38599,6 +38603,7 @@ CREATE TABLE IF NOT EXISTS `k_shop_items` (
   `sottotitolo` varchar(255) DEFAULT '',
   `anteprima` text,
   `testo` text,
+  `featuredimage` INT( 6 ) NOT NULL,
   `prezzo` decimal(8,2) NOT NULL,
   `scontato` decimal(6,2) NOT NULL,
   `created` datetime NOT NULL,
@@ -38611,6 +38616,7 @@ CREATE TABLE IF NOT EXISTS `k_shop_items` (
   `rating` decimal(8,1) NOT NULL DEFAULT '0.0',
   `votes` int(8) NOT NULL DEFAULT '0',
   `customfields` text,
+  `manufacturer` INT( 6 ) NOT NULL,
   `layout` varchar(255) DEFAULT '',
   `ordine` int(8) NOT NULL,
   `traduzioni` text,
@@ -38740,7 +38746,7 @@ CREATE TABLE IF NOT EXISTS `k_users` (
 
 
 INSERT INTO `k_users` (`iduser`, `name`, `username`, `password`, `email`, `permissions`, `created`, `lastlogin`) VALUES
-(1, '{VAR_USER_NAME}', '{VAR_USER_USERNAME}', '{VAR_USER_PASSWORD}', '{VAR_USER_EMAIL}', ',.,profilo,./.,home,pages,news,photogallery,menu,members,shop,newsletter,landingpage,shortURL,banner,repository,private,stats,lingue,dizionario,impostazioni,setup,log,users,upgrade,', NOW(), '0000-00-00 00:00:00');
+(1, '{VAR_USER_NAME}', '{VAR_USER_USERNAME}', '{VAR_USER_PASSWORD}', '{VAR_USER_EMAIL}', ',.,profilo,./.,home,pages,news,photogallery,menu,members,shop,newsletter,landingpage,shortURL,banner,repository,private,stats,lingue,dizionario,impostazioni,setup,maintenance,log,users,upgrade,', NOW(), '0000-00-00 00:00:00');
 
 
 CREATE TABLE IF NOT EXISTS `k_users_prop` (

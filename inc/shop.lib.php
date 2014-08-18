@@ -1311,7 +1311,7 @@ class kShop {
 		if(!isset($vars['coupons'])) $vars['coupons']=array();
 		if(!is_array($vars['coupons'])) $vars['coupons']=array($vars['coupons']);
 		
-		/* search for member id */
+		/* check if member is logged. if not, try to create a user, then log-in */
 		$idmember=0;
 		if(isset($_SESSION['member']['idmember']))
 		{
@@ -1338,6 +1338,25 @@ class kShop {
 			} else {
 				trigger_error('Error creating your user');
 				return false;
+			}
+		}
+		
+		/* save/update metadata for the current user with the order data */
+		if(isset($_SESSION['member']['idmember'])&&kGetMemberUsername()!="")
+		{
+			foreach($vars['customer'] as $param=>$value)
+			{
+				kMemberReplaceMetadata(kGetMemberUsername(),"shop_customer_".$param,$value);
+			}
+
+			foreach($vars['delivery'] as $param=>$value)
+			{
+				kMemberReplaceMetadata(kGetMemberUsername(),"shop_delivery_".$param,$value);
+			}
+
+			foreach($vars['payment'] as $param=>$value)
+			{
+				kMemberReplaceMetadata(kGetMemberUsername(),"shop_payment_".$param,$value);
 			}
 		}
 
