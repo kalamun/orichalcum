@@ -215,6 +215,9 @@ class kShop {
 			if($this->shopExists()==true&&!$this->shopManufacturerExists()&&!$this->shopCartExists()&&$GLOBALS['__subdir__']!="") $vars['category']=$GLOBALS['__subdir__'];
 			else $vars['category']='*';
 		}
+		if($vars['category']!='*' && !is_array($vars['category'])) $vars['category']=array($vars['category']);
+		if(!isset($vars['category_operator'])) $vars['category_operator']='OR';
+		$vars['category_operator']=strtoupper($vars['category_operator']);
 
 		if(!isset($vars['expired'])) $vars['expired']=$GLOBALS['__template']->getVar('shop-order',2);
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
@@ -223,15 +226,23 @@ class kShop {
 		if(isset($vars['expired'])&&$vars['expired']=="nascondi") $query.="AND `expired`<NOW() ";
 		if(isset($vars['conditions'])&&$vars['conditions']!="") $query.="AND (".$vars['conditions'].") ";
 		if(isset($vars['manufacturer'])&&$vars['manufacturer']!="") $query.=" AND `manufacturer`='".intval($vars['manufacturer'])."' ";
-		if($vars['ll']==LANG) {
-			if(count($this->cats)>0&&$vars['category']!="*") {
-				$query.="AND (categorie=',' ";
-				foreach($this->cats as $cat=>$true) {
-					if($vars['category']==$this->allthecats[$cat]['dir']||$vars['category']==$cat) $query.="OR categorie LIKE '%,".$cat.",%' ";
+		if($vars['ll']==LANG)
+		{
+			if(count($this->cats)>0&&$vars['category']!="*")
+			{
+				if($vars['category_operator']=='OR') $query.="AND (categorie=',' ";
+				else $query.="AND (categorie!='' ";
+				foreach($vars['category'] as $category)
+				{
+					foreach($this->cats as $cat=>$true)
+					{
+						if($category==$cat||$category==$this->allthecats[$cat]['dir']||$category==b3_htmlize($this->allthecats[$cat]['dir'],true,"")) $query.=$vars['category_operator']." categorie LIKE '%,".$cat.",%' ";
 					}
-				$query.=") ";
 				}
+				$query.=") ";
 			}
+		}
+
 		if(isset($vars['options'])&&$vars['options']!="") $query.=" ".$vars['options']." ";
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
@@ -259,6 +270,9 @@ class kShop {
 			if($this->shopExists()==true&&!$this->shopManufacturerExists()&&!$this->shopCartExists()&&$GLOBALS['__subdir__']!="") $vars['category']=$GLOBALS['__subdir__'];
 			else $vars['category']='*';
 		}
+		if($vars['category']!='*' && !is_array($vars['category'])) $vars['category']=array($vars['category']);
+		if(!isset($vars['category_operator'])) $vars['category_operator']='OR';
+		$vars['category_operator']=strtoupper($vars['category_operator']);
 
 		if($vars['orderby']=="") $orderby="public";
 		if($vars['orderby']=="created"||$vars['orderby']=="public"||$vars['orderby']=="expired") $dataRef=$vars['orderby']; else $dataRef='titolo';
@@ -270,15 +284,22 @@ class kShop {
 		if(isset($vars['expired'])&&$vars['expired']=="nascondi") $query.="AND `expired`<NOW() ";
 		if(isset($vars['conditions'])&&$vars['conditions']!="") $query.="AND (".$vars['conditions'].") ";
 		if(isset($vars['manufacturer'])&&$vars['manufacturer']!="") $query.=" AND `manufacturer`='".intval($vars['manufacturer'])."' ";
-		if($vars['ll']==LANG) {
-			if(count($this->cats)>0&&$vars['category']!="*") {
-				$query.="AND (categorie=',' ";
-				foreach($this->cats as $cat=>$true) {
-					if($vars['category']==$this->allthecats[$cat]['dir']||$vars['category']==$cat) $query.="OR categorie LIKE '%,".$cat.",%' ";
+		if($vars['ll']==LANG)
+		{
+			if(count($this->cats)>0&&$vars['category']!="*")
+			{
+				if($vars['category_operator']=='OR') $query.="AND (categorie=',' ";
+				else $query.="AND (categorie!='' ";
+				foreach($vars['category'] as $category)
+				{
+					foreach($this->cats as $cat=>$true)
+					{
+						if($category==$cat||$category==$this->allthecats[$cat]['dir']||$category==b3_htmlize($this->allthecats[$cat]['dir'],false,"")) $query.=$vars['category_operator']." categorie LIKE '%,".$cat.",%' ";
 					}
-				$query.=") ";
 				}
+				$query.=") ";
 			}
+		}
 		if(isset($vars['options'])&&$vars['options']!="") $query.=" ".$vars['options']." ";
 		$query.="ORDER BY ".$vars['orderby'].",`titolo`,`idsitem` DESC LIMIT ".$vars['from'].",".$vars['limit']."";
 		$results=mysql_query($query);
