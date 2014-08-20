@@ -37,8 +37,114 @@ function kInit() {
 	}
 kInit();
 
-/* utili per i testi */
-class kText {
+/* text utilities */
+class kText
+{
+
+	/* parse requested tag and extract their position in string and their attributes */
+	function tagParser($string,$tagref)
+	{
+		$tags=array();
+
+		// find "<img "
+		$offset=0;
+		while(strpos($string,"<".$tagref." ",$offset)!==false)
+		{
+			$tag=array();
+			$tag['start']=strpos($string,"<".$tagref." ",$offset);
+			$tag['name']=$tagref;
+			$tag['attributes']=array();
+			$tag['innerHTML']="";
+			$offset=$tag['start']+strlen($tagref)+2;
+			$end=false;
+
+			// parse every attribute till the end of tag
+			while(strlen($string) > $offset)
+			{
+				// skip spaces
+				for(; trim($string[$offset])==""; $offset++) {}
+				// check the end of the tag
+				if(strlen($string)-1 < $offset || $string[$offset]==">" || $string[$offset]=="/") break;
+				
+				$tagname="";
+				// parse letters till "="
+				while($string[$offset]!="=")
+				{
+					$tagname.=$string[$offset];
+					$offset++;
+				}
+				
+				// =
+				$offset++;
+
+				// skip spaces
+				for(; trim($string[$offset])==""; $offset++) {}
+				
+				// check boundaries
+				$bound="";
+				if($string[$offset]=="'" || $string[$offset]=='"')
+				{
+					$bound=$string[$offset];
+					$offset++;
+				}
+				
+				// find the value, considering escape chars and the end of the tag
+				$value="";
+				while (
+					strlen($string) > $offset &&
+					(
+						trim($string[$offset])!=$bound ||
+						$string[$offset-1]=="\\"
+					)
+				)
+				{
+					// when no boundary is defined and there are spaces or >, skip
+					if($bound=="" && (trim($string[$offset])=="" || $string[$offset]==">"))
+					{
+						$offset++;
+						continue;
+					}
+
+					$value.=$string[$offset];
+					$offset++;
+				}
+				
+				$offset++;
+				$tag['attributes'][trim($tagname)]=$value;
+			}
+
+			if(strlen($string) > $offset)
+			{
+				// skip latest spaces and tag's closure chars
+				for(; trim($string[$offset])==""; $offset++) {}
+				for(; $string[$offset]=="/" || $string[$offset]==">"; $offset++) {}
+			}
+
+			// look forward for close tag, if no other tags of the same type was opened before
+			if(strlen($string)>$offset && strpos($string,"</".$tagref.">",$offset)!==false)
+			{
+				$closeoffset=strpos($string,"</".$tagref.">",$offset);
+				if(strpos($string,"<".$tagref." ",$offset)===false || strpos($string,"<".$tagref." ",$offset)>$closeoffset)
+				{
+					// there are a valid close tag
+					$tag['innerHTML']=substr($string,$offset,$closeoffset-$offset);
+					$offset=$closeoffset+strlen("</".$tagref.">");
+				}
+			}
+			
+			$tag['end']=$offset;
+			$tag['source']=substr($string,$tag['start'],$tag['end']-$tag['start']);
+
+			$tags[]=$tag;
+
+			if(strlen($string)<$offset) break;
+		}
+		
+		return $tags;
+	}
+
+	
+	/* format html text conforming the template re-definitions of tags */
 	function formatText($string) {
 		global $__template;
 
@@ -102,46 +208,66 @@ class kText {
 		return $string;
 		}
 
-	function embedImg($string) {
+	function embedImg($string)
+	{
 		global $__template;
 		$kImage=new kImages;
-		$images=array();
-
-		//detect delle immagini
-		$offset=0;
-		while(strpos($string,"<img ",$offset)!==false) {
-			$id=count($images);
-			$images[$id]['start']=strpos($string,"<img ",$offset);
-			$images[$id]['end']=strpos($string,">",$images[$id]['start'])+1;
-			$images[$id]['html']=substr($string,$images[$id]['start'],$images[$id]['end']-$images[$id]['start']);
-			if(preg_match("/^.*id=[\"']?(thumb|img)(\d+)[\"'].*$/",$images[$id]['html'])) {
-				$images[$id]['type']=preg_replace("/^.*id=[\"']?(thumb|img)(\d+)[\"'].*$/","$1",$images[$id]['html']);
-				$images[$id]['idimg']=preg_replace("/^.*id=[\"']?(thumb|img)(\d+)[\"'].*$/","$2",$images[$id]['html']);
-				}
-			strpos($images[$id]['html'],' width=')!==false?$images[$id]['width']=preg_replace("/^.*width=[\"']?(\d+)[\"'].*$/","$1",$images[$id]['html']):$images[$id]['width']="";
-			strpos($images[$id]['html'],' height=')!==false?$images[$id]['height']=preg_replace("/^.*height=[\"']?(\d+)[\"'].*$/","$1",$images[$id]['html']):$images[$id]['height']="";
-			if($images[$id]['width']=="") strpos($images[$id]['html'],'width:')!==false?$images[$id]['width']=preg_replace("/^.*width: ?([^;]+);.*$/","$1",$images[$id]['html']):$images[$id]['width']="";
-			if($images[$id]['height']=="") strpos($images[$id]['html'],'height:')!==false?$images[$id]['height']=preg_replace("/^.*height: ?([^;]+);.*$/","$1",$images[$id]['html']):$images[$id]['height']="";
-			strpos($images[$id]['html'],' class=')!==false?$images[$id]['class']=preg_replace("/^.*class=[\"']?([^\"]+)[\"'].*$/","$1",$images[$id]['html']):$images[$id]['class']="";
-			$offset=$images[$id]['end']+1;
-			}
+		$images=$this->tagParser($string,"img");
 
 		$embeddedimages=array();
-		for($i=count($images)-1;$i>=0;$i--) {
-			if(isset($images[$i]['idimg'])) {
-				$__template->imgDB=$kImage->getImage($images[$i]['idimg']);
-				if($images[$i]['width']!="") $__template->imgDB['width']=$images[$i]['width'];
-				if($images[$i]['height']!="") $__template->imgDB['height']=$images[$i]['height'];
-				if($images[$i]['class']!="") $__template->imgDB['class']=$images[$i]['class'];
-				$embeddedimages[]=$__template->imgDB;
-				if($images[$i]['type']=="img") $tpl=$__template->getSubTemplate('image');
-				else $tpl=$__template->getSubTemplate('thumbnail');
-				$string=substr_replace($string,$tpl,$images[$i]['start'],$images[$i]['end']-$images[$i]['start']);
-				}
+		for($i=count($images)-1;$i>=0;$i--)
+		{
+			$idimg=0;
+			$attributes=$images[$i]['attributes'];
+			if(isset($attributes['id']))
+			{
+				if(substr($attributes['id'],0,3)=="img") $idimg=intval(substr($attributes['id'],3));
+				elseif(substr($attributes['id'],0,5)=="thumb") $idimg=intval(substr($attributes['id'],5));
 			}
 
-		return array($string,$embeddedimages);
+			if($idimg>0)
+			{
+				$__template->contents=$images[$i];
+				$__template->imgDB=$kImage->getImage($idimg);
+				if(isset($attributes['width'])) $__template->imgDB['width']=$attributes['width'];
+				if(isset($attributes['height'])) $__template->imgDB['height']=$attributes['height'];
+				if(isset($attributes['width'])) $__template->imgDB['thumb']['width']=$attributes['width'];
+				if(isset($attributes['height'])) $__template->imgDB['thumb']['height']=$attributes['height'];
+				if(isset($attributes['class'])) $__template->imgDB['class']=$attributes['class'];
+				if(isset($attributes['alt'])) $__template->imgDB['alt']=$attributes['alt'];
+
+				if(isset($attributes['style']))
+				{
+					// get width from CSS, prioritary respect the attribute width
+					$attributes['style'].=";";
+					if(preg_match("/width: ?([^;]+);/i",$attributes['style'],$match))
+					{
+						$__template->imgDB['width']=$match[1];
+						$__template->imgDB['thumb']['width']=$match[1];
+					}
+					
+					// get height from CSS, prioritary respect the attribute height
+					$attributes['style'].=";";
+					if(preg_match("/height: ?([^;]+);/i",$attributes['style'],$match))
+					{
+						$__template->imgDB['height']=$match[1];
+						$__template->imgDB['thumb']['height']=$match[1];
+					}
+				}
+				$embeddedimages[]=$__template->imgDB;
+				
+				// load image or thumbnail template
+				if(substr($attributes['id'],0,3)=="img") $tpl=$__template->getSubTemplate('image');
+				else $tpl=$__template->getSubTemplate('thumbnail');
+				
+				// replace the old image with the new one
+				$string=substr_replace($string,$tpl,$images[$i]['start'],$images[$i]['end']-$images[$i]['start']);
+			}
 		}
+
+		return array($string,$embeddedimages);
+	}
+
 
 	function embedDocs($string) {
 		global $__template;

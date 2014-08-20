@@ -1895,6 +1895,26 @@ class kShop {
 		$output['embeddedmedias']=array();
 		$output['preview']=$this->kText->formatText($output['preview']);
 		$output['description']=$this->kText->formatText($output['description']);
+		
+		$tmp=$this->kText->embedImg($output['preview']);
+			$output['preview']=$tmp[0];
+			if(is_array($tmp[1])) $output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
+		$tmp=$this->kText->embedDocs($output['preview']);
+			$output['preview']=$tmp[0];
+			if(is_array($tmp[1])) $output['embeddeddocs']=array_merge($output['embeddeddocs'],$tmp[1]);
+		$tmp=$this->kText->embedMedia($output['preview']);
+			$output['preview']=$tmp[0];
+			if(is_array($tmp[1])) $output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
+
+		$tmp=$this->kText->embedImg($output['description']);
+			$output['description']=$tmp[0];
+			if(is_array($tmp[1])) $output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
+		$tmp=$this->kText->embedDocs($output['description']);
+			$output['description']=$tmp[0];
+			if(is_array($tmp[1])) $output['embeddeddocs']=array_merge($output['embeddeddocs'],$tmp[1]);
+		$tmp=$this->kText->embedMedia($output['description']);
+			$output['description']=$tmp[0];
+			if(is_array($tmp[1])) $output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
 
 		if($row['featuredimage']==0) $output['featuredimage']=false;
 		else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
