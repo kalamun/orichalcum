@@ -578,6 +578,9 @@ class kNews {
 					}
 				}
 			if($subdir=="") $subdir=$output[$i]['categorie'][0]['dir'];
+			
+			$output[$i]['featuredimage'] = $output[$i]['featuredimage']>0 ? $this->imgs->getImage($output[$i]['featuredimage']) : array();
+			
 			$output[$i]['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.$subdir.'/'.$row['dir'];
 			$output[$i]['catpermalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.$subdir;
 			$output[$i]['archpermalink']['year']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,4);

@@ -73,9 +73,11 @@ class kImages {
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
 
-		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg=".$idimg." LIMIT 1";
+		$query="SELECT * FROM ".TABLE_IMG." WHERE `idimg`=".intval($idimg)." LIMIT 1";
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
+		if(!isset($row['idimg'])) return false;
+
 		$output=$row;
 		if($row['filename']!=""||$output['hotlink']=="") {
 			$row['filename']=str_replace(" ","%20",$row['filename']);

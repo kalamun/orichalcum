@@ -227,7 +227,7 @@ class kText
 
 			if($idimg>0)
 			{
-				$__template->contents=$images[$i];
+				$__template->contents=array("name"=>$images[$i]['name'], "attributes"=>$images[$i]['attributes'], "innerHTML"=>$images[$i]['innerHTML']);
 				$__template->imgDB=$kImage->getImage($idimg);
 				if(isset($attributes['width'])) $__template->imgDB['width']=$attributes['width'];
 				if(isset($attributes['height'])) $__template->imgDB['height']=$attributes['height'];
@@ -235,6 +235,7 @@ class kText
 				if(isset($attributes['height'])) $__template->imgDB['thumb']['height']=$attributes['height'];
 				if(isset($attributes['class'])) $__template->imgDB['class']=$attributes['class'];
 				if(isset($attributes['alt'])) $__template->imgDB['alt']=$attributes['alt'];
+				if(isset($attributes['caption'])) $__template->imgDB['caption']=$attributes['alt'];
 
 				if(isset($attributes['style']))
 				{
@@ -269,39 +270,35 @@ class kText
 	}
 
 
-	function embedDocs($string) {
+	function embedDocs($string)
+	{
 		global $__template;
 		$kDocuments=new kDocuments;
-		$documents=array();
-
-		//detect delle immagini
-		$offset=0;
-		while(strpos($string,"<a ",$offset)!==false) {
-			$id=count($documents);
-			$documents[$id]['start']=strpos($string,"<a ",$offset);
-			$documents[$id]['end']=strpos($string,"</a>",$documents[$id]['start'])+4;
-			$documents[$id]['html']=substr($string,$documents[$id]['start'],$documents[$id]['end']-$documents[$id]['start']);
-			if(preg_match("/^.*id=[\"']?doc(\d+)[\"'].*$/",$documents[$id]['html'])) {
-				$documents[$id]['iddoc']=preg_replace("/^.*id=[\"']?doc(\d+)[\"'].*$/","$1",$documents[$id]['html']);
-				$documents[$id]['caption']=preg_replace("/^.*id=[\"']?doc\d+[\"'].*?>(.*)<\/a>$/","$1",$documents[$id]['html']);
-				}
-			$offset=$documents[$id]['end'];
-			}
-
+		$documents=$this->tagParser($string,"a");
 
 		$embeddeddocs=array();
-		for($i=count($documents)-1;$i>=0;$i--) {
-			if(isset($documents[$i]['iddoc'])) {
+		for($i=count($documents)-1;$i>=0;$i--)
+		{
+			$iddoc=0;
+			$attributes=$documents[$i]['attributes'];
+			if(isset($attributes['id']))
+			{
+				if(substr($attributes['id'],0,3)=="doc") $iddoc=intval(substr($attributes['id'],3));
+			}
+
+			if($iddoc>0)
+			{
+				$__template->contents=array("name"=>$documents[$i]['name'], "attributes"=>$documents[$i]['attributes'], "innerHTML"=>$documents[$i]['innerHTML']);
 				$__template->docDB=$kDocuments->getDocument($documents[$i]['iddoc']);
-				$__template->docDB['caption']=$documents[$i]['caption'];
+				if(isset($attributes['innerHTML'])) $__template->docDB['caption']=$attributes['innerHTML'];
 				$embeddeddocs[]=$__template->docDB;
 				$tpl=$__template->getSubTemplate('document');
 				$string=substr_replace($string,$tpl,$documents[$i]['start'],$documents[$i]['end']-$documents[$i]['start']);
-				}
 			}
+		}
 
 		return array($string,$embeddeddocs);
-		}
+	}
 
 	function embedMedia($string) {
 		global $__template;
@@ -339,33 +336,17 @@ class kText
 		return array($string,$embeddedmedia);
 		}
 
-	/* crea delle ancore html dentro al testo in corrispondenza del tag desiderato */	
-/*	function getAnchors($string,$tag) {
-		$offset=0;
-		$index=array();
-		for($i=0;strpos($string,$tag,$offset)!==false;$i++) {
-			$offset=strpos($string,$tag,$offset);
-			$anchor='<a name="ilink'.$i.'"></a>';
-			$index[$i]=substr($string,$offset+strlen($tag),strpos($string,'</'.trim($tag,"<> ").'>',$offset)-$offset+strlen($tag)-strlen($tag)-strlen('</'.trim($tag,"<> ").'>')+1);
-			$string=substr($string,0,$offset).$anchor.substr($string,$offset);
-			$offset+=strlen($anchor)+strlen($tag);
-			if(strpos($string,$tag,$offset)!==false) $offset=strpos($string,$tag,$offset);
-			else $offset=strlen($string);
-			}
-		return array("string"=>$string,"index"=>$index);
-		}
-	*/
 	}
 
 
 /* statistiche */
 function kStatistiche() {
 	/* sposto la roba vecchia in archivio */
-	$q="INSERT INTO ".TABLE_STATS_ARCHIVE." (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) SELECT `ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll` FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
+	$q="INSERT INTO `".TABLE_STATS_ARCHIVE."` (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) SELECT `ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll` FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
 	/**/ $GLOBALS['microseconds']=microtime();
 	if(mysql_query($q)) {
 		/**/ kTxtLog($q);
-		$q="DELETE FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
+		$q="DELETE FROM `".TABLE_STATISTICHE."` WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
 		mysql_query($q);
 		/**/ kTxtLog($q);
 		}
@@ -378,7 +359,7 @@ function kStatistiche() {
 	if(isset($GLOBALS['__subsubdir__'])) $url.=$GLOBALS['__subsubdir__'].'/';
 	$url=trim($url,"/ ").'?';
 	foreach($_GET as $k=>$v) {
-		if($k!='lang'&&$k!='dir'&&$k!='subdir'&&$k!='subsubdir') $url.=$k.'='.urlencode($v).'&';
+		if($k!='lang'&&$k!='__dir__'&&$k!='__subdir__'&&$k!='__subsubdir__') $url.=$k.'='.urlencode($v).'&';
 		}
 	$url=trim($url,"&?");
 
@@ -396,20 +377,17 @@ function kStatistiche() {
 
 		/* verifico se e' una nuova visita */
 		$q="SELECT count(*) AS tot FROM ".TABLE_STATISTICHE." WHERE ip='".$ip."' AND system='".mysql_real_escape_string($system)."'";
-		kTxtLog($q);
 		$p=mysql_query($q);
 		$r=mysql_fetch_array($p);
 		if($r['tot']==0) {
 			//nuova visita
 			$q="INSERT INTO ".TABLE_STATISTICHE." (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) VALUES('".$ip."','".date("Y-m-d H:i",time())."','".mysql_real_escape_string($url)."','".mysql_real_escape_string($referer)."','".mysql_real_escape_string($system)."',1,'')";
-				mysql_query($q);
-				/**/ kTxtLog($q);
+			mysql_query($q);
 			}
 		else {
 			//nuovo contatto
-			$q="UPDATE ".TABLE_STATISTICHE." SET `date`='".date("Y-m-d H:i",time())."',`url`=CONCAT(url,'"."\n".$url."'),`contacts`=`contacts`+1 WHERE `ip`='".$ip."' AND system='".mysql_real_escape_string($system)."'";
-				$results=mysql_query($q);
-				/**/ kTxtLog($q);
+			$q="UPDATE ".TABLE_STATISTICHE." SET `date`='".date("Y-m-d H:i",time())."',`url`=CONCAT(url,'"."\n".mysql_real_escape_string($url)."'),`contacts`=`contacts`+1 WHERE `ip`='".$ip."' AND system='".mysql_real_escape_string($system)."'";
+			$results=mysql_query($q);
 			}
 		}
 	}
