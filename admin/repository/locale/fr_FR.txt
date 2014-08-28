@@ -1,0 +1,12 @@
+Repository:Images				Images
+Repository:Documents			Documents
+Repository:Multimedia			Multimedia
+Repository:Images Archive		Archive des images
+Repository:Pages				Pages
+Repository:Upload an image		Ajouter une image
+Repository:No caption defined	No caption défini
+Repository:View					Voir
+Repository:Size					Dimensions
+Repository:Uploaded on			Téléchargé le
+Repository:previous				précédente
+Repository:next					suivante

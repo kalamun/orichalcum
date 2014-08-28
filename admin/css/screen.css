@@ -658,9 +658,11 @@ h3 {
 	}
 
 .topset {
+	position:relative;
 	padding-right:220px;
 	}
 .subset {
+	position:relative;
 	float:right;
 	width:200px;
 	color:#888;

@@ -1,5 +1,38 @@
-table td .thumb {
-	width:100px;
-	height:100px;
-	overflow:hidden;
-	}
+.options {
+	float:right;
+}
+.box {
+	margin:15px 0;
+	text-align:center;
+}
+.box a {
+	display:inline-block;
+	padding:1px 5px;
+}
+.box a:hover {
+	background-color:#fff;
+	color:#5E8EB2;
+}
+.box a.selected {
+	background-color:#FFFFCC;
+}
+.image {
+	display:inline-block;
+	width:27%;
+	margin:1%;
+	padding:2%;
+	background-color:#fff;
+}
+.thumb {
+	width:100%;
+	height:150px;
+	background-color:#eee;
+	background-size:contain;
+	background-position:center center;
+	background-repeat:no-repeat;
+	margin-bottom:5px;
+}
+.image small {
+	display:block;
+	margin:5px 0;
+}
