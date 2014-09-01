@@ -252,11 +252,26 @@ class kaShop {
 
 
 		
+	public function getOrderArchiveMonths($conditions="",$status='OPN')
+	{
+		$output=array();
+		$query="SELECT `date` FROM `".TABLE_SHOP_ORDERS."` WHERE `status`='".mysql_real_escape_string($status)."' ";
+		if($conditions!="") $query.=" AND (".$conditions.") ";
+		$query.=" GROUP BY year(`date`),month(`date`) ORDER BY `date` DESC";
+		
+		$results=mysql_query($query);
+		while($row=mysql_fetch_array($results)) {
+			$output[]=substr($row['date'],0,7);
+			}
+
+		return $output;
+	}
+		
 	public function getOrderList($conditions="",$status='OPN') {
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/members/members.lib.php');
 		$kaMembers=new kaMembers();
 		$output=array();
-		$query="SELECT * FROM `".TABLE_SHOP_ORDERS."` WHERE status='".mysql_real_escape_string($status)."' ";
+		$query="SELECT * FROM `".TABLE_SHOP_ORDERS."` WHERE `status`='".mysql_real_escape_string($status)."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" ORDER BY `date` DESC";
 		$results=mysql_query($query);

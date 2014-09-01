@@ -206,3 +206,16 @@ table.orderDetails td.qty {
 table.orderDetails td.price {
 	text-align:right;
 }
+
+.archive {
+	clear:both;
+	font-size:.8em;
+	width:200px;
+	list-style:none;
+	padding:0;
+	}
+.archive li {
+	float:left;
+	padding:0 3px;
+	white-space:nowrap;
+	}
