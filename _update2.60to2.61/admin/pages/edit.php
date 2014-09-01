@@ -289,7 +289,7 @@ else {
 			<fieldset class="box"><legend><?= $kaTranslate->translate('Pages:Comments'); ?></legend>
 				<?= b3_create_input("allowcomments","checkbox",$kaTranslate->translate('Pages:This page is commentable'),'s',"","",($page['allowcomments']=='s'?'checked':'')); ?><br />
 				<?= $kaTranslate->translate('Pages:This page has %s comments, %s of which still to moderate',$page['commentiTot'],($page['commentiTot']-$page['commentiOnline'])); ?>.<br />
-				<a href="javascript:kOpenIPopUp(ADMINDIR+'inc/ajax/commentsManager.php','t=<?= TABLE_PAGINE; ?>&id=<?= $page['idpag']; ?>','600px','400px')" class="smallbutton"><?= $kaTranslate->translate('Pages:Comment management'); ?></a>
+				<a href="javascript:k_openIframeWindow(ADMINDIR+'inc/commentsManager.php?t=<?= TABLE_PAGINE; ?>&id=<?= $page['idpag']; ?>','600px','400px')" class="smallbutton"><?= $kaTranslate->translate('Pages:Comment management'); ?></a>
 				</fieldset><br />
 			<? } ?>
 
