@@ -21,6 +21,15 @@ if(!$kaUsers->canIUse('shop')) die("You don't have permissions to access this in
 include('../shop.lib.php');
 $kaShop=new kaShop();
 
+
+/* actions */
+if(isset($_POST['savenotes']))
+{
+	$kaShop->orderUpdateNotes($_GET['idord'], $_POST['notes']);
+}
+/**/
+
+
 $o=$kaShop->getOrderById($_GET['idord']);
 
 define("PAGE_NAME",$kaTranslate->translate('Shop:Details'));
@@ -36,6 +45,7 @@ function kXmlParser($string) {
 		}
 	return $output;
 	}
+
 
 ?>
 <!DOCTYPE html>
@@ -257,6 +267,15 @@ function kXmlParser($string) {
 	</div>
 	
 	<div class="clearBoth"></div>
+	
+	<div class="column">
+		<form action="" method="post">
+			<h2><?= $kaTranslate->translate('Shop:Notes'); ?></h2>
+			<textarea name="notes" style="width:100%; height:150px;"><?= $o['notes']; ?></textarea><br>
+			<input type="submit" name="savenotes" value="<?= $kaTranslate->translate('Shop:Save Notes'); ?>" class="button">
+		</form>
+	</div>
+	
 	
 </div>
 

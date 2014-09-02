@@ -109,7 +109,7 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 	</div>
 	
 <div class="topset">
-	<table class="tabella">
+	<table class="tabella ordersList">
 	<tr>
 	<th><?= $kaTranslate->translate('Shop:Order #'); ?></th>
 	<th><?= $kaTranslate->translate('Shop:Date'); ?></th>
@@ -128,20 +128,42 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 		?><tr id="order<?= $row['uid']; ?>">
 		<td>
 			<h2><?= $row['uid']; ?></h2>
-			</td>
+		</td>
+
 		<td class="percorso"><?= str_replace(" ",'<br /><img src="../img/clock10.png" width="10" height="10" /> ',$row['friendlydate']); ?></td>
+
 		<td><?= isset($row['member']['name'])?$row['member']['name']:''; ?></td>
-		<td class="payment"><?= $row['totalprice']; ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?> <div class="payed <?= $row['payed']; ?>" onmouseover="kOpenBaloon('ajax/paymentBaloon.php?idord=<?= $row['idord']; ?>',kGetPosition(this).y,(kGetPosition(this).x+this.offsetWidth/2));" onmouseout="kCloseBaloon();"><?= $row['payment_method']['name']; ?></div></td>
-		<td class="shippment"><?= $row['shipped']=='n'?$kaTranslate->translate('Shop:Not yet shipped'):$kaTranslate->translate('Shop:Shipped'); ?> <div class="shipped <?= $row['shipped']; ?>" onmouseover="kOpenBaloon('ajax/deliverBaloon.php?idord=<?= $row['idord']; ?>',kGetPosition(this).y,(kGetPosition(this).x+this.offsetWidth/2));" onmouseout="kCloseBaloon();"><?= $row['deliverer']['name']; ?></div></td>
-		<td>
+		
+		<td class="payment">
+			<?= $row['totalprice']; ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?>
+			<div class="payed <?= $row['payed']; ?>" onmouseover="kOpenBaloon('ajax/paymentBaloon.php?idord=<?= $row['idord']; ?>',kGetPosition(this).y,(kGetPosition(this).x+this.offsetWidth/2));" onmouseout="kCloseBaloon();">
+				<?= $row['payment_method']['name']; ?>
+			</div>
+		</td>
+		
+		<td class="shipment">
+			<?= $row['shipped']=='n'?$kaTranslate->translate('Shop:Not yet shipped'):$kaTranslate->translate('Shop:Shipped'); ?>
+			<div class="shipped <?= $row['shipped']; ?>" onmouseover="kOpenBaloon('ajax/deliverBaloon.php?idord=<?= $row['idord']; ?>',kGetPosition(this).y,(kGetPosition(this).x+this.offsetWidth/2));" onmouseout="kCloseBaloon();">
+				<?= $row['deliverer']['name']; ?>
+			</div>
+		</td>
+
+		<td class="details">
 			<input type="button" class="button" value="<?= $kaTranslate->translate('Shop:Details'); ?>" onclick="k_openIframeWindow('ajax/orderSummary.php?idord=<?= $row['idord']; ?>','800px','450px');">
-			</td>
-		<td style="white-spaces:nowrap;vertical-align:middle;">
+			<?
+			if(trim($row['notes'])!="") { ?>
+				<div class="notes" onmouseover="kOpenBaloon('ajax/notesBaloon.php?idord=<?= $row['idord']; ?>',kGetPosition(this).y,(kGetPosition(this).x+this.offsetWidth/2));" onmouseout="kCloseBaloon();">
+					<img src="<?= ADMINRELDIR; ?>img/comment.png" width="12" height="12" alt=""> <?= substr($row['notes'],0,max(10,strpos($row['notes']," "))); ?>…
+				</div>
+			<? }
+			?>
+		</td>
+		<td class="options">
 			<small class="actions">
 				<a href="#" onclick="k_openIframeWindow('ajax/orderClose.php?idord=<?= $row['idord']; ?>','600px','400px'); return false;"><?= $kaTranslate->translate('Shop:Close order'); ?></a><br />
 				<a href="#" onclick="k_openIframeWindow('ajax/orderCancel.php?idord=<?= $row['idord']; ?>','600px','400px'); return false;" class="warning"><?= $kaTranslate->translate('Shop:Cancel'); ?></a>
-				</small>
-			</td>
+			</small>
+		</td>
 		</tr>
 		<? } ?>
 	</div>

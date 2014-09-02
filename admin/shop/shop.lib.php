@@ -396,6 +396,12 @@ class kaShop {
 		if(!mysql_query($query)) return false;
 		return true;
 		}
+	public function orderUpdateNotes($idord,$notes)
+	{
+		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `notes`='".mysql_real_escape_string($notes)."' WHERE `idord`='".intval($idord)."' LIMIT 1";
+		if(!mysql_query($query)) return false;
+		return true;
+	}
 
 	public function applyPrivatePermissions($idord) {
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'private/private.lib.php');

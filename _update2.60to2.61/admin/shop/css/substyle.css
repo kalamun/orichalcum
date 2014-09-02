@@ -207,6 +207,21 @@ table.orderDetails td.price {
 	text-align:right;
 }
 
+table.ordersList td.options {
+	white-space:nowrap;
+	vertical-align:middle;
+}
+table.ordersList td.payment,
+table.ordersList td.shipment
+{
+	max-width:150px;
+}
+table.ordersList td.details .notes {
+	color:#888;
+	font-size:.8em;
+	margin-top:3px;
+}
+
 .archive {
 	clear:both;
 	font-size:.8em;
