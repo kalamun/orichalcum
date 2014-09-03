@@ -30,6 +30,9 @@ Menu:Activity Log	Journal d'activité
 Menu:Users			Utilisateurs
 Menu:Languages		Langues
 Menu:Maintenance	Entretien
+Menu:Insert before	Insérer avant
+Menu:Insert as submenu of	Insérer comme sous-menu de
+Menu:Insert after	Insérer après
 
 //UI
 UI:Username			Nom d'utilisateur

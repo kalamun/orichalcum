@@ -30,6 +30,9 @@ Menu:Activity Log	Activity Log
 Menu:Users			Users
 Menu:Languages		Languages
 Menu:Maintenance	Maintenance
+Menu:Insert before	Insert before
+Menu:Insert as submenu of	Insert as submenu of
+Menu:Insert after	Insert after
 
 //UI
 UI:Username			Username

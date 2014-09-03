@@ -30,6 +30,9 @@ Menu:Activity Log	Registro Attività
 Menu:Users			Utenti
 Menu:Languages		Lingue
 Menu:Maintenance	Manutenzione
+Menu:Insert before	Inserisci prima di
+Menu:Insert as submenu of	Inserisci come sottomenù di
+Menu:Insert after	Inserisci dopo di
 
 //UI
 UI:Username			Nome utente
