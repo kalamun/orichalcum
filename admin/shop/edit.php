@@ -515,7 +515,7 @@ else {
 		
 		<div class="topset">
 		<? if(strpos($pageLayout,",title,")!==false) {
-			echo '<div class="title">'.b3_create_input("titolo","text",$kaTranslate->translate('Shop:Title')."<br />",b3_lmthize($row['titolo'],"input"),"70%",64).'</div>';
+			echo '<div class="title">'.b3_create_input("titolo","text",$kaTranslate->translate('Shop:Title')."<br />",b3_lmthize($row['titolo'],"input"),"70%",250).'</div>';
 			}
 		
 		if(!isset($row['categorie'][0])) $cat=array("dir"=>"");
