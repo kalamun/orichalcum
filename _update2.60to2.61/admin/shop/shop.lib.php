@@ -872,7 +872,7 @@ class kaShop {
 		if(!isset($vars['ll'])) $vars['ll']=$_SESSION['ll'];
 		if(!isset($vars['orderby'])) $vars['orderby']='`name`';
 		$conditions='';
-		if(isset($vars['conditions'])) $conditions.="(".$vars['conditions'].") AND ";
+		if(isset($vars['conditions'])&&$vars['conditions']!="") $conditions.="(".$vars['conditions'].") AND ";
 		if(isset($vars['search']))
 		{
 			$conditions.="(";
