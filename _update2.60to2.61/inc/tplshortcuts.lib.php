@@ -1552,6 +1552,9 @@ function kGetShopItem($dir=false) {
 	if($dir==false) $dir=$GLOBALS['__subsubdir__'];
 	return $GLOBALS['__shop']->getItemByDir($dir);
 	}
+function kGetShopItemById($idsitem) {
+	return $GLOBALS['__shop']->getItemById($idsitem);
+	}
 function kGetShopItemId() {
 	return $GLOBALS['__shop']->getItemVar('idsitem');
 	}
