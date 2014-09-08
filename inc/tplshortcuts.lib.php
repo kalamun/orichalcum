@@ -16,12 +16,18 @@ function kInitBettino($dir=false) {
 		}
 
 	require_once($dir."admin/inc/config.inc.php");
-	if(defined("DEBUG")&&DEBUG==true) error_reporting(E_ALL);
-	else error_reporting(0);
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/connect.inc.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/main.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/kalamun.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/setlang.inc.php");
+	if(defined("DEBUG") && DEBUG==true)
+	{
+		error_reporting(E_ALL);
+		ini_set('error_reporting', E_ALL);
+		ini_set('display_errors',1);
+	} else error_reporting(0);
+
+	$bd=$_SERVER['DOCUMENT_ROOT'].BASEDIR;
+	require_once($bd."admin/inc/connect.inc.php");
+	require_once($bd."admin/inc/main.lib.php");
+	require_once($bd."inc/kalamun.lib.php");
+	require_once($bd."inc/setlang.inc.php");
 
 	$timezone=kGetVar('timezone',1);
 	if($timezone!="") {
@@ -30,19 +36,20 @@ function kInitBettino($dir=false) {
 		$results=mysql_query($query);
 		}
 
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/config.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/images.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/documents.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/media.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/template.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/emails.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/pagine.lib.php");
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/news.lib.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/shop.lib.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/photogallery.lib.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/utenti.lib.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/banner.lib.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/private.lib.php');
+
+	require_once($bd."inc/config.lib.php");
+	require_once($bd."inc/images.lib.php");
+	require_once($bd."inc/documents.lib.php");
+	require_once($bd."inc/media.lib.php");
+	require_once($bd."inc/template.lib.php");
+	require_once($bd."inc/emails.lib.php");
+	require_once($bd."inc/pagine.lib.php");
+	require_once($bd.'inc/news.lib.php');
+	require_once($bd.'inc/shop.lib.php');
+	require_once($bd.'inc/photogallery.lib.php');
+	require_once($bd.'inc/utenti.lib.php');
+	require_once($bd.'inc/banner.lib.php');
+	require_once($bd.'inc/private.lib.php');
 
 	$GLOBALS['__config']=new kImpostazioni();
 	$GLOBALS['__images']=new kImages();

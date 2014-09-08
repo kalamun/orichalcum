@@ -134,6 +134,7 @@ class kEmails {
 
 		//$composition['subject']=mb_convert_encoding($this->subject,"UTF-8","HTML-ENTITIES");
 		$composition['subject']=$this->subject;
+		$composition['subject']=b3_unhtmlize($composition['subject']);
 		$composition['subject']='=?UTF-8?B?'.base64_encode($composition['subject']).'?=';
 
 		/* pure HTML -> import template */
