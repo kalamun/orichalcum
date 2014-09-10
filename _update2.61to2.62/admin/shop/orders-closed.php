@@ -123,8 +123,8 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 			echo '<ul class="archive"><li>'.$yyyy.'</li>';
 			$tmpyyyy=$yyyy;
 			}
-		if($_GET['y']==date("Y")) $_GET['y']=$yyyy;
-		if($_GET['m']==date("m")) $_GET['m']=$mm;
+		//if($_GET['y']==date("Y")) $_GET['y']=$yyyy;
+		//if($_GET['m']==date("m")) $_GET['m']=$mm;
 		echo '<li><a href="?m='.ltrim($mm,'0').'&y='.$yyyy.'">'.strftime("%B",mktime(1,0,0,$mm,1,$yyyy)).'</a></li>';
 		}
 	echo '</ul>';

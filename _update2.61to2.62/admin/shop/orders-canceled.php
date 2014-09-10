@@ -1,7 +1,7 @@
 <?
 /* (c) Kalamun.org - GNU/GPL 3 */
 
-define("PAGE_NAME","Shop:Opened orders");
+define("PAGE_NAME","Shop:Canceled orders");
 include_once("../inc/head.inc.php");
 include_once("./shop.lib.php");
 include_once("../inc/comments.lib.php");
@@ -9,6 +9,10 @@ include_once("../inc/metadata.lib.php");
 
 $kaShop=new kaShop();
 $kaMetadata=new kaMetadata;
+
+if(!isset($_GET['y'])) $_GET['y']=date("Y");
+if(!isset($_GET['m'])) $_GET['m']=date("m");
+
 
 /* AZIONI */
 if(isset($_POST['update'])&&isset($_GET['idord'])) {
@@ -78,20 +82,11 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 		   }
 		document.getElementById('searchQ').onkeyup=searchKeyUp;
 		
-		function showActions(td) {
-			for(var i=0;td.getElementsByTagName('DIV')[i];i++) {
-				td.getElementsByTagName('DIV')[i].style.visibility='visible';
-				}
-			}
-		function hideActions(td) {
-			for(var i=0;td.getElementsByTagName('DIV')[i];i++) {
-				td.getElementsByTagName('DIV')[i].style.visibility='hidden';
-				}
-			}
 		function markPayment(uid) {
-			for(var i=0,td=document.getElementById('order'+uid).getElementsByTagName('TD');td[i];i++) {
-				if(td[i].className=='payment') {
-					td[i].getElementsByTagName('DIV')[0].className='payed s';
+			for(var i=0;document.getElementById('order'+uid).getElementsByTagName('TD')[i];i++) {
+				var td=document.getElementById('order'+uid).getElementsByTagName('TD')[i];
+				if(td.className=='payment') {
+					td.getElementsByTagName('DIV')[0].className='payed s';
 					}
 				}
 			}
@@ -106,25 +101,46 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 		</script>
 	</fieldset>
 	<br />
+
+	<h2><?= $kaTranslate->translate('Shop:Archive'); ?></h2>
+	<?
+	$tmpyyyy="";
+	foreach($kaShop->getOrderArchiveMonths("",'CNC') as $date) {
+		$yyyy=substr($date,0,4);
+		$mm=substr($date,5,2);
+		if($tmpyyyy!=$yyyy) {
+			if($tmpyyyy!="") echo '</ul>';
+			echo '<ul class="archive"><li>'.$yyyy.'</li>';
+			$tmpyyyy=$yyyy;
+			}
+		echo '<li><a href="?m='.ltrim($mm,'0').'&y='.$yyyy.'">'.strftime("%B",mktime(1,0,0,$mm,1,$yyyy)).'</a></li>';
+		}
+	echo '</ul>';
+	?>
 	</div>
 	
 <div class="topset">
-	<table class="tabella ordersList">
+	<table class="tabella">
 	<tr>
 	<th><?= $kaTranslate->translate('Shop:Order #'); ?></th>
 	<th><?= $kaTranslate->translate('Shop:Date'); ?></th>
 	<th><?= $kaTranslate->translate('Shop:Customer'); ?></th>
 	<th><?= $kaTranslate->translate('Shop:Payment'); ?></th>
 	<th><?= $kaTranslate->translate('Shop:Delivery'); ?></th>
-	<th colspan="2">&nbsp;</th>
+	<th>&nbsp;</th>
+	<th>&nbsp;</th>
 	</tr>
 	<?php
 	$conditions="";
-	if(isset($_GET['search'])&&$_GET['search']!="") {
-		$conditions.="`order_summary` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
-		$conditions.="`uid` LIKE '%".b3_htmlize($_GET['search'],true,"")."%'";
-		}
-	foreach($kaShop->getOrderList($conditions) as $row) {
+	if(isset($_GET['search'])&&$_GET['search']!="")
+	{
+		$conditions.="order_summary LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
+		$conditions.="uid LIKE '%".b3_htmlize($_GET['search'],true,"")."%'";
+	} else {
+		$conditions.="`date` LIKE '".mysql_real_escape_string($_GET['y'].'-'.str_pad($_GET['m'],2,"0",STR_PAD_LEFT))."%'";
+	}
+
+	foreach($kaShop->getOrderList($conditions,'CNC') as $row) {
 		?><tr id="order<?= $row['uid']; ?>">
 		<td>
 			<h2><?= $row['uid']; ?></h2>
@@ -158,12 +174,12 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 			<? }
 			?>
 		</td>
+
 		<td class="options">
 			<small class="actions">
-				<a href="#" onclick="k_openIframeWindow('ajax/orderClose.php?idord=<?= $row['idord']; ?>','600px','400px'); return false;"><?= $kaTranslate->translate('Shop:Close order'); ?></a><br />
-				<a href="#" onclick="k_openIframeWindow('ajax/orderCancel.php?idord=<?= $row['idord']; ?>','600px','400px'); return false;" class="warning"><?= $kaTranslate->translate('Shop:Cancel'); ?></a>
-			</small>
-		</td>
+				<a href="#" onclick="k_openIframeWindow('ajax/orderDelete.php?idord=<?= $row['idord']; ?>','600px','400px'); return false;" class="warning"><?= $kaTranslate->translate('Shop:Delete'); ?></a>
+				</small>
+			</td>
 		</tr>
 		<? } ?>
 	</div>
