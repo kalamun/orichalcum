@@ -224,11 +224,19 @@ class kTemplate {
 		$url=explode("/",$row['url']);
 		if($this->menuManualURL!=false) {
 			$page=$this->menuManualURL;
-			if(rtrim($row['url'],"/")==$page) return true;
+			if(rtrim($row['url'],"/")==$page || rtrim($row['url'],"/")==b3_htmlize($page,true,"")) return true;
 			}
 		else {
-			$page=substr(rtrim($_SERVER['REQUEST_URI'],"/"),(strlen(BASEDIR)+3));
-			if(rtrim($row['url'],"/")==$page||($GLOBALS['__dir__']==kGetVar('dir_news',1)&&$url[0]==$GLOBALS['__dir__'])) return true;
+			$page=substr(rtrim(urldecode($_SERVER['REQUEST_URI']),"/"),(strlen(BASEDIR)+3));
+			if(
+				rtrim($row['url'],"/")==$page ||
+				rtrim($row['url'],"/")==b3_htmlize($page,true,"") ||
+				($GLOBALS['__dir__']==kGetVar('dir_news',1) && $url[0]==$GLOBALS['__dir__']) ||
+				($GLOBALS['__dir__']==kGetVar('dir_shop',1) && $url[0]==$GLOBALS['__dir__']) ||
+				($GLOBALS['__dir__']==kGetVar('dir_photogallery',1) && $url[0]==$GLOBALS['__dir__']) ||
+				($GLOBALS['__dir__']==kGetVar('dir_private',1) && $url[0]==$GLOBALS['__dir__']) ||
+				($GLOBALS['__dir__']==kGetVar('dir_users',1) && $url[0]==$GLOBALS['__dir__'])
+				) return true;
 			}
 		return false;
 		}
@@ -391,22 +399,30 @@ class kTemplate {
 			}
 		return false;
 		}
-	public function getCategory($vars) {
+
+	public function getCategory($vars)
+	{
+		// parse also the html entities alternative
+		$vars['htmldir']=b3_htmlize($vars['dir'],"");
 		foreach($this->categories as $k=>$cat) {
 			$results=true;
-			if(isset($vars['dir'])&&$cat['dir']!=$vars['dir']&&$cat['dir']!=b3_htmlize($vars['dir'],"")) $results=false;
-			if(isset($vars['table'])&&$cat['tabella']!=$vars['table']) $results=false;
-			if(isset($vars['id'])&&$cat['idcat']!=$vars['id']) $results=false;
-			if($results==true) {
-				if(!isset($cat['imgs'])) {
+			if(isset($vars['dir']) && $cat['dir']!=$vars['dir'] && $cat['dir']!=$vars['htmldir']) $results=false;
+			if(isset($vars['table']) && $cat['tabella']!=$vars['table']) $results=false;
+			if(isset($vars['id']) && $cat['idcat']!=$vars['id']) $results=false;
+		
+			if($results==true)
+			{
+				if(!isset($cat['imgs']))
+				{
 					$this->categories[$k]['imgs']=$this->imgallery->getList(TABLE_CATEGORIE,$cat['idcat']);
 					$cat['imgs']=$this->categories[$k]['imgs'];
-					}
-				return $cat;
 				}
+				return $cat;
 			}
-		return false;
 		}
+		return false;
+	}
+
 	public function getParentCategories($vars) {
 		$output=array();
 		foreach($this->categories as $cat) {

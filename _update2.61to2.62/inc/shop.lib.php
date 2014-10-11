@@ -323,9 +323,14 @@ class kShop {
 
 	public function getCategoryByDir($dir) {
 		if(!$this->inited) $this->init();
+		
+		// version with html entitites
+		$htmldir=b3_htmlize($dir,false,"");
+		
 		if(count($this->allthecats)>0) {
 			foreach($this->allthecats as $cat) {
-				if($cat['dir']==$dir) return $cat;
+				print_r($cat['dir'].' - '.$dir.'<br>');
+				if($cat['dir']==$dir || $cat['dir']==$htmldir) return $cat;
 				}
 			}
 		return false;
