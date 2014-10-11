@@ -289,7 +289,7 @@ class kShop {
 			if(count($this->cats)>0&&$vars['category']!="*")
 			{
 				if($vars['category_operator']=='OR') $query.="AND (categorie=',' ";
-				else $query.="AND (categorie!='' ";
+				else $query.="AND (`categorie`!='' ";
 				foreach($vars['category'] as $category)
 				{
 					foreach($this->cats as $cat=>$true)
