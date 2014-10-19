@@ -290,7 +290,7 @@ class kText
 			{
 				$__template->contents=array("name"=>$documents[$i]['name'], "attributes"=>$documents[$i]['attributes'], "innerHTML"=>$documents[$i]['innerHTML']);
 				$__template->docDB=$kDocuments->getDocument($iddoc);
-				if(isset($attributes['innerHTML'])) $__template->docDB['caption']=$attributes['innerHTML'];
+				if(!empty($documents[$i]['innerHTML'])) $__template->docDB['caption']=$documents[$i]['innerHTML'];
 				$embeddeddocs[]=$__template->docDB;
 				$tpl=$__template->getSubTemplate('document');
 				$string=substr_replace($string,$tpl,$documents[$i]['start'],$documents[$i]['end']-$documents[$i]['start']);
