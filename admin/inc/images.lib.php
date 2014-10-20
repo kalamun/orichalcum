@@ -118,11 +118,9 @@ class kaImages {
 			$output[$i]['thumb']['height']=$size[1];
 			
 			$output[$i]['alts']=json_decode($output[$i]['alt'],true);
-			if($output[$i]['alts']!=false)
-			{
-				if(!isset($output[$i]['alts'][$_SESSION['ll']])) $output[$i]['alts'][$_SESSION['ll']]="";
-				$output[$i]['alt']=$output[$i]['alts'][$_SESSION['ll']];
-			}
+			if(!is_array($output[$i]['alts'])) $output[$i]['alts']=array($_SESSION['ll']=>$output[$i]['alt']);
+			if(empty($output[$i]['alts'][$_SESSION['ll']])) $output[$i]['alts'][$_SESSION['ll']]="";
+			$output[$i]['alt']=$output[$i]['alts'][$_SESSION['ll']];
 			
 		}
 		
