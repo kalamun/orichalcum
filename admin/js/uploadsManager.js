@@ -65,19 +65,19 @@ function kUploads()
 		
 	}
 
-	var loadImages=function(start,limit,conditions)
+	var loadImages=function(start,itemsperpage,conditions)
 	{
 		if(isLoading==false) // prevend double calls
 		{
 			isLoading=true;
 			if(!start) start=counter;
-			if(!limit) limit=30;
+			if(!itemsperpage) itemsperpage=30;
 			if(!conditions) conditions="";
 			var aj=new kAjax();
 			aj.onSuccess(printImages);
 			aj.onFail( function() { alert('loading error :-('); } );
-			aj.send('post','../inc/ajax/uploadHandler.php','&action=getImageList&start='+parseInt(start)+'&limit='+parseInt(limit)+'&orderby='+orderKey+'&search='+encodeURIComponent(searchKey)+'&conditions='+encodeURIComponent(conditions));
-			counter+=limit;
+			aj.send('post','../inc/ajax/uploadHandler.php','&action=getImageList&start='+parseInt(start)+'&limit='+parseInt(itemsperpage)+'&orderby='+orderKey+'&search='+encodeURIComponent(searchKey)+'&conditions='+encodeURIComponent(conditions));
+			counter+=itemsperpage;
 		}
 	}
 	this.loadImages=loadImages;
@@ -86,12 +86,12 @@ function kUploads()
 	var reloadImage=function(id,select)
 	{
 		start=0;
-		limit=1;
+		var itemsperpage=1;
 		conditions="`idimg`='"+parseInt(id)+"'";
 		var aj=new kAjax();
 		aj.onSuccess( function(html,xml) { printImages(html,xml,select); } );
 		aj.onFail( function() { alert('loading error :-('); } );
-		aj.send('post','../inc/ajax/uploadHandler.php','&action=getImageList&start='+parseInt(start)+'&limit='+parseInt(limit)+'&orderby='+orderKey+'&search=&conditions='+encodeURIComponent(conditions));
+		aj.send('post','../inc/ajax/uploadHandler.php','&action=getImageList&start='+parseInt(start)+'&limit='+parseInt(itemsperpage)+'&orderby='+orderKey+'&search=&conditions='+encodeURIComponent(conditions));
 	}
 	this.reloadImage=reloadImage;
 	
@@ -362,7 +362,7 @@ function kUploads()
 		{
 			selected[selected.length]=objectArchive[c[i].id.substr(3)];
 		}
-		if(selected.length>0) onsubmit(selected);
+		if(onsubmit && selected.length>0) onsubmit(selected);
 		}
 	var onSubmit2=function() {
 		var selected=Array();
@@ -370,7 +370,7 @@ function kUploads()
 		{
 			selected[selected.length]=objectArchive[c[i].id.substr(3)];
 		}
-		if(selected.length>0) onsubmit2(selected);
+		if(onsubmit2 && selected.length>0) onsubmit2(selected);
 		}
 	
 	/* EDIT */
