@@ -1,3 +1,12 @@
+div>.actions {
+	display:block;
+	visibility:hidden;
+	}
+div:hover>.actions {
+	visibility:visible;
+	}
+
+
 .dragdrop {
 	width:60%;
 	margin:0;

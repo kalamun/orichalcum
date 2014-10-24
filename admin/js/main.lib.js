@@ -439,14 +439,12 @@ kZenEditor=function() {
 					range.setStartBefore(range.startContainer);
 					range.setEndAfter(range.endContainer);
 					var fragment=range.extractContents();
-					console.log(fragment);
 					for(var i=0,c=fragment.childNodes[0].childNodes;c[i];c++) {
 						c[i].className=c[i].className.replace('alignleft','');
 						c[i].className=c[i].className.replace('alignright','');
 						fragment.appendChild(c[i]);
 						}
 					fragment.removeChild(fragment.childNodes[0]);
-					console.log(fragment);
 					range.insertNode(fragment);
 					}
 				if(set=='left'||set=='right') {
@@ -1507,20 +1505,20 @@ kDragAndDrop=function() {
 	var dragElement=dropElement=null;
 	var offset={x:false,y:false},dragElement=null;
 
-	var makeDraggable=function(elm,customOnDragStart,customOnDrag,customOnDragStop) {
+	var makeDraggable=function(elm,customOnDragStart,customOnDrag,customOnDragEnd) {
 		if(!elm) return false;
 		if(!customOnDragStart) customOnDragStart=function() {};
 		if(!customOnDrag) customOnDrag=function() {};
-		if(!customOnDragStop) customOnDragStop=function() {};
+		if(!customOnDragEnd) customOnDragEnd=function() {};
 		elm.draggable=true;
 		elm.customOnDragStart=customOnDragStart;
 		elm.customOnDrag=customOnDrag;
-		elm.customOnDragStop=customOnDragStop;
+		elm.customOnDragEnd=customOnDragEnd;
 		elm.addEventListener("dragstart",onDragStart);
-		elm.addEventListener("drag",onDrag);
+		elm.addEventListener("dragend",onDragEnd);
 		elm.addEventListener("touchstart",onDragStart);
 		elm.addEventListener("touchmove",onTouchMove);
-		elm.addEventListener("touchend",onDragStop);
+		elm.addEventListener("touchend",onDragEnd);
 		document.body.addEventListener("dragover",onDragOverBody);
 		}
 	this.makeDraggable=makeDraggable;
@@ -1540,12 +1538,14 @@ kDragAndDrop=function() {
 	this.makeDroppable=makeDroppable;
 	
 	var onDragStart=function(e) {
+		var img=document.createElement("img"); //hide drag element
+		e.dataTransfer.setDragImage(img, 0, 0);
+		
 		dragElement=this;
 		this.customOnDragStart(e);
+		document.body.addEventListener("mouseup",onDrop,true);
 		e.dataTransfer.effectAllowed='copy';
 		e.dataTransfer.setData('Text',dragElement.id);
-		}
-	var onDrag=function(e) {
 		}
 	var onDragOverBody=function(e) {
 		if(offset.x==false) {
@@ -1568,8 +1568,8 @@ kDragAndDrop=function() {
 			dragElement.customOnDrag(touch);
 			}
 		}
-	var onDragStop=function(e) {
-		dragElement.customOnDragStop(e);
+	var onDragEnd=function(e) {
+		dragElement.customOnDragEnd(e);
 		}
 	var onDragOver=function(e) {
 		e.preventDefault();
@@ -1616,9 +1616,173 @@ kDragAndDrop=function() {
 /* photogallery manager
 a div id=photogallery must exists into the page
 */
+var photogalleryDD=new kDragAndDrop();
+var photogalleryStartingOrder=[];
+var draggingObject=null;
+
 function kLoadPhotogallery(images)
 {
 	var c=document.getElementById('photogallery');
 	if(!c) return false;
 	if(!images||images.replace(",","")=="") return false;
+	
+	photogalleryDD.makeDroppable(c);
+	
+	var conditions="";
+	var imgs=images.split(",");
+	photogalleryStartingOrder=imgs;
+
+	for(var i in imgs)
+	{
+		if(parseInt(imgs[i])>0) conditions+=" `idimg`="+parseInt(imgs[i])+" OR ";
+	}
+	conditions+=" `idimg`=0 ";
+	
+	var aj=new kAjax();
+	aj.onSuccess(kLoadPhotogalleryImages);
+	aj.onFail(function() { c.innerHTML='OoOps, error loading photogallery!'; });
+	aj.send("post",ADMINDIR+'inc/ajax/uploadHandler.php','action=getImageList&conditions='+encodeURIComponent(conditions));
+	
 }
+
+function kLoadPhotogalleryImages(html,xml)
+{
+	var html=html.split("\n");
+	var imgs={};
+	for(var i=0; html[i]; i++)
+	{
+		if(html[i]=="") continue;
+		var img=html[i].split("\t");
+		
+		imgs[img[0]]=img;
+	}
+	for(var i in photogalleryStartingOrder)
+	{
+		if(photogalleryStartingOrder[i]=="") continue;
+		img=imgs[photogalleryStartingOrder[i]];
+		if(img)
+		{
+			kCreateThumbnailIntoPhotogallery({
+				"id": img[0],
+				"dir": img[1],
+				"image": img[2],
+				"thumbnail": img[3],
+				"size": img[4],
+				"alt": img[5],
+				});
+		}
+	}
+	kUpdatePhotogalleryList();
+}
+
+function kAddImagesToPhotogallery(images)
+{
+	for( var i=0; images[i]; i++)
+	{
+		kCreateThumbnailIntoPhotogallery(images[i]);
+	}
+	kUpdatePhotogalleryList();
+	k_closeIframeWindow();
+}
+
+function kUpdatePhotogalleryList()
+{
+	var c=document.getElementById('photogallery');
+	if(!c) return false;
+	
+	var input=document.getElementById('photogalleryList');
+	if(!input)
+	{
+		var input=document.createElement('INPUT');
+		input.setAttribute("name","photogallery");
+		input.setAttribute("type","hidden");
+		input.setAttribute("id","photogalleryList");
+		c.parentNode.appendChild(input);
+	}
+	
+	var ids=',';
+	for(var i=0; c.childNodes[i]; i++)
+	{
+		if(c.childNodes[i].nodeType==1 && c.childNodes[i].getAttribute('idimg'))
+		{
+			ids+=parseInt(c.childNodes[i].getAttribute('idimg'))+',';
+		}
+	}
+	
+	input.value=ids;
+}
+
+function kCreateThumbnailIntoPhotogallery(image)
+{
+	var c=document.getElementById('photogallery');
+	if(!c || !image) return false;
+	
+	var imgc=document.createElement('DIV');
+	imgc.setAttribute("class","imagecontainer");
+	imgc.setAttribute("id","img"+c.childNodes.length+1);
+	imgc.setAttribute("idimg",image.id);
+	
+	var img=document.createElement('DIV');
+	img.setAttribute("class","image");
+	img.style.backgroundImage="url('"+image.dir+encodeURIComponent(image.thumbnail)+"')";
+	imgc.appendChild(img);
+	
+	var remove=document.createElement('DIV');
+	remove.setAttribute("class","remove");
+	remove.setAttribute("id","remove"+c.childNodes.length+1);
+	remove.appendChild(document.createTextNode('X'));
+	kAddEvent(remove,"click",kRemoveThumbnailFromPhotogallery);
+	imgc.appendChild(remove);
+	
+	var edit=document.createElement('DIV');
+	edit.setAttribute("class","edit");
+	edit.setAttribute("id","edit"+c.childNodes.length+1);
+	edit.appendChild(document.createTextNode(kaDictionary.Edit));
+	kAddEvent(edit,"click",kEditThumbnailFromPhotogallery);
+	imgc.appendChild(edit);
+	
+	c.appendChild(imgc);
+	
+	photogalleryDD.makeDraggable(imgc,kThumbnailOnDragStart,kThumbnailOnDrag,kThumbnailOnDragEnd);
+
+}
+
+function kRemoveThumbnailFromPhotogallery(e,id)
+{
+	if(!id) var id=this.id.replace('remove','img');
+	img=document.getElementById(id);
+	if(img) img.parentNode.removeChild(img,true);
+	kUpdatePhotogalleryList();
+}
+function kEditThumbnailFromPhotogallery(e,id)
+{
+	if(!id) var id=this.parentNode.getAttribute("idimg");
+	k_openIframeWindow(ADMINDIR+'inc/uploadsManager_edit.inc.php?id=img'+parseInt(id));
+}
+
+function kThumbnailOnDragStart(e)
+{
+	draggingObject=e.target;
+	e.target.className+=" onDrag";
+}
+function kThumbnailOnDrag(e)
+{
+	var t=e.target.parentNode;
+	if(t.className=='imagecontainer')
+	{
+		var pos=kGetPosition(t);
+		if((pos.x+t.offsetWidth/2)>e.clientX) t.parentNode.insertBefore(draggingObject,t);
+		else t.parentNode.insertBefore(draggingObject,t.nextSibling);
+	}
+}
+function kThumbnailOnDragEnd(e)
+{
+	console.log(e);
+	if(draggingObject)
+	{
+		draggingObject.className=draggingObject.className.replace(" onDrag","");
+		photogalleryDD.makeDraggable(draggingObject,kThumbnailOnDragStart,kThumbnailOnDrag,kThumbnailOnDragEnd);
+	}
+	kUpdatePhotogalleryList();
+}
+
