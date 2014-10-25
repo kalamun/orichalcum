@@ -35,103 +35,55 @@ if(isset($_GET['translate'])) {
 	}
 
 
-/**************************************************************************/
-/* ACTIONS: create database entries, copy contents or set translations... */
-/**************************************************************************/
+/***********/
+/* ACTIONS */
+/***********/
+//insert page
 if(isset($_POST['save'])) {
 	$log="";
 
-	$categorie=",";
-	if(isset($_POST['idcat'])) {
-		foreach($_POST['idcat'] as $idcat) {
-			$categorie.=$idcat.',';
-			}
+	$categories=",";
+	if(!empty($_POST['idcat']))
+	{
+		foreach($_POST['idcat'] as $idcat)
+		{
+			$categories.=$idcat.',';
 		}
-	if(trim($categorie,",")=="") $categorie=",,";
+	}
+	
+	if(empty($_POST['idcat'])) $_POST['idcat']="";
+	if(empty($_POST['title'])) $_POST['title']="";
+	if(empty($_POST['dir'])) $_POST['dir']="";
+	if(empty($_POST['translation_id'])) $_POST['translation_id']="";
+	if(empty($_POST['copyfrom'])) $_POST['copyfrom']="";
+	if(empty($_POST['addtomenu'])) $_POST['addtomenu']="";
 
 	if(!isset($_POST['dir'])&&isset($_POST['titolo'])) $_POST['dir']=preg_replace("/[^\w\/\.\-\x{C0}-\x{D7FF}\x{2C00}-\x{D7FF}]+/","-",strtolower($_POST['titolo']));
 	if(!isset($_POST['dir'])||$_POST['dir']==""||$_POST['dir']=="-.html") $_POST['dir']=rand(10,999999);
 	if(strlen($_POST['dir'])>64) $_POST['dir']=substr(str_replace(".html","",$_POST['dir']),0,64).".html";
 
-	//insert page
-	$query="INSERT INTO ".TABLE_PAGINE." (created,modified,titolo,sottotitolo,anteprima,testo,categorie,ll,dir,template,layout,traduzioni,riservata,allowcomments,allowconversions,featuredimage) VALUES(NOW(),NOW(),'".b3_htmlize($_POST['titolo'],true,"")."','','<p></p>','<p></p>','".mysql_real_escape_string($categorie)."','".$_SESSION['ll']."','".mysql_real_escape_string($_POST['dir'])."','','','','s','n',false,0)";
-	if(!mysql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while saving');
-	else $id=mysql_insert_id();
+	$vars=[
+		"idcat"=>$_POST['idcat'],
+		"title"=>$_POST['titolo'],
+		"categories"=>$categories,
+		"dir"=>$_POST['dir'],
+		"translation_id"=>$_POST['translation_id'],
+		"copyfrom"=>$_POST['copyfrom'],
+		"addtomenu"=>$_POST['addtomenu']
+		];
+	$log=$kaPages->add($vars);
 
-	//if the page is a translated version of another page
-	if(isset($_POST['translation_id'])&&$_POST['translation_id']!="") {
-		$page=$kaPages->get($_POST['translation_id']);
-		// first of all, clear translations from previous+current pages
-		foreach($page['traduzioni'] as $k=>$v) {
-			if($v!="") $kaPages->removePageFromTranslations($v);
-			}
-		// translation has this format: |LL=idpag|LL=idpag|...
-		$page['traduzioni'][$_SESSION['ll']]=$id;
-		$translations="|";
-		foreach($page['traduzioni'] as $k=>$v) {
-			$translations.=$k."=".$v."|";
-			}
-		// then set the new translations in the current pages
-		foreach($page['traduzioni'] as $k=>$v) {
-			if($v!="") {
-				$kaPages->setTranslations($v,$translations);
-				}
-			}
-		}
 
-	//copy contents from another page
-	if(isset($_POST['copyfrom'])) {
-		$query="SELECT * FROM ".TABLE_PAGINE." WHERE `idpag`=".mysql_real_escape_string($_POST['copyfrom'])." LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
-			$query="UPDATE ".TABLE_PAGINE." SET `sottotitolo`='".mysql_real_escape_string($row['sottotitolo'])."',anteprima='".mysql_real_escape_string($row['anteprima'])."',testo='".mysql_real_escape_string($row['testo'])."',template='".mysql_real_escape_string($row['template'])."',layout='".mysql_real_escape_string($row['layout'])."',traduzioni='".mysql_real_escape_string($row['traduzioni'])."' WHERE idpag=".mysql_real_escape_string($id)." LIMIT 1";
-			if(!mysql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while copying contents');
-			
-			foreach($kaMetadata->getList(TABLE_PAGINE,$row['idpag']) as $ka=>$v) {
-				$kaMetadata->set(TABLE_PAGINE,$id,$ka,$v);
-				}
-			}
-		}
-
-	//add to menu
-	if(isset($_POST['addtomenu']))
+	if(!is_numeric($log))
 	{
-		require_once("../menu/menu.lib.php");
-		$kaMenu=new kaMenu();
-
-		$query="SELECT `idpag`,`titolo`,`dir` FROM ".TABLE_PAGINE." WHERE idpag='".$id."' AND ll='".$_SESSION['ll']."' LIMIT 1";
-		$results=mysql_query($query);
-		if($page=mysql_fetch_array($results))
-		{
-			$vars['title']=$page['titolo'];
-			$vars['dir']=$page['dir'];
-			$vars['idpag']=$page['idpag'];
-			$addtomenu=explode(",",$_POST['addtomenu']);
-			$vars['idmenu']=$addtomenu[0];
-			$vars['where']=$addtomenu[1];
-			$log=$kaMenu->addElement($vars);
-
-			if($log==false)
-			{
-				echo '<div id="MsgAlert">'.$kaTranslate->translate('Pages:An error occurred while inserting page into menu').'</div>';
-				$kaLog->add("ERR",'Pages: Error while inserting in the menu the page <a href="'.BASEDIR.strtolower($_SESSION['ll']).'/'.$vars['dir'].'">'.$vars['title'].'</a> <em>(ID: '.$vars['idpag'].')</em>');
-			} else {
-				$kaLog->add("INS",'Pages: Page was inserted in the menu: <a href="'.BASEDIR.strtolower($_SESSION['ll']).'/'.$vars['dir'].'">'.$vars['title'].'</a> <em>(ID: '.$vars['idpag'].')</em>');
-				$log="";
-			}
-		}
-	}
-
-	if($log!="") {
-		echo '<div id="MsgAlert">'.$log.'</div>';
-		$kaLog->add("ERR",'Pages: Error while creating page <em>'.b3_htmlize($_POST['dir'],true,"").'</em>');
-		}
-	else {
+		echo '<div id="MsgAlert">'.$kaTranslate->translate($log).'</div>';
+		$kaLog->add("ERR",'Pages: Error while creating page <em>'.b3_htmlize($_POST['dir'],true,"").'</em> ('.$log.')');
+	} else {
 		$kaLog->add("INS",'Pages: Successfully added the page <a href="'.BASEDIR.strtolower($_SESSION['ll']).'/'.$_POST['dir'].'">'.$_POST['titolo'].'</a>');
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate('Pages:Page saved').'</div>';
-		echo '<meta http-equiv="refresh" content="0; url=edit.php?idpag='.$id.'">';
-		}
+		echo '<meta http-equiv="refresh" content="0; url=edit.php?idpag='.$log.'">';
 	}
+}
 /***/
 
 	
