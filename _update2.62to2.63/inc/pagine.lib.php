@@ -4,7 +4,7 @@
 /* PAGINE */
 class kPages {
 	protected $inited;
-	protected $imgs,$imgallery,$docgallery,$kText,$loadedPage,$page,$currentConversion,$type;
+	protected $imgs,$docgallery,$kText,$loadedPage,$page,$currentConversion,$type;
 
 	public function __construct() {
 		$this->inited=false;
@@ -20,7 +20,6 @@ class kPages {
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/tplshortcuts.lib.php");
 		$this->kText=new kText();
 		$this->imgs=new kImages();
-		$this->imgallery=new kImgallery();
 		$this->docgallery=new kDocgallery();
 		}
 
@@ -103,17 +102,52 @@ class kPages {
 		if(!$this->inited) $this->init();
 		return $this->loadedPage[$var];
 		}
-	public function getPageList($ll=null) {
+	public function getPageList($ll=null)
+	{
 		if(!$this->inited) $this->init();
 		if($ll==null) $ll=LANG;
 		$output=array();
 		$query="SELECT `dir` FROM `".TABLE_PAGINE."` WHERE `ll`='".$ll."' AND `riservata`='n' ORDER BY `titolo`";
 		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
-			$output[]=$row;
-			}
-		return $output;
+		while($row=mysql_fetch_array($results))
+		{
+			$output[] = $this->row2output($row);
 		}
+		return $output;
+	}
+
+	public function getQuickList($cat=false,$from=0,$limit=10,$conditions="",$options="",$orderby="",$ll=null)
+	{
+		if(!$this->inited) $this->init();
+		
+		$vars=[
+			'photogallery'=>false,
+			'documentgallery'=>false,
+			'comments'=>false,
+			'translations'=>false
+			];
+
+		if($from=="") $from=0;
+		if($limit=="") $limit=10;
+		if($orderby=="") $orderby="titolo";
+		if($ll==null) $ll=LANG;
+
+		$output=array();
+		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `ll`='".$ll."' ";
+		if($conditions!="") $query.="AND (".$conditions.") ";
+		if($cat!=false)
+		{
+			$query.="AND `categorie` LIKE '%,".mysql_real_escape_string($cat).",%' ";
+		}
+		if($options!="") $query.=" ".$options." ";
+		$query.=" AND `riservata`='n' ORDER BY `".$orderby."` DESC,`idpag` DESC LIMIT ".intval($from).",".intval($limit)."";
+		$results=mysql_query($query);
+		for($i=0;$row=mysql_fetch_array($results);$i++)
+		{
+			$output[$i]=$this->row2output($row,$vars);
+		}
+		return $output;
+	}
 
 	function getPage($dir=false,$ll=false) {
 		if(!$this->inited) $this->init();
@@ -124,95 +158,30 @@ class kPages {
 
 		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND `riservata`='n' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
 		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
-			$output=$row;
-			$output['embeddedimgs']=array();
-			$output['embeddeddocs']=array();
-			$output['embeddedmedias']=array();
-			$output['anteprima']=$this->kText->formatText($output['anteprima']);
-			$tmp=$this->kText->embedImg($output['anteprima']);
-				$output['anteprima']=$tmp[0];
-				$output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
-			$tmp=$this->kText->embedDocs($output['anteprima']);
-				$output['anteprima']=$tmp[0];
-				$output['embeddeddocs']=array_merge($output['embeddeddocs'],$tmp[1]);
-			$tmp=$this->kText->embedMedia($output['anteprima']);
-				$output['anteprima']=$tmp[0];
-				$output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
-			$output['testo']=$this->kText->formatText($output['testo']);
-			$tmp=$this->kText->embedImg($output['testo']);
-				$output['testo']=$tmp[0];
-				$output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
-			$tmp=$this->kText->embedDocs($output['testo']);
-				$output['testo']=$tmp[0];
-				$output['embeddeddocs']=array_merge($output['embeddeddocs'],$tmp[1]);
-			$tmp=$this->kText->embedMedia($output['testo']);
-				$output['testo']=$tmp[0];
-				$output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
+		if($row=mysql_fetch_array($results))
+		{
+			$output = $this->row2output($row);
 
-			if($row['featuredimage']==0) $output['featuredimage']=false;
-			else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
-			$output['imgs']=$this->imgallery->getList(TABLE_PAGINE,$row['idpag']);
-			$output['docs']=$this->docgallery->getList(TABLE_PAGINE,$row['idpag']);
-			$output['commenti']=$this->getComments($row['idpag']);
-			$output['permalink']=BASEDIR.strtolower($ll).'/'.$row['dir'];
-
-			$output['categorie']=array();
-			if(strpos(kGetVar('admin-page-layout',1),",categories,")!==false) {
-				$row['categorie']=trim($row['categorie'],",");
-				foreach(explode(",",$row['categorie']) as $cat) {
-					$output['categorie'][]=$this->getCatById($cat);
-					}
-				}
-			
-			$output['traduzioni']=array();
-			foreach(explode("|",trim($row['traduzioni'],"|")) as $trad) {
-				if(substr($trad,0,2)!="") $output['traduzioni'][substr($trad,0,2)]=$this->getPermalinkById(substr($trad,3));
-				}
-
-			//substitute {CAPTCHA} with the reCaptcha output
-			if(strpos($output['testo'],'{CAPTCHA}')!==false || strpos($output['anteprima'],'{CAPTCHA}')!==false) {
-				require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/recaptcha/recaptchalib.php');
-				$output['anteprima']=str_replace('{CAPTCHA}',recaptcha_get_html(kGetVar('captcha',1)),$output['anteprima']);
-				$output['testo']=str_replace('{CAPTCHA}',recaptcha_get_html(kGetVar('captcha',1)),$output['testo']);
-				}
-
-			$output['conversions']=array();
-			if($output['allowconversions']==1&&(!isset($GLOBALS['conversionstracker'][$output['idpag']])||$GLOBALS['conversionstracker'][$output['idpag']]==false)) {
-				//register of conversions, in order to apply conversions just one time for page
-				if(!isset($GLOBALS['conversionstracker'])) $GLOBALS['conversionstracker']=array();
-				$GLOBALS['conversionstracker'][$output['idpag']]=true;
-				
-				//populate conversions array
-				$output['conversions']=$this->getConversions($output['idpag']);
-				//process conversions
-				$this->processConversions($output);
-				}
+		} else {
+			$query="DESCRIBE ".TABLE_PAGINE;
+			$results=mysql_query($query);
+			while($row=mysql_fetch_array($results))
+			{
+				$output[$row['Field']]="";
 			}
-		else {
-			$output['idpag']="";
-			$output['titolo']="";
-			$output['sottotitolo']="";
-			$output['anteprima']="";
-			$output['testo']="";
-			$output['template']="";
-			$output['layout']="";
-			$output['traduzioni']="";
-			$output['draft']="";
-			$output['allowconversions']="";
 			$output['imgs']=array();
 			$output['docs']=array();
-			$output['commenti']="";
+			$output['commenti']=array();
 			$output['permalink']="";
 			$output['categorie']=array();
-			$output['conversions']="";
+			$output['conversions']=array();
 			$output['embeddedimgs']=array();
 			$output['embeddeddocs']=array();
 			$output['embeddedmedias']=array();
-			}
+		}
 
 		return $output;
-		}
+	}
 	
 	public function getPermalinkById($idpag) {
 		if(!$this->inited) $this->init();
@@ -259,30 +228,123 @@ class kPages {
 		return $output;
 		}
 
-	public function getQuickList($cat=false,$from=0,$limit=10,$conditions="",$options="",$orderby="",$ll=null) {
+	private function row2output($row,$vars=array())
+	{
 		if(!$this->inited) $this->init();
-		if($from=="") $from=0;
-		if($limit=="") $limit=10;
-		if($orderby=="") $orderby="titolo";
-		if($ll==null) $ll=LANG;
 
-		$output=array();
-		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `ll`='".$ll."' ";
-		if($conditions!="") $query.="AND (".$conditions.") ";
-		if($cat!=false)
+		if(!isset($vars['photogallery'])) $vars['photogallery']=true;
+		if(!isset($vars['documentgallery'])) $vars['documentgallery']=true;
+		if(!isset($vars['comments'])) $vars['comments']=true;
+		if(!isset($vars['translations'])) $vars['translations']=true;
+
+		$output=$row;
+		$output['embeddedimgs']=array();
+		$output['embeddeddocs']=array();
+		$output['embeddedmedias']=array();
+		$output['anteprima']=$this->kText->formatText($output['anteprima']);
+		$tmp=$this->kText->embedImg($output['anteprima']);
+			$output['anteprima']=$tmp[0];
+			$output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
+		$tmp=$this->kText->embedDocs($output['anteprima']);
+			$output['anteprima']=$tmp[0];
+			$output['embeddeddocs']=array_merge($output['embeddeddocs'],$tmp[1]);
+		$tmp=$this->kText->embedMedia($output['anteprima']);
+			$output['anteprima']=$tmp[0];
+			$output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
+		$output['testo']=$this->kText->formatText($output['testo']);
+		$tmp=$this->kText->embedImg($output['testo']);
+			$output['testo']=$tmp[0];
+			$output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
+		$tmp=$this->kText->embedDocs($output['testo']);
+			$output['testo']=$tmp[0];
+			$output['embeddeddocs']=array_merge($output['embeddeddocs'],$tmp[1]);
+		$tmp=$this->kText->embedMedia($output['testo']);
+			$output['testo']=$tmp[0];
+			$output['embeddedmedias']=array_merge($output['embeddedmedias'],$tmp[1]);
+
+		if($row['featuredimage']==0) $output['featuredimage']=false;
+		else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
+		
+		// get photogallery in the correct order
+		$output['imgs']=array();
+		if($vars['photogallery']==true)
 		{
-			$query.="AND `categorie` LIKE '%,".mysql_real_escape_string($cat).",%' ";
+			$conditions="";
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				$conditions.="`idimg`='".intval($idimg)."' OR ";
+			}
+			$conditions.="`idimg`='0'";
+			
+			$imgs=$this->imgs->getList(false,false,false,$conditions);
+			
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				foreach($imgs as $img)
+				{
+					if($img['idimg']==$idimg) $output['imgs'][]=$img;
+				}
+			}
 		}
-		if($options!="") $query.=" ".$options." ";
-		$query.=" AND `riservata`='n' ORDER BY `".$orderby."` DESC,`idpag` DESC LIMIT ".intval($from).",".intval($limit)."";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++)
+		
+		
+		$output['docs']=array();
+		if($vars['documentgallery']==true)
 		{
-			$output[$i]=$row;
-			$output[$i]['permalink']=BASEDIR.strtolower($ll).'/'.$row['dir'];
+			$output['docs']=$this->docgallery->getList(TABLE_PAGINE,$row['idpag']);
 		}
+		
+		$output['commenti']=array();
+		if($vars['comments']==true)
+		{
+			$output['commenti']=$this->getComments($row['idpag']);
+		}
+		
+		$output['traduzioni']=array();
+		if($vars['translations']==true)
+		{
+			$output['traduzioni']=array();
+			foreach(explode("|",trim($row['traduzioni'],"|")) as $trad)
+			{
+				if(substr($trad,0,2)!="") $output['traduzioni'][substr($trad,0,2)]=$this->getPermalinkById(substr($trad,3));
+			}
+		}
+		
+		$output['permalink']=BASEDIR.strtolower($ll).'/'.$row['dir'];
+
+		$output['categorie']=array();
+		if(strpos(kGetVar('admin-page-layout',1),",categories,")!==false)
+		{
+			$row['categorie']=trim($row['categorie'],",");
+			foreach(explode(",",$row['categorie']) as $cat)
+			{
+				$output['categorie'][]=$this->getCatById($cat);
+			}
+		}
+		
+		//substitute {CAPTCHA} with the reCaptcha output
+		if(strpos($output['testo'],'{CAPTCHA}')!==false || strpos($output['anteprima'],'{CAPTCHA}')!==false)
+		{
+			require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/recaptcha/recaptchalib.php');
+			$output['anteprima']=str_replace('{CAPTCHA}',recaptcha_get_html(kGetVar('captcha',1)),$output['anteprima']);
+			$output['testo']=str_replace('{CAPTCHA}',recaptcha_get_html(kGetVar('captcha',1)),$output['testo']);
+		}
+
+		$output['conversions']=array();
+		if($output['allowconversions']==1&&(!isset($GLOBALS['conversionstracker'][$output['idpag']])||$GLOBALS['conversionstracker'][$output['idpag']]==false))
+		{
+			//register of conversions, in order to apply conversions just one time for page
+			if(!isset($GLOBALS['conversionstracker'])) $GLOBALS['conversionstracker']=array();
+			$GLOBALS['conversionstracker'][$output['idpag']]=true;
+			
+			//populate conversions array
+			$output['conversions']=$this->getConversions($output['idpag']);
+			//process conversions
+			$this->processConversions($output);
+		}
+
 		return $output;
-		}
+	}
 
 	/* CONVERSIONS */
 	public function getConversions($vars) {
