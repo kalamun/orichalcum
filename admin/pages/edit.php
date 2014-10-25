@@ -168,75 +168,75 @@ else {
 
 	/* actions (update, etc..) in case of submit */
 	if(isset($_POST['update'])) {
-		$log="";
-
 		/* update translation table in all involved pages (past and current) */
-		if(isset($_POST['translation_id'])) {
+		if(isset($_POST['translation_id']))
+		{
 			// translation has this format: |LL=idpag|LL=idpag|...
 			$translations="";
 			$_POST['translation_id'][$_SESSION['ll']]=$_GET['idpag'];
-			foreach($_POST['translation_id'] as $k=>$v) {
-				if($v!="") {
+			foreach($_POST['translation_id'] as $k=>$v)
+			{
+				if($v!="")
+				{
 					$translations.=$k.'='.$v.'|';
 					$kaPages->removePageFromTranslations($v);
-					}
-				}
-			// first of all, clear translations from previous+current pages
-			foreach($page['traduzioni'] as $k=>$v) {
-				if($v!="") $kaPages->removePageFromTranslations($v);
-				}
-			// then set the new translations in the current pages
-			foreach($_POST['translation_id'] as $k=>$v) {
-				if($v!="") {
-					$kaPages->setTranslations($v,$translations);
-					}
 				}
 			}
-
-		/* clean permalink */
-		//if(isset($_POST['dir'])) $_POST['dir']=preg_replace("/[^\w\/\.\-\x{C0}-\x{D7FF}\x{2C00}-\x{D7FF}]+/","-",$_POST['dir']);
+			// first of all, clear translations from previous+current pages
+			foreach($page['traduzioni'] as $k=>$v)
+			{
+				if($v!="") $kaPages->removePageFromTranslations($v);
+			}
+			// then set the new translations in the current pages
+			foreach($_POST['translation_id'] as $k=>$v)
+			{
+				if($v!="")
+				{
+					$kaPages->setTranslations($v,$translations);
+				}
+			}
+		}
 
 		/* categories */
-		if(isset($_POST['idcat'])) {
-			$categorie=",";
-			foreach($_POST['idcat'] as $idcat) { $categorie.=intval($idcat).','; }
-			}
-		else $categorie=",,";
+		$categories=",";
+		if(isset($_POST['idcat']))
+		{
+			foreach($_POST['idcat'] as $idcat) { $categories.=intval($idcat).','; }
+		}
 
-		$riservata='n';
-		if(isset($_POST['riservata'])&&$_POST['riservata']=='s') $riservata='s';
+		
+		$vars=[];
+		if(isset($_POST['titolo'])) $vars['title']=$_POST['titolo'];
+		if(isset($_POST['sottotitolo'])) $vars['subtitle']=$_POST['sottotitolo'];
+		if(isset($_POST['anteprima'])) $vars['preview']=$_POST['anteprima'];
+		if(isset($_POST['testo'])) $vars['text']=$_POST['testo'];
+		if(isset($_POST['photogallery'])) $vars['photogallery']=$_POST['photogallery'];
+		if(isset($_POST['dir'])) $vars['dir']=$_POST['dir'];
+		$vars['categories']=$categories;
+		if(isset($_POST['template'])) $vars['template']=$_POST['template'];
+		if(isset($_POST['layout'])) $vars['layout']=$_POST['layout'];
+		if(isset($_POST['featuredimage'])) $vars['featuredimage']=$_POST['featuredimage'];
+		if($kaImpostazioni->getVar('pages-commenti',1)=='s')
+		{
+			if(isset($vars['allowcomments'])) $vars['allowconversions']='s';
+			else $vars['allowconversions']='n';
+		}
+		if(strpos($pageLayout,",conversion,")!==false)
+		{
+			if(isset($_POST['allowconversions'])) $vars['allowconversions']='s';
+			else $vars['allowconversions']='n';
+		}
+		if(strpos($pageLayout,",seo,")!==false)
+		{
+			if(isset($_POST['seo_robots'])) $vars['seo_robots']=implode(",",$_POST['seo_robots']);
+			else $vars['seo_robots']="";
+		}
+		if(isset($_POST['seo_priority'])) $vars['seo_priority']=$_POST['seo_priority'];
+		if(isset($_POST['offline'])) $vars['offline']='s';
 
-		//modifico o inserisco il record
-		$query="UPDATE ".TABLE_PAGINE." SET ";
-			if(isset($_POST['titolo'])) $query.="titolo='".b3_htmlize($_POST['titolo'],true,"")."',";
-			if(isset($_POST['sottotitolo'])) $query.="sottotitolo='".b3_htmlize($_POST['sottotitolo'],true,"")."',";
-			if(isset($_POST['anteprima'])) $query.="anteprima='".b3_htmlize($_POST['anteprima'],true)."',";
-			if(isset($_POST['testo'])) $query.="testo='".b3_htmlize($_POST['testo'],true)."',";
-			if(isset($_POST['dir'])) $query.="dir='".mysql_real_escape_string($_POST['dir'])."',";
-			if(isset($_POST['template'])) $query.="template='".mysql_real_escape_string($_POST['template'])."',";
-			if(isset($_POST['layout'])) $query.="layout='".mysql_real_escape_string($_POST['layout'])."',";
-			if(isset($_POST['featuredimage'])) $query.="featuredimage='".intval($_POST['featuredimage'])."',";
-			if($kaImpostazioni->getVar('pages-commenti',1)=='s') {
-				if(isset($_POST['allowcomments'])) $query.="allowcomments='s',";
-				else $query.="allowcomments='n',";
-				}
-			if(strpos($pageLayout,",conversion,")!==false) {
-				if(isset($_POST['allowconversions'])) $query.="allowconversions=1,";
-				else $query.="allowconversions=0,";
-				}
-			$query.="categorie='".mysql_real_escape_string($categorie)."',`riservata`='".mysql_real_escape_string($riservata)."',modified=NOW() WHERE idpag=".mysql_real_escape_string($_GET['idpag'])." LIMIT 1";
-		if(!mysql_query($query)) $log="Problemi durante la modifica della pagina";
-		else $id=$_GET['idpag'];
-
-		if(strpos($pageLayout,",seo,")!==false) {
-			if(isset($_POST['seo_robots'])) $_POST['seo_robots']=implode(",",$_POST['seo_robots']);
-			else $_POST['seo_robots']="";
-			foreach($_POST as $ka=>$v) {
-				if(substr($ka,0,4)=="seo_") $kaMetadata->set(TABLE_PAGINE,$_GET['idpag'],$ka,$v);
-				}
-			}
-
-		if($log!="") {
+		$log=$kaPages->update($_GET['idpag'],$vars);
+		
+		if($log!=true) {
 			echo '<div id="MsgAlert">'.$log.'</div>';
 			$kaLog->add("ERR",'Pages:Error updating page <a href="'.BASEDIR.strtolower($_SESSION['ll']).'/'.$_POST['dir'].'">'.b3_htmlize($_POST['titolo'],true,"").'</a> <em>(ID: '.$_GET['idpag'].')</em>');
 			}
@@ -342,8 +342,12 @@ else {
 			} ?>
 
 		<? if(strpos($pageLayout,",photogallery,")!==false) { ?>
-			<div class="box <?= count($page['imgallery'])==0?'closed':'opened'; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('Pages:Photo gallery'); ?></h2>
-			<iframe src="<?php echo ADMINDIR; ?>inc/imgallery.inc.php?refid=imgallery&mediatable=<?= TABLE_PAGINE; ?>&mediaid=<?= $page['idpag']; ?>" class="imgframe" id="imgallery" onload="kAutosizeIframe(this);"></iframe>
+			<div class="box <?= trim($page['photogallery'],",")=="" ? "closed" : "opened"; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('UI:Photogallery'); ?></h2>
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?submitlabel=<?= urlencode($kaTranslate->translate('UI:Add selected images to the list')); ?>&onsubmit=kAddImagesToPhotogallery','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('UI:Add images to gallery'); ?></a>
+				<div id="photogallery"></div>
+				<script type="text/javascript">
+					kLoadPhotogallery('<?= $page['photogallery']; ?>');
+				</script>
 			</div>
 			<? } ?>
 

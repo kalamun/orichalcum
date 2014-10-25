@@ -8,9 +8,13 @@ class kaPages {
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/comments.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/imgallery.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/docgallery.lib.php');
+		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/metadata.lib.php');
+		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'menu/menu.lib.php');
 		$this->kaComments=new kaComments();
 		$this->kaImgallery=new kaImgallery();
 		$this->kaDocgallery=new kaDocgallery();
+		$this->kaMetadata=new kaMetadata();
+		$this->kaMenu=new kaMenu();
 		}
 
 	public function get($vars) {
@@ -62,15 +66,176 @@ class kaPages {
 			}
 		return $output;
 		}
+	
+	public function add($vars)
+	{
+		$log="";
+		
+		if(!isset($vars['dir'])) $vars['dir']="";
+		if(!isset($vars['title'])) $vars['title']="";
+		if(!isset($vars['categories'])) $vars['categories']=",";
+		
+		if($vars['dir']=="") $vars['dir']=preg_replace("/[\s\?]*/","-",strtolower($vars['title']));
+		if($vars['dir']=="") $vars['dir']=strtolower(strftime("%d-%B-%Y-%H-%M-%S")).'.html';
+		
+		// check id dir already exists
+		$query="SELECT (`idpag`) as `tot` FROM `".TABLE_PAGINE."` WHERE `dir`='".mysql_real_escape_string($vars['dir'])."' AND `ll`='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+		$results=mysql_query($query);
+		$row=mysql_fetch_array($results);
+		if($row['tot']>0) $vars['dir']=rand(100000,999999).$vars['dir'];
+		
+		// insert
+		$query="INSERT INTO ".TABLE_PAGINE." (
+				`created`,
+				`modified`,
+				`titolo`,
+				`sottotitolo`,
+				`anteprima`,
+				`testo`,
+				`photogallery`,
+				`categorie`,
+				`ll`,
+				`dir`,
+				`template`,
+				`layout`,
+				`traduzioni`,
+				`riservata`,
+				`allowcomments`,
+				`allowconversions`,
+				`featuredimage`)
+			VALUES(
+				NOW(),
+				NOW(),
+				'".mysql_real_escape_string($vars['title'])."',
+				'',
+				'<p></p>',
+				'<p></p>',
+				',',
+				'".mysql_real_escape_string($vars['categories'])."',
+				'".mysql_real_escape_string($_SESSION['ll'])."',
+				'".mysql_real_escape_string($vars['dir'])."',
+				'',
+				'',
+				'',
+				's',
+				'n',
+				false,
+				0
+			)";
+		if(!mysql_query($query)) $log='Pages:Errors occurred while saving';
+		else $id=mysql_insert_id();
 
-	public function update($idpag,$vars) {
-		$query="UPDATE ".TABLE_PAGINE." SET ";
-		if(isset($vars['riservata'])) $query.="`riservata`='".mysql_real_escape_string($vars['riservata'])."',";
-		$query=rtrim($query,",");
-		$query.=" WHERE `idpag`=".mysql_real_escape_string($idpag)." LIMIT 1";
-		if(mysql_query($query)) return true;
-		else return false;
+		if($log!="") return $log;
+
+		//if the page is a translated version of another page
+		if(isset($vars['translation_id'])&&$vars['translation_id']!="") {
+			$page=$this->get($vars['translation_id']);
+			// first of all, clear translations from previous+current pages
+			foreach($page['traduzioni'] as $k=>$v) {
+				if($v!="") $this->removePageFromTranslations($v);
+				}
+			// translation has this format: |LL=idpag|LL=idpag|...
+			$page['traduzioni'][$_SESSION['ll']]=$id;
+			$translations="|";
+			foreach($page['traduzioni'] as $k=>$v) {
+				$translations.=$k."=".$v."|";
+				}
+			// then set the new translations in the current pages
+			foreach($page['traduzioni'] as $k=>$v) {
+				if($v!="") {
+					$this->setTranslations($v,$translations);
+					}
+				}
+			}
+
+		//copy contents from another page
+		if(isset($vars['copyfrom']))
+		{
+			$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `idpag`=".mysql_real_escape_string($vars['copyfrom'])." LIMIT 1";
+			$results=mysql_query($query);
+			if($row=mysql_fetch_array($results))
+			{
+				$query="UPDATE ".TABLE_PAGINE." SET
+					`sottotitolo`='".mysql_real_escape_string($row['sottotitolo'])."',
+					`anteprima`='".mysql_real_escape_string($row['anteprima'])."',
+					`testo`='".mysql_real_escape_string($row['testo'])."',
+					`categorie`='".mysql_real_escape_string($row['categorie'])."',
+					`allowcomments`='".mysql_real_escape_string($row['allowcomments'])."',
+					`allowconversions`='".mysql_real_escape_string($row['allowconversions'])."',
+					`featuredimage`='".mysql_real_escape_string($row['featuredimage'])."',
+					`template`='".mysql_real_escape_string($row['template'])."',
+					`layout`='".mysql_real_escape_string($row['layout'])."',
+					`photogallery`='".mysql_real_escape_string($row['photogallery'])."'
+					WHERE `idpag`=".mysql_real_escape_string($id)." LIMIT 1";
+				if(!mysql_query($query)) $log='Pages:Errors occurred while copying contents';
+				
+				// copy conversions
+				$this->copyConversions($row['idpag'],$id);
+
+				// copy metadata
+				foreach($this->kaMetadata->getList(TABLE_PAGINE,$row['idpag']) as $ka=>$v)
+				{
+					$this->kaMetadata->set(TABLE_PAGINE,$id,$ka,$v);
+				}
+			}
 		}
+
+		if($log!="") return $log;
+
+		//add to menu
+		if(!empty($vars['addtomenu']))
+		{
+			$query="SELECT `idpag`,`titolo`,`dir` FROM `".TABLE_PAGINE."` WHERE `idpag`='".$id."' AND `ll`='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+			$results=mysql_query($query);
+			if($page=mysql_fetch_array($results))
+			{
+				$mvars=[];
+				$mvars['title']=$page['titolo'];
+				$mvars['dir']=$page['dir'];
+				$mvars['idpag']=$page['idpag'];
+				$addtomenu=explode(",",$vars['addtomenu']);
+				$mvars['idmenu']=$addtomenu[0];
+				$mvars['where']=$addtomenu[1];
+				$log=$this->kaMenu->addElement($mvars);
+
+				if($log==false) return 'Pages:An error occurred while inserting page into menu';
+			}
+		}
+		
+		return $id;
+	}
+
+	public function update($idpag,$vars)
+	{
+		$offline='n';
+
+		if(empty($vars['categories'])) $vars['categories']=",";
+		
+		//modifico o inserisco il record
+		$query="UPDATE ".TABLE_PAGINE." SET ";
+			if(isset($vars['title'])) $query.="`titolo`='".mysql_real_escape_string($vars['title'])."',";
+			if(isset($vars['subtitle'])) $query.="`sottotitolo`='".mysql_real_escape_string($vars['subtitle'])."',";
+			if(isset($vars['preview'])) $query.="`anteprima`='".b3_htmlize($vars['preview'],true)."',";
+			if(isset($vars['text'])) $query.="`testo`='".b3_htmlize($vars['text'],true)."',";
+			if(isset($vars['photogallery'])) $query.="`photogallery`='".b3_htmlize($vars['photogallery'],true)."',";
+			if(isset($vars['dir'])) $query.="`dir`='".mysql_real_escape_string($vars['dir'])."',";
+			if(isset($vars['template'])) $query.="`template`='".mysql_real_escape_string($vars['template'])."',";
+			if(isset($vars['layout'])) $query.="`layout`='".mysql_real_escape_string($vars['layout'])."',";
+			if(isset($vars['featuredimage'])) $query.="`featuredimage`='".intval($vars['featuredimage'])."',";
+			if(isset($vars['allowcomments'])) $query.="`allowcomments`='".intval($vars['allowcomments'])."',";
+			if(isset($vars['allowconversions'])) $query.="`allowconversions`='".intval($vars['allowconversions'])."',";
+			if(isset($vars['offline'])&&($vars['offline']=='s'||$vars['offline']=='n')) $query.="`riservata`='".mysql_real_escape_string($vars['offline'])."',";
+			$query.="`categorie`='".mysql_real_escape_string($vars['categories'])."', `modified`=NOW() WHERE `idpag`='".intval($_GET['idpag'])."' LIMIT 1";
+		if(!mysql_query($query)) return "Pages:An error occurred while saving into the database";
+		else $id=$_GET['idpag'];
+
+		foreach($vars as $ka=>$v)
+		{
+			if(substr($ka,0,4)=="seo_") $this->kaMetadata->set(TABLE_PAGINE,$idpag,$ka,$v);
+		}
+	
+		return true;
+	}
 
 	public function setTranslations($idpag,$translations) {
 		$query="UPDATE ".TABLE_PAGINE." SET `traduzioni`='".mysql_real_escape_string($translations)."' WHERE `idpag`='".mysql_real_escape_string($idpag)."' LIMIT 1";
@@ -89,9 +254,12 @@ class kaPages {
 		$this->update($idpag,array("riservata"=>$draft));
 		return $draft;
 		}
+		
+
 
 	/* CONVERSIONS */
-	public function getConversions($vars) {
+	public function getConversions($vars)
+	{
 		if(!is_array($vars)) $vars=array("idpag"=>$vars);
 
 		$query="SELECT * FROM ".TABLE_CONVERSIONS." WHERE ";
@@ -133,9 +301,10 @@ class kaPages {
 			}
 
 		return $output;
-		}
+	}
 
-	public function updateConversions($vars) {
+	public function updateConversions($vars)
+	{
 		if(!is_array($vars)) return false;
 		if(!isset($vars['idpag'])) return false;
 
@@ -171,6 +340,27 @@ class kaPages {
 		$query.="`idpag`=".mysql_real_escape_string($vars['idpag'])." WHERE `idconv`=".mysql_real_escape_string($row['idconv'])." LIMIT 1";
 		if(mysql_query($query)) return true;
 		else return false;
-		}
 	}
+	
+	// copy conversions from idpag to a new idpag
+	public function copyConversions($from,$to)
+	{
+		// check if conversions are defined
+		$query="SELECT count(`idconv`) as `tot` FROM `".TABLE_CONVERSIONS."` WHERE `idpag`='".intval($from)."' LIMIT 1";
+		$results=mysql_query($query);
+		$row=mysql_fetch_array($results);
+		if($row['tot']==0) return true; // no conversions defined
+		
+		// duplicate
+		$query="INSERT INTO `".TABLE_CONVERSIONS."` (`idpag`,`moderate`,`create_member`,`create_member_config`,`newsletters_add`,`newsletters_remove`,`private_dir`,`notification_emails`,`notification_from`,`notification_subject`,`notification_text`,`followup_from`,`followup_subject`,`followup_text`,`conversion_code`,`fail_code`,`variables`)
+			(SELECT `idpag`,`moderate`,`create_member`,`create_member_config`,`newsletters_add`,`newsletters_remove`,`private_dir`,`notification_emails`,`notification_from`,`notification_subject`,`notification_text`,`followup_from`,`followup_subject`,`followup_text`,`conversion_code`,`fail_code`,`variables` FROM `".TABLE_CONVERSIONS."` WHERE `idpag`='".intval($from)."' LIMIT 1)";
+		if(!mysql_query($query)) return false;
+		$id=mysql_insert_id();
+		
+		// change the idpag reference to the new one
+		$query="UPDATE `".TABLE_CONVERSIONS."` SET `idpag`='".intval($to)."' WHERE `idconv`='".$id."' LIMIT 1";
+		if(!mysql_query($query)) return false;
+		return true;
+	}
+}
 ?>

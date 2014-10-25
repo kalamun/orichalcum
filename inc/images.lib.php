@@ -7,16 +7,15 @@ class kImages {
 	function __construct() {
 		}
 
-	function getList($tabella=false,$id=false,$orderby='ordine',$conditions='')
+	function getList($tabella=false,$id=false,$orderby=false,$conditions='')
 	{
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 		$output=array();
+		if(empty($orderby)) $orderby='idimg';
 
-		$query="SELECT * FROM ".TABLE_IMG." WHERE idimg>0 ";
-		if($tabella!="") $query.=" AND tabella='".$tabella."' ";
-		if($id!="") $query.=" AND id='".$id."' ";
+		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`>0 ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
-		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
+		$query.=" ORDER BY ".$orderby." ";
 
 		$results=mysql_query($query);
 		for($i=0;$row=mysql_fetch_array($results);$i++)
