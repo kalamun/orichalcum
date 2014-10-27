@@ -4,7 +4,8 @@ ALTER TABLE `k_members` ADD UNIQUE ( `username` )
 ALTER TABLE `k_metadata` ADD INDEX ( `tabella` , `id` ) 
 ALTER TABLE `k_commenti` ADD INDEX ( `tabella` , `ip` ) 
 ALTER TABLE `k_pagine` ADD `photogallery` TEXT NOT NULL AFTER `testo` 
-
+ALTER TABLE `k_news` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
+ALTER TABLE `k_shop_items` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
 
 
 
@@ -32,5 +33,6 @@ while($row=mysql_fetch_array($results))
 	mysql_query("UPDATE ".TABLE_PAGINE." SET `photogallery`='".$photogallery."' WHERE `idpag`='".$row['idpag']."' LIMIT 1");
 	echo $c.' photos in  '.$row['titolo'].'<br>';
 }
+mysql_query("DELETE FROM ".TABLE_IMGALLERY." WHERE `tabella`='".TABLE_PAGINE."'");
 
 ?>
