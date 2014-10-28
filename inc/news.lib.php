@@ -304,6 +304,8 @@ class kNews {
 
 	/* convert raw array from database into improved array */
 	private function row2output($row,$orderby="data DESC") {
+		$vars['photogallery']=true; // for now always true... need to be implemented
+	
 		if(!$this->inited) $this->init();
 		$output=$row;
 		if($orderby=="") $orderby=$this->orderby;
@@ -356,7 +358,29 @@ class kNews {
 
 		if($row['featuredimage']==0) $output['featuredimage']=false;
 		else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
-		$output['imgs']=$GLOBALS['__images_gallery']->getList(TABLE_NEWS,$row['idnews']);
+
+		// get photogallery in the correct order
+		$output['imgs']=array();
+		if($vars['photogallery']==true)
+		{
+			$conditions="";
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				$conditions.="`idimg`='".intval($idimg)."' OR ";
+			}
+			$conditions.="`idimg`='0'";
+			
+			$imgs=$this->imgs->getList(false,false,false,$conditions);
+			
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				foreach($imgs as $img)
+				{
+					if($img['idimg']==$idimg) $output['imgs'][]=$img;
+				}
+			}
+		}
+
 		$output['docs']=$GLOBALS['__documents_gallery']->getList(TABLE_NEWS,$row['idnews']);
 
 		$output['autore']=$GLOBALS['__users']->getUserById($row['iduser']);

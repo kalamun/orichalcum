@@ -44,6 +44,7 @@ class kaNews {
 		if(!isset($values['iduser'])||$values['iduser']==false) $values['iduser']=$_SESSION['iduser'];
 		if(!isset($values['home'])||$values['home']!="s") $values['home']="n";
 		if(!isset($values['calendar'])||$values['calendar']!="s") $values['calendar']="n";
+		if(!isset($values['photogallery'])) $values['photogallery']=",";
 		
 		if(isset($values['title'])) $values['title']=mysql_real_escape_string($values['title']);
 		if(isset($values['subtitle'])) $values['subtitle']=mysql_real_escape_string($values['subtitle']);
@@ -51,6 +52,7 @@ class kaNews {
 		if(isset($values['text'])) $values['text']=mysql_real_escape_string($values['text']);
 		if(isset($values['template'])) $values['template']=mysql_real_escape_string($values['template']);
 		if(isset($values['translations'])) $values['translations']=mysql_real_escape_string($values['translations']);
+		if(isset($values['photogallery'])) $values['photogallery']=mysql_real_escape_string($values['photogallery']);
 
 		if(!isset($values['dir'])&&isset($values['titolo'])) $values['dir']=preg_replace("/[^\w\/\.\-\x{C0}-\x{D7FF}\x{2C00}-\x{D7FF}]+/","-",strtolower($values['titolo']));
 		if(!isset($values['dir'])||$values['dir']==""||$values['dir']=="-.html") $values['dir']=rand(10,999999);
@@ -74,8 +76,8 @@ class kaNews {
 			$query="SELECT * FROM `".TABLE_NEWS."` WHERE `idnews`='".intval($values['copyfrom'])."' LIMIT 1";
 			$results=mysql_query($query);
 			if($row=mysql_fetch_array($results)) {
-				$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
-					SELECT `titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll` FROM `".TABLE_NEWS."` WHERE `idnews`='".$values['copyfrom']."' LIMIT 1
+				$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`photogallery`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
+					SELECT `titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`photogallery`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll` FROM `".TABLE_NEWS."` WHERE `idnews`='".$values['copyfrom']."' LIMIT 1
 					";
 
 				if(mysql_query($query)) {
@@ -105,9 +107,6 @@ class kaNews {
 						$this->kaMetadata->set(TABLE_NEWS,$idnews,$ka,$v);
 						}
 					
-					//copy image gallery
-					$this->copyImageGallery($values['copyfrom'],$idnews);
-					
 					//copy document gallery
 					$this->copyDocumentGallery($values['copyfrom'],$idnews);
 					
@@ -135,20 +134,15 @@ class kaNews {
 			if(!isset($values['dir'])) $values['dir']="";
 			if(!isset($values['home'])) $values['home']="";
 			if(!isset($values['calendar'])) $values['calendar']="";
-			$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
-					VALUES('".$values['title']."','".$values['subtitle']."','".$values['preview']."','".$values['text']."',0,'".$values['creation_date']."','".$values['public_date']."','".$values['starting_date']."','".$values['expiration_date']."',NOW(),'".$values['template']."','".$values['layout']."','".$values['translations']."','".$values['categories']."','".$values['dir']."','".$values['home']."','".$values['calendar']."','".$values['iduser']."','".$values['ll']."')";
+			$query="INSERT INTO `".TABLE_NEWS."` (`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`photogallery`,`data`,`pubblica`,`starting_date`,`scadenza`,`modified`,`template`,`layout`,`traduzioni`,`categorie`,`dir`,`home`,`calendario`,`iduser`,`ll`)
+					VALUES('".$values['title']."','".$values['subtitle']."','".$values['preview']."','".$values['text']."',0,'".$values['photogallery']."','".$values['creation_date']."','".$values['public_date']."','".$values['starting_date']."','".$values['expiration_date']."',NOW(),'".$values['template']."','".$values['layout']."','".$values['translations']."','".$values['categories']."','".$values['dir']."','".$values['home']."','".$values['calendar']."','".$values['iduser']."','".$values['ll']."')";
 			if(mysql_query($query)) return mysql_insert_id();
 			}
 
 		return false;
 		}
 	
-	public function copyImageGallery($from,$to) {
-		foreach($this->kaImgallery->getList(TABLE_NEWS,$from) as $img) {
-			$this->kaImgallery->add(TABLE_NEWS,$to,$img['idimg']);
-			}
-		}
-	
+
 	public function copyDocumentGallery($from,$to) {
 		foreach($this->kaDocgallery->getList(TABLE_NEWS,$from) as $doc) {
 			$this->kaDocgallery->add(TABLE_NEWS,$to,$doc['iddoc']);
@@ -231,36 +225,41 @@ class kaNews {
 		return $row;
 		}
 
-	public function update($idnews,$titolo,$sottotitolo="false",$anteprima="false",$testo="false",$categorie="false",$data="false",$pubblica="false",$starting_date="false",$scadenza="false",$template="false",$layout="false",$dir="false",$home=null,$calendario="false",$featuredimage=0,$iduser="false",$ll=false) {
-		if($ll==false) $ll=$_SESSION['ll'];
+	public function update($vars) {
+		if(empty($vars['idnews'])) return false;
+		if(empty($vars['ll'])) $ll=$_SESSION['ll'];
+		if(empty($vars['iduser'])) $vars['iduser']=$_SESSION['iduser'];
 
-		$titolo=mysql_real_escape_string($titolo);
-		$sottotitolo=mysql_real_escape_string($sottotitolo);
-		$anteprima=mysql_real_escape_string($anteprima);
-		$testo=mysql_real_escape_string($testo);
-		$template=mysql_real_escape_string($template);
-		$layout=mysql_real_escape_string($layout);
-		$dir=mysql_real_escape_string($dir);
+		if(isset($vars['title'])) $vars['title']=mysql_real_escape_string($vars['title']);
+		if(isset($vars['subtitle'])) $vars['subtitle']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['preview'])) $vars['preview']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['text'])) $vars['text']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['categories'])) $vars['categories']=mysql_real_escape_string($vars['categories']);
+		if(isset($vars['template'])) $vars['template']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['layout'])) $vars['layout']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['dir'])) $vars['dir']=mysql_real_escape_string($vars['subtitle']);
 
 		$query="UPDATE ".TABLE_NEWS." SET ";
-		if($titolo!="false") $query.="titolo='".$titolo."',";
-		if($sottotitolo!="false") $query.="sottotitolo='".$sottotitolo."',";
-		if($anteprima!="false") $query.="anteprima='".$anteprima."',";
-		if($testo!="false") $query.="testo='".$testo."',";
-		if($categorie!="false") $query.="categorie='".$categorie."',";
-		if($data!="false") $query.="data='".$data."',";
-		if($pubblica!="false") $query.="pubblica='".$pubblica."',";
-		if($starting_date!="false") $query.="starting_date='".$starting_date."',";
-		if($scadenza!="false") $query.="scadenza='".$scadenza."',";
-		if($template!="false") $query.="template='".$template."',";
-		if($layout!="false") $query.="layout='".$layout."',";
-		if($dir!="false") $query.="dir='".$dir."',";
-		if($home!=null) $query.="home='".$home."',";
-		if($calendario!="false") $query.="calendario='".$calendario."',";
-		if($iduser!="false") $query.="iduser='".$iduser."',";
-		if($featuredimage!=false) $query.="featuredimage='".intval($_POST['featuredimage'])."',";
-		$query.="modified=NOW() WHERE idnews='".$idnews."'";
-		if(mysql_query($query)) return $idnews;
+		if(isset($vars['title'])) $query.="`titolo`='".$vars['title']."',";
+		if(isset($vars['subtitle'])) $query.="`sottotitolo`='".$vars['subtitle']."',";
+		if(isset($vars['preview'])) $query.="`anteprima`='".$vars['preview']."',";
+		if(isset($vars['text'])) $query.="`testo`='".$vars['text']."',";
+		if(isset($vars['categories'])) $query.="`categorie`='".$vars['categories']."',";
+		if(isset($vars['date_date'])) $query.="`data`='".$vars['date_date']."',";
+		if(isset($vars['visible_date'])) $query.="`pubblica`='".$vars['visible_date']."',";
+		if(isset($vars['starting_date'])) $query.="`starting_date`='".$vars['starting_date']."',";
+		if(isset($vars['expiration_date'])) $query.="`scadenza`='".$vars['expiration_date']."',";
+		if(isset($vars['template'])) $query.="`template`='".$vars['template']."',";
+		if(isset($vars['layout'])) $query.="`layout`='".$vars['layout']."',";
+		if(isset($vars['dir'])) $query.="`dir`='".$vars['dir']."',";
+		if(isset($vars['home'])) $query.="`home`='".$vars['home']."',";
+		if(isset($vars['calendar'])) $query.="`calendar`='".$vars['calendar']."',";
+		if(isset($vars['iduser'])) $query.="`iduser`='".$vars['iduser']."',";
+		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".$vars['featuredimage']."',";
+		if(isset($vars['photogallery'])) $query.="`photogallery`='".$vars['photogallery']."',";
+
+		$query.="`modified`=NOW() WHERE `idnews`='".intval($vars['idnews'])."'";
+		if(mysql_query($query)) return $vars['idnews'];
 		else return false;
 		}
 		
@@ -274,7 +273,7 @@ class kaNews {
 		}
 
 	public function delete($idnews) {
-		$query="DELETE FROM ".TABLE_NEWS." WHERE idnews='".$idnews."'";
+		$query="DELETE FROM ".TABLE_NEWS." WHERE `idnews`='".intval($idnews)."' LIMIT 1";
 		if(mysql_query($query)) return $idnews;
 		else return false;
 		}

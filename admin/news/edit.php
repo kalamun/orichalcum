@@ -263,35 +263,31 @@ else {
 				}
 			}
 
-		if(isset($_POST['date_day'])&&isset($_POST['date_hour'])) $date_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['date_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['date_hour']);
-		else $date_date="false";
-		if(isset($_POST['visible_day'])&&isset($_POST['visible_hour'])) $visible_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['visible_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['visible_hour']);
-		else $visible_date="false";
-		if(isset($_POST['expiration_day'])&&isset($_POST['expiration_hour'])) $expiration_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['expiration_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['expiration_hour']);
-		else $expiration_date="false";
-		if(isset($_POST['starting_day'])&&isset($_POST['starting_hour'])) $starting_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['starting_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['starting_hour']);
-		else $starting_date=$expiration_date;
+		$vars=array("idnews"=>$_GET['idnews']);
+		
+		if(isset($_POST['date_day'])&&isset($_POST['date_hour'])) $vars['date_date']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['date_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['date_hour']);
+		if(isset($_POST['visible_day'])&&isset($_POST['visible_hour'])) $vars['visible_date']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['visible_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['visible_hour']);
+		if(isset($_POST['expiration_day'])&&isset($_POST['expiration_hour'])) $vars['expiration_date']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['expiration_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['expiration_hour']);
+		if(isset($_POST['starting_day'])&&isset($_POST['starting_hour'])) $vars['starting_date']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['starting_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['starting_hour']);
+		elseif(isset($vars['expiration_date'])) $vars['starting_date']=$vars['expiration_date'];
 
-		if(isset($_POST['idcat'])) {
-			$categorie=",";
-			foreach($_POST['idcat'] as $idcat) { $categorie.=$idcat.','; }
-			}
-		else $categorie="false";
+		if(isset($_POST['idcat'])) $vars['categories']=",".implode(",",$_POST['idcat']).",";
+		else $vars['categories']=",";
 
-		isset($_POST['home'])?$_POST['home']='s':$_POST['home']='n';
-		if(strpos($pageLayout,",home,")==false) $_POST['home']=null;
-		if(strpos($pageLayout,",calendario,")==false) $_POST['calendario']='s';
-		isset($_POST['calendario'])?$_POST['calendario']='s':$_POST['calendario']='n';
-		isset($_POST['titolo'])?$_POST['titolo']=b3_htmlize($_POST['titolo'],false,""):$_POST['titolo']="false";
-		isset($_POST['sottotitolo'])?$_POST['sottotitolo']=b3_htmlize($_POST['sottotitolo'],false,""):$_POST['sottotitolo']="false";
-		isset($_POST['anteprima'])?$_POST['anteprima']=b3_htmlize($_POST['anteprima'],false):$_POST['anteprima']="false";
-		isset($_POST['testo'])?$_POST['testo']=b3_htmlize($_POST['testo'],false):$_POST['testo']="false";
-		isset($_POST['dir'])?$_POST['dir']=b3_htmlize($_POST['dir'],false,""):$_POST['dir']="false";
-		if(!isset($_POST['template'])) $_POST['template']="false";
-		if(!isset($_POST['layout'])) $_POST['layout']="false";
-		if(!isset($_POST['featuredimage'])) $_POST["featuredimage"]="false";
+		if(strpos($pageLayout,",home,")!=false) { isset($_POST['home']) ? $vars['home']='s' : $vars['home']='n'; }
+		if(strpos($pageLayout,",calendario,")!=false) { isset($_POST['calendario']) ? $vars['calendar']='s' : $vars['calendar']='n'; }
+		if(isset($_POST['titolo'])) $vars['title']=b3_htmlize($_POST['titolo'],false,"");
+		if(isset($_POST['sottotitolo'])) $vars['subtitle']=b3_htmlize($_POST['sottotitolo'],false,"");
+		if(isset($_POST['anteprima'])) $vars['preview']=b3_htmlize($_POST['anteprima'],false);
+		if(isset($_POST['testo'])) $vars['text']=b3_htmlize($_POST['testo'],false);
+		if(isset($_POST['dir'])) $vars['dir']=$_POST['dir'];
+		if(isset($_POST['template'])) $vars['template']=$_POST['template'];
+		if(isset($_POST['layout'])) $vars['layout']=$_POST['layout'];
+		if(isset($_POST['featuredimage'])) $vars["featuredimage"]=$_POST['featuredimage'];
+		if(isset($_POST['photogallery'])) $vars["photogallery"]=$_POST['photogallery'];
 
-		$id=$kaNews->update($_GET['idnews'],$_POST['titolo'],$_POST['sottotitolo'],$_POST['anteprima'],$_POST['testo'],$categorie,$date_date,$visible_date,$starting_date,$expiration_date,$_POST['template'],$_POST['layout'],$_POST['dir'],$_POST['home'],$_POST['calendario'],$_POST['featuredimage']);
+		$id=$kaNews->update($vars);
+
 		if($id==false) $log="Problemi durante la modifica del database<br />";
 		else {
 			if(strpos($pageLayout,",seo,")!==false) {
@@ -428,8 +424,12 @@ else {
 			} ?>
 
 		<? if(strpos($pageLayout,",photogallery,")!==false) { ?>
-			<div class="box <?= count($row['imgallery'])==0?'closed':'opened'; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('News:Photo gallery'); ?></h2>
-			<iframe src="<?php echo ADMINDIR; ?>inc/imgallery.inc.php?refid=imgallery&mediatable=<?php echo TABLE_NEWS; ?>&mediaid=<?php echo $row['idnews']; ?>" class="imgframe" id="imgallery" onload="kAutosizeIframe(this);"></iframe>
+			<div class="box <?= trim($row['photogallery'],",")=="" ? "closed" : "opened"; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('UI:Photogallery'); ?></h2>
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?submitlabel=<?= urlencode($kaTranslate->translate('UI:Add selected images to the list')); ?>&onsubmit=kAddImagesToPhotogallery','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('UI:Add images to gallery'); ?></a>
+				<div id="photogallery"></div>
+				<script type="text/javascript">
+					kLoadPhotogallery('<?= $row['photogallery']; ?>');
+				</script>
 			</div>
 			<? } ?>
 

@@ -43,7 +43,7 @@ class kaShop {
 		$row=mysql_fetch_array($results);
 		$ordine=$row['tot']+1;
 
-		$query="INSERT INTO ".TABLE_SHOP_ITEMS." (`online`,`dir`,`categorie`,`productcode`,`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`prezzo`,`scontato`,`created`,`public`,`expired`,`modified`,`qta`,`weight`,`layout`,`privatearea`,`rating`,`votes`,`customfields`,`manufacturer`,`ordine`,`traduzioni`,`ll`) VALUES('n','".$dir."','".$categorie."','','".$titolo."','".$sottotitolo."','".$anteprima."','".$testo."',0,'".$prezzo."','".$scontato."','".$created."','".$public."','".$expired."',NOW(),'".$qta."','".$weight."','".$layout."','','0','0','',0,'".$ordine."','','".$ll."')";
+		$query="INSERT INTO ".TABLE_SHOP_ITEMS." (`online`,`dir`,`categorie`,`productcode`,`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`photogallery`,`prezzo`,`scontato`,`created`,`public`,`expired`,`modified`,`qta`,`weight`,`layout`,`privatearea`,`rating`,`votes`,`customfields`,`manufacturer`,`ordine`,`traduzioni`,`ll`) VALUES('n','".$dir."','".$categorie."','','".$titolo."','".$sottotitolo."','".$anteprima."','".$testo."',0,',','".$prezzo."','".$scontato."','".$created."','".$public."','".$expired."',NOW(),'".$qta."','".$weight."','".$layout."','','0','0','',0,'".$ordine."','','".$ll."')";
 		if(mysql_query($query)) return mysql_insert_id();
 		else return false;
 		}
@@ -163,48 +163,53 @@ class kaShop {
 		return $row;
 		}
 
-	public function updateItem($idsitem,$online,$productcode,$titolo,$sottotitolo="false",$anteprima="false",$testo="false",$categorie="false",$prezzo=0,$scontato=0,$created="false",$public="false",$expired="false",$qta=0,$weight=0,$layout=false,$dir=false,$privatearea="false",$ll=false,$template="",$customfields=array(),$featuredimage=-1,$manufacturer=-1) {
-		if($ll==false) $ll=$_SESSION['ll'];
-		$productcode=mysql_real_escape_string($productcode);
-		$titolo=mysql_real_escape_string($titolo);
-		$sottotitolo=mysql_real_escape_string($sottotitolo);
-		$anteprima=mysql_real_escape_string($anteprima);
-		$testo=mysql_real_escape_string($testo);
-		$template=mysql_real_escape_string($template);
-		$layout=mysql_real_escape_string($layout);
-		$dir=mysql_real_escape_string($dir);
-		$privatearea=mysql_real_escape_string($privatearea);
+	public function updateItem($idsitem,$vars) {
+	
+		if(empty($vars['ll'])) $vars['ll']=$_SESSION['ll'];
+		
+		foreach(array("productcode","titolo","sottotitolo","anteprima","testo","template","layout","dir","privatearea") as $field)
+		{
+			if(isset($vars[$field])) $vars['field']=mysql_real_escape_string($vars[$field]);
+		}
+		
+		if(isset($vars['online']) && $vars['online']!="y") $vars['online']='n';
 
 		$cf="";
 		//customfields: for each field of the category, get the value or, if missing, assign an empty value
-		foreach($this->getCustomFields(array("categories"=>explode(",",trim($categorie,",")))) as $f) {
-			if(!isset($customfields[$f['idsfield']])) $customfields[$f['idsfield']]="";
-			//if the field is a textarea, process
-			if($f['type']=='textarea') $customfields[$f['idsfield']]=b3_htmlize($customfields[$f['idsfield']],false);
-			if($f['type']=='multichoice') $customfields[$f['idsfield']]=implode("\n",$customfields[$f['idsfield']]);
-			$cf.='<field id="'.$f['idsfield'].'">'.mysql_real_escape_string($customfields[$f['idsfield']])."</field>\n";
+		if(isset($vars['categories']))
+		{
+			foreach($this->getCustomFields(array("categories"=>explode(",",trim($vars['categories'],",")))) as $f)
+			{
+				if(!isset($vars['customfields'][$f['idsfield']])) $vars['customfields'][$f['idsfield']]="";
+				//if the field is a textarea, process
+				if($f['type']=='textarea') $vars['customfields'][$f['idsfield']]=b3_htmlize($vars['customfields'][$f['idsfield']],false);
+				if($f['type']=='multichoice') $vars['customfields'][$f['idsfield']]=implode("\n",$vars['customfields'][$f['idsfield']]);
+				$cf.='<field id="'.$f['idsfield'].'">'.mysql_real_escape_string($vars['customfields'][$f['idsfield']])."</field>\n";
 			}
+		}
 
 		$query="UPDATE ".TABLE_SHOP_ITEMS." SET ";
-		if($online!="y") $query.="`online`='n',"; else $query.="online='y',";
-		if($productcode!="false") $query.="`productcode`='".$productcode."',";
-		if($titolo!="false") $query.="`titolo`='".$titolo."',";
-		if($sottotitolo!="false") $query.="`sottotitolo`='".$sottotitolo."',";
-		if($anteprima!="false") $query.="`anteprima`='".$anteprima."',";
-		if($testo!="false") $query.="`testo`='".$testo."',";
-		if($categorie!="false") $query.="`categorie`='".$categorie."',";
-		if($prezzo!="false") $query.="`prezzo`='".$prezzo."',";
-		if($scontato!="false") $query.="`scontato`='".$scontato."',";
-		if($qta!="false") $query.="`qta`='".$qta."',";
-		if($weight!="false") $query.="`weight`='".$weight."',";
-		if($created!="false") $query.="`created`='".$created."',";
-		if($public!="false") $query.="`public`='".$public."',";
-		if($expired!="false") $query.="`expired`='".$expired."',";
-		if($layout!="false") $query.="`layout`='".$layout."',";
-		if($dir!="false") $query.="`dir`='".$dir."',";
-		if($privatearea!="false") $query.="`privatearea`='".$privatearea."',";
-		if($featuredimage>-1) $query.="featuredimage='".intval($featuredimage)."',";
-		if($manufacturer>-1) $query.="manufacturer='".intval($manufacturer)."',";
+		if(isset($vars['online'])) $query.="`online`='".$vars['online']."',";
+		if(isset($vars['productcode'])) $query.="`productcode`='".$vars['productcode']."',";
+		if(isset($vars['titolo'])) $query.="`titolo`='".$vars['titolo']."',";
+		if(isset($vars['sottotitolo'])) $query.="`sottotitolo`='".$vars['sottotitolo']."',";
+		if(isset($vars['anteprima'])) $query.="`anteprima`='".$vars['anteprima']."',";
+		if(isset($vars['testo'])) $query.="`testo`='".$vars['testo']."',";
+		if(isset($vars['categories'])) $query.="`categorie`='".$vars['categories']."',";
+		if(isset($vars['prezzo'])) $query.="`prezzo`='".$vars['prezzo']."',";
+		if(isset($vars['scontato'])) $query.="`scontato`='".$vars['scontato']."',";
+		if(isset($vars['qta'])) $query.="`qta`='".$vars['qta']."',";
+		if(isset($vars['weight'])) $query.="`weight`='".$vars['weight']."',";
+		if(isset($vars['created'])) $query.="`created`='".$vars['created']."',";
+		if(isset($vars['public'])) $query.="`public`='".$vars['public']."',";
+		if(isset($vars['expiration'])) $query.="`expired`='".$vars['expiration']."',";
+		if(isset($vars['layout'])) $query.="`layout`='".$vars['layout']."',";
+		if(isset($vars['dir'])) $query.="`dir`='".$vars['dir']."',";
+		if(isset($vars['privatearea'])) $query.="`privatearea`='".$vars['privatearea']."',";
+		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".$vars['featuredimage']."',";
+		if(isset($vars['manufacturer'])) $query.="`manufacturer`='".$vars['manufacturer']."',";
+		if(isset($vars['photogallery'])) $query.="`photogallery`='".$vars['photogallery']."',";
+
 		$query.="`customfields`='".$cf."',`modified`=NOW() WHERE `idsitem`='".$idsitem."'";
 		if(mysql_query($query)) return $idsitem;
 		else return false;
@@ -820,6 +825,7 @@ class kaShop {
 			`preview`,
 			`description`,
 			`featuredimage`,
+			`photogallery`,
 			`created`,
 			`modified`,
 			`translations`,
@@ -831,6 +837,7 @@ class kaShop {
 			'',
 			'',
 			0,
+			',',
 			NOW(),
 			NOW(),
 			'',
@@ -962,8 +969,9 @@ class kaShop {
 		if(isset($vars['description'])) $query.="`description`='".b3_htmlize($vars['description'],true)."',";
 		if(isset($vars['dir'])) $query.="`dir`='".mysql_real_escape_string($vars['dir'])."',";
 		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".intval($vars['featuredimage'])."',";
+		if(isset($vars['photogallery'])) $query.="`photogallery`='".mysql_real_escape_string($vars['photogallery'])."',";
 		$query.="`modified`=NOW() WHERE `idsman`=".mysql_real_escape_string($vars['idsman'])." LIMIT 1";
-		
+
 		if(!mysql_query($query)) return false;
 
 		foreach($vars as $ka=>$v)
@@ -977,7 +985,6 @@ class kaShop {
 	// delete a manufacturer
 	public function deleteManufacturer($idsman)
 	{
-		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/imgallery.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/docgallery.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/metadata.lib.php');
 		$kaImgallery=new kaImgallery();
@@ -988,12 +995,6 @@ class kaShop {
 		
 		if(mysql_query($query))
 		{
-			// remove from image gallery
-			foreach($kaImgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $img)
-			{
-				$kaImgallery->del($img['idimga']);
-			}
-
 			// remove from document gallery
 			foreach($kaDocgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $doc)
 			{

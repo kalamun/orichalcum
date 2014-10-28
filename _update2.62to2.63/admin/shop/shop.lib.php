@@ -825,6 +825,7 @@ class kaShop {
 			`preview`,
 			`description`,
 			`featuredimage`,
+			`photogallery`,
 			`created`,
 			`modified`,
 			`translations`,
@@ -836,6 +837,7 @@ class kaShop {
 			'',
 			'',
 			0,
+			',',
 			NOW(),
 			NOW(),
 			'',
@@ -967,8 +969,9 @@ class kaShop {
 		if(isset($vars['description'])) $query.="`description`='".b3_htmlize($vars['description'],true)."',";
 		if(isset($vars['dir'])) $query.="`dir`='".mysql_real_escape_string($vars['dir'])."',";
 		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".intval($vars['featuredimage'])."',";
+		if(isset($vars['photogallery'])) $query.="`photogallery`='".mysql_real_escape_string($vars['photogallery'])."',";
 		$query.="`modified`=NOW() WHERE `idsman`=".mysql_real_escape_string($vars['idsman'])." LIMIT 1";
-		
+
 		if(!mysql_query($query)) return false;
 
 		foreach($vars as $ka=>$v)
@@ -982,7 +985,6 @@ class kaShop {
 	// delete a manufacturer
 	public function deleteManufacturer($idsman)
 	{
-		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/imgallery.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/docgallery.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/metadata.lib.php');
 		$kaImgallery=new kaImgallery();
@@ -993,12 +995,6 @@ class kaShop {
 		
 		if(mysql_query($query))
 		{
-			// remove from image gallery
-			foreach($kaImgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $img)
-			{
-				$kaImgallery->del($img['idimga']);
-			}
-
 			// remove from document gallery
 			foreach($kaDocgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $doc)
 			{

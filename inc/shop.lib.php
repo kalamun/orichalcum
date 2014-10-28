@@ -646,8 +646,27 @@ class kShop {
 		$output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
 		if($row['featuredimage']==0) $output['featuredimage']=false;
 		
+		// get photogallery in the correct order
 		$output['imgs']=array();
-		if($vars['photogallery']==true) $output['imgs']=$this->imgallery->getList(TABLE_SHOP_ITEMS,$row['idsitem']);
+		if($vars['photogallery']==true)
+		{
+			$conditions="";
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				$conditions.="`idimg`='".intval($idimg)."' OR ";
+			}
+			$conditions.="`idimg`='0'";
+			
+			$imgs=$this->imgs->getList(false,false,false,$conditions);
+			
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				foreach($imgs as $img)
+				{
+					if($img['idimg']==$idimg) $output['imgs'][]=$img;
+				}
+			}
+		}
 		
 		$output['docs']=array();
 		if($vars['documentgallery']==true) $output['docs']=$this->docgallery->getList(TABLE_SHOP_ITEMS,$row['idsitem']);
@@ -1869,6 +1888,8 @@ class kShop {
 	{
 		if(!$this->inited) $this->init();
 		
+		$vars['photogallery']=true; // always on for now...
+		
 		/* if no manufacturer, return an array with empty values */
 		if(!isset($row['idsman'])||$row['idsman']=="")
 		{
@@ -1926,7 +1947,28 @@ class kShop {
 		if($row['featuredimage']==0) $output['featuredimage']=false;
 		else $output['featuredimage']=$this->imgs->getImage($row['featuredimage']);
 		
-		$output['imgs']=$this->imgallery->getList(TABLE_SHOP_MANUFACTURERS,$row['idsman']);
+		// get photogallery in the correct order
+		$output['imgs']=array();
+		if($vars['photogallery']==true)
+		{
+			$conditions="";
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				$conditions.="`idimg`='".intval($idimg)."' OR ";
+			}
+			$conditions.="`idimg`='0'";
+			
+			$imgs=$this->imgs->getList(false,false,false,$conditions);
+			
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				foreach($imgs as $img)
+				{
+					if($img['idimg']==$idimg) $output['imgs'][]=$img;
+				}
+			}
+		}
+
 		$output['docs']=$this->docgallery->getList(TABLE_SHOP_MANUFACTURERS,$row['idsman']);
 		$output['comments']=$this->getComments($row['idsman']);
 		$output['translations']=array();

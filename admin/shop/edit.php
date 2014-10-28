@@ -60,48 +60,64 @@ if(isset($_POST['update'])&&isset($_GET['idsitem'])) {
 				}
 			}
 		}
+	
+	$vars=array();
 
-	if(isset($_POST['date_day'])&&isset($_POST['date_hour'])) $date_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['date_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['date_hour']);
-	else $date_date="false";
-	if(isset($_POST['visible_day'])&&isset($_POST['visible_hour'])) $visible_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['visible_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['visible_hour']);
-	else $visible_date="false";
-	if(isset($_POST['expiration_day'])&&isset($_POST['expiration_hour'])) $expiration_date=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['expiration_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['expiration_hour']);
-	else $expiration_date="false";
+	if(isset($_POST['date_day'])&&isset($_POST['date_hour'])) $vars['created']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['date_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['date_hour']);
+	if(isset($_POST['visible_day'])&&isset($_POST['visible_hour'])) $vars['public']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['visible_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['visible_hour']);
+	if(isset($_POST['expiration_day'])&&isset($_POST['expiration_hour'])) $vars['expiration']=preg_replace('/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/','$3-$2-$1',$_POST['expiration_day']).' '.preg_replace('/(\d{1,2})[^\d](\d{1,2})/','$1:$2:00',$_POST['expiration_hour']);
 
-	if(strpos($pageLayout,",privatearea,")!==false) {
-		$privatearea="";
-		if(isset($_POST['private'])) {
-			foreach($_POST['private'] as $dir) {
-				$privatearea.=$dir."\n";
-				}
+	if(strpos($pageLayout,",privatearea,")!==false)
+	{
+		$vars['privatearea']="";
+		if(isset($_POST['private']))
+		{
+			foreach($_POST['private'] as $dir)
+			{
+				$vars['privatearea'].=$dir."\n";
 			}
 		}
-	else $privatearea="false";
+	}
 	
-	if(isset($_POST['idcat'])) {
-		$categorie=",";
-		foreach($_POST['idcat'] as $idcat) { $categorie.=$idcat.','; }
+	if(strpos($pageLayout,",categories,")!==false)
+	{
+		$vars['categories']=",";
+		if(isset($_POST['idcat']))
+		{
+			foreach($_POST['idcat'] as $idcat) { $vars['categories'].=$idcat.','; }
 		}
-	else $categorie="false";
+	}
 
-	isset($_POST['productcode'])?$_POST['productcode']=b3_htmlize($_POST['productcode'],false,""):$_POST['productcode']="false";
-	isset($_POST['titolo'])?$_POST['titolo']=b3_htmlize($_POST['titolo'],false,""):$_POST['titolo']="false";
-	isset($_POST['sottotitolo'])?$_POST['sottotitolo']=b3_htmlize($_POST['sottotitolo'],false,""):$_POST['sottotitolo']="false";
-	isset($_POST['anteprima'])?$_POST['anteprima']=b3_htmlize($_POST['anteprima'],false):$_POST['anteprima']="false";
-	isset($_POST['testo'])?$_POST['testo']=b3_htmlize($_POST['testo'],false):$_POST['testo']="false";
-	isset($_POST['dir'])?$_POST['dir']=b3_htmlize($_POST['dir'],false,""):$_POST['dir']="false";
-	isset($_POST['prezzo'])?$_POST['prezzo']=number_format($_POST['prezzo'],2,'.',''):$_POST['prezzo']="0";
-	isset($_POST['scontato'])?$_POST['scontato']=number_format($_POST['scontato'],2,'.',''):$_POST['scontato']="0";
-	isset($_POST['weight'])?$_POST['weight']=floatval($_POST['weight']):$_POST['weight']="0";
-	if(!isset($_POST['template'])) $_POST['template']="false";
-	if(!isset($_POST['layout'])) $_POST['layout']="false";
-	if(!isset($_POST['qta'])) $_POST['qta']=0;
-	if(!isset($_POST['online'])) $_POST['online']='y';
-	if(!isset($_POST['customfield'])) $_POST['customfield']=array();
-	if(!isset($_POST['featuredimage'])) $_POST["featuredimage"]=-1;
-	if(!isset($_POST['manufacturer'])) $_POST["manufacturer"]=-1;
-
-	$id=$kaShop->updateItem($_GET['idsitem'],$_POST['online'],$_POST['productcode'],$_POST['titolo'],$_POST['sottotitolo'],$_POST['anteprima'],$_POST['testo'],$categorie,$_POST['prezzo'],$_POST['scontato'],$date_date,$visible_date,$expiration_date,$_POST['qta'],$_POST['weight'],$_POST['layout'],$_POST['dir'],$privatearea,$_SESSION['ll'],$_POST['template'],$_POST['customfield'],$_POST['featuredimage'],$_POST['manufacturer']);
+	/* simple fields */
+	foreach(array("dir","template","layout") as $field)
+	{
+		if(isset($_POST[$field])) $vars[$field] = $_POST[$field];
+	}
+	
+	/* single line text fields */
+	foreach(array("productcode","titolo","sottotitolo") as $field)
+	{
+		if(isset($_POST[$field])) $vars[$field] = b3_htmlize($_POST[$field],false,"");
+	}
+	
+	/* multiline text fields */
+	foreach(array("testo","anteprima") as $field)
+	{
+		if(isset($_POST[$field])) $vars[$field] = b3_htmlize($_POST[$field],false,"");
+	}
+	
+	$vars['prezzo'] = isset($_POST['prezzo']) ? number_format($_POST['prezzo'],2,'.','') : 0;
+	$vars['scontato'] = isset($_POST['scontato']) ? number_format($_POST['prezzo'],2,'.','') : 0;
+	$vars['weight'] = isset($_POST['weight']) ? floatval($_POST['prezzo']) : 0;
+	$vars['qta'] = isset($_POST['qta']) ? intval($_POST['qta']) : 0;
+	$vars['online'] = !isset($_POST['online']) ? 'y' : 'n';
+	$vars['customfield'] = empty($_POST['customfield']) ? array() : $_POST['customfield'];
+	if(isset($_POST['featuredimage'])) $vars['featuredimage']=intval($_POST['featuredimage']);
+	if(isset($_POST['manufacturer'])) $vars['manufacturer']=intval($_POST['manufacturer']);
+	if(isset($_POST['photogallery'])) $vars['photogallery']=$_POST['photogallery'];
+	
+	$id=$kaShop->updateItem($_GET['idsitem'],$vars);
+	
 	if($id==false) $log="Problemi durante la modifica del database<br />";
 	else {
 		if(strpos($pageLayout,",seo,")!==false) {
@@ -682,8 +698,12 @@ else {
 			<? } ?>
 
 		<? if(strpos($pageLayout,",photogallery,")!==false) { ?>
-			<div class="box <?= count($row['imgallery'])==0?'closed':'opened'; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('Shop:Photogallery'); ?></h2>
-			<iframe src="<?php echo ADMINDIR; ?>inc/imgallery.inc.php?refid=imgallery&mediatable=<?php echo TABLE_SHOP_ITEMS; ?>&mediaid=<?php echo $row['idsitem']; ?>&label=<?= urlencode($kaTranslate->translate('Img:Insert a picture')); ?>" class="imgframe" id="imgallery"></iframe>
+			<div class="box <?= trim($row['photogallery'],",")=="" ? "closed" : "opened"; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('UI:Photogallery'); ?></h2>
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?submitlabel=<?= urlencode($kaTranslate->translate('UI:Add selected images to the list')); ?>&onsubmit=kAddImagesToPhotogallery','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('UI:Add images to gallery'); ?></a>
+				<div id="photogallery"></div>
+				<script type="text/javascript">
+					kLoadPhotogallery('<?= $row['photogallery']; ?>');
+				</script>
 			</div>
 			<? } ?>
 

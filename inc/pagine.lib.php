@@ -120,12 +120,12 @@ class kPages {
 	{
 		if(!$this->inited) $this->init();
 		
-		$vars=[
+		$vars=array(
 			'photogallery'=>false,
 			'documentgallery'=>false,
 			'comments'=>false,
 			'translations'=>false
-			];
+			);
 
 		if($from=="") $from=0;
 		if($limit=="") $limit=10;

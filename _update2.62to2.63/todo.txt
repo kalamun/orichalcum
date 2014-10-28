@@ -6,6 +6,7 @@ ALTER TABLE `k_commenti` ADD INDEX ( `tabella` , `ip` )
 ALTER TABLE `k_pagine` ADD `photogallery` TEXT NOT NULL AFTER `testo` 
 ALTER TABLE `k_news` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
 ALTER TABLE `k_shop_items` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
+ALTER TABLE `k_shop_manufacturers` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
 
 
 
