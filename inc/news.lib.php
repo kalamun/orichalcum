@@ -291,7 +291,7 @@ class kNews {
 					}
 				}
 			else {
-				$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_NEWS."' AND id='".$news['idnews']."'";
+				$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_NEWS."' AND id='".intval($news['idnews'])."'";
 				$results=mysql_query($query);
 				while($row=mysql_fetch_array($results)) {
 					$metadata[$row['param']]=$row['value'];
@@ -303,7 +303,7 @@ class kNews {
 		}
 
 	/* convert raw array from database into improved array */
-	private function row2output($row,$orderby="data DESC") {
+	private function row2output($row,$orderby="`data` DESC") {
 		$vars['photogallery']=true; // for now always true... need to be implemented
 	
 		if(!$this->inited) $this->init();
