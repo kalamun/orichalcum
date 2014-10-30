@@ -5,6 +5,10 @@ ALTER TABLE `k_metadata` ADD INDEX ( `tabella` , `id` )
 ALTER TABLE `k_commenti` ADD INDEX ( `tabella` , `ip` ) 
 ALTER TABLE `k_pagine` ADD `photogallery` TEXT NOT NULL AFTER `testo` 
 ALTER TABLE `k_news` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
+ALTER TABLE `k_photogallery` ADD `featuredimage` INT( 6 ) NOT NULL AFTER `dir` 
+ALTER TABLE `k_photogallery` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
+ALTER TABLE `k_photogallery` ADD `categories` VARCHAR( 255 ) NOT NULL AFTER `photogallery` 
+ALTER TABLE `k_photogallery` ADD `modified` DATETIME NOT NULL AFTER `data` 
 ALTER TABLE `k_shop_items` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
 ALTER TABLE `k_shop_manufacturers` ADD `photogallery` TEXT NOT NULL AFTER `featuredimage` 
 ALTER TABLE `k_users` ADD `featuredimage` INT( 6 ) NOT NULL AFTER `email` 
