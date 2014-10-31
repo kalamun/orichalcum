@@ -81,7 +81,7 @@ $comments=$kaImpostazioni->getParam('photogallery-commenti');
 
 <h3><?= $kaTranslate->translate('Setup:Fields to display in administration panel'); ?></h3>
 	<?
-	$elm=array("title"=>"Titolo","text"=>"Testo","photogallery"=>"Galleria Fotografica","template"=>"Template","layout"=>"Layout","metadata"=>"Metadata","traduzioni"=>"Traduzioni","seo"=>"SEO (Search Engine Optimization)");
+	$elm=array("title"=>"Titolo","text"=>"Testo","photogallery"=>"Galleria Fotografica","featuredimage"=>"Featured image","categories"=>"Categories","template"=>"Template","layout"=>"Layout","metadata"=>"Metadata","traduzioni"=>"Traduzioni","seo"=>"SEO (Search Engine Optimization)");
 	$elmobl=array("title"=>true,"photogallery"=>true);
 	foreach($elm as $ka=>$v) {
 		echo b3_create_input("layout[".$ka."]","checkbox",$kaTranslate->translate($v),"s","","",(strpos($layout['value1'],",".$ka.",")!==false||isset($elmobl[$ka])?'checked':'').' '.(isset($elmobl[$ka])?'disabled':''),true).'<br />';

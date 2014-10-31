@@ -523,7 +523,7 @@ else {
 					}
 					?></div>
 				<input type="hidden" name="featuredimage" id="featuredimage" value="<?= $row['featuredimage']; ?>">
-				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?limit=1&submitlabel=<?= urlencode($kaTranslate->translate('Pages:Set featured image')); ?>&onsubmit=setFeaturedImage','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('Shop:Choose featured image'); ?></a>
+				<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?limit=1&submitlabel=<?= urlencode($kaTranslate->translate('Shop:Set featured image')); ?>&onsubmit=setFeaturedImage','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('Shop:Choose featured image'); ?></a>
 				<small><a href="javascript:removeFeaturedImage();" id="removeFeaturedImage" class="warning" <? if($row['featuredimage']==0) echo 'style="display:none;"'; ?>><?= $kaTranslate->translate('UI:Delete'); ?></a></small>
 				</fieldset><br />
 			<? } ?>
@@ -692,7 +692,7 @@ else {
 		<? if(strpos($pageLayout,",categories,")!==false) { ?>
 			<div class="box closed"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('Shop:Categories'); ?></h2>
 				<div id="categorie">Loading...</div>
-				<script type="text/javascript" src="./ajax/categorie.js"></script>
+				<script type="text/javascript" src="./ajax/categorie.js" charset="UTF-8"></script>
 				<script type="text/javascript">k_reloadCat(<? echo $row['idsitem']; ?>);</script>
 				</div>
 			<? } ?>
