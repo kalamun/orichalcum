@@ -194,14 +194,14 @@ class kPages {
 	public function getCatByName($name,$ll=false) {
 		if(!$this->inited) $this->init();
 		if($ll==false) $ll=LANG;
-		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND categoria='".b3_htmlize($name,true,"")."' AND ll='".strtoupper($ll)."' LIMIT 1";
+		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND (`categoria`='".b3_htmlize($name,true,"")."' OR `categoria`='".mysql_real_escape_string($name)."') AND ll='".strtoupper($ll)."' LIMIT 1";
 		$results=mysql_query($query);
 		if($row=mysql_fetch_array($results)) return $row;
 		else return false;
 		}
 	public function getCatById($idcat) {
 		if(!$this->inited) $this->init();
-		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND idcat='".$idcat."' LIMIT 1";
+		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND idcat='".intval($idcat)."' LIMIT 1";
 		$results=mysql_query($query);
 		if($row=mysql_fetch_array($results)) return $row;
 		else return false;
