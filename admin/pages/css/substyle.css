@@ -78,3 +78,54 @@ table.tabella .sposta, #drago  .sposta {
 .alert.conversions {
 	background-color:#E8D400;
 	}
+
+.DragZone {
+	width:60%;
+	margin:0;
+	padding:5px 10px;
+	background-color:#f8f8f8;
+	list-style:none;
+	border:1px dashed transparent;
+	}
+
+.DragZone ul, #drago {
+	list-style:none;
+	padding:3px;
+	min-height:5px;
+	border:1px dashed transparent;
+	margin:0 0 0 50px;
+	}
+#drago {
+	margin:0;
+	}
+#drago li {
+	list-style:none;
+	}
+.ondrag ul {
+	border:1px dashed #ca0000;
+	}
+
+
+.DragZone .elm, #drago .elm {
+	position:relative;
+	padding:3px 15px;
+	margin:3px 0;
+	background-color:#fff;
+	border:1px solid #e8e6e4;
+	cursor:move;
+	list-style:none;
+	}
+.DragZone .elm:hover {
+	background-color:#ffc;
+	}
+
+.DragZone li span,#drago li span {
+	position:absolute;
+	top:5px;
+	right:5px;
+	}
+
+.DragZone li.empty {
+	padding:3px;
+	background-color:#e8e6e4;
+	}

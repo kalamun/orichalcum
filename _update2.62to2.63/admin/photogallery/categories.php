@@ -1,5 +1,5 @@
 <?
-define("PAGE_NAME","Shop:Categories management");
+define("PAGE_NAME","Photogalleries:Categories management");
 include_once("../inc/head.inc.php");
 include_once("../inc/categorie.lib.php");
 
@@ -37,7 +37,13 @@ elseif(isset($_POST['insert'])) {
 	}
 
 elseif(isset($_POST['update'])) {
-	$log=$kaCategorie->update($_POST['idcat'],$_POST['categoria'],$_POST['dir'],TABLE_PHOTOGALLERY);
+	$vars=array();
+	$vars['categoria']=$_POST['categoria'];
+	$vars['dir']=$_POST['dir'];
+	if(isset($_POST['photogallery'])) $vars['photogallery']=$_POST['photogallery'];
+	$vars['tabella']=TABLE_PHOTOGALLERY;
+
+	$log=$kaCategorie->update($_POST['idcat'],$vars);
 	if($log==false) {
 		echo '<div id="MsgAlert">Problemi durante la modifica della categoria</div>';
 		$kaLog->add("ERR",'Errore durante la modifica della categoria <em>'.b3_htmlize($_POST['categoria'],true,"").'</em> nel Negozio');
@@ -83,8 +89,16 @@ if(isset($_GET['idcat'])) {
 		target.setAttribute("oldvalue",target.value);
 		</script>
 	<br />
-	<label for="imgallery">Immagini</label>
-	<iframe src="<?php echo ADMINDIR; ?>inc/imgallery.inc.php?refid=imgallery&mediatable=<?php echo TABLE_CATEGORIE; ?>&mediaid=<?php echo $cat['idcat']; ?>" class="imgframe" id="imgallery"></iframe>
+
+	<div class="box <?= trim($cat['photogallery'],",")=="" ? "closed" : "opened"; ?>"><h2 onclick="kBoxSwapOpening(this.parentNode);"><?= $kaTranslate->translate('UI:Photogallery'); ?></h2>
+		<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?submitlabel=<?= urlencode($kaTranslate->translate('UI:Add selected images to the list')); ?>&onsubmit=kAddImagesToPhotogallery','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('UI:Add images to gallery'); ?></a>
+		<div id="photogallery"></div>
+		<script type="text/javascript">
+			kLoadPhotogallery('<?= $cat['photogallery']; ?>');
+		</script>
+	</div>
+	<br>
+
 	<div class="submit"><input type="button" value="Annulla" class="button" onclick="window.location='?';" /> <input type="submit" name="update" value="Salva le modifiche" class="button" /></div>
 	</form>
 	<?
@@ -179,8 +193,8 @@ else { ?>
 		<br />
 		
 		<div class="submit" id="submit">
-			<input type="submit" name="save" class="button" value="<?= $kaTranslate->translate('Shop:Save order'); ?>" />
-			<input type="submit" name="sortAZ" class="smallbutton" value="<?= $kaTranslate->translate('Shop:Sort A-Z'); ?>" />
+			<input type="submit" name="save" class="button" value="<?= $kaTranslate->translate('Photogalleries:Save order'); ?>" />
+			<input type="submit" name="sortAZ" class="smallbutton" value="<?= $kaTranslate->translate('Photogalleries:Sort A-Z'); ?>" />
 			</div>
 	</form>
 
@@ -190,12 +204,12 @@ else { ?>
 	
 	<script type="text/javascript" src="js/categorie.js"></script>
 	<table><tr>
-	<td><input type="button" class="button" value="<?= $kaTranslate->translate('Shop:New category'); ?>" onclick="showReq('nuovaCat');" /></td>
+	<td><input type="button" class="button" value="<?= $kaTranslate->translate('Photogalleries:New category'); ?>" onclick="showReq('nuovaCat');" /></td>
 	<td><div id="nuovaCat" style="display:none;">
-		<fieldset class="box"><legend><?= $kaTranslate->translate('Shop:Add a new category'); ?></legend>
+		<fieldset class="box"><legend><?= $kaTranslate->translate('Photogalleries:Add a new category'); ?></legend>
 		<form action="" method="post">
-		<div class="title"><?= b3_create_input("titolo","text",$kaTranslate->translate('Shop:Category name')."<br />","","95%",250,'autocomplete="off" onkeyup="title2url()" onblur="titleBlur()"'); ?></div>
-		<div class="URLBox"><?= b3_create_input("dir","text",$kaTranslate->translate('Shop:Category URL').": ".BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_photogallery',1).'/',(isset($copyfrom['dir'])?$copyfrom['dir'].'-'.date("Ymd"):''),"400px",64,'onkeyup="checkURL(this)"'); ?> <span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div><br />
+		<div class="title"><?= b3_create_input("titolo","text",$kaTranslate->translate('Photogalleries:Category name')."<br />","","95%",250,'autocomplete="off" onkeyup="title2url()" onblur="titleBlur()"'); ?></div>
+		<div class="URLBox"><?= b3_create_input("dir","text",$kaTranslate->translate('Photogalleries:Category URL').": ".BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_photogallery',1).'/',(isset($copyfrom['dir'])?$copyfrom['dir'].'-'.date("Ymd"):''),"400px",64,'onkeyup="checkURL(this)"'); ?> <span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div><br />
 		<div class="submit"><input type="submit" name="insert" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" /></div>
 		</form>
 		</fieldset>
