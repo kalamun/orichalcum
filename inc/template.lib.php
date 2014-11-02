@@ -3,7 +3,7 @@
 
 /* TEMPLATE */
 class kTemplate {
-	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$imgallery,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList;
+	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList;
 	public $imgDB,$docDB,$mediaDB,$pageDB,$commentDB,$config,$menuStructure,$menuByRef,$contents,$currentConversion; //contents is a temporary recipient
 	
 	public function __construct() {
@@ -26,7 +26,6 @@ class kTemplate {
 		$this->currentConversion=array();
 		$this->menuCollection='';
 		$this->menuCurrentSettings=array("sub"=>false,"recursive"=>false,"img"=>false,"ll"=>false);
-		$this->imgallery=new kImgallery();
 		if(!isset($GLOBALS['__images'])) $GLOBALS['__images']=new kImages();
 		
 		//load all categories for the current language
@@ -36,7 +35,6 @@ class kTemplate {
 		$results=mysql_query($query);
 		for($i=0;$row=mysql_fetch_array($results);$i++) {
 			$this->categories[$row['idcat']]=$row;
-			$this->categories[$row['idcat']]['imgs']=$this->imgallery->getList(TABLE_CATEGORIE,$row['idcat']);
 			$this->categories[$row['idcat']]['permalink']=BASEDIR.strtolower(LANG).'/'.$this->getVar('dir_shop',1).'/'.$row['dir'];
 			}
 		foreach($this->categories as $row) {
@@ -374,9 +372,30 @@ class kTemplate {
 		$output=array();
 		foreach($this->categories as $k=>$cat) {
 			if($cat['ref']==$refId) {
-				if(!isset($cat['imgs'])) {
-					$this->categories[$k]['imgs']=$this->imgallery->getList(TABLE_CATEGORIE,$cat['idcat']);
+				if(!isset($cat['imgs']))
+				{
+					$this->categories[$k]['imgs']=array();
+
+					if(trim($cat['photogallery'],",")!="")
+					{
+						$conditions="";
+						foreach(explode(",",trim($cat['photogallery'],",")) as $idimg)
+						{
+							$conditions.="`idimg`='".intval($idimg)."' OR ";
+						}
+						$conditions.="`idimg`='0'";
+						
+						$imgs=$GLOBALS['__images']->getList(false,false,false,$conditions);
+						
+						foreach(explode(",",trim($cat['photogallery'],",")) as $idimg)
+						{
+							foreach($imgs as $img)
+							{
+								if($img['idimg']==$idimg) $this->categories[$k]['imgs'][]=$img;
+							}
+						}
 					}
+				}
 				$output[$cat['ordine']]=$cat;
 				$output[$cat['ordine']]["childNodes"]=$this->loadSubCategories($cat['idcat']);
 				}
@@ -418,7 +437,28 @@ class kTemplate {
 			{
 				if(!isset($cat['imgs']))
 				{
-					$this->categories[$k]['imgs']=$this->imgallery->getList(TABLE_CATEGORIE,$cat['idcat']);
+					$this->categories[$k]['imgs']=array();
+					
+					if(trim($cat['photogallery'],",")!="")
+					{
+						$conditions="";
+						foreach(explode(",",trim($cat['photogallery'],",")) as $idimg)
+						{
+							$conditions.="`idimg`='".intval($idimg)."' OR ";
+						}
+						$conditions.="`idimg`='0'";
+						
+						$imgs=$GLOBALS['__images']->getList(false,false,false,$conditions);
+						
+						foreach(explode(",",trim($cat['photogallery'],",")) as $idimg)
+						{
+							foreach($imgs as $img)
+							{
+								if($img['idimg']==$idimg) $this->categories[$k]['imgs'][]=$img;
+							}
+						}
+					}
+
 					$cat['imgs']=$this->categories[$k]['imgs'];
 				}
 				return $cat;

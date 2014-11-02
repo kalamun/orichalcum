@@ -205,7 +205,7 @@ else {
 		}
 
 		
-		$vars=[];
+		$vars=array();
 		if(isset($_POST['titolo'])) $vars['title']=$_POST['titolo'];
 		if(isset($_POST['sottotitolo'])) $vars['subtitle']=$_POST['sottotitolo'];
 		if(isset($_POST['anteprima'])) $vars['preview']=$_POST['anteprima'];

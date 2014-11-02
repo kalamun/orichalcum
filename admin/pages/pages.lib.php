@@ -189,7 +189,7 @@ class kaPages {
 			$results=mysql_query($query);
 			if($page=mysql_fetch_array($results))
 			{
-				$mvars=[];
+				$mvars=array();
 				$mvars['title']=$page['titolo'];
 				$mvars['dir']=$page['dir'];
 				$mvars['idpag']=$page['idpag'];

@@ -73,7 +73,7 @@ class kPhotogallery {
 
 		// get photogallery in the correct order
 		$output['imgs']=array();
-		if($vars['photogallery']==true)
+		if($vars['photogallery']==true && trim($row['photogallery'],",")!="" )
 		{
 			$conditions="";
 			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)

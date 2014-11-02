@@ -232,6 +232,7 @@ class kPages {
 	{
 		if(!$this->inited) $this->init();
 
+		if(!isset($vars['ll'])) $vars['ll']=$_SESSION['ll'];
 		if(!isset($vars['photogallery'])) $vars['photogallery']=true;
 		if(!isset($vars['documentgallery'])) $vars['documentgallery']=true;
 		if(!isset($vars['comments'])) $vars['comments']=true;
@@ -267,7 +268,7 @@ class kPages {
 		
 		// get photogallery in the correct order
 		$output['imgs']=array();
-		if($vars['photogallery']==true)
+		if($vars['photogallery']==true && trim($row['photogallery'],",")!="" )
 		{
 			$conditions="";
 			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
@@ -310,7 +311,7 @@ class kPages {
 			}
 		}
 		
-		$output['permalink']=BASEDIR.strtolower($ll).'/'.$row['dir'];
+		$output['permalink']=BASEDIR.strtolower($vars['ll']).'/'.$row['dir'];
 
 		$output['categorie']=array();
 		if(strpos(kGetVar('admin-page-layout',1),",categories,")!==false)

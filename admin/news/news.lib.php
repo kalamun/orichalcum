@@ -232,12 +232,12 @@ class kaNews {
 
 		if(isset($vars['title'])) $vars['title']=mysql_real_escape_string($vars['title']);
 		if(isset($vars['subtitle'])) $vars['subtitle']=mysql_real_escape_string($vars['subtitle']);
-		if(isset($vars['preview'])) $vars['preview']=mysql_real_escape_string($vars['subtitle']);
-		if(isset($vars['text'])) $vars['text']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['preview'])) $vars['preview']=mysql_real_escape_string($vars['preview']);
+		if(isset($vars['text'])) $vars['text']=mysql_real_escape_string($vars['text']);
 		if(isset($vars['categories'])) $vars['categories']=mysql_real_escape_string($vars['categories']);
-		if(isset($vars['template'])) $vars['template']=mysql_real_escape_string($vars['subtitle']);
-		if(isset($vars['layout'])) $vars['layout']=mysql_real_escape_string($vars['subtitle']);
-		if(isset($vars['dir'])) $vars['dir']=mysql_real_escape_string($vars['subtitle']);
+		if(isset($vars['template'])) $vars['template']=mysql_real_escape_string($vars['template']);
+		if(isset($vars['layout'])) $vars['layout']=mysql_real_escape_string($vars['layout']);
+		if(isset($vars['dir'])) $vars['dir']=mysql_real_escape_string($vars['dir']);
 
 		$query="UPDATE ".TABLE_NEWS." SET ";
 		if(isset($vars['title'])) $query.="`titolo`='".$vars['title']."',";

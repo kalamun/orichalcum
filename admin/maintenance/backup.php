@@ -25,16 +25,18 @@ elseif(isset($_GET['backupnow'])) {
 			public function addDir($path) {
 				$this->addEmptyDir($path);
 				$nodes=glob($path.'/*');
-				foreach($nodes as $node) {
-					if(is_dir($node)) {
-						if(basename(rtrim($node,"/"))!="bkups") $this->addDir($node);
-						}
-					elseif(is_file($node)) {
-						$this->addFile($node,preg_replace("/^".preg_quote(rtrim($_SERVER['DOCUMENT_ROOT'],"/").BASEDIR,"/")."/","",$node));
+				if(!empty($nodes))
+				{
+					foreach($nodes as $node) {
+						if(is_dir($node)) {
+							if(basename(rtrim($node,"/"))!="bkups") $this->addDir($node);
+						} elseif(is_file($node)) {
+							$this->addFile($node,preg_replace("/^".preg_quote(rtrim($_SERVER['DOCUMENT_ROOT'],"/").BASEDIR,"/")."/","",$node));
 						}
 					}
 				}
 			}
+		}
 		$zip=new kZipper();
 		$filename="./bkups/".date("YmdHi").".zip";
 		if($zip->open($filename,ZipArchive::CREATE)!==TRUE) {
@@ -120,17 +122,19 @@ elseif(isset($alert)) echo '<div id="MsgAlert">'.$alert.'</div>';
 		<th>&nbsp;</th>
 		</tr>
 	<?
-	foreach(glob("bkups/*") as $file) {
-		if(trim($file,".")!="") { ?>
-			<tr>
-				<td><?= basename($file); ?></td>
-				<td class="percorso"><strong><?= date("d-m-Y H:i",filectime($file)); ?></strong></td>
-				<td><?= number_format(filesize($file)/1024/1024,2); ?>Mb</td>
-				<td><a href="<?= $file; ?>" class="smallbutton"><?= $kaTranslate->translate('Maintenance:Download'); ?></a>
-					<a href="?delete=<?= urlencode(basename($file)); ?>" class="smallalertbutton" onclick="return confirm('<?= $kaTranslate->translate('Maintenance:Do you really want to delete this backup file?'); ?>');"><?= $kaTranslate->translate('Maintenance:Delete'); ?></a></td>
-				</tr>
+	if(glob("bkups/*")) {
+		foreach(glob("bkups/*") as $file) {
+			if(trim($file,".")!="") { ?>
+				<tr>
+					<td><?= basename($file); ?></td>
+					<td class="percorso"><strong><?= date("d-m-Y H:i",filectime($file)); ?></strong></td>
+					<td><?= number_format(filesize($file)/1024/1024,2); ?>Mb</td>
+					<td><a href="<?= $file; ?>" class="smallbutton"><?= $kaTranslate->translate('Maintenance:Download'); ?></a>
+						<a href="?delete=<?= urlencode(basename($file)); ?>" class="smallalertbutton" onclick="return confirm('<?= $kaTranslate->translate('Maintenance:Do you really want to delete this backup file?'); ?>');"><?= $kaTranslate->translate('Maintenance:Delete'); ?></a></td>
+					</tr>
 			<? }
 		}
+	}
 	?>
 	</table>
 
