@@ -49,7 +49,7 @@ class kImages {
 			$row['thumbnail']=str_replace("?","%3F",$row['thumbnail']);
 			$row['thumbnail']=str_replace("@","%40",$row['thumbnail']);
 			$output[$i]['thumb']['url']=SITE_URL.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'];
-			if($output[$i]['thumbnail']!=""&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['thumbnail'])) $size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['thumbnail']);
+			if($output[$i]['thumbnail']!=""&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['thumbnail'])) $size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['thumbnail']);
 			else $size=array(0,0,0,"");
 			$output[$i]['thumb']['width']=$size[0];
 			$output[$i]['thumb']['height']=$size[1];
