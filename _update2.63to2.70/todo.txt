@@ -1,0 +1,1 @@
+remove short open tag on config.inc.php

@@ -1,4 +1,4 @@
-<?
+<?php 
 /* (c) Kalamun.org - GNU/GPL 3 */
 
 /*
@@ -301,4 +301,3 @@ class kaPrivate {
 		}
 	}
 
-?>
