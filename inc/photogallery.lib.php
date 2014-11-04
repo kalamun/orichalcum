@@ -48,8 +48,8 @@ class kPhotogallery {
 			}
 		if(isset($idphg)) {
 			$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_PHOTOGALLERY."' AND id='".$idphg."'";
-				$results=mysql_query($query);
-					while($row=mysql_fetch_array($results)) {
+			$results=mysql_query($query);
+			while($row=mysql_fetch_array($results)) {
 				$metadata[$row['param']]=$row['value'];
 				}
 			}
@@ -104,7 +104,27 @@ class kPhotogallery {
 		}
 
 		$output['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
-		$output['imgs']=$this->imgallery->getList(TABLE_PHOTOGALLERY,$row['idphg']);
+		// get photogallery in the correct order
+		$output['imgs']=array();
+		if(trim($row['photogallery'],",")!="" )
+		{
+			$conditions="";
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				$conditions.="`idimg`='".intval($idimg)."' OR ";
+			}
+			$conditions.="`idimg`='0'";
+			
+			$imgs=$this->imgs->getList(false,false,false,$conditions);
+			
+			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+			{
+				foreach($imgs as $img)
+				{
+					if($img['idimg']==$idimg) $output['imgs'][]=$img;
+				}
+			}
+		}
 		$output['commenti']=$this->getComments($row['idphg']);
 		return $output;
 		}
@@ -121,7 +141,27 @@ class kPhotogallery {
 			$id=count($output);
 			$output[$id]=$row;
 			$output[$id]['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
-			$output[$id]['imgs']=$this->imgallery->getList(TABLE_PHOTOGALLERY,$row['idphg']);
+			// get photogallery in the correct order
+			$output[$id]['imgs']=array();
+			if(trim($row['photogallery'],",")!="" )
+			{
+				$conditions="";
+				foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+				{
+					$conditions.="`idimg`='".intval($idimg)."' OR ";
+				}
+				$conditions.="`idimg`='0'";
+				
+				$imgs=$this->imgs->getList(false,false,false,$conditions);
+				
+				foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+				{
+					foreach($imgs as $img)
+					{
+						if($img['idimg']==$idimg) $output[$id]['imgs'][]=$img;
+					}
+				}
+			}
 			$output[$id]['commenti']=$this->getComments($row['idphg']);
 
 			if($row['featuredimage']==0) $output[$id]['featuredimage']=false;
