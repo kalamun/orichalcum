@@ -90,8 +90,6 @@ if(isset($_GET['iduser'])) {
 			}
 		function checkUsername(field) {
 			var target=document.getElementById('n_username')
-			//cancello i caratteri non ammessi
-			target.value=target.value.replace(/[^\w^\/]+/g,"-");
 			//controllo maiuscole
 			if(typeof(ajaxTimer)!=='undefined') clearTimeout(ajaxTimer);
 			t=setTimeout("b3_ajaxSend('post','ajax/checkUsername.php','username="+escape(field.value)+"',markUsernamefield);",500);

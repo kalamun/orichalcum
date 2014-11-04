@@ -1390,6 +1390,9 @@ function kGetMemberName() {
 function kGetMemberEmail() {
 	return $GLOBALS['__members']->getVar('email');
 	}
+function kGetMemberAffiliation() {
+	return $GLOBALS['__members']->getVar('affiliation');
+	}
 function kGetMemberPhotogallery() {
 	return $GLOBALS['__members']->getVar('imgs');
 	}
@@ -1402,6 +1405,9 @@ function kGetMemberMetadata($param) {
 function kMemberRegister($username,$password=false,$name,$email,$affiliation="",$expire=false) {
 	if($expire==false) $expire="0000-00-00 00:00:00";
 	return $GLOBALS['__members']->register($username,$password,$name,$email,$affiliation,$expire);
+	}
+function kMemberReplaceData($username,$param,$value,$affiliation=false) {
+	return $GLOBALS['__members']->replaceVar($username,$param,$value,$affiliation);
 	}
 function kMemberReplaceMetadata($username,$param,$value,$affiliation=false) {
 	return $GLOBALS['__members']->replaceMetadata($username,$param,$value,$affiliation);
