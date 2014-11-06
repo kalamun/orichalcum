@@ -225,12 +225,18 @@ else {
 			if(isset($_POST['allowconversions'])) $vars['allowconversions']='s';
 			else $vars['allowconversions']='n';
 		}
+
+		if(isset($_POST['seo_robots'])) $_POST['seo_robots']=implode(",",$_POST['seo_robots']);
 		if(strpos($pageLayout,",seo,")!==false)
 		{
-			if(isset($_POST['seo_robots'])) $vars['seo_robots']=implode(",",$_POST['seo_robots']);
-			else $vars['seo_robots']="";
+			foreach($_POST as $k => $v)
+			{
+				if(substr($k,0,4) == "seo_")
+				{
+					$vars[$k]=$v;
+				}
+			}
 		}
-		if(isset($_POST['seo_priority'])) $vars['seo_priority']=$_POST['seo_priority'];
 		if(isset($_POST['offline'])) $vars['offline']='s';
 
 		$log=$kaPages->update($_GET['idpag'],$vars);
