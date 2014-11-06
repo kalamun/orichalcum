@@ -238,6 +238,7 @@ class kaNews {
 		if(isset($vars['template'])) $vars['template']=mysql_real_escape_string($vars['template']);
 		if(isset($vars['layout'])) $vars['layout']=mysql_real_escape_string($vars['layout']);
 		if(isset($vars['dir'])) $vars['dir']=mysql_real_escape_string($vars['dir']);
+		if(isset($vars['calendar'])) $vars['calendar']= $vars['calendar']=='s' ? 's' : 'n';
 
 		$query="UPDATE ".TABLE_NEWS." SET ";
 		if(isset($vars['title'])) $query.="`titolo`='".$vars['title']."',";
@@ -253,7 +254,7 @@ class kaNews {
 		if(isset($vars['layout'])) $query.="`layout`='".$vars['layout']."',";
 		if(isset($vars['dir'])) $query.="`dir`='".$vars['dir']."',";
 		if(isset($vars['home'])) $query.="`home`='".$vars['home']."',";
-		if(isset($vars['calendar'])) $query.="`calendar`='".$vars['calendar']."',";
+		if(isset($vars['calendar'])) $query.="`calendario`='".$vars['calendar']."',";
 		if(isset($vars['iduser'])) $query.="`iduser`='".$vars['iduser']."',";
 		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".$vars['featuredimage']."',";
 		if(isset($vars['photogallery'])) $query.="`photogallery`='".$vars['photogallery']."',";
