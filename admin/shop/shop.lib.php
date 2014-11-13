@@ -169,7 +169,7 @@ class kaShop {
 		
 		foreach(array("productcode","titolo","sottotitolo","anteprima","testo","template","layout","dir","privatearea") as $field)
 		{
-			if(isset($vars[$field])) $vars['field']=mysql_real_escape_string($vars[$field]);
+			if(isset($vars[$field])) $vars[$field]=mysql_real_escape_string($vars[$field]);
 		}
 		
 		if(isset($vars['online']) && $vars['online']!="y") $vars['online']='n';

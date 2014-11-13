@@ -103,7 +103,7 @@ if(isset($_POST['update'])&&isset($_GET['idsitem'])) {
 	/* multiline text fields */
 	foreach(array("testo","anteprima") as $field)
 	{
-		if(isset($_POST[$field])) $vars[$field] = b3_htmlize($_POST[$field],false,"");
+		if(isset($_POST[$field])) $vars[$field] = b3_htmlize($_POST[$field],false);
 	}
 	
 	$vars['prezzo'] = isset($_POST['prezzo']) ? number_format($_POST['prezzo'],2,'.','') : 0;
