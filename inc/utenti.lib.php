@@ -152,9 +152,48 @@ class kMembers {
 			}
 		return false;
 		}
+	
+	/* replace a column of the database */
+	public function replaceVar($username,$param,$value,$affiliation=false)
+	{
+		if(!$this->inited) $this->init();
+		
+		// validate param
+		$param=strtolower($param);
+		if($param!="name" &&
+			$param!="email" &&
+			$param!="username" &&
+			$param!="password" &&
+			$param!="affiliation" &&
+			$param!="expiration" &&
+			$param!="status") return false;
+		
+		// get member if it exists
+		$query="SELECT * FROM `".TABLE_MEMBERS."` WHERE (`username`='".b3_htmlize($username,true,"")."' OR `username`='".mysql_real_escape_string($username)."') AND ";
+		if($affiliation!=false) $query.=" `affiliation`='".b3_htmlize($affiliation,true,"")."' AND ";
+		$query.=" `status`<>'del' LIMIT 1";
+		$results=mysql_query($query);
+		$row=mysql_fetch_array($results);
+		if(isset($row['idmember']))
+		{
+			// validate email
+			if($param=='email')
+			{
+				if(!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/',$value)) return false;
+			} elseif($param=='affiliation') {
+				$param=b3_htmlize($param,false,"");
+			}
+			
+			$query="UPDATE ".TABLE_MEMBERS." SET `".mysql_real_escape_string($param)."`='".mysql_real_escape_string($value)."' WHERE `idmember`='".intval($row['idmember'])."' LIMIT 1";
+			if(mysql_query($query)) return true;
+			return false;
+		}
+		return false;
+	}
+
 	public function replaceMetadata($username,$param,$value,$affiliation=false) {
 		if(!$this->inited) $this->init();
-		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE `username`='".b3_htmlize($username,true,"")."' AND ";
+		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE (`username`='".b3_htmlize($username,true,"")."' OR `username`='".mysql_real_escape_string($username)."') AND ";
 		if($affiliation!=false) $query.=" `affiliation`='".b3_htmlize($affiliation,true,"")."' AND ";
 		$query.=" status<>'del' LIMIT 1";
 		$results=mysql_query($query);
@@ -165,13 +204,15 @@ class kMembers {
 			if($row2=mysql_fetch_array($results2)) {
 				$query3="UPDATE ".TABLE_METADATA." SET `value`='".b3_htmlize($value,true,"")."' WHERE `tabella`='".TABLE_MEMBERS."' AND `id`='".$row['idmember']."' AND `param`='".b3_htmlize($param,true,"")."' LIMIT 1";
 				$results3=mysql_query($query3);
-				if($results3) return mysql_insert_id();
+				if($results3) $id=mysql_insert_id();
 				}
 			else {
 				$query3="INSERT INTO ".TABLE_METADATA." (`tabella`,`id`,`param`,`value`) VALUES('".TABLE_MEMBERS."','".$row['idmember']."','".b3_htmlize($param,true,"")."','".b3_htmlize($value,true,"")."')";
 				$results3=mysql_query($query3);
-				if($results3) return mysql_insert_id();
+				if($results3) $id=mysql_insert_id();
 				}
+			$_SESSION['member']['metadata'][$param]=$value;
+			return $id;
 			}
 		return false;		
 		}

@@ -149,7 +149,7 @@ class kaPages {
 			}
 
 		//copy contents from another page
-		if(isset($vars['copyfrom']))
+		if(isset($vars['copyfrom']) && is_numeric($vars['copyfrom']))
 		{
 			$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `idpag`=".mysql_real_escape_string($vars['copyfrom'])." LIMIT 1";
 			$results=mysql_query($query);
@@ -207,8 +207,6 @@ class kaPages {
 
 	public function update($idpag,$vars)
 	{
-		$offline='n';
-
 		if(empty($vars['categories'])) $vars['categories']=",";
 		
 		//modifico o inserisco il record

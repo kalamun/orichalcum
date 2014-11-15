@@ -130,7 +130,13 @@ class kaNews {
 			if(!isset($values['template'])) $values['template']="";
 			if(!isset($values['layout'])) $values['layout']="";
 			if(!isset($values['translations'])) $values['translations']="";
-			if(!isset($values['categories'])) $values['categories']="";
+			if(empty($values['categories']))
+			{
+				//if no categories are specified, choose the first one
+				$kaCategorie=new kaCategorie();
+				$cats=$kaCategorie->getList(TABLE_NEWS);
+				$values['categories']=",".$cats[0]['idcat'].",";
+			}
 			if(!isset($values['dir'])) $values['dir']="";
 			if(!isset($values['home'])) $values['home']="";
 			if(!isset($values['calendar'])) $values['calendar']="";

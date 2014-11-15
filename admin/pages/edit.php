@@ -217,13 +217,11 @@ else {
 		if(isset($_POST['featuredimage'])) $vars['featuredimage']=$_POST['featuredimage'];
 		if($kaImpostazioni->getVar('pages-commenti',1)=='s')
 		{
-			if(isset($vars['allowcomments'])) $vars['allowconversions']='s';
-			else $vars['allowconversions']='n';
+			$vars['allowcomments']=isset($_POST['allowcomments']) ? 's' : 'n';
 		}
 		if(strpos($pageLayout,",conversion,")!==false)
 		{
-			if(isset($_POST['allowconversions'])) $vars['allowconversions']='s';
-			else $vars['allowconversions']='n';
+			$vars['allowconversions']=isset($_POST['allowconversions']) ? 1 : 0;
 		}
 
 		if(isset($_POST['seo_robots'])) $_POST['seo_robots']=implode(",",$_POST['seo_robots']);
@@ -237,7 +235,7 @@ else {
 				}
 			}
 		}
-		if(isset($_POST['offline'])) $vars['offline']='s';
+		$vars['offline']= isset($_POST['offline']) ? 's' : 'n';
 
 		$log=$kaPages->update($_GET['idpag'],$vars);
 		

@@ -100,8 +100,6 @@ if(isset($_GET['idmember'])) {
 			}
 		function checkUsername(field) {
 			var target=document.getElementById('m_username')
-			//cancello i caratteri non ammessi
-			target.value=target.value.replace(/[^\w^\/]+/g,"-");
 			//controllo maiuscole
 			if(target.value==target.value.replace(/[A-Z]+/g,"")) document.getElementById('maiuscole').style.display='none';
 			else document.getElementById('maiuscole').style.display='block';

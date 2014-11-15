@@ -61,7 +61,7 @@ if(isset($_POST['save'])) {
 	if(!isset($_POST['dir'])||$_POST['dir']==""||$_POST['dir']=="-.html") $_POST['dir']=rand(10,999999);
 	if(strlen($_POST['dir'])>64) $_POST['dir']=substr(str_replace(".html","",$_POST['dir']),0,64).".html";
 
-	$vars=[
+	$vars=array(
 		"idcat"=>$_POST['idcat'],
 		"title"=>$_POST['titolo'],
 		"categories"=>$categories,
@@ -69,9 +69,9 @@ if(isset($_POST['save'])) {
 		"translation_id"=>$_POST['translation_id'],
 		"copyfrom"=>$_POST['copyfrom'],
 		"addtomenu"=>$_POST['addtomenu']
-		];
+		);
 	$log=$kaPages->add($vars);
-
+print_r($log);
 
 	if(!is_numeric($log))
 	{

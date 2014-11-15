@@ -111,7 +111,7 @@ if(isset($_POST['update'])&&isset($_GET['idsitem'])) {
 	$vars['weight'] = isset($_POST['weight']) ? floatval($_POST['prezzo']) : 0;
 	$vars['qta'] = isset($_POST['qta']) ? intval($_POST['qta']) : 0;
 	$vars['online'] = !isset($_POST['online']) ? 'y' : 'n';
-	$vars['customfield'] = empty($_POST['customfield']) ? array() : $_POST['customfield'];
+	$vars['customfields'] = empty($_POST['customfield']) ? array() : $_POST['customfield'];
 	if(isset($_POST['featuredimage'])) $vars['featuredimage']=intval($_POST['featuredimage']);
 	if(isset($_POST['manufacturer'])) $vars['manufacturer']=intval($_POST['manufacturer']);
 	if(isset($_POST['photogallery'])) $vars['photogallery']=$_POST['photogallery'];
