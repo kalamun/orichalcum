@@ -46,7 +46,7 @@ class kShop {
 		while($row=mysql_fetch_array($results)) {
 			$row['categoria']=mb_convert_encoding($row['categoria'],"UTF-8");
 			$this->allthecats[$row['idcat']]=$row;
-			$this->allthecats[$row['idcat']]['permalink']=BASEDIR.strtolower(LANG).'/'.$__template->getVar('dir_shop',1).'/'.$row['dir'];
+			$this->allthecats[$row['idcat']]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$__template->getVar('dir_shop',1).'/'.$row['dir'];
 			$this->allthecats[$row['idcat']]['imgs']=$this->imgallery->getList(TABLE_CATEGORIE,$row['idcat']);
 			if($tmp=="*") $this->allowedcats[$row['idcat']]=true;
 			if(array_search($row['idcat'],$this->allowedcats)!==false) $this->cats[$row['idcat']]=true;
@@ -556,7 +556,7 @@ class kShop {
 			}
 		unset($allowedCategories);
 
-		return BASEDIR.strtolower($row['ll']).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
+		return BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
 		}
 
 	public function getCatByDir($dir) {
@@ -615,8 +615,8 @@ class kShop {
 				}
 			}
 		if($subdir==""&&isset($output['categories'][0])) $subdir=$output['categories'][0]['dir'];
-		$output['permalink']=BASEDIR.strtolower($vars['ll']).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
-		$output['catpermalink']=BASEDIR.strtolower($vars['ll']).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir;
+		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI($vars['ll']).$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir.'/'.$row['dir'];
+		$output['catpermalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI($vars['ll']).$GLOBALS['__template']->getVar('dir_shop',1).'/'.$subdir;
 		$kText=new kText();
 		$output['testo']=$row['testo'];
 		$output['embeddedimgs']=array();
@@ -1875,7 +1875,7 @@ class kShop {
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
 
-		return BASEDIR.strtolower($row['ll']).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$GLOBALS['__template']->getVar('dir_shop_manufacturers',1).'/'.$row['dir'];
+		return BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$GLOBALS['__template']->getVar('dir_shop',1).'/'.$GLOBALS['__template']->getVar('dir_shop_manufacturers',1).'/'.$row['dir'];
 	}
 	
 	public function getManufacturerVar($param)
@@ -1915,7 +1915,7 @@ class kShop {
 		
 		$output=$row;
 		
-		$output['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_shop',1).'/'.$GLOBALS['__template']->getVar('dir_shop_manufacturers',1).'/'.$row['dir'];
+		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$GLOBALS['__template']->getVar('dir_shop',1).'/'.$GLOBALS['__template']->getVar('dir_shop_manufacturers',1).'/'.$row['dir'];
 
 		$kText=new kText();
 		$output['embeddedimgs']=array();

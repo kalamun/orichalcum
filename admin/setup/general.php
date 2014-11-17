@@ -12,10 +12,13 @@ if(isset($_POST['update'])) {
 		$kaImpostazioni->setParam('seo_'.$ka,b3_htmlize($v,false,""),"");
 		}
 
+	$_POST['short_permalink_default_lang'][1] = isset($_POST['short_permalink_default_lang'][1]) ? "true" : "false";
+	
 	$kaImpostazioni->setParam('sitename',b3_htmlize($_POST['sitename'][1],false,""),b3_htmlize($_POST['sitename'][2],false,""),$_SESSION['ll']);
 	$kaImpostazioni->setParam('footer',b3_htmlize($_POST['footer'][1],false),b3_htmlize($_POST['footer'][2],false,""),$_SESSION['ll']);
 	$kaImpostazioni->setParam('timezone',$_POST['timezone'][1],$_POST['timezone'][2],$_SESSION['ll']);
 	$kaImpostazioni->setParam('captcha',$_POST['captcha']['public'],$_POST['captcha']['private'],"*");
+	$kaImpostazioni->setParam('short_permalink_default_lang',$_POST['short_permalink_default_lang'][1],'',"*");
 
 	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Setup:Successfully saved').'</div>';
 	$kaLog->add("UPD",'Setup: Changed some general settings');
@@ -51,6 +54,12 @@ $captcha=$kaImpostazioni->getParam('captcha',$_SESSION['ll']);
 			<br />
 			<?= b3_create_input("footer[2]","text",$kaTranslate->translate('Setup:Copyright')." ",b3_lmthize($footer['value2'],"input"),"500px",250); ?><br />
 			<br /><br /><br />
+		</td></tr>
+
+		<tr><td><h2><?= $kaTranslate->translate('Setup:Permalink'); ?></h2></td>
+		<td>
+			<?= b3_create_input("short_permalink_default_lang[1]","checkbox",$kaTranslate->translate('SEO:Short permalink for default language'),'true','','',($kaImpostazioni->getVar('short_permalink_default_lang',1,"*")=="true"?'checked':'')); ?> <small><?= $kaTranslate->translate('Setup:eg').': /'.strtolower(DEFAULT_LANG).'/index.html '.$kaTranslate->translate('Setup:became').' /index.html'; ?></small>
+			<br><br>
 		</td></tr>
 		
 		<tr><td><h2><?= $kaTranslate->translate('Setup:Timezone'); ?></h2></td>

@@ -1,6 +1,7 @@
 <?php 
 /* (c) Kalamun.org - GPL 3 */
-/*autorilevamento lingua*/
+
+/* autodetect current language */
 require($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/inc/connect.inc.php');
 
 function kDetectLang() {
@@ -22,22 +23,32 @@ function kDetectLang() {
 	return strtoupper(DEFAULT_LANG);
 	}
 
-if(isset($_GET['lang'])&&$_GET['lang']!="") {
+// if language is set by URL (eg. /en/)
+if(isset($_GET['lang']) && $_GET['lang']!="") {
 	define("LANG",strtoupper($_GET['lang']));
-	if(!headers_sent()) {
+	if(!headers_sent())
+	{
 		setcookie("lang",LANG,0,"/");
 		$_COOKIE['lang']=LANG;
-		}
-	}
-elseif(isset($_COOKIE['lang'])) define("LANG",$_COOKIE['lang']);
-else {
-	define("LANG",kDetectLang());
-	if(!headers_sent()) {
-		setcookie("lang",LANG,0,"/");
-		$_COOKIE['lang']=LANG;
-		}
 	}
 
+// if language is set by cookie
+} elseif(isset($_COOKIE['lang'])) {
+	// if short permalink for default language is active, prevent to detect when no specified
+	if(kGetVar('short_permalink_default_lang',1,"*")=="true") define("LANG",DEFAULT_LANG);
+	else define("LANG",$_COOKIE['lang']);
+
+// if language is not set, auto-detect it
+} else {
+	define("LANG",kDetectLang());
+	if(!headers_sent())
+	{
+		setcookie("lang",LANG,0,"/");
+		$_COOKIE['lang']=LANG;
+	}
+}
+
+// set locale to current language
 $query="SELECT * FROM `".TABLE_LINGUE."` WHERE `online`='s' AND `ll`='".mysql_real_escape_string(LANG)."' LIMIT 1";
 $results=mysql_query($query);
 $row=mysql_fetch_array($results);

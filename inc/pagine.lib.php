@@ -84,7 +84,7 @@ class kPages {
 		while($row=mysql_fetch_array($results)) {
 			$output[]=array(
 				"title"=>$row['titolo'],
-				"permalink"=>BASEDIR.strtolower(LANG).'/'.$row['dir'],
+				"permalink"=>BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$row['dir'],
 				"excerpt"=>$row['anteprima']
 				);
 			}
@@ -187,7 +187,7 @@ class kPages {
 		$query="SELECT `ll`,`dir` FROM `".TABLE_PAGINE."` WHERE `idpag`='".intval($idpag)."' LIMIT 1";
 		$results=mysql_query($query);
 		$row=mysql_fetch_array($results);
-		return BASEDIR.strtolower($row['ll']).'/'.$row['dir'];
+		return BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$row['dir'];
 		}
 
 	public function getCatByName($name,$ll=false) {
@@ -310,7 +310,7 @@ class kPages {
 			}
 		}
 		
-		$output['permalink']=BASEDIR.strtolower($vars['ll']).'/'.$row['dir'];
+		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI($vars['ll']).$row['dir'];
 
 		$output['categorie']=array();
 		if(strpos(kGetVar('admin-page-layout',1),",categories,")!==false)

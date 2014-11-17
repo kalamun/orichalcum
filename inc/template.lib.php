@@ -2,7 +2,7 @@
 
 /* TEMPLATE */
 class kTemplate {
-	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList;
+	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList,$llurl;
 	public $imgDB,$docDB,$mediaDB,$pageDB,$commentDB,$config,$menuStructure,$menuByRef,$contents,$currentConversion; //contents is a temporary recipient
 	
 	public function __construct() {
@@ -13,9 +13,14 @@ class kTemplate {
 		$this->config=array();
 		$query="SELECT * FROM `".TABLE_CONFIG."` WHERE `ll`='*' OR `ll`='**' OR `ll`='".LANG."'";
 		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		while($row=mysql_fetch_array($results))
+		{
 			$this->config[$row['param']]=$row;
-			}
+		}
+
+		// prevent language indication in URLs for default language if this option is turned on in Settings > General Settings
+		$this->llurl=strtolower(LANG)."/";
+		if(LANG==DEFAULT_LANG && $this->getVar('short_permalink_default_lang',1,'*')=="true") $this->llurl="";
 		
 		//load default template
 		$this->tpl=$this->isMobile()?$this->getVar('template_default',2):$this->getVar('template_default',1);
@@ -32,42 +37,58 @@ class kTemplate {
 		$this->categoriesStructure=array(); //structure of nested categories, key is order
 		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `ll`='".LANG."' ORDER BY `ordine`";
 		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		for($i=0;$row=mysql_fetch_array($results);$i++)
+		{
 			$this->categories[$row['idcat']]=$row;
-			$this->categories[$row['idcat']]['permalink']=BASEDIR.strtolower(LANG).'/'.$this->getVar('dir_shop',1).'/'.$row['dir'];
-			}
-		foreach($this->categories as $row) {
-			if($row['ref']==0) {
+			$this->categories[$row['idcat']]['permalink']=BASEDIR.$this->llurl.$this->getVar('dir_shop',1).'/'.$row['dir'];
+		}
+
+		foreach($this->categories as $row)
+		{
+			if($row['ref']==0)
+			{
 				$this->categoriesStructure[$row['tabella']][$row['ordine']]=$row;
 				$this->categoriesStructure[$row['tabella']][$row['ordine']]["childNodes"]=$this->loadSubCategories($row['idcat']);
-				}
 			}
+		}
 
 		//load dictionary terms for the current language
 		$this->dizionario=array();
 		$query="SELECT * FROM `".TABLE_DIZIONARIO."` WHERE `ll`='".LANG."'";
 		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		for($i=0;$row=mysql_fetch_array($results);$i++)
+		{
 			$this->dizionario[$i]=array();
 			$this->dizionario[$i]['param']=$row['param'];
 			$this->dizionario[$i]['testo']=$row['testo'];
-			}
 		}
+	}
 	
 	/* return specific value from config db table */
-	public function getVar($param,$value=1,$ll=false) {
+	public function getVar($param,$value=1,$ll=false)
+	{
 		if($ll==false) $ll=LANG;
 		if($value!=2) $value=1;
-		if(trim($ll,'*')==""||$ll==LANG&&isset($this->config[$param]['value'.$value])) {
+		if(trim($ll,'*')==""||$ll==LANG&&isset($this->config[$param]['value'.$value]))
+		{
+			if(!isset($this->config[$param]['value'.$value])) $this->config[$param]['value'.$value]="";
 			return $this->config[$param]['value'.$value];
-			}
-		else {
+		} else {
 			$query="SELECT `value".$value."` FROM ".TABLE_CONFIG." WHERE param='".mysql_real_escape_string($param)."' AND ll='".mysql_real_escape_string($ll)."' LIMIT 1";
 				$results=mysql_query($query);
 					$row=mysql_fetch_array($results);
 			return $row['value'.$value];
-			}
 		}
+	}
+	
+	public function getLanguageURI($ll="")
+	{
+		$ll=trim($ll,"/ ");
+		$ll=strtolower($ll);
+		if($ll=="" || $ll==strtolower(LANG)) return $this->llurl;
+		else return $ll."/";
+	}
+
 	public function setTemplate($tpl) {
 		if($tpl!="") $this->tpl=$tpl;
 		}
@@ -140,6 +161,10 @@ class kTemplate {
 		$this->menuContents=array();
 		$this->menuByRef=array();
 		if($ll==false) $ll=LANG;
+
+		// prevent language indication in URLs for default language if this option is turned on in Settings > General Settings
+		$llurl=strtolower($ll)."/";
+		if($ll==DEFAULT_LANG && $this->getVar('short_permalink_default_lang',1,'*')=="true") $llurl="";
 		
 		/* get all menu's metadata */
 		$meta=array();
@@ -158,7 +183,7 @@ class kTemplate {
 			$this->menuContents[$row['idmenu']]['href']="";
 			if($row['url']!="") {
 				if(preg_match("/^https?:\/\/.*/",$this->menuContents[$row['idmenu']]['url'])) $this->menuContents[$row['idmenu']]['href']=$this->menuContents[$row['idmenu']]['url'];
-				else $this->menuContents[$row['idmenu']]['href']=BASEDIR.strtolower(LANG).'/'.$this->menuContents[$row['idmenu']]['url'];
+				else $this->menuContents[$row['idmenu']]['href']=BASEDIR.$llurl.$this->menuContents[$row['idmenu']]['url'];
 				}
 			$this->menuContents[$row['idmenu']]['photogallery']=array();
 			foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
@@ -235,7 +260,7 @@ class kTemplate {
 			if(rtrim($row['url'],"/")==$page || rtrim($row['url'],"/")==b3_htmlize($page,true,"")) return true;
 			}
 		else {
-			$page=substr(rtrim(urldecode($_SERVER['REQUEST_URI']),"/"),(strlen(BASEDIR)+3));
+			$page=substr(rtrim(urldecode($_SERVER['REQUEST_URI']),"/"),(strlen(BASEDIR)+strlen($this->getLanguageURI(LANG))));
 			if(
 				rtrim($row['url'],"/")==$page ||
 				rtrim($row['url'],"/")==b3_htmlize($page,true,"") ||
@@ -303,12 +328,12 @@ class kTemplate {
 			$output="<ul>";
 			foreach($this->menuCrumbs as $c) {
 				$output.="<li>";
-				$output.='<a href="'.BASEDIR.strtolower(LANG).'/'.$this->menuContents[$c]['url'].'">'.$this->menuContents[$c]['label'].'</a>';
+				$output.='<a href="'.BASEDIR.$this->getLanguageURI(LANG).$this->menuContents[$c]['url'].'">'.$this->menuContents[$c]['label'].'</a>';
 				$output.="</li>";
 				}
 			if($this->menuSelected!=false) {
 				$output.="<li>";
-				$output.='<a href="'.BASEDIR.strtolower(LANG).'/'.$this->menuContents[$this->menuSelected]['url'].'">'.$this->menuContents[$this->menuSelected]['label'].'</a>';
+				$output.='<a href="'.BASEDIR.$this->getLanguageURI(LANG).$this->menuContents[$this->menuSelected]['url'].'">'.$this->menuContents[$this->menuSelected]['label'].'</a>';
 				$output.="</li>";
 				}
 			$output.="</ul>";
@@ -324,8 +349,12 @@ class kTemplate {
 		$results=mysql_query($query);
 		while($row=mysql_fetch_array($results)) {
 			$output[$row['ll']]=$row;
-			if(!isset($translations[$row['ll']])||trim($translations[$row['ll']]," /.")=="") $output[$row['ll']]['url']=BASEDIR.strtolower($row['ll']).'/';
+			if(!isset($translations[$row['ll']]) || trim($translations[$row['ll']]," /.")=="") $output[$row['ll']]['url']=BASEDIR.strtolower($row['ll']).'/';
 			else $output[$row['ll']]['url']=$translations[$row['ll']];
+
+			// prevent language indication in URLs for default language if this option is turned on in Settings > General Settings
+			if($row['ll']==DEFAULT_LANG && $this->getVar('short_permalink_default_lang',1,'*')=="true") $output[$row['ll']]['url']=str_replace("/".strtolower(DEFAULT_LANG)."/", "/", $output[$row['ll']]['url']);
+			
 			$icon=BASEDIR.DIR_TEMPLATE.$this->tpl.'/lang/'.$row['code'].'.png';
 			if(!file_exists($_SERVER['DOCUMENT_ROOT'].$icon)) {
 				$icon=BASEDIR.'img/lang/'.strtolower($row['ll']).'.gif';
@@ -600,7 +629,7 @@ class kTemplate {
 
 	public function isHome() {
 		$url=rtrim(implode("/",$GLOBALS['url']),"/");
-		if($url==$this->getVar('home_page',1)) return true;
+		if($url=="" || $url==$this->getVar('home_page',1)) return true;
 		else return false;
 		}
 	public function isNews() {

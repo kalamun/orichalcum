@@ -103,7 +103,7 @@ class kPhotogallery {
 			}
 		}
 
-		$output['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
+		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
 		// get photogallery in the correct order
 		$output['imgs']=array();
 		if(trim($row['photogallery'],",")!="" )
@@ -140,7 +140,7 @@ class kPhotogallery {
 		while($row=mysql_fetch_array($results)) {
 			$id=count($output);
 			$output[$id]=$row;
-			$output[$id]['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
+			$output[$id]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
 			// get photogallery in the correct order
 			$output[$id]['imgs']=array();
 			if(trim($row['photogallery'],",")!="" )

@@ -1,4 +1,5 @@
-<?php /* (c) Kalamun.org - GNU/GPL 3 */
+<?php
+/* (c) Kalamun.org - GNU/GPL 3 */
 
 /* generic */
 function kInitBettino($dir=false) {
@@ -89,13 +90,13 @@ function kGetBaseDir() {
 	return BASEDIR;
 	}
 function kGetBasePath() {
-	return $_SESSION['DOCUMENT_ROOT'].BASEDIR;
+	return $_SERVER['DOCUMENT_ROOT'].BASEDIR;
 	}
 function kGetCurrentLanguageDir() {
 	return BASEDIR.strtolower(LANG).'/';
 	}
 function kGetCurrentLanguagePath() {
-	return $_SESSION['DOCUMENT_ROOT'].BASEDIR.strtolower(LANG).'/';
+	return $_SERVER['DOCUMENT_ROOT'].BASEDIR.strtolower(LANG).'/';
 	}
 function kGetTemplateDir($basedir=false) {
 	if($basedir==false) $basedir=BASEDIR;
@@ -115,6 +116,9 @@ function kGetSearchDir($basedir=false) {
 	}
 function kGetLanguage() {
 	return LANG;
+	}
+function kGetLanguageURI() {
+	return $GLOBALS['__template']->getLanguageURI(LANG);
 	}
 function kTranslate($param,$ll=false) {
 	$args=func_get_args();

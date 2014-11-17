@@ -49,7 +49,7 @@ class kNews {
 		$results=mysql_query($query);
 		while($row=mysql_fetch_array($results)) {
 			$this->categoriesList[$row['ordine']]=$row;
-			$this->categoriesList[$row['ordine']]['permalink']=BASEDIR.strtolower(LANG).'/'.$this->dir_news.'/'.$row['dir'];
+			$this->categoriesList[$row['ordine']]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$row['dir'];
 			$this->categoriesList[$row['ordine']]['imgs']=$GLOBALS['__images_gallery']->getList(TABLE_CATEGORIE,$row['idcat']);
 			$this->categoriesList[$row['ordine']]['metadata']=isset($meta[$row['idcat']])?$meta[$row['idcat']]:array();
 			if($allowedCategories=="*") $this->allowedCategories[$row['idcat']]=true;
@@ -92,7 +92,7 @@ class kNews {
 
 			$output[]=array(
 				"title"=>$row['titolo'],
-				"permalink"=>BASEDIR.strtolower(LANG).'/'.$this->dir_news.'/'.$subdir.'/'.$row['dir'],
+				"permalink"=>BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$subdir.'/'.$row['dir'],
 				"excerpt"=>$row['anteprima']
 				);
 			}
@@ -152,7 +152,7 @@ class kNews {
 				"idcat"=>false,
 				"categoria"=>strftime($dateformat,mktime(0,0,0,substr($dir,5,2),$dd,substr($dir,0,4))),
 				"dir"=>$dir,
-				"permalink"=>BASEDIR.strtolower(LANG).'/'.$this->dir_news.'/'.$dir,
+				"permalink"=>BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$dir,
 				"imgs"=>array()
 				);
 			}
@@ -305,7 +305,6 @@ class kNews {
 	/* convert raw array from database into improved array */
 	private function row2output($row,$orderby="`data` DESC") {
 		$vars['photogallery']=true; // for now always true... need to be implemented
-	
 		if(!$this->inited) $this->init();
 		$output=$row;
 		if($orderby=="") $orderby=$this->orderby;
@@ -325,12 +324,11 @@ class kNews {
 			}
 		if($subdir=="") $subdir=$output['categorie'][0]['dir'];
 
-		$output['permalink']=BASEDIR.strtolower(LANG).'/'.$this->dir_news.'/'.$subdir.'/'.$row['dir'];
-		$output['catpermalink']=BASEDIR.strtolower(LANG).'/'.$this->dir_news.'/'.$subdir;
-		$output['archpermalink']['year']=BASEDIR.strtolower(LANG).'/'.$this->dir_news.'/'.substr($row[$dataRef],0,4);
+		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$subdir.'/'.$row['dir'];
+		$output['catpermalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$subdir;
+		$output['archpermalink']['year']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.substr($row[$dataRef],0,4);
 		$output['archpermalink']['month']=$output['archpermalink']['year'].substr($row[$dataRef],4,3);
 		$output['archpermalink']['day']=$output['archpermalink']['month'].substr($row[$dataRef],7,3);
-
 		$kText=new kText();
 		$output['embeddedimgs']=array();
 		$output['embeddeddocs']=array();
@@ -495,7 +493,7 @@ class kNews {
 				}
 			}
 		unset($allowedCategories);
-		return BASEDIR.strtolower($row['ll']).'/'.$GLOBALS['__template']->getVar('dir_news',1,$row['ll']).'/'.$subdir.'/'.$row['dir'];
+		return BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$GLOBALS['__template']->getVar('dir_news',1,$row['ll']).'/'.$subdir.'/'.$row['dir'];
 		}
 
 
@@ -604,12 +602,12 @@ class kNews {
 			if($subdir=="") $subdir=$output[$i]['categorie'][0]['dir'];
 			
 			$output[$i]['featuredimage'] = $output[$i]['featuredimage']>0 ? $this->imgs->getImage($output[$i]['featuredimage']) : array();
-			
-			$output[$i]['permalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.$subdir.'/'.$row['dir'];
-			$output[$i]['catpermalink']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.$subdir;
-			$output[$i]['archpermalink']['year']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,4);
-			$output[$i]['archpermalink']['month']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,7);
-			$output[$i]['archpermalink']['day']=BASEDIR.strtolower(LANG).'/'.$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,10);
+
+			$output[$i]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_news',1).'/'.$subdir.'/'.$row['dir'];
+			$output[$i]['catpermalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_news',1).'/'.$subdir;
+			$output[$i]['archpermalink']['year']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,4);
+			$output[$i]['archpermalink']['month']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,7);
+			$output[$i]['archpermalink']['day']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_news',1).'/'.substr($row[$dataRef],0,10);
 			}
 		return $output;
 		}

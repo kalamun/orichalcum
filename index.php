@@ -3,14 +3,24 @@
 require_once("inc/tplshortcuts.lib.php");
 kInitBettino();
 
+/* redirect to the URL without language indication if option is activated and we are in the default language */
+if(
+	strlen($_SERVER['REQUEST_URI']) >= strlen(BASEDIR)+3
+	&& strtolower(substr($_SERVER['REQUEST_URI'],strlen(BASEDIR),3))==strtolower(DEFAULT_LANG).'/'
+	&& kGetVar('short_permalink_default_lang',1,"*")=="true"
+	)
+{
+	$url=$_SERVER['REQUEST_URI'];
+	$url=str_replace("/".strtolower(DEFAULT_LANG)."/","/",$url);
+	$url=str_replace("/".strtoupper(DEFAULT_LANG)."/","/",$url);
+	header('Location: '.$url);
+}
+
 /* generazione pagine e template */
-if(!isset($GLOBALS['__dir__'])||$GLOBALS['__dir__']=="") {
-	if(kGetVar('home_page',1)!="") {
-		header('Location:'.SITE_URL.BASEDIR.strtolower(LANG)."/".kGetVar('home_page',1));
-		die();
-		}
-	else die(kTranslate('Under Construction'));
-	}
+if(!isset($GLOBALS['__dir__'])||$GLOBALS['__dir__']=="")
+{
+	$GLOBALS['__dir__']=kGetVar('home_page',1);
+}
 $__template->loadMenu();
 
 /* news */

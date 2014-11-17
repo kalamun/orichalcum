@@ -34,8 +34,9 @@ class kBanners {
 	function getBanners($vars=array()) {
 		if(!$this->inited) $this->init();
 		$banners=array();
+		
 		if(!isset($vars['orderby'])||$vars['orderby']==false) $vars['orderby']="`ordine`";
-		if(!isset($vars['lang'])||$vars['lang']==false) $vars['lang']=$_GET['lang'];
+		if(!isset($vars['lang'])||$vars['lang']==false) $vars['lang']=LANG;
 	
 		$cat=$this->getCategories();
 		if(!isset($vars['category'])||$vars['category']==false) $vars['category']=$cat[0]['category'];

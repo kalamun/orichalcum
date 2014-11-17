@@ -79,7 +79,7 @@ class kPrivate {
 				//read dir
 				$output['dirname']=$dir;
 				$output['permissions']=$this->getPermissions(utf8_decode($dir));
-				$output['permalink']=SITE_URL.BASEDIR.strtolower(kGetLanguage()).'/'.$GLOBALS['__template']->getVar('dir_private',1).'/'.$dir;
+				$output['permalink']=SITE_URL.BASEDIR.$GLOBALS['__template']->getLanguageURI(kGetLanguage()).$GLOBALS['__template']->getVar('dir_private',1).'/'.$dir;
 				$output['parent']=dirname($dir);
 				$output['size']=0;
 
@@ -90,7 +90,7 @@ class kPrivate {
 							if(count($tmp)>0) {
 								$tmp['dirname']=mb_convert_encoding($file,"UTF-8");
 								$tmp['abslocation']=rtrim($fulldir,"/").'/'.$file;
-								$tmp['permalink']=SITE_URL.BASEDIR.strtolower(kGetLanguage()).'/'.$GLOBALS['__template']->getVar('dir_private',1).'/'.str_replace("%2F","/",urlencode(utf8_decode($dir))).($dir!=""?'/':'').urlencode($file);
+								$tmp['permalink']=SITE_URL.BASEDIR.$GLOBALS['__template']->getLanguageURI(kGetLanguage()).$GLOBALS['__template']->getVar('dir_private',1).'/'.str_replace("%2F","/",urlencode(utf8_decode($dir))).($dir!=""?'/':'').urlencode($file);
 								$tmp['permissions']=$this->getPermissions($dir.'/'.$file);
 								$dirs[$file]=$tmp;
 								$output['size']+=$tmp['size']['b'];
@@ -101,7 +101,7 @@ class kPrivate {
 							$tmp['filename']=mb_convert_encoding($file,"UTF-8");
 							$tmp['extension']=substr($file,strrpos($file,".")+1);
 							$tmp['location']=$fulldir.'/'.$file;
-							$tmp['permalink']=SITE_URL.BASEDIR.strtolower(kGetLanguage()).'/'.$GLOBALS['__template']->getVar('dir_private',1).'/'.str_replace("%2F","/",urlencode(utf8_decode($dir))).($dir!=""?'/':'').urlencode($file);
+							$tmp['permalink']=SITE_URL.BASEDIR.$GLOBALS['__template']->getLanguageURI(kGetLanguage()).$GLOBALS['__template']->getVar('dir_private',1).'/'.str_replace("%2F","/",urlencode(utf8_decode($dir))).($dir!=""?'/':'').urlencode($file);
 							$size=filesize($fulldir.'/'.$file);
 							$tmp['size']=array("b"=>$size,
 												"Kb"=>number_format($size/(1024),2),

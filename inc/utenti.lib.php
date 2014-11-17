@@ -44,7 +44,7 @@ class kUsers {
 				}
 
 			$tmpPublicUsers[$row['iduser']]['imgs']=($row['featuredimage']>0 ? $kImages->getImage($row['featuredimage']) : array());
-			$tmpPublicUsers[$row['iduser']]['permalink']=BASEDIR.strtolower(LANG).'/'.kGetVar('dir_users',1).'/'.$row['username'];
+			$tmpPublicUsers[$row['iduser']]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).kGetVar('dir_users',1).'/'.$row['username'];
 			}
 		foreach($iduser as $k=>$v) {
 			if(isset($tmpPublicUsers[$k])) $this->publicUsers[]=$tmpPublicUsers[$k];

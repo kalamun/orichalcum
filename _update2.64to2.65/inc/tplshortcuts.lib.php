@@ -90,13 +90,13 @@ function kGetBaseDir() {
 	return BASEDIR;
 	}
 function kGetBasePath() {
-	return $_SESSION['DOCUMENT_ROOT'].BASEDIR;
+	return $_SERVER['DOCUMENT_ROOT'].BASEDIR;
 	}
 function kGetCurrentLanguageDir() {
 	return BASEDIR.strtolower(LANG).'/';
 	}
 function kGetCurrentLanguagePath() {
-	return $_SESSION['DOCUMENT_ROOT'].BASEDIR.strtolower(LANG).'/';
+	return $_SERVER['DOCUMENT_ROOT'].BASEDIR.strtolower(LANG).'/';
 	}
 function kGetTemplateDir($basedir=false) {
 	if($basedir==false) $basedir=BASEDIR;

@@ -44,8 +44,8 @@ class kText
 	function tagParser($string,$tagref)
 	{
 		$tags=array();
-
-		// find "<img "
+		
+		
 		$offset=0;
 		while(strpos($string,"<".$tagref." ",$offset)!==false)
 		{
@@ -67,7 +67,7 @@ class kText
 				
 				$tagname="";
 				// parse letters till "="
-				while($string[$offset]!="=")
+				while($string[$offset]!="=" && strlen($string) > $offset)
 				{
 					$tagname.=$string[$offset];
 					$offset++;
@@ -77,7 +77,7 @@ class kText
 				$offset++;
 
 				// skip spaces
-				for(; trim($string[$offset])==""; $offset++) {}
+				for(; trim($string[$offset])==""  && strlen($string)>$offset; $offset++) {}
 				
 				// check boundaries
 				$bound="";
@@ -110,6 +110,7 @@ class kText
 				
 				$offset++;
 				$tag['attributes'][trim($tagname)]=$value;
+				
 			}
 
 			if(strlen($string) > $offset)
