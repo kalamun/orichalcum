@@ -371,7 +371,8 @@ class kPages {
 		foreach(explode("\n",trim($row['variables'])) as $line) {
 			if(trim($line)!="") {
 				$line=explode("\t",trim($line));
-				$output['variables'][]=array("variable_name"=>$line[0],"correspondence"=>$line[1],"mandatary"=>$line[2]);
+				if(empty($line[3])) $line[3]="*";
+				$output['variables'][]=array("variable_name"=>$line[0],"correspondence"=>$line[1],"mandatary"=>$line[2],"empty"=>$line[3]);
 				}
 			}
 
@@ -409,17 +410,28 @@ class kPages {
 		$GLOBALS['__template']->currentConversion['fail_code']=isset($page['conversions']['fail_code'])?$page['conversions']['fail_code']:'';
 		$correspondence=array("name"=>"","surname"=>"","username"=>"","password"=>"","email"=>"","expiration"=>"","affiliation"=>"");
 
-		/* CHECK IF THERE ARE A VALID SUBMISSION; IF NOT, RETURN FALSE */
-		if(isset($conv['variables'])&&is_array($conv['variables'])) {
+		/* CHECK IF THERE IS A VALID SUBMISSION; IF NOT, RETURN FALSE */
+		if(isset($conv['variables'])&&is_array($conv['variables']))
+		{
 			foreach($conv['variables'] as $var) {
-				if($var['mandatary']==true&&!isset($_POST[$var['variable_name']])) return false;
+				//check if mandatary variables exists
+				if($var['mandatary']=="y"&&!isset($_POST[$var['variable_name']])) return false;
+				
+				//check the emptyness
+				if(isset($_POST[$var['variable_name']]))
+				{
+					if($var['empty']=='y' && trim($_POST[$var['variable_name']])!="") return false;
+					elseif($var['empty']=='n' && trim($_POST[$var['variable_name']])=="") return false;
+				}
+
 				//in the meanwhile, track relationships beetween variables and fields
-				foreach($correspondence as $k=>$v) {
+				foreach($correspondence as $k=>$v)
+				{
 					if($var['correspondence']==$k) $correspondence[$k]=$var['variable_name'];
-					}
 				}
 			}
-		$GLOBALS['__template']->currentConversion['result']="fail"; // ok, is valid... if something happens before the end, it remains on fail
+		}
+		$GLOBALS['__template']->currentConversion['result']="fail"; // ok, it is valid... if something happens before the end, it remains on fail
 
 		/* IN CASE OF MODERATION */
 		//admin moderation

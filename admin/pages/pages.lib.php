@@ -30,11 +30,12 @@ class kaPages {
 		$output=$row;
 
 		$output['traduzioni']=array();
-		foreach(explode("|",$row['traduzioni']) as $t) {
+		foreach(explode("|",$row['traduzioni']) as $t)
+		{
 			$ll=substr($t,0,2);
 			$id=intval(substr($t,3));
 			if($ll!=""&&$id!=0) $output['traduzioni'][$ll]=$id;
-			}
+		}
 
 		$output['commentiOnline']=$this->kaComments->count(TABLE_PAGINE,$row['idpag'],"public='s'");
 		$output['commentiTot']=$this->kaComments->count(TABLE_PAGINE,$row['idpag']);
@@ -282,8 +283,9 @@ class kaPages {
 				$line=explode("\t",trim($line));
 				if(!isset($line[0])) continue;
 				if(!isset($line[1])) $line[1]="";
-				if(!isset($line[2])) $line[2]="";
-				$output['variables'][]=array("variable_name"=>$line[0],"correspondence"=>$line[1],"mandatory"=>$line[2]);
+				if(!isset($line[2])) $line[2]=""; // mandatary
+				if(!isset($line[3])) $line[3]="*"; // empty
+				$output['variables'][]=array("variable_name"=>$line[0],"correspondence"=>$line[1],"mandatory"=>$line[2],"empty"=>$line[3]);
 				}
 			}
 
