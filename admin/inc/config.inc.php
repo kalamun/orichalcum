@@ -35,6 +35,7 @@ define("TABLE_CONFIG","k_config");
 define("TABLE_DIZIONARIO","k_dizionario");
 define("TABLE_STATISTICHE","k_statistiche");
 define("TABLE_STATS_ARCHIVE","k_stats_archive");
+define("TABLE_STATS_SUMMARY","k_stats_summary");
 define("TABLE_IP2COUNTRY","k_ip2country");
 define("TABLE_SHORTURL","k_shorturl");
 define("TABLE_LOG","k_log");

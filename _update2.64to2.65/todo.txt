@@ -1,0 +1,14 @@
+add to config.inc.php
+define("TABLE_STATS_SUMMARY","k_stats_summary");
+
+
+CREATE TABLE IF NOT EXISTS `k_stats_summary` (
+  `family` varchar(16) NOT NULL,
+  `type` varchar(16) NOT NULL,
+  `reference` varchar(32) NOT NULL,
+  `count` int(6) NOT NULL,
+  `data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
