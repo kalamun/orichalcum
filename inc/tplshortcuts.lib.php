@@ -93,10 +93,10 @@ function kGetBasePath() {
 	return $_SERVER['DOCUMENT_ROOT'].BASEDIR;
 	}
 function kGetCurrentLanguageDir() {
-	return BASEDIR.strtolower(LANG).'/';
+	return BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG);
 	}
 function kGetCurrentLanguagePath() {
-	return $_SERVER['DOCUMENT_ROOT'].BASEDIR.strtolower(LANG).'/';
+	return $_SERVER['DOCUMENT_ROOT'].BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG);
 	}
 function kGetTemplateDir($basedir=false) {
 	if($basedir==false) $basedir=BASEDIR;
