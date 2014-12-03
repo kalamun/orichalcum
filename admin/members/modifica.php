@@ -239,9 +239,9 @@ else {
 	if(!isset($_GET['skMetadataValues'])) $_GET['skMetadataValues']=array(""); //values of custom fields
 	$conditions="";
 	
-	if($_GET['skName']!="") $conditions.=" `name` LIKE '%".mysql_real_escape_string($_GET['skName'])."%' AND ";
-	if($_GET['skEmail']!="") $conditions.=" `email` LIKE '%".mysql_real_escape_string($_GET['skEmail'])."%' AND ";
-	if($_GET['skAffiliation']!="") $conditions.=" `affiliation` LIKE '%".mysql_real_escape_string($_GET['skAffiliation'])."%' AND ";
+	if($_GET['skName']!="") $conditions.=" `name` LIKE '%".ksql_real_escape_string($_GET['skName'])."%' AND ";
+	if($_GET['skEmail']!="") $conditions.=" `email` LIKE '%".ksql_real_escape_string($_GET['skEmail'])."%' AND ";
+	if($_GET['skAffiliation']!="") $conditions.=" `affiliation` LIKE '%".ksql_real_escape_string($_GET['skAffiliation'])."%' AND ";
 
 	if($kaUsers->canIUse('newsletter')&&$_GET['skNewsletter']!="") {
 		//if true show only subscribers, else only not subscribed to any list
@@ -378,7 +378,7 @@ else {
 		$vars['conditions']=$conditions;
 		if(isset($_GET['p'])) {
 			if($vars['conditions']!="") $vars['conditions'].=' AND ';
-			if($_GET['p']!="#") $vars['conditions'].=" `name` LIKE '".mysql_real_escape_string($_GET['p'])."%'";
+			if($_GET['p']!="#") $vars['conditions'].=" `name` LIKE '".ksql_real_escape_string($_GET['p'])."%'";
 			else {
 				$letters="ABCDEFGHIJKLMNOPQRSTUWYXZ";
 				for($i=0;isset($letters[$i]);$i++) {

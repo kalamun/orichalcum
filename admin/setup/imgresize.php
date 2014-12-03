@@ -31,8 +31,8 @@ echo '<form action="?" method="post" enctype="multipart/form-data">';
 <div class="topset"><?php 
 	echo "<h3>IMMAGINI</h3>";
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='img_resize' AND ll='*' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 		$option=array("all","bigger","smaller","none");
 		$value=array("Ridimensiona tutte le immagini","Ridimensiona solo quelle pi&ugrave; grandi","Ridimensiona solo quelle più piccole","Non ridimensionare");
 		echo b3_create_select("img_resize1","",$value,$option,b3_lmthize($row['value1'],"input")).'<br />';
@@ -41,14 +41,14 @@ echo '<form action="?" method="post" enctype="multipart/form-data">';
 		echo b3_create_select("img_resize2","",$value,$option,b3_lmthize($row['value2'],"input")).'<br />';
 
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='img_size' AND ll='*' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 		echo b3_create_input("img_size1","text","Larghezza ",b3_lmthize($row['value1'],"input"),"50px",5).' px<br />';
 		echo b3_create_input("img_size2","text","Altezza ",b3_lmthize($row['value2'],"input"),"50px",5).' px<br />';
 
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='img_quality' AND ll='*' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 		echo b3_create_input("img_quality1","text","Qualit&agrave; ",b3_lmthize($row['value1'],"input"),"50px",3).'/100<br />';
 		echo b3_create_input("img_quality2","hidden","",b3_lmthize($row['value2'],"input"),"50px",5);
 
@@ -56,22 +56,22 @@ echo '<form action="?" method="post" enctype="multipart/form-data">';
 
 	echo "<h3>ANTEPRIME</h3>";
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_resize' AND ll='*' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 		echo b3_create_input("thumb_resize1","hidden","",b3_lmthize($row['value1'],"input"),"50px",5);
 		$option=array("inside","outside","fit");
 		$value=array("Internamente","Esternamente","Adatta");
 		echo b3_create_select("thumb_resize2","",$value,$option,b3_lmthize($row['value2'],"input")).'<br />';
 
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_size' AND ll='*' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 		echo b3_create_input("thumb_size1","text","Larghezza ",b3_lmthize($row['value1'],"input"),"50px",5).' px<br />';
 		echo b3_create_input("thumb_size2","text","Altezza ",b3_lmthize($row['value2'],"input"),"50px",5).' px<br />';
 
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_quality' AND ll='*' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 		echo b3_create_input("thumb_quality1","text","Qualit&agrave; ",b3_lmthize($row['value1'],"input"),"50px",3).'/100<br />';
 		echo b3_create_input("thumb_quality2","hidden","",b3_lmthize($row['value2'],"input"),"50px",5);
 

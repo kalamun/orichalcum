@@ -8,4 +8,4 @@
 </body>
 </html>
 
-<?php  mysql_close($__db['id']); 
+<?php  ksql_close($__db['id']); 

@@ -13,9 +13,9 @@ if(!isset($_GET['start'])) $_GET['start']=0;
 if(!isset($_GET['stop'])) $_GET['stop']=30;
 
 $conditions="";
-if($_GET['date']!="") $conditions.=" `date` LIKE '%".mysql_real_escape_string($_GET['date'])."%' AND ";
-if($_GET['to']!="") $conditions.=" `to` LIKE '%".mysql_real_escape_string($_GET['to'])."%' AND ";
-if($_GET['searchkey']!="") $conditions.=" (`plain` LIKE '%".mysql_real_escape_string($_GET['searchkey'])."%' OR `title` LIKE '%".mysql_real_escape_string($_GET['searchkey'])."%') AND ";
+if($_GET['date']!="") $conditions.=" `date` LIKE '%".ksql_real_escape_string($_GET['date'])."%' AND ";
+if($_GET['to']!="") $conditions.=" `to` LIKE '%".ksql_real_escape_string($_GET['to'])."%' AND ";
+if($_GET['searchkey']!="") $conditions.=" (`plain` LIKE '%".ksql_real_escape_string($_GET['searchkey'])."%' OR `title` LIKE '%".ksql_real_escape_string($_GET['searchkey'])."%') AND ";
 $conditions.="`ideml`>0";
 ?>
 <h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>

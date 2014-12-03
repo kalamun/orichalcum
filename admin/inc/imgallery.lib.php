@@ -17,8 +17,8 @@ class kaImgallery {
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$this->kaImages->getImage($row['idimg']);
 			$output[$i]['idimga']=$row['idimga'];
 			$output[$i]['tabella']=$row['tabella'];
@@ -32,8 +32,8 @@ class kaImgallery {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE idimga=".$idimga." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$this->kaImages->getImage($row['idimg']);
 		$output['idimga']=$row['idimga'];
 		$output['tabella']=$row['tabella'];
@@ -44,22 +44,22 @@ class kaImgallery {
 
 	function add($tabella,$id,$idimg,$start=1,$max=999) {
 		$query="SELECT ordine FROM ".TABLE_IMGALLERY." WHERE tabella='".$tabella."' AND id='".$id."' AND ordine>=".$start." AND ordine<".($start+$max)." ORDER BY ordine DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['ordine']=="") $ordine=$start;
 		else $ordine=$row['ordine']+1;
 		if($start>0&&$max>0&&$ordine>$start+$max) return false;
 		if($ordine<$start) $ordine=$start;
 
 		$query="INSERT INTO ".TABLE_IMGALLERY." (tabella,id,ordine,idimg) VALUES('".$tabella."','".$id."','".$ordine."','".$idimg."')";
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 	
 	function del($idimga,$start=1,$max=999) {
 		$query="SELECT ordine,tabella,id FROM ".TABLE_IMGALLERY." WHERE idimga='".$idimga."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$ordine=$row['ordine'];
 		if($start>0&&$max>0&&$ordine>$start+$max) return false;
 		if($ordine<$start) $ordine=$start;
@@ -67,10 +67,10 @@ class kaImgallery {
 		$id=$row['id'];
 
 		$query="DELETE FROM ".TABLE_IMGALLERY." WHERE idimga=".$idimga." LIMIT 1";
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		
 		$query="UPDATE ".TABLE_IMGALLERY." SET ordine=ordine-1 WHERE tabella='".$tabella."' AND id='".$id."' AND ordine>".$ordine." AND ordine>=".$start." AND ordine<".($start+$max);
-		mysql_query($query);
+		ksql_query($query);
 		
 		return true;
 		}
@@ -79,15 +79,15 @@ class kaImgallery {
 		if(!is_array($order)) {
 			$order=array();
 			$query="SELECT idimga FROM ".TABLE_IMGALLERY." WHERE tabella='".$tabella."' AND id='".$id."' AND ordine>=".$start." AND ordine<".($start+$max)." ORDER BY ordine";
-			$results=mysql_query($query);
-			while($results=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+			while($results=ksql_fetch_array($results)) {
 				$order[]=$row['idimga'];
 				}
 			}
 		for($i=0;isset($order[$i]);$i++) {
 			if($i>$max) break;
 			$query="UPDATE ".TABLE_IMGALLERY." SET ordine=".($i+$start)." WHERE idimga=".$order[$i]." LIMIT 1";
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			}
 		return true;
 		}

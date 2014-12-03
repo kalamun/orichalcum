@@ -20,15 +20,15 @@ if(!isset($_GET['idscoup'])) {
 	if(isset($_POST['idscoup'])&&is_array($_POST['idscoup'])) {
 		for($i=0;isset($_POST['idscoup'][$i]);$i++) {
 			$query="UPDATE ".TABLE_SHOP_COUPONS." SET ordine=".($i+1)." WHERE ll='".$_SESSION['ll']."' AND idscoup=".$_POST['idscoup'][$i]." LIMIT 1";
-			mysql_query($query);
+			ksql_query($query);
 			}
 		}
 
 	elseif(isset($_POST['addcoupon'])) {
 		$log="";
 		$query="INSERT INTO ".TABLE_SHOP_COUPONS." (`title`,`context`,`action`,`starting_date`,`expiration_date`) VALUES('".b3_htmlize($_POST['title'],true,"")."','always','discount=0',NOW(),NOW())";
-		if(!mysql_query($query)) $log="Errore durante l'inserimento del coupon";
-		else $id=mysql_insert_id();
+		if(!ksql_query($query)) $log="Errore durante l'inserimento del coupon";
+		else $id=ksql_insert_id();
 
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -46,7 +46,7 @@ if(!isset($_GET['idscoup'])) {
 	elseif(isset($_GET['delete'])) {
 		$log="";
 		$query="DELETE FROM ".TABLE_SHOP_COUPONS." WHERE ll='".$_SESSION['ll']."' AND idscoup=".$_GET['delete']." LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante l'eliminazione";
+		if(!ksql_query($query)) $log="Errore durante l'eliminazione";
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
 			$kaLog->add("ERR",'Shop: Errore nell\'eliminazione del metodo di pagamento <em>ID: '.b3_htmlize($_GET['delete'],true,"").'</em>');
@@ -71,15 +71,15 @@ if(!isset($_GET['idscoup'])) {
 		</tr>
 	<?php 
 	$query="SELECT * FROM ".TABLE_SHOP_COUPONS." ORDER BY `expiration_date`,`starting_date`,`title`";
-	$results=mysql_query($query);
-	while($row=mysql_Fetch_array($results)) {
+	$results=ksql_query($query);
+	while($row=ksql_Fetch_array($results)) {
 		//count valid coupons
-		$rs=mysql_query("SELECT count(*) AS tot FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `idscoup`='".$row['idscoup']."' AND `valid`=1");
-		$r=mysql_fetch_array($rs);
+		$rs=ksql_query("SELECT count(*) AS tot FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `idscoup`='".$row['idscoup']."' AND `valid`=1");
+		$r=ksql_fetch_array($rs);
 		$valid=$r['tot'];
 		//count used coupons
-		$rs=mysql_query("SELECT count(*) AS tot FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `idscoup`='".$row['idscoup']."' AND `valid`=0");
-		$r=mysql_fetch_array($rs);
+		$rs=ksql_query("SELECT count(*) AS tot FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `idscoup`='".$row['idscoup']."' AND `valid`=0");
+		$r=ksql_fetch_array($rs);
 		$used=$r['tot'];
 		?>
 		<tr>
@@ -126,8 +126,8 @@ else {
 		$starting_date=preg_replace("/(\d{1,2}).(\d{1,2}).(\d{4})/","$3-$2-$1",$_POST['starting_date']).' '.$_POST['starting_time'];
 		$expiration_date=preg_replace("/(\d{1,2}).(\d{1,2}).(\d{4})/","$3-$2-$1",$_POST['expiration_date']).' '.$_POST['expiration_time'];
 		
-		$query="UPDATE ".TABLE_SHOP_COUPONS." SET `title`='".b3_htmlize($_POST['title'],true,"")."',`context`='".mysql_real_escape_string($context)."',`action`='".mysql_real_escape_string($action)."',`starting_date`='".mysql_real_escape_string($starting_date)."',`expiration_date`='".mysql_real_escape_string($expiration_date)."' WHERE `idscoup`='".$_GET['idscoup']."' LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante la scrittura nel database";
+		$query="UPDATE ".TABLE_SHOP_COUPONS." SET `title`='".b3_htmlize($_POST['title'],true,"")."',`context`='".ksql_real_escape_string($context)."',`action`='".ksql_real_escape_string($action)."',`starting_date`='".ksql_real_escape_string($starting_date)."',`expiration_date`='".ksql_real_escape_string($expiration_date)."' WHERE `idscoup`='".$_GET['idscoup']."' LIMIT 1";
+		if(!ksql_query($query)) $log="Errore durante la scrittura nel database";
 		
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -146,8 +146,8 @@ else {
 	
 	
 	$query="SELECT * FROM ".TABLE_SHOP_COUPONS." WHERE `idscoup`='".intval($_GET['idscoup'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$coupon=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$coupon=ksql_fetch_array($results);
 	
 	$context="always";
 	if(substr($coupon['context'],0,1)==">") $context=">";
@@ -234,8 +234,8 @@ else {
 			<h3>COUPON VALIDI</h3>
 			<a href="javascript:k_openIframeWindow('ajax/shopCouponsManager.php?valid=1&idscoup=<?= $_GET['idscoup']; ?>','800px','400px');" class="count"><?php 
 			$query="SELECT count(*) AS `tot` FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `idscoup`='".$_GET['idscoup']."' AND `valid`=1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			echo $row['tot'];
 			?></a>
 			<a href="ajax/shopCouponsExport.php?csv&valid=1&idscoup=<?= $_GET['idscoup']; ?>" class="smallbutton">Esporta in CSV</a>
@@ -245,8 +245,8 @@ else {
 			<h3>COUPON USATI</h3>
 			<a href="javascript:k_openIframeWindow('ajax/shopCouponsManager.php?valid=0&idscoup=<?= $_GET['idscoup']; ?>','800px','400px');" class="count"><?php 
 			$query="SELECT count(*) AS `tot` FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `idscoup`='".$_GET['idscoup']."' AND `valid`=0";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			echo $row['tot'];
 			?></a>
 			<a href="ajax/shopCouponsExport.php?csv&valid=0&idscoup=<?= $_GET['idscoup']; ?>" class="smallbutton">Esporta in CSV</a>

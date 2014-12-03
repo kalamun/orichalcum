@@ -13,11 +13,11 @@ class kaNewsletter {
 	public function getNewslettersList($vars=array()) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_NEWSLETTER_LISTE."` WHERE ";
-		if(isset($vars['idlista'])) $query.=" `idlista`='".mysql_real_escape_string($vars['idlista'])."' AND ";
-		if(isset($vars['ll'])) $query.=" `ll`='".mysql_real_escape_string($vars['ll'])."' AND ";
+		if(isset($vars['idlista'])) $query.=" `idlista`='".ksql_real_escape_string($vars['idlista'])."' AND ";
+		if(isset($vars['ll'])) $query.=" `ll`='".ksql_real_escape_string($vars['ll'])."' AND ";
 		$query.=" `idlista`>0 ORDER BY `lista`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$row['subscribers_number']=$this->kaMembers->countUsers(array("lists"=>array($row['idlista']), "conditions"=>"`status`='act'"));
 			$output[]=$row;
 			}
@@ -50,19 +50,19 @@ class kaNewsletter {
 	public function getConfig() {
 		$config=array();
 
-		$query="SELECT `value1` FROM `".TABLE_CONFIG."` WHERE `param`='newsletter_pretitolo' AND ll='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT `value1` FROM `".TABLE_CONFIG."` WHERE `param`='newsletter_pretitolo' AND ll='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$config['prefix']=$row['value1'];
 
-		$query="SELECT `value1` FROM ".TABLE_CONFIG." WHERE `param`='email_footer' AND ll='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT `value1` FROM ".TABLE_CONFIG." WHERE `param`='email_footer' AND ll='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$config['footer']=$row['value1'];
 		
-		$query="SELECT * FROM ".TABLE_CONFIG." WHERE `param`='newsletter_mittente' AND ll='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT * FROM ".TABLE_CONFIG." WHERE `param`='newsletter_mittente' AND ll='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if(!isset($row['value1'])||trim($row['value1'])=="") $row['value1']=ADMIN_NAME;
 		if(!isset($row['value2'])||trim($row['value2'])=="") $row['value2']=ADMIN_MAIL;
 		$config['from']=$row['value1'].' <'.$row['value2'].'>';
@@ -126,7 +126,7 @@ class kaNewsletter {
 		if(!isset($vars['description'])) return false;
 		$query="INSERT INTO `".TABLE_NEWSLETTER_LISTE."` (`data`,`lista`,`descr`,`ll`) VALUES(NOW(),'".b3_htmlize($vars['listname'],true,"")."','".b3_htmlize($vars['description'],true)."','".$_SESSION['ll']."')";
 
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 	
@@ -134,9 +134,9 @@ class kaNewsletter {
 		if(!isset($vars['idlista'])) return false;
 		if(!isset($vars['listname'])) return false;
 		if(!isset($vars['description'])) return false;
-		$query="UPDATE `".TABLE_NEWSLETTER_LISTE."` SET `lista`='".b3_htmlize($vars['listname'],true,"")."',`descr`='".b3_htmlize($vars['description'],true)."' WHERE `idlista`=".mysql_real_escape_string($vars['idlista']);
+		$query="UPDATE `".TABLE_NEWSLETTER_LISTE."` SET `lista`='".b3_htmlize($vars['listname'],true,"")."',`descr`='".b3_htmlize($vars['description'],true)."' WHERE `idlista`=".ksql_real_escape_string($vars['idlista']);
 
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
@@ -145,17 +145,17 @@ class kaNewsletter {
 
 		if(isset($vars['move_to'])) {
 			//if moving users to another list, set the new list if they aren't yet subscribed
-			$query="UPDATE `".TABLE_MEMBERS."` SET `newsletter_lists`=CONCAT(`newsletter_lists`,'".mysql_real_escape_string($vars['move_to']).",') WHERE `newsletter_lists` LIKE '%,".$vars['idlista'].",%' AND `newsletter_lists` NOT LIKE '%,".$vars['move_to'].",%'";
-			if(!mysql_query($query)) return false;
+			$query="UPDATE `".TABLE_MEMBERS."` SET `newsletter_lists`=CONCAT(`newsletter_lists`,'".ksql_real_escape_string($vars['move_to']).",') WHERE `newsletter_lists` LIKE '%,".$vars['idlista'].",%' AND `newsletter_lists` NOT LIKE '%,".$vars['move_to'].",%'";
+			if(!ksql_query($query)) return false;
 			}
 
 		//then remove the old list from all users
-		$query="UPDATE `".TABLE_MEMBERS."` SET `newsletter_lists`=REPLACE(`newsletter_lists`,',".mysql_real_escape_string($vars['idlista']).",',',')";
-		if(!mysql_query($query)) return false;
+		$query="UPDATE `".TABLE_MEMBERS."` SET `newsletter_lists`=REPLACE(`newsletter_lists`,',".ksql_real_escape_string($vars['idlista']).",',',')";
+		if(!ksql_query($query)) return false;
 
 		//then delete the old list
-		$query="DELETE FROM `".TABLE_NEWSLETTER_LISTE."` WHERE `idlista`=".mysql_real_escape_string($vars['idlista'])." LIMIT 1";
-		if(!mysql_query($query)) return false;
+		$query="DELETE FROM `".TABLE_NEWSLETTER_LISTE."` WHERE `idlista`=".ksql_real_escape_string($vars['idlista'])." LIMIT 1";
+		if(!ksql_query($query)) return false;
 
 		return true;
 		}
@@ -173,9 +173,9 @@ class kaNewsletter {
 		if(!isset($vars['template'])) $vars['template']="";
 		if(!isset($vars['recipients_number'])) $vars['recipients_number']=0;
 
-		$query="INSERT INTO `".TABLE_NEWSLETTER_ARCH."` (`data`,`titolo`,`testo`,`template`,`destinatari`) VALUES(NOW(),'".mysql_real_escape_string($vars['subject'])."','".mysql_real_escape_string($vars['message'])."','".mysql_real_escape_string($vars['template'])."','".mysql_real_escape_string($vars['recipients_number'])."')";
-		if(!mysql_query($query)) return false;
-		else return mysql_insert_id();
+		$query="INSERT INTO `".TABLE_NEWSLETTER_ARCH."` (`data`,`titolo`,`testo`,`template`,`destinatari`) VALUES(NOW(),'".ksql_real_escape_string($vars['subject'])."','".ksql_real_escape_string($vars['message'])."','".ksql_real_escape_string($vars['template'])."','".ksql_real_escape_string($vars['recipients_number'])."')";
+		if(!ksql_query($query)) return false;
+		else return ksql_insert_id();
 	}
 
 	public function getArchiveList($vars)
@@ -197,8 +197,8 @@ class kaNewsletter {
 			$query.=" AND (".$vars['conditions'].") ";
 		}
 		$query.=" ORDER BY `data` DESC LIMIT ".intval($vars['from']).",".intval($vars['limit']);
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results))
 		{
 			if(!empty($vars['stats']))
 			{
@@ -216,23 +216,23 @@ class kaNewsletter {
 	public function getFromArchive($vars) {
 		if(!isset($vars['idarch'])) return false;
 
-		$query="SELECT * FROM `".TABLE_NEWSLETTER_ARCH."` WHERE `idarch`='".mysql_real_escape_string($vars['idarch'])."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT * FROM `".TABLE_NEWSLETTER_ARCH."` WHERE `idarch`='".ksql_real_escape_string($vars['idarch'])."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 
 		return $row;
 		}
 
 	public function countArchiveRecords() {
 		$query="SELECT count(*) AS `tot` FROM `".TABLE_NEWSLETTER_ARCH."`";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 
 	public function deleteFromArchive($idarch) {
 		$query="DELETE FROM `".TABLE_NEWSLETTER_ARCH."` WHERE `idarch`='".intval($idarch)."' LIMIT 1";
-		if(mysql_query($query)) {
+		if(ksql_query($query)) {
 			return $this->removeFromQueueByIdarch($idarch);
 			}
 		return false;
@@ -251,9 +251,9 @@ class kaNewsletter {
 		if(!isset($vars['template'])) $vars['template']="";
 		if(!isset($vars['idarch'])) $vars['idarch']="0";
 
-		$query="INSERT INTO `".TABLE_EMAIL_QUEUE."` (`idarch`,`date`,`from`,`to`,`subject`,`message`,`template`) VALUES('".mysql_real_escape_string($vars['idarch'])."',NOW(),'".mysql_real_escape_string($vars['from'])."','".mysql_real_escape_string($vars['to'])."','".mysql_real_escape_string($vars['subject'])."','".mysql_real_escape_string($vars['message'])."','".mysql_real_escape_string($vars['template'])."')";
-		if(!mysql_query($query)) return false;
-		else return mysql_insert_id();
+		$query="INSERT INTO `".TABLE_EMAIL_QUEUE."` (`idarch`,`date`,`from`,`to`,`subject`,`message`,`template`) VALUES('".ksql_real_escape_string($vars['idarch'])."',NOW(),'".ksql_real_escape_string($vars['from'])."','".ksql_real_escape_string($vars['to'])."','".ksql_real_escape_string($vars['subject'])."','".ksql_real_escape_string($vars['message'])."','".ksql_real_escape_string($vars['template'])."')";
+		if(!ksql_query($query)) return false;
+		else return ksql_insert_id();
 		}
 
 	//count how many emails are in queue
@@ -261,8 +261,8 @@ class kaNewsletter {
 	{
 		$query="SELECT count(*) AS `tot` FROM `".TABLE_EMAIL_QUEUE."`";
 		if(isset($vars['idarch'])) $query.=" WHERE `idarch`='".intval($vars['idarch'])."' ";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 	}
 	
@@ -272,8 +272,8 @@ class kaNewsletter {
 
 		$query="SELECT * FROM `".TABLE_EMAIL_QUEUE."` ORDER BY `date`,`idemlq` ";
 		if(isset($vars['limit'])) $query.=" LIMIT 0,".intval($vars['limit']);
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 
@@ -282,13 +282,13 @@ class kaNewsletter {
 
 	//remove a mail from queue
 	public function removeFromQueueById($idemlq) {
-		$query="DELETE FROM `".TABLE_EMAIL_QUEUE."` WHERE `idemlq`='".mysql_real_escape_string($idemlq)."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		$query="DELETE FROM `".TABLE_EMAIL_QUEUE."` WHERE `idemlq`='".ksql_real_escape_string($idemlq)."' LIMIT 1";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 	public function removeFromQueueByIdarch($idarch) {
-		$query="DELETE FROM `".TABLE_EMAIL_QUEUE."` WHERE `idarch`='".mysql_real_escape_string($idarch)."'";
-		if(mysql_query($query)) return true;
+		$query="DELETE FROM `".TABLE_EMAIL_QUEUE."` WHERE `idarch`='".ksql_real_escape_string($idarch)."'";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
@@ -298,8 +298,8 @@ class kaNewsletter {
 		$query="SELECT count(*) AS `tot` FROM `".TABLE_EMAIL_LOG."` WHERE `ideml`>0";
 		if(isset($vars['idarch'])) $query.=" AND `idarch`='".intval($vars['idarch'])."' ";
 		if(isset($vars['readed']) && $vars['readed']==true) $query.=" AND `readed`>'0000-00-00 00:00:00' ";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 	}
 
@@ -309,8 +309,8 @@ class kaNewsletter {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_EMAIL_LOG."` WHERE `readed`>'0000-00-00 00:00:00' ";
 		if(isset($vars['idarch'])) $query.=" AND `idarch`='".intval($vars['idarch'])."' ";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results))
 		{
 			$output[]=preg_replace("/.* <(.*?)>/","$1",$row['to']);
 		}
@@ -323,7 +323,7 @@ class kaNewsletter {
 		$output=array();
 		$query="DELETE FROM `".TABLE_EMAIL_LOG."` WHERE `ideml`>0 ";
 		if(isset($vars['idarch'])) $query.=" AND `idarch`='".intval($vars['idarch'])."' ";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		
 		return $results;
 	}

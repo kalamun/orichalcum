@@ -13,9 +13,9 @@ elseif($_GET['url']=="sitemap.xml")
 }
 
 // search for short URLs
-$query="SELECT * FROM `".TABLE_SHORTURL."` WHERE `urlfrom`='".b3_htmlize($_GET['url'],true,"")."' OR `urlfrom`='".mysql_real_escape_string($_GET['url'])."' LIMIT 1";
-$results=mysql_query($query);
-if($row=mysql_fetch_array($results))
+$query="SELECT * FROM `".TABLE_SHORTURL."` WHERE `urlfrom`='".b3_htmlize($_GET['url'],true,"")."' OR `urlfrom`='".ksql_real_escape_string($_GET['url'])."' LIMIT 1";
+$results=ksql_query($query);
+if($row=ksql_fetch_array($results))
 {
 	// requested url is defined in the database
 	// if it's local, redirect to local, else redirect to url

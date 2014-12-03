@@ -28,15 +28,15 @@ if(isset($_GET['checkorphanimages'])) {
 	asort($tables);
 	
 	$query="SELECT * FROM ".TABLE_IMG;
-	$results_imgs=mysql_query($query);
-	while($img=mysql_fetch_array($results_imgs)) {
+	$results_imgs=ksql_query($query);
+	while($img=ksql_fetch_array($results_imgs)) {
 		$used=false;
 
 		// controlla che non sia usata in qualche galleria
 		// o in qualche menù
 		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE `idimg`='".$img['idimg']."' LIMIT 1";
-		$results=mysql_query($query);
-		if(mysql_fetch_array($results)!=false) {
+		$results=ksql_query($query);
+		if(ksql_fetch_array($results)!=false) {
 			$used=true;
 			}
 		
@@ -45,10 +45,10 @@ if(isset($_GET['checkorphanimages'])) {
 			foreach($tables as $ka=>$t) {
 				$q="SELECT * FROM `".$t."` WHERE ";
 				$query="SHOW COLUMNS FROM `".$t."`";
-				$results=mysql_query($query);
+				$results=ksql_query($query);
 				if($results) {
 					$primary="";
-					while($row=mysql_fetch_array($results)) {
+					while($row=ksql_fetch_array($results)) {
 						if($row['Key']=='PRI') $primary=$row['Field'];
 						if(substr($row['Type'],0,7)=='varchar'||substr($row['Type'],0,4)=='text') {
 							$q.=" `".$row['Field']."` LIKE '%id=\"img".$img['idimg']."\"%' ";
@@ -59,9 +59,9 @@ if(isset($_GET['checkorphanimages'])) {
 						}
 					$q=rtrim($q," OR");
 					if($primary!="") {
-						$rs=mysql_query($q);
+						$rs=ksql_query($q);
 						if($rs!=false) {
-							while($r=mysql_fetch_array($rs)) {
+							while($r=ksql_fetch_array($rs)) {
 								$used=true;
 								}
 							}

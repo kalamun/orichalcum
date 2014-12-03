@@ -74,7 +74,7 @@ if(!isset($_GET['search'])||$_GET['search']=="")
 		$numberOfItemsInThisView=$vars['limit']*2;
 	}
 	elseif($_GET['l']=="#") $vars['conditions'].="`".$vars['orderby']."` RLIKE '^[^[A-Za-z].*'";
-	else $vars['conditions'].="`".$vars['orderby']."` LIKE '".mysql_real_escape_string($_GET['l'])."%'";
+	else $vars['conditions'].="`".$vars['orderby']."` LIKE '".ksql_real_escape_string($_GET['l'])."%'";
 	
 } else {
 	$vars['conditions'].="(productcode LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";

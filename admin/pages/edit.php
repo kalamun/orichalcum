@@ -27,8 +27,8 @@ if(!isset($_GET['idpag'])) {
 		$kaMenu=new kaMenu();
 
 		$query="SELECT `idpag`,`titolo`,`dir` FROM ".TABLE_PAGINE." WHERE idpag='".$_GET['usePage']."' AND ll='".$_SESSION['ll']."' LIMIT 1";
-		$results=mysql_query($query);
-		if($page=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		if($page=ksql_fetch_array($results))
 		{
 			$vars['title']=b3_unhtmlize($page['titolo']);
 			$vars['dir']=$page['dir'];
@@ -109,8 +109,8 @@ if(!isset($_GET['idpag'])) {
 			}
 		$conditions.="ll='".$_SESSION['ll']."'";
 		$query="SELECT idpag,titolo,dir,riservata,allowconversions FROM ".TABLE_PAGINE." WHERE ".$conditions." ORDER BY titolo";
-		$results=mysql_query($query);
-		while($page=mysql_fetch_array($results)) { ?>
+		$results=ksql_query($query);
+		while($page=ksql_fetch_array($results)) { ?>
 			<tr>
 			<td>
 				<h2><a href="?idpag=<?= $page['idpag']; ?>">
@@ -442,8 +442,8 @@ else {
 					$translation=array();
 					$translation_id=array();
 					$query_l="SELECT * FROM ".TABLE_LINGUE." WHERE ll<>'".$page['ll']."' ORDER BY lingua";
-					$results_l=mysql_query($query_l);
-					while($page_l=mysql_fetch_array($results_l)) {
+					$results_l=ksql_query($query_l);
+					while($page_l=ksql_fetch_array($results_l)) {
 						if(!isset($page['traduzioni'][$page_l['ll']])||$page['traduzioni'][$page_l['ll']]=="") {
 							$translation[$page_l['ll']]="";
 							$translation_id[$page_l['ll']]="";

@@ -11,7 +11,7 @@ if(!isset($_GET['p'])) $_GET['p']=1;
 if(!isset($_GET['q'])) $_GET['q']="";
 
 $conditions="";
-if($_GET['q']!="") $conditions.="`filename` LIKE '%".mysql_real_escape_string($_GET['q'])."%' OR `thumbnail` LIKE '%".mysql_real_escape_string($_GET['q'])."%' OR `alt` LIKE '%".mysql_real_escape_string($_GET['q'])."%'";
+if($_GET['q']!="") $conditions.="`filename` LIKE '%".ksql_real_escape_string($_GET['q'])."%' OR `thumbnail` LIKE '%".ksql_real_escape_string($_GET['q'])."%' OR `alt` LIKE '%".ksql_real_escape_string($_GET['q'])."%'";
 ?>
 
 <h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>

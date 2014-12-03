@@ -16,7 +16,7 @@ $timezone=kaGetVar('timezone',1);
 if($timezone!="") {
 	date_default_timezone_set($timezone);
 	$query="SET time_zone='".date("P")."'";
-	mysql_query($query);
+	ksql_query($query);
 	}
 
 if(get_magic_quotes_gpc()) $_POST['v']=stripslashes($_POST['v']);

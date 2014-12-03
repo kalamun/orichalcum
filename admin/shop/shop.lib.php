@@ -26,12 +26,12 @@ class kaShop {
 		if(!isset($dir)&&isset($titolo)) $dir=preg_replace("/[^\w\/\.\-\x{C0}-\x{D7FF}\x{2C00}-\x{D7FF}]+/","-",strtolower($titolo));
 		if(!isset($dir)||$dir==""||$dir=="-.html") $dir=rand(10,999999);
 		if(strlen($dir)>64) $dir=substr(str_replace(".html","",$dir),0,64).".html";
-		$dir=mysql_real_escape_string($dir);
+		$dir=ksql_real_escape_string($dir);
 		
-		$titolo=mysql_real_escape_string($titolo);
-		$sottotitolo=mysql_real_escape_string($sottotitolo);
-		$anteprima=mysql_real_escape_string($anteprima);
-		$testo=mysql_real_escape_string($testo);
+		$titolo=ksql_real_escape_string($titolo);
+		$sottotitolo=ksql_real_escape_string($sottotitolo);
+		$anteprima=ksql_real_escape_string($anteprima);
+		$testo=ksql_real_escape_string($testo);
 		if($qta==false) $qta=0;
 		if($weight==false) $weight=0;
 		if($layout==false) $layout="";
@@ -39,12 +39,12 @@ class kaShop {
 		$scontato=number_format($scontato,2,'.','');
 		
 		$query="SELECT count(*) as tot FROM ".TABLE_SHOP_ITEMS." WHERE ll='".$ll."' ORDER BY ordine DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$ordine=$row['tot']+1;
 
 		$query="INSERT INTO ".TABLE_SHOP_ITEMS." (`online`,`dir`,`categorie`,`productcode`,`titolo`,`sottotitolo`,`anteprima`,`testo`,`featuredimage`,`photogallery`,`prezzo`,`scontato`,`created`,`public`,`expired`,`modified`,`qta`,`weight`,`layout`,`privatearea`,`rating`,`votes`,`customfields`,`manufacturer`,`ordine`,`traduzioni`,`ll`) VALUES('n','".$dir."','".$categorie."','','".$titolo."','".$sottotitolo."','".$anteprima."','".$testo."',0,',','".$prezzo."','".$scontato."','".$created."','".$public."','".$expired."',NOW(),'".$qta."','".$weight."','".$layout."','','0','0','',0,'".$ordine."','','".$ll."')";
-		if(mysql_query($query)) return mysql_insert_id();
+		if(ksql_query($query)) return ksql_insert_id();
 		else return false;
 		}
 		
@@ -55,8 +55,8 @@ class kaShop {
 		$query="SELECT count(`idsitem`) as `tot` FROM `".TABLE_SHOP_ITEMS."` WHERE ";
 		if($conditions!="") $query.="(".$conditions.") AND ";
 		$query.="`ll`='".$lang."'";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row['tot'];
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row['tot'];
 		return 0;
 	}
 
@@ -70,8 +70,8 @@ class kaShop {
 		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE ";
 		if($conditions!="") $query.="(".$conditions.") AND ";
 		$query.="`ll`='".$lang."' ORDER BY ".$ordine.",`titolo`,`productcode`,`idsitem`";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['categorie']=array();
 			foreach($this->categoriesList as $cat) {
@@ -92,12 +92,12 @@ class kaShop {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE `idsitem`>0 ";
 		if($vars['conditions']!="") $query.=" AND (".$vars['conditions'].") ";
-		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".mysql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".mysql_real_escape_string($vars['match'])."%')";
-		if(isset($vars['ll'])) $query.=" AND `ll`='".mysql_real_escape_string($vars['ll'])."' ";
-		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".mysql_real_escape_string($vars['exclude_ll'])."' ";
+		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".ksql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".ksql_real_escape_string($vars['match'])."%')";
+		if(isset($vars['ll'])) $query.=" AND `ll`='".ksql_real_escape_string($vars['ll'])."' ";
+		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".ksql_real_escape_string($vars['exclude_ll'])."' ";
 		$query.=" ORDER BY ".$vars['orderby'].",`titolo`,`productcode`,`idsitem` LIMIT ".$vars['start'].",".$vars['limit'];
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['categorie']=array();
 			foreach($this->categoriesList as $cat) {
@@ -113,8 +113,8 @@ class kaShop {
 
 		$output=array();
 		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE `idsitem`='".intval($idsitem)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$output=$row;
 
 			$output['categorie']=array();
@@ -158,8 +158,8 @@ class kaShop {
 
 	public function getTitleById($idsitem) {
 		$query="SELECT `titolo`,`dir`,`idsitem` FROM ".TABLE_SHOP_ITEMS." WHERE `idsitem`='".intval($idsitem)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row;
 		}
 
@@ -169,7 +169,7 @@ class kaShop {
 		
 		foreach(array("productcode","titolo","sottotitolo","anteprima","testo","template","layout","dir","privatearea") as $field)
 		{
-			if(isset($vars[$field])) $vars[$field]=mysql_real_escape_string($vars[$field]);
+			if(isset($vars[$field])) $vars[$field]=ksql_real_escape_string($vars[$field]);
 		}
 		
 		if(isset($vars['online']) && $vars['online']!="y") $vars['online']='n';
@@ -184,7 +184,7 @@ class kaShop {
 				//if the field is a textarea, process
 				if($f['type']=='textarea') $vars['customfields'][$f['idsfield']]=b3_htmlize($vars['customfields'][$f['idsfield']],false);
 				if($f['type']=='multichoice') $vars['customfields'][$f['idsfield']]=implode("\n",$vars['customfields'][$f['idsfield']]);
-				$cf.='<field id="'.$f['idsfield'].'">'.mysql_real_escape_string($vars['customfields'][$f['idsfield']])."</field>\n";
+				$cf.='<field id="'.$f['idsfield'].'">'.ksql_real_escape_string($vars['customfields'][$f['idsfield']])."</field>\n";
 			}
 		}
 
@@ -211,7 +211,7 @@ class kaShop {
 		if(isset($vars['photogallery'])) $query.="`photogallery`='".$vars['photogallery']."',";
 
 		$query.="`customfields`='".$cf."',`modified`=NOW() WHERE `idsitem`='".$idsitem."'";
-		if(mysql_query($query)) return $idsitem;
+		if(ksql_query($query)) return $idsitem;
 		else return false;
 		}
 
@@ -219,39 +219,39 @@ class kaShop {
 		if($to==0) $to=9999;
 		if($lang==false) $lang=$this->ll;
 		$query="SELECT count(*) AS tot FROM ".TABLE_SHOP_ITEMS." WHERE ll='".$lang."' LIMIT ".$from.",".$to;
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 
 	public function offlineItem($idsitem) {
 		$query="UPDATE ".TABLE_SHOP_ITEMS." SET online='n' WHERE idsitem='".$idsitem."'";
-		if(mysql_query($query)) return $idsitem;
+		if(ksql_query($query)) return $idsitem;
 		else return false;
 		}
 	public function deleteItem($idsitem) {
 		$query="DELETE FROM ".TABLE_SHOP_ITEMS." WHERE idsitem='".$idsitem."'";
-		if(mysql_query($query)) return $idsitem;
+		if(ksql_query($query)) return $idsitem;
 		else return false;
 		}
 	function sort($idsitem) {
 		for($i=0;isset($idsitem[$i]);$i++) {
 			if(is_numeric($idsitem[$i])) {
 				$query="UPDATE ".TABLE_SHOP_ITEMS." SET ordine='".($i+1)."' WHERE idsitem=".$idsitem[$i]." AND ll='".$_SESSION['ll']."' LIMIT 1";
-				if(!mysql_query($query)) return false;
+				if(!ksql_query($query)) return false;
 				}
 			}
 		return true;
 		}
 
 	public function setTranslations($idsitem,$translations) {
-		$query="UPDATE ".TABLE_SHOP_ITEMS." SET `traduzioni`='".mysql_real_escape_string($translations)."' WHERE `idsitem`='".mysql_real_escape_string($idsitem)."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_SHOP_ITEMS." SET `traduzioni`='".ksql_real_escape_string($translations)."' WHERE `idsitem`='".ksql_real_escape_string($idsitem)."' LIMIT 1";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 	public function removePageFromTranslations($idsitem) {
-		$query="UPDATE ".TABLE_SHOP_ITEMS." SET `traduzioni`=REPLACE(`traduzioni`,'=".mysql_real_escape_string($idsitem)."|','=|') WHERE `traduzioni` LIKE '%=".mysql_real_escape_string($idsitem)."%|'";
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_SHOP_ITEMS." SET `traduzioni`=REPLACE(`traduzioni`,'=".ksql_real_escape_string($idsitem)."|','=|') WHERE `traduzioni` LIKE '%=".ksql_real_escape_string($idsitem)."%|'";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
@@ -260,12 +260,12 @@ class kaShop {
 	public function getOrderArchiveMonths($conditions="",$status='OPN')
 	{
 		$output=array();
-		$query="SELECT `date` FROM `".TABLE_SHOP_ORDERS."` WHERE `status`='".mysql_real_escape_string($status)."' ";
+		$query="SELECT `date` FROM `".TABLE_SHOP_ORDERS."` WHERE `status`='".ksql_real_escape_string($status)."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" GROUP BY year(`date`),month(`date`) ORDER BY `date` DESC";
 		
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=substr($row['date'],0,7);
 			}
 
@@ -276,11 +276,11 @@ class kaShop {
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/members/members.lib.php');
 		$kaMembers=new kaMembers();
 		$output=array();
-		$query="SELECT * FROM `".TABLE_SHOP_ORDERS."` WHERE `status`='".mysql_real_escape_string($status)."' ";
+		$query="SELECT * FROM `".TABLE_SHOP_ORDERS."` WHERE `status`='".ksql_real_escape_string($status)."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" ORDER BY `date` DESC";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$id=count($output);
 			$output[$id]=$row;
 			$output[$id]['friendlydate']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 $4:$5",$row['date']);
@@ -301,8 +301,8 @@ class kaShop {
 		$kaMembers=new kaMembers();
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_ORDERS."` WHERE idord='".intval($idord)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$output=$row;
 			$output['friendlydate']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 $4:$5",$row['date']);
 			if($row['idmember']>0) $output['member']=$kaMembers->getUserById($row['idmember']);
@@ -330,7 +330,7 @@ class kaShop {
 				$currency=$this->kaImpostazioni->getVar('shop-currency',2);
 				}
 			$query="INSERT INTO `".TABLE_SHOP_TRANSACTIONS."` (`idord`,`date`,`value`,`currency`,`idspay`,`method`,`details`) VALUES('".intval($idord)."',NOW(),'".number_format($value,2,'.','')."','".b3_htmlize($currency,true,"")."','".$p['idspay']."','".b3_htmlize($p['name'],true,"")."','".b3_htmlize($details,true,"")."')";
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			$o=$this->getOrderById($idord);
 			$totalamount=0;
@@ -341,7 +341,7 @@ class kaShop {
 				}
 			if($totalamount>=$o['totalprice']) {
 				$query="UPDATE `".TABLE_SHOP_ORDERS."` SET payed='s' WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
-				if(!mysql_query($query)) return false;
+				if(!ksql_query($query)) return false;
 				if($o['member']['email']!="") $this->sendEmail('payed',$o['idord']);
 				
 				//set permissions for private area folders
@@ -360,7 +360,7 @@ class kaShop {
 			}
 		if($totalamount>=$o['totalprice']) {
 			$query="UPDATE `".TABLE_SHOP_ORDERS."` SET payed='s' WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			if($o['member']['email']!="") $this->sendEmail('payed',$o['idord']);
 			
 			//set permissions for private area folders
@@ -374,7 +374,7 @@ class kaShop {
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `shipped`='s',`iddel`='".intval($d['iddel'])."',`deliverer`='".b3_htmlize($d['name'],true,"")."',`tracking_number`='".b3_htmlize($tracking_number,true,"")."',`tracking_url`='".b3_htmlize($tracking_url,true,"")."',`shippedon`=NOW(),`status`='CLS' WHERE idord='".$o['idord']."' LIMIT 1";
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		if(!$this->applyPrivatePermissions($idord)) return false;
 		$this->sendEmail('sended',$o['idord']);
 		return true;
@@ -383,14 +383,14 @@ class kaShop {
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `status`='CNC' WHERE idord='".intval($o['idord'])."' LIMIT 1";
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		return true;
 		}
 	public function closeOrder($idord) {
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `status`='CLS' WHERE idord='".intval($o['idord'])."' LIMIT 1";
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		if(!$this->applyPrivatePermissions($idord)) return false;
 		return true;
 		}
@@ -398,13 +398,13 @@ class kaShop {
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="DELETE FROM `".TABLE_SHOP_ORDERS."` WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		return true;
 		}
 	public function orderUpdateNotes($idord,$notes)
 	{
-		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `notes`='".mysql_real_escape_string($notes)."' WHERE `idord`='".intval($idord)."' LIMIT 1";
-		if(!mysql_query($query)) return false;
+		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `notes`='".ksql_real_escape_string($notes)."' WHERE `idord`='".intval($idord)."' LIMIT 1";
+		if(!ksql_query($query)) return false;
 		return true;
 	}
 
@@ -494,8 +494,8 @@ class kaShop {
 	public function getPaymentMethodsByZone($idzone) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_PAYMENTS."` WHERE zones LIKE '%,".intval($idzone).",%' ORDER BY `ordine`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 		return $output;
@@ -503,8 +503,8 @@ class kaShop {
 	public function getPaymentMethodById($idspay) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_PAYMENTS."` WHERE idspay='".intval($idspay)."' LIMIT 1";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output=$row;
 			}
 		return $output;
@@ -512,8 +512,8 @@ class kaShop {
 	public function getDeliverersByZone($idzone) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_DELIVERERS."` WHERE zones LIKE '%,".intval($idzone).",%' ORDER BY `ordine`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 		return $output;
@@ -521,8 +521,8 @@ class kaShop {
 	public function getDelivererById($iddel) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_DELIVERERS."` WHERE iddel='".intval($iddel)."' LIMIT 1";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output=$row;
 			}
 		return $output;
@@ -530,8 +530,8 @@ class kaShop {
 	public function getTransactionsByOrderId($idord) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_TRANSACTIONS."` WHERE idord='".intval($idord)."' ORDER BY `date`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$id=count($output);
 			$output[$id]=$row;
 			$output[$id]['friendlydate']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 $4:$5",$output[$id]['date']);
@@ -571,8 +571,8 @@ class kaShop {
 		
 		$query.=" ORDER BY `".$vars['order']."`";
 
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$row['categoriesList']="";
 			foreach(explode(",",trim($row['categories'],",")) as $idcat) {
 				if(isset($categories[$idcat])) $row['categoriesList'].=$categories[$idcat]."\n";
@@ -592,12 +592,12 @@ class kaShop {
 		if(!isset($vars['values'])) $vars['values']="";
 		if(!isset($vars['categories'])) $vars['categories']=",";
 		$query="SELECT `order` FROM `".TABLE_SHOP_CUSTOMFIELDS."` ORDER BY `order` DESC LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) $vars['order']=$row['order']+1;
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) $vars['order']=$row['order']+1;
 		else $vars['order']=1;
 
-		$query="INSERT INTO ".TABLE_SHOP_CUSTOMFIELDS." (`name`,`type`,`values`,`categories`,`order`) VALUES('".mysql_real_escape_string($vars['name'])."','".mysql_real_escape_string($vars['type'])."','".mysql_real_escape_string($vars['values'])."','".b3_htmlize($vars['categories'],true,"")."','".intval($vars['order'])."')";
-		if(mysql_query($query)) return true;
+		$query="INSERT INTO ".TABLE_SHOP_CUSTOMFIELDS." (`name`,`type`,`values`,`categories`,`order`) VALUES('".ksql_real_escape_string($vars['name'])."','".ksql_real_escape_string($vars['type'])."','".ksql_real_escape_string($vars['values'])."','".b3_htmlize($vars['categories'],true,"")."','".intval($vars['order'])."')";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
@@ -609,23 +609,23 @@ class kaShop {
 		if(!isset($vars['values'])) $vars['values']="";
 		if(!isset($vars['categories'])) $vars['categories']=",";
 
-		$query="UPDATE ".TABLE_SHOP_CUSTOMFIELDS." SET `name`='".mysql_real_escape_string($vars['name'])."',`type`='".mysql_real_escape_string($vars['type'])."',`values`='".mysql_real_escape_string($vars['values'])."',`categories`='".mysql_real_escape_string($vars['categories'])."' WHERE `idsfield`='".intval($vars['idsfield'])."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_SHOP_CUSTOMFIELDS." SET `name`='".ksql_real_escape_string($vars['name'])."',`type`='".ksql_real_escape_string($vars['type'])."',`values`='".ksql_real_escape_string($vars['values'])."',`categories`='".ksql_real_escape_string($vars['categories'])."' WHERE `idsfield`='".intval($vars['idsfield'])."' LIMIT 1";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
 	public function removeCustomField($idsfield) {
 		/* permanently delete a custom field */
 		$query="DELETE FROM ".TABLE_SHOP_CUSTOMFIELDS." WHERE `idsfield`=".intval($idsfield)." LIMIT 1";
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
 	public function sortCustomFields($order) {
 		$i=1;
 		foreach($order as $idsfield) {
-			$query="UPDATE ".TABLE_SHOP_CUSTOMFIELDS." SET `order`=".$i." WHERE `idsfield`='".mysql_real_escape_string($idsfield)."' LIMIT 1";
-			mysql_query($query);
+			$query="UPDATE ".TABLE_SHOP_CUSTOMFIELDS." SET `order`=".$i." WHERE `idsfield`='".ksql_real_escape_string($idsfield)."' LIMIT 1";
+			ksql_query($query);
 			$i++;
 			}
 		}
@@ -641,8 +641,8 @@ class kaShop {
 		if(isset($vars['idsitem'])) $query.=" `idsitem`='".intval($vars['idsitem'])."' AND ";
 		$query.=" `idsvar`<>0 GROUP BY `collection` ORDER BY ".$vars['orderby'];
 
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			if(trim($row['collection'])!="") $output[]=$row['collection'];
 			}
 
@@ -658,8 +658,8 @@ class kaShop {
 		if(isset($vars['idsvar'])) $query.=" `idsvar`='".intval($vars['idsvar'])."' AND ";
 		$query.=" `idsvar`<>0 ORDER BY ".$vars['orderby'];
 
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 
@@ -668,25 +668,25 @@ class kaShop {
 	
 	public function addVariation($idsitem,$name,$collection,$copy) {
 		$idsitem=intval($idsitem);
-		$name=mysql_real_escape_string($name);
-		$collection=mysql_real_escape_string($collection);
-		$copy=mysql_real_escape_string($copy);
+		$name=ksql_real_escape_string($name);
+		$collection=ksql_real_escape_string($collection);
+		$copy=ksql_real_escape_string($copy);
 
 		$query="SELECT `order` FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsitem`='".$idsitem."' AND `collection`='".$collection."' ORDER BY `order` DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$order=$row['order']+1;
 		
 		if($copy=="") {
 			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`collection`,`order`) VALUES('".$idsitem."','".$name."','','','".$collection."','".$order."')";
-			if(mysql_query($query)) return mysql_insert_id();
+			if(ksql_query($query)) return ksql_insert_id();
 			}
 		else {
 			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`collection`,`order`) SELECT `idsitem`,`name`,`descr`,`price`,`collection`,`order` FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsvar`='".$copy."' LIMIT 1";
-			if(mysql_query($query)){
-				$id=mysql_insert_id();
+			if(ksql_query($query)){
+				$id=ksql_insert_id();
 				$query="UPDATE ".TABLE_SHOP_VARIATIONS." SET `name`='".$name."',`collection`='".$collection."',`order`='".$order."' WHERE idsvar='".$id."' LIMIT 1";
-				if(mysql_query($query)) return $id;
+				if(ksql_query($query)) return $id;
 				return false;
 				}
 			return false;
@@ -698,16 +698,16 @@ class kaShop {
 	public function importVariations($from,$to) {
 		$output=true;
 		$query="SELECT * FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsitem`='".intval($from)."' ORDER BY `collection` ASC,`order` ASC";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$q="SELECT * FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsitem`='".intval($to)."' AND `collection`='".$row['collection']."' ORDER BY `order` DESC LIMIT 1";
-			$rs=mysql_query($q);
-			$r=mysql_fetch_array($rs);
+			$rs=ksql_query($q);
+			$r=ksql_fetch_array($rs);
 			$order=$r['order']+1;
 			
 			$q="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`collection`,`name`,`descr`,`price`,`default`,`order`)
-				VALUES('".intval($to)."','".mysql_real_escape_string($row['collection'])."','".mysql_real_escape_string($row['name'])."','".mysql_real_escape_string($row['descr'])."','".mysql_real_escape_string($row['price'])."','".mysql_real_escape_string($row['default'])."','".mysql_real_escape_string($order)."')";
-			if(!mysql_query($q)) $output=false;
+				VALUES('".intval($to)."','".ksql_real_escape_string($row['collection'])."','".ksql_real_escape_string($row['name'])."','".ksql_real_escape_string($row['descr'])."','".ksql_real_escape_string($row['price'])."','".ksql_real_escape_string($row['default'])."','".ksql_real_escape_string($order)."')";
+			if(!ksql_query($q)) $output=false;
 			}
 		return $output;
 		}
@@ -717,20 +717,20 @@ class kaShop {
 		
 		$query="UPDATE ".TABLE_SHOP_VARIATIONS." SET ";
 		foreach($vars as $k=>$v) {
-			$vars[$k]=mysql_real_escape_string(trim($v));
+			$vars[$k]=ksql_real_escape_string(trim($v));
 			if($k=='price') $vars[$k]=str_replace(",",".",$vars[$k]);
 			if($k!='idsvar') $query.=" `".$k."`='".$vars[$k]."',";
 			}
 		$query=rtrim($query,",");
 		$query.=" WHERE `idsvar`='".$vars['idsvar']."' LIMIT 1";
 		
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		return false;
 		}
 	
 	public function deleteVariation($idsvar) {
 		$query="DELETE FROM `".TABLE_SHOP_VARIATIONS."` WHERE `idsvar`='".intval($idsvar)."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		return false;
 		}
 
@@ -758,12 +758,12 @@ class kaShop {
 				}
 			
 			//check if code exists yet
-			$query="SELECT * FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `code`='".mysql_real_escape_string($code)."' LIMIT 1";
-			$results=mysql_query($query);
-			if(!mysql_fetch_array($results)) {
+			$query="SELECT * FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `code`='".ksql_real_escape_string($code)."' LIMIT 1";
+			$results=ksql_query($query);
+			if(!ksql_fetch_array($results)) {
 				//if not exists, insert
-				$query="INSERT INTO ".TABLE_SHOP_COUPONS_CODES." (`idscoup`,`code`,`valid`) VALUES('".mysql_real_escape_string($vars['idscoup'])."','".mysql_real_escape_string($code)."',1)";
-				mysql_query($query);
+				$query="INSERT INTO ".TABLE_SHOP_COUPONS_CODES." (`idscoup`,`code`,`valid`) VALUES('".ksql_real_escape_string($vars['idscoup'])."','".ksql_real_escape_string($code)."',1)";
+				ksql_query($query);
 				$i++;
 				}
 			else $errors++;
@@ -772,18 +772,18 @@ class kaShop {
 		}
 
 	public function markCouponAsUsed($code) {
-		$query="UPDATE ".TABLE_SHOP_COUPONS_CODES." SET `valid`=0 WHERE `code`='".mysql_real_escape_string($code)."'";
-		return mysql_query($query);
+		$query="UPDATE ".TABLE_SHOP_COUPONS_CODES." SET `valid`=0 WHERE `code`='".ksql_real_escape_string($code)."'";
+		return ksql_query($query);
 		}
 
 	public function markCouponAsValid($code) {
-		$query="UPDATE ".TABLE_SHOP_COUPONS_CODES." SET `valid`=1 WHERE `code`='".mysql_real_escape_string($code)."'";
-		return mysql_query($query);
+		$query="UPDATE ".TABLE_SHOP_COUPONS_CODES." SET `valid`=1 WHERE `code`='".ksql_real_escape_string($code)."'";
+		return ksql_query($query);
 		}
 
 	public function deleteCoupon($code) {
-		$query="DELETE FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `code`='".mysql_real_escape_string($code)."'";
-		return mysql_query($query);
+		$query="DELETE FROM ".TABLE_SHOP_COUPONS_CODES." WHERE `code`='".ksql_real_escape_string($code)."'";
+		return ksql_query($query);
 		}
 	
 	//get an array with the list of coupons
@@ -798,8 +798,8 @@ class kaShop {
 		if(isset($vars['valid'])) $query.=" AND `valid`='".$vars['valid']."' ";
 		if(isset($vars['idscoup'])) $query.=" AND `idscoup`='".intval($vars['idscoup'])."' ";
 		$query.=" ORDER BY `code`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 
@@ -832,7 +832,7 @@ class kaShop {
 			`ll`
 			) VALUES(
 			'".b3_htmlize($vars['name'],true,"")."',
-			'".mysql_real_escape_string($vars['dir'])."',
+			'".ksql_real_escape_string($vars['dir'])."',
 			'',
 			'',
 			'',
@@ -844,7 +844,7 @@ class kaShop {
 			'".$_SESSION['ll']."'
 			)";
 		
-		if(mysql_query($query)) return mysql_insert_id();
+		if(ksql_query($query)) return ksql_insert_id();
 		else return false;
 	}
 
@@ -859,14 +859,14 @@ class kaShop {
 			$conditions.="(";
 			$conditions.="`name` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
 			$conditions.="`subtitle` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
-			$conditions.="`dir` LIKE '%".mysql_real_escape_string($_GET['search'])."%'";
+			$conditions.="`dir` LIKE '%".ksql_real_escape_string($_GET['search'])."%'";
 			$conditions.=") AND ";
 		}
 
 		$conditions.="ll='".$vars['ll']."'";
 		$query="SELECT count(`idsman`) AS `tot` FROM ".TABLE_SHOP_MANUFACTURERS." WHERE ".$conditions." ORDER BY ".$vars['orderby'];
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		
 		return $row['tot'];
 	}
@@ -885,15 +885,15 @@ class kaShop {
 			$conditions.="(";
 			$conditions.="`name` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
 			$conditions.="`subtitle` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
-			$conditions.="`dir` LIKE '%".mysql_real_escape_string($_GET['search'])."%'";
+			$conditions.="`dir` LIKE '%".ksql_real_escape_string($_GET['search'])."%'";
 			$conditions.=") AND ";
 		}
 
 		$conditions.="ll='".$vars['ll']."'";
 		$query="SELECT `idsman`,`name`,`dir`,`featuredimage` FROM ".TABLE_SHOP_MANUFACTURERS." WHERE ".$conditions." ORDER BY ".$vars['orderby'];
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 
-		while($page=mysql_fetch_array($results))
+		while($page=ksql_fetch_array($results))
 		{
 			$output[]=$page;
 		}
@@ -907,9 +907,9 @@ class kaShop {
 
 		if(!isset($idsman)) return false;
 		$query="SELECT * FROM ".TABLE_SHOP_MANUFACTURERS." WHERE `idsman`='".intval($idsman)."' LIMIT 1";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 
-		if($page=mysql_fetch_array($results))
+		if($page=ksql_fetch_array($results))
 		{
 			$page['imgallery']=$this->kaImgallery->getList(TABLE_SHOP_MANUFACTURERS,$page['idsman']);
 			$page['docgallery']=$this->kaDocgallery->getList(TABLE_SHOP_MANUFACTURERS,$page['idsman']);
@@ -967,12 +967,12 @@ class kaShop {
 		if(isset($vars['subtitle'])) $query.="`subtitle`='".b3_htmlize($vars['subtitle'],true,"")."',";
 		if(isset($vars['preview'])) $query.="`preview`='".b3_htmlize($vars['preview'],true)."',";
 		if(isset($vars['description'])) $query.="`description`='".b3_htmlize($vars['description'],true)."',";
-		if(isset($vars['dir'])) $query.="`dir`='".mysql_real_escape_string($vars['dir'])."',";
+		if(isset($vars['dir'])) $query.="`dir`='".ksql_real_escape_string($vars['dir'])."',";
 		if(isset($vars['featuredimage'])) $query.="`featuredimage`='".intval($vars['featuredimage'])."',";
-		if(isset($vars['photogallery'])) $query.="`photogallery`='".mysql_real_escape_string($vars['photogallery'])."',";
-		$query.="`modified`=NOW() WHERE `idsman`=".mysql_real_escape_string($vars['idsman'])." LIMIT 1";
+		if(isset($vars['photogallery'])) $query.="`photogallery`='".ksql_real_escape_string($vars['photogallery'])."',";
+		$query.="`modified`=NOW() WHERE `idsman`=".ksql_real_escape_string($vars['idsman'])." LIMIT 1";
 
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 
 		foreach($vars as $ka=>$v)
 		{
@@ -993,7 +993,7 @@ class kaShop {
 		
 		$query="DELETE FROM `".TABLE_SHOP_MANUFACTURERS."` WHERE `idsman`='".intval($idsman)."' LIMIT 1";
 		
-		if(mysql_query($query))
+		if(ksql_query($query))
 		{
 			// remove from document gallery
 			foreach($kaDocgallery->getList(TABLE_SHOP_MANUFACTURERS,intval($idsman)) as $doc)

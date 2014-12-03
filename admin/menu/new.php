@@ -58,16 +58,16 @@ elseif(isset($_POST['private-insert'])) {
 
 if(isset($_POST['insert'])) {
 	$log="";
-	$query="SELECT `ordine` FROM `".TABLE_MENU."` WHERE `collection`='".mysql_real_escape_string($_GET['collection'])."' AND `ll`='".$_SESSION['ll']."' AND `ref`='0' ORDER BY `ordine` DESC LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$query="SELECT `ordine` FROM `".TABLE_MENU."` WHERE `collection`='".ksql_real_escape_string($_GET['collection'])."' AND `ll`='".$_SESSION['ll']."' AND `ref`='0' ORDER BY `ordine` DESC LIMIT 1";
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	$ordine=$row['ordine']+1;
 
-	$query="INSERT INTO `".TABLE_MENU."` (`label`,`url`,`ref`,`photogallery`,`ll`,`ordine`,`collection`) VALUES('".b3_htmlize($_POST['title'],true,"")."','".b3_htmlize($_POST['dir'],true,"")."','0','','".$_SESSION['ll']."','".$ordine."','".mysql_real_escape_string($_GET['collection'])."')";
-	if(!mysql_query($query)) {
+	$query="INSERT INTO `".TABLE_MENU."` (`label`,`url`,`ref`,`photogallery`,`ll`,`ordine`,`collection`) VALUES('".b3_htmlize($_POST['title'],true,"")."','".b3_htmlize($_POST['dir'],true,"")."','0','','".$_SESSION['ll']."','".$ordine."','".ksql_real_escape_string($_GET['collection'])."')";
+	if(!ksql_query($query)) {
 		$log=$kaTranslate->translate("Menu:Error occurred while saving item");
 		}
-	else $id=mysql_insert_id();
+	else $id=ksql_insert_id();
 
 	if($log=="") {
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate("Menu:Successfully saved").'</div>';

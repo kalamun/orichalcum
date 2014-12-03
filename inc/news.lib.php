@@ -15,7 +15,6 @@ class kNews {
 	/* reset to defaults value */
 	public function init() {
 		$this->inited=true;
-		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."admin/inc/connect.inc.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."admin/inc/main.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/images.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/documents.lib.php");
@@ -41,13 +40,13 @@ class kNews {
 		// load categories
 		$meta=array();
 		$query="SELECT * FROM ".TABLE_METADATA." WHERE `tabella`='".TABLE_CATEGORIE."'";
-			$results=mysql_query($query);
-				while($row=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+				while($row=ksql_fetch_array($results)) {
 			$meta[$row['id']][$row['param']]=$row['value'];
 			}
 		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_NEWS."' AND ll='".LANG."' ORDER BY ordine";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$this->categoriesList[$row['ordine']]=$row;
 			$this->categoriesList[$row['ordine']]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$row['dir'];
 			$this->categoriesList[$row['ordine']]['imgs']=$GLOBALS['__images_gallery']->getList(TABLE_CATEGORIE,$row['idcat']);
@@ -74,13 +73,13 @@ class kNews {
 			}
 		if(substr($query,-6)=="WHERE ") return $output; //if no valid keywords return the empty array (prevent to return all pages)
 
-		$query.="`ll`='".mysql_real_escape_string(LANG)."' ";
+		$query.="`ll`='".ksql_real_escape_string(LANG)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
 		$query.="ORDER BY ".$this->orderby."";
 
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 
 			$subdir="";
 			foreach($this->categoriesList as $cat) {
@@ -181,8 +180,8 @@ class kNews {
 				$output[$i]=$cat;
 				if($count==true) {
 					$query="SELECT count(*) AS tot FROM ".TABLE_NEWS." WHERE `categorie` LIKE '%,".$cat['idcat'].",%'";
-					$results=mysql_query($query);
-					$row=mysql_fetch_array($results);
+					$results=ksql_query($query);
+					$row=ksql_fetch_array($results);
 					$output[$i]['count']=$row['tot'];
 					}
 				}
@@ -205,12 +204,12 @@ class kNews {
 		if(!isset($dir[2])) $dir[2]="";
 
 		if($this->orderby=="") $this->orderby="data";
-		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".mysql_real_escape_string($dir[2])."') AND `ll`='".mysql_real_escape_string($ll)."' ";
+		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND `ll`='".ksql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
 		$query.=" LIMIT 1";
-			$results=mysql_query($query);
-				if($row=mysql_fetch_array($results)) return true;
+			$results=ksql_query($query);
+				if($row=ksql_fetch_array($results)) return true;
 		else return false;
 		}
 
@@ -236,7 +235,7 @@ class kNews {
 			}
 
 		// else get from database
-		$query="SELECT `template`,`layout` FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') AND `ll`='".mysql_real_escape_string(LANG)."' ";
+		$query="SELECT `template`,`layout` FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".ksql_real_escape_string($dir)."') AND `ll`='".ksql_real_escape_string(LANG)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
 		if(count($this->allowedCategories)>0) {
@@ -247,8 +246,8 @@ class kNews {
 			$query.=") ";
 			}
 		$query.=" LIMIT 1";
-			$results=mysql_query($query);
-				if($row=mysql_fetch_array($results)) return $row;
+			$results=ksql_query($query);
+				if($row=ksql_fetch_array($results)) return $row;
 		return false;
 		}
 
@@ -292,8 +291,8 @@ class kNews {
 				}
 			else {
 				$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_NEWS."' AND id='".intval($news['idnews'])."'";
-				$results=mysql_query($query);
-				while($row=mysql_fetch_array($results)) {
+				$results=ksql_query($query);
+				while($row=ksql_fetch_array($results)) {
 					$metadata[$row['param']]=$row['value'];
 					}
 				$this->loadedNews['metadata']=$metadata;
@@ -399,12 +398,12 @@ class kNews {
 		if($dir==false) $dir=$GLOBALS['url'][2];
 		if($this->orderby=="") $orderby="data DESC";
 
-		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') AND `ll`='".mysql_real_escape_string($ll)."' ";
+		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".ksql_real_escape_string($dir)."') AND `ll`='".ksql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() ";
 		if($this->if_expired=="nascondi") $query.=" AND scaduta<=NOW() ";
 		$query.="ORDER BY ".$this->orderby." LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) $row=$this->row2output($row);
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) $row=$this->row2output($row);
 		else $row=array();
 		return $row;
 		}
@@ -419,9 +418,9 @@ class kNews {
 		if($cat=="*") $this->setCatByDir();
 		$limit=intval($limit);
 
-		$query="SELECT `".$dataRef."` FROM `".TABLE_NEWS."` WHERE `dir`='".mysql_real_escape_string($dir)."' LIMIT 1";
-			$results=mysql_query($query);
-				if($row=mysql_fetch_array($results)) {
+		$query="SELECT `".$dataRef."` FROM `".TABLE_NEWS."` WHERE `dir`='".ksql_real_escape_string($dir)."' LIMIT 1";
+			$results=ksql_query($query);
+				if($row=ksql_fetch_array($results)) {
 			$output=array();
 			$query="SELECT * FROM ".TABLE_NEWS." WHERE `".$dataRef."`<'".$row[$dataRef]."' AND ll='".LANG."' AND pubblica<=NOW() ";
 			if($this->if_expired=="nascondi") $query.="AND scaduta<=NOW() ";
@@ -431,9 +430,9 @@ class kNews {
 				}
 			$query.=") ";
 			$query.="ORDER BY ".$orderby." LIMIT ".$limit;
-			$results=mysql_query($query);
-			$results=mysql_query($query);
-			while($row=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+			$results=ksql_query($query);
+			while($row=ksql_fetch_array($results)) {
 				$output[]=$this->row2output($row,$orderby);
 				}
 			return $output;
@@ -450,9 +449,9 @@ class kNews {
 			elseif(strpos($orderby,"data")!==false) $dataRef="data";
 			else $dataRef="pubblica";
 		$orderby=preg_replace('/ desc$/i',' ASC',$orderby);
-		$query="SELECT `".$dataRef."` FROM ".TABLE_NEWS." WHERE `dir`='".mysql_real_escape_string($dir)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$query="SELECT `".$dataRef."` FROM ".TABLE_NEWS." WHERE `dir`='".ksql_real_escape_string($dir)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$output=array();
 			$query="SELECT * FROM ".TABLE_NEWS." WHERE `".$dataRef."`>'".$row[$dataRef]."' AND ll='".LANG."' AND pubblica<=NOW() ";
 			if($this->if_expired=="nascondi") $query.="AND scaduta<=NOW() ";
@@ -462,8 +461,8 @@ class kNews {
 				}
 			$query.=") ";
 			$query.="ORDER BY ".$orderby." LIMIT ".$limit;
-				$results=mysql_query($query);
-					while($row=mysql_fetch_array($results)) {
+				$results=ksql_query($query);
+					while($row=ksql_fetch_array($results)) {
 				$output[]=$this->row2output($row,$orderby);
 				}
 			return $output;
@@ -474,15 +473,15 @@ class kNews {
 	public function getPermalinkById($idnews) {
 		if(!$this->inited) $this->init();
 		$query="SELECT `ll`,`dir`,`categorie` FROM `".TABLE_NEWS."` WHERE `idnews`='".intval($idnews)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 
 		$subdir="";
 
 		$allowedCategories=$GLOBALS['__template']->getVar('news',2,$row['ll']);
 		$catquery="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `tabella`='".TABLE_NEWS."' AND `ll`='".$row['ll']."' ORDER BY `ordine`";
-		$catresults=mysql_query($catquery);
-		while($catrow=mysql_fetch_array($catresults)) {
+		$catresults=ksql_query($catquery);
+		while($catrow=ksql_fetch_array($catresults)) {
 			if($allowedCategories==",*,"&&strpos($row['categorie'],','.$catrow['idcat'].',')!==false) {
 				$subdir=$catrow['dir'];
 				break;
@@ -512,7 +511,7 @@ class kNews {
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
 
 		$output=array();
-		$query="SELECT * FROM `".TABLE_NEWS."` WHERE `ll`='".mysql_real_escape_string($vars['ll'])."' AND `pubblica`<=NOW() ";
+		$query="SELECT * FROM `".TABLE_NEWS."` WHERE `ll`='".ksql_real_escape_string($vars['ll'])."' AND `pubblica`<=NOW() ";
 		if($this->if_expired=="archivia"&&isset($vars['archive'])) {
 			if($vars['archive']==true) $query.="AND `scadenza`<NOW() ";
 			else $query.="AND `scadenza`>=NOW() ";
@@ -527,7 +526,7 @@ class kNews {
 				}
 			$query.=") ";
 			}
-		if($this->allowedDate!="") $query.=" AND `".mysql_real_escape_string($dataRef)."` LIKE '".mysql_real_escape_string($this->allowedDate)."%' ";
+		if($this->allowedDate!="") $query.=" AND `".ksql_real_escape_string($dataRef)."` LIKE '".ksql_real_escape_string($this->allowedDate)."%' ";
 		if(isset($vars['options'])&&$vars['options']!="") $query.=" ".$vars['options']." ";
 		
 		if(isset($vars['home'])&&$vars['home']==true) $query.=" AND `home`='s' ";
@@ -536,14 +535,14 @@ class kNews {
 			else $query.=" AND `calendario`='n' ";
 			}
 		
-		$query.="ORDER BY ".mysql_real_escape_string($vars['orderby']).",`idnews` DESC ";
+		$query.="ORDER BY ".ksql_real_escape_string($vars['orderby']).",`idnews` DESC ";
 		if(isset($vars['offset'])||isset($vars['limit'])) {
 			if(!isset($vars['offset'])) $vars['offset']=0;
 			$query.=" LIMIT ".intval($vars['offset']);
 			if(isset($vars['limit'])) $query.=",".intval($vars['limit']);
 			}
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$this->row2output($row,$vars['orderby']);
 			}
 		return $output;
@@ -578,7 +577,7 @@ class kNews {
 				}
 			$query.=") ";
 			}
-		if($this->allowedDate!="") $query.=" AND `".mysql_real_escape_string($dataRef)."` LIKE '".mysql_real_escape_string($this->allowedDate)."%' ";
+		if($this->allowedDate!="") $query.=" AND `".ksql_real_escape_string($dataRef)."` LIKE '".ksql_real_escape_string($this->allowedDate)."%' ";
 		if(isset($vars['options'])&&$vars['options']!="") $query.=" ".$vars['options']." ";
 		
 		if(isset($vars['home'])&&$vars['home']==true) $query.=" AND `home`='s' ";
@@ -588,8 +587,8 @@ class kNews {
 			}
 		
 		$query.="ORDER BY ".$vars['orderby'].",idnews DESC LIMIT ".$vars['limit']." OFFSET ".$vars['offset']."";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['categorie']=array();
 			$subdir="";
@@ -618,8 +617,8 @@ class kNews {
 		if($this->geo>0) $query.="AND categorie LIKE '%,".$this->geo.",%' ";
 		if($this->cat>0) $query.="AND categorie LIKE '%,".$this->cat.",%' ";
 		if($conditions!="") $query.="AND (".$conditions.") ";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 		
@@ -645,20 +644,20 @@ class kNews {
 		if(!$this->inited) $this->init();
 		if($public!="s") $public="n";
 		$query="INSERT INTO ".TABLE_COMMENTI." (ip,data,tabella,id,autore,email,testo,public) VALUES('".$_SERVER['REMOTE_ADDR']."',NOW(),'".TABLE_NEWS."','".$idnews."','".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($text,true,"")."','".$public."')";
-		$results=mysql_query($query);
-		$idcomm=mysql_insert_id();
+		$results=ksql_query($query);
+		$idcomm=ksql_insert_id();
 		
 		//notifica
 		$mail=array("headers"=>"","to"=>"","subject"=>"","message"=>"");
 		$query="SELECT idnews,titolo,iduser FROM ".TABLE_NEWS." WHERE idnews=".$idnews." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$iduser=$row['iduser'];
 		$titolo=$row['titolo'];
 		$idnews=$row['idnews'];
 		$query="SELECT * FROM ".TABLE_USERS." WHERE iduser='".$iduser."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$siteTitle=$GLOBALS['__template']->getVar('sitename',1);
 			$mail['subject']="[".$siteTitle."] Nuovo commento";
 			$mail['message']="Ciao ".$row['name'].",\n"
@@ -685,8 +684,8 @@ class kNews {
 		if(!$this->inited) $this->init();
 		$output=array();
 		$query="SELECT * FROM ".TABLE_COMMENTI." WHERE tabella='".TABLE_NEWS."' AND id='".intval($idnews)."' AND public='s' ORDER BY data";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['dataleggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).*/","$3-$2-$1 $4:$5",$row['data']);
 			}

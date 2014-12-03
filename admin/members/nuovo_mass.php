@@ -15,7 +15,7 @@ if(isset($_POST['insert'])&&$_POST['m_prefix']!=""&&$_POST['m_qty']!="") {
 
 	if($id==false) $log="Problemi durante la creazione del nuovo utente";
 	if($log=="") {
-		$id=mysql_insert_id();
+		$id=ksql_insert_id();
 		$kaLog->add("INS",'Members: Mass creation successfully done for '.$_POST['m_qty'].' users');
 		echo '<div id="MsgSuccess">Membri inseriti con successo</div>';
 		}

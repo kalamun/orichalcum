@@ -19,8 +19,8 @@ class kImpostazioni {
 			}
 		else {
 			$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='".$param."' AND ll='".$ll."' LIMIT 1";
-				$results=mysql_query($query);
-					if($row=mysql_fetch_array($results)) return true;
+				$results=ksql_query($query);
+					if($row=ksql_fetch_array($results)) return true;
 			else return false;
 			}
 		}
@@ -29,7 +29,7 @@ class kImpostazioni {
 		// aggiungo un parametro
 		if($ll==false) $ll=$this->ll;
 		$query="INSERT INTO ".TABLE_CONFIG." (param,value1,value2,sistema,ll) VALUES('".$param."','".$value1."','".$value2."','".$sistema."','".$ll."')";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		if($results) return true;
 		else return false;
 		}
@@ -38,7 +38,7 @@ class kImpostazioni {
 		// aggiungo un parametro
 		if($ll==false) $ll=$this->ll;
 		$query="UPDATE ".TABLE_CONFIG." SET value1='".$value1."',value2='".$value2."',sistema='".$sistema."' WHERE param='".$param."' AND ll='".$ll."' LIMIT 1";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		if($results) return true;
 		else return false;
 		}
@@ -58,8 +58,8 @@ class kImpostazioni {
 			}
 		else {
 			$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='".$param."' AND ll='".$ll."' LIMIT 1";
-				$results=mysql_query($query);
-					if($row=mysql_fetch_array($results)) return $row;
+				$results=ksql_query($query);
+					if($row=ksql_fetch_array($results)) return $row;
 			else return false;
 			}
 		}

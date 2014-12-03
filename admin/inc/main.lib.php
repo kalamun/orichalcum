@@ -55,8 +55,8 @@ class kaOrichalcum
 		if($timezone=="") $timezone='Europe/Rome';
 		date_default_timezone_set($timezone);
 		$query="SET time_zone='".date("P")."'";
-		mysql_query($query);
-		mysql_query("SET NAMES utf8");
+		ksql_query($query);
+		ksql_query("SET NAMES utf8");
 
 		/* load setup variables */
 		require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR."inc/log.lib.php");
@@ -685,8 +685,8 @@ function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$r
 	preg_match_all('/&lt;img .*?id="img(\d*)".*?&gt;/',$value,$matches);
 	foreach($matches[1] as $k=>$v) {
 		$query="SELECT * FROM ".TABLE_IMG." WHERE `idimg`='".$v."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			if($row['filename']==""&&$row['hotlink']!="") $row['filename']=$row['hotlink'];
 			$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?id="img'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'].'$3',$value);
 			}
@@ -694,8 +694,8 @@ function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$r
 	preg_match_all('/&lt;img .*?id="thumb(\d*)".*?&gt;/',$value,$matches);
 	foreach($matches[1] as $k=>$v) {
 		$query="SELECT * FROM ".TABLE_IMG." WHERE `idimg`='".$v."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			if($row['thumbnail']==""&&$row['hotlink']!="") $row['thumbnail']=$row['hotlink'];
 			$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?id="thumb'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'].'$3',$value);
 			}
@@ -703,16 +703,16 @@ function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$r
 	preg_match_all('/&lt;a .*?id="doc(\d*)".*?&gt;/',$value,$matches);
 	foreach($matches[1] as $k=>$v) {
 		$query="SELECT * FROM ".TABLE_DOCS." WHERE `iddoc`='".$v."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$value=preg_replace('/(&lt;a .*?href=")([^"]*)(" .*?id="doc'.$v.'".*?&gt;)/','$1'.BASEDIR.DIR_DOCS.$row['iddoc'].'/'.$row['filename'].'$3',$value);
 			}
 		}
 	preg_match_all('/&lt;img .*?id="media(\d*)".*?&gt;/',$value,$matches);
 	foreach($matches[1] as $k=>$v) {
 		$query="SELECT * FROM ".TABLE_MEDIA." WHERE `idmedia`='".$v."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			if($row['thumbnail']!="") $url=BASEDIR.DIR_MEDIA.$row['idmedia'].'/'.$row['thumbnail'];
 			else $url=ADMINDIR.'img/media_placeholder.png';
 			$value=preg_replace('/(&lt;img .*?src=")([^"]*)(" .*?id="media'.$v.'".*?&gt;)/','$1'.$url.'$3',$value);

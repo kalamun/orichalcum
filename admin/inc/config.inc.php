@@ -16,7 +16,7 @@ $__db['user']="{VAR_DB_USER}";
 $__db['password']="{VAR_DB_PASSWORD}";
 $__db['name']="{VAR_DB_NAME}";
 define("DEFAULT_LANG","{VAR_DEFAULT_LANG}"); //lingua di partenza
-define("SW_VERSION","2.60"); //versione del software
+define("SW_VERSION","2.70"); //versione del software
 
 /*tabelle*/
 define("TABLE_USERS","k_users");

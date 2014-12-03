@@ -8,32 +8,32 @@ include_once("../inc/head.inc.php");
 /* AZIONI */
 if(isset($_GET['fixpermalink'])) {
 	$query="SELECT * FROM (SELECT dir,ll,count(*) AS tot FROM ".TABLE_PAGINE." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
-		$q="SELECT idpag FROM ".TABLE_PAGINE." WHERE `dir`='".mysql_real_escape_string($row['dir'])."' AND `ll`='".mysql_real_escape_string($row['ll'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
-			mysql_query("UPDATE ".TABLE_PAGINE." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idpag`=".$r['idpag']);
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
+		$q="SELECT idpag FROM ".TABLE_PAGINE." WHERE `dir`='".ksql_real_escape_string($row['dir'])."' AND `ll`='".ksql_real_escape_string($row['ll'])."'";
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
+			ksql_query("UPDATE ".TABLE_PAGINE." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idpag`=".$r['idpag']);
 			}
 		}
 
 	$query="SELECT * FROM (SELECT dir,ll,count(*) AS tot FROM ".TABLE_NEWS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
-		$q="SELECT idnews FROM ".TABLE_NEWS." WHERE `dir`='".mysql_real_escape_string($row['dir'])."' AND `ll`='".mysql_real_escape_string($row['ll'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
-			mysql_query("UPDATE ".TABLE_NEWS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idnews`=".$r['idnews']);
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
+		$q="SELECT idnews FROM ".TABLE_NEWS." WHERE `dir`='".ksql_real_escape_string($row['dir'])."' AND `ll`='".ksql_real_escape_string($row['ll'])."'";
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
+			ksql_query("UPDATE ".TABLE_NEWS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idnews`=".$r['idnews']);
 			}
 		}
 
 	$query="SELECT * FROM (SELECT dir,ll,count(*) AS tot FROM ".TABLE_SHOP_ITEMS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
-		$q="SELECT idsitem FROM ".TABLE_SHOP_ITEMS." WHERE `dir`='".mysql_real_escape_string($row['dir'])."' AND `ll`='".mysql_real_escape_string($row['ll'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
-			mysql_query("UPDATE ".TABLE_SHOP_ITEMS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idsitem`=".$r['idsitem']);
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
+		$q="SELECT idsitem FROM ".TABLE_SHOP_ITEMS." WHERE `dir`='".ksql_real_escape_string($row['dir'])."' AND `ll`='".ksql_real_escape_string($row['ll'])."'";
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
+			ksql_query("UPDATE ".TABLE_SHOP_ITEMS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idsitem`=".$r['idsitem']);
 			}
 		}
 
@@ -50,18 +50,18 @@ elseif(isset($alert)) echo '<div id="MsgAlert">'.$alert.'</div>';
 <?php 
 $output="";
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_PAGINE." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$output.='<li>Pagine: <strong>'.$row['tot'].'</strong> '.$row['dir'].'</li>';
 	}
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_NEWS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$output.='<li>News: <strong>'.$row['tot'].'</strong> '.$row['dir'].'</li>';
 	}
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_SHOP_ITEMS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$output.='<li>Shop: <strong>'.$row['tot'].'</strong> '.$row['dir'].'</li>';
 	}
 if($output!="") { ?>

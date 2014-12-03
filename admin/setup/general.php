@@ -70,7 +70,7 @@ $captcha=$kaImpostazioni->getParam('captcha',$_SESSION['ll']);
 				echo $line;
 				} ?>
 			<small><strong><?= $kaTranslate->translate('Setup:%s date','PHP'); ?></strong>: <?= date("d-m-Y H:i:s"); ?> &nbsp;&nbsp;
-			<strong><?= $kaTranslate->translate('Setup:%s date','MySQL'); ?></strong>: <?php  $row=mysql_fetch_array(mysql_query("SELECT NOW() AS t")); echo $row['t']; ?></small><br />
+			<strong><?= $kaTranslate->translate('Setup:%s date','MySQL'); ?></strong>: <?php  $row=ksql_fetch_array(ksql_query("SELECT NOW() AS t")); echo $row['t']; ?></small><br />
 			<br />
 			<?php 
 			echo b3_create_input("timezone[2]","text",$kaTranslate->translate('Setup:Date format')." ",b3_lmthize($timezone['value2'],"input"),"","","",true).' '; ?>

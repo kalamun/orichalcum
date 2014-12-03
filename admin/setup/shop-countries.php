@@ -6,8 +6,8 @@ include_once("../inc/head.inc.php");
 
 $countriesUsed=",";
 $query="SELECT * FROM ".TABLE_SHOP_COUNTRIES;
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$countriesUsed.=$row['ll'].",";
 	}
 
@@ -25,10 +25,10 @@ foreach(file('../shop/countries.txt') as $line) {
 
 /* AZIONI */
 if(isset($_POST['update'])) {
-	mysql_query("TRUNCATE TABLE `k_shop_countries`");
+	ksql_query("TRUNCATE TABLE `k_shop_countries`");
 	for($i=1;isset($_POST['zone'.$i]);$i++) {
 		foreach(explode(",",trim($_POST['zone'.$i],",")) as $code) {
-			if($code!="") mysql_query("INSERT INTO ".TABLE_SHOP_COUNTRIES." (country,ll,zone) VALUES('".$countries[$code]."','".$code."','".$i."')");
+			if($code!="") ksql_query("INSERT INTO ".TABLE_SHOP_COUNTRIES." (country,ll,zone) VALUES('".$countries[$code]."','".$code."','".$i."')");
 			}
 		}
 	?><div id="MsgSuccess">Zone salvate con successo</div><?php 
@@ -59,8 +59,8 @@ if(isset($_POST['update'])) {
 			<div class="zoneContainer" id="zoneContainer<?= $i; ?>">
 				<ul class="DropZone"><?php 
 				$query="SELECT * FROM ".TABLE_SHOP_COUNTRIES." WHERE zone='".$i."' ORDER BY ll,country";
-				$results=mysql_query($query);
-				while($row=mysql_fetch_array($results)) {
+				$results=ksql_query($query);
+				while($row=ksql_fetch_array($results)) {
 					?><li countryCode="<?= $row['ll']; ?>"><img src="<?= BASEDIR; ?>img/lang/<?= strtolower($row['ll']); ?>.gif" /> <?= $row['country']; ?></li><?php 
 					}
 				?><li style="clear:left;"></li></ul>

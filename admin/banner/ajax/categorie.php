@@ -10,8 +10,8 @@ $kaCategorie=new kaCategorie();
 $catSel=array();
 if($_POST['idbanner']>0) {
 	$query="SELECT categoria FROM ".TABLE_BANNER." WHERE idbanner='".$_POST['idbanner']."' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	$catSel[$row['categorie']]=true;
 	}
 

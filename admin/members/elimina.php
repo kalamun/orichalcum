@@ -102,7 +102,7 @@ $numberOfUsers=$kaMembers->countUsers();
 		<table class="tabella">
 		<tr><th>&nbsp;</th><th>Utente</th><th>Username</th><th>Creato</th><th>Ultimo Accesso</th><th>Scadenza</th></tr><?php 		$vars=array();
 		if(isset($_GET['p'])) {
-			if($_GET['p']!="#") $vars['conditions']="`name` LIKE '".mysql_real_escape_string($_GET['p'])."%'";
+			if($_GET['p']!="#") $vars['conditions']="`name` LIKE '".ksql_real_escape_string($_GET['p'])."%'";
 			else {
 				$vars['conditions']="";
 				$letters="ABCDEFGHIJKLMNOPQRSTUWYXZ";

@@ -15,8 +15,8 @@ if(isset($_SESSION['iduser'])&&isset($_POST['update'])) {
 		}
 
 	$query="SELECT count(*) AS tot FROM ".TABLE_CONFIG." WHERE param='".PARAM."' AND ll='".$_SESSION['ll']."' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 
 	if(VALUE1TYPE=="textarea") $_POST['value1']=b3_htmlize($_POST['value1'],true);
 	elseif(VALUE1TYPE=="input") $_POST['value1']=b3_htmlize($_POST['value1'],true,"");
@@ -27,7 +27,7 @@ if(isset($_SESSION['iduser'])&&isset($_POST['update'])) {
 	
 	if($row['tot']>0) $query="UPDATE ".TABLE_CONFIG." SET value1='".$_POST['value1']."',value2='".$_POST['value2']."' WHERE param='".PARAM."' AND ll='".$_SESSION['ll']."'";
 	else $query="INSERT INTO ".TABLE_CONFIG." (param,value1,value2,ll) VALUES('".PARAM."','".$_POST['value1']."','".$_POST['value2']."','".$_SESSION['ll']."')";
-	if(mysql_query($query)) {
+	if(ksql_query($query)) {
 		echo '<div id="MsgSuccess">Configurazione salvata con successo</div>';
 		$kaLog->add("CFG","Modificate impostazioni di Statistiche esterne");
 		}
@@ -45,8 +45,8 @@ if(isset($_SESSION['iduser'])&&isset($_POST['update'])) {
 <p>Incollare qui il codice Javascript necessario ad attivare un motore di statistiche esterno (es. <em>Google Analytics</em> o <em>StatCounter</em>) sul proprio sito internet.</p>
 <?php 
 $query="SELECT * FROM ".TABLE_CONFIG." WHERE param='".PARAM."' AND ll='".$_SESSION['ll']."' LIMIT 1";
-$results=mysql_query($query);
-$row=mysql_fetch_array($results);
+$results=ksql_query($query);
+$row=ksql_fetch_array($results);
 ?>
 <form action="?" method="post">
 	<textarea name="value1" style="width:100%;height:300px;font-family:'Courier New',fixed;"><?php 

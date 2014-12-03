@@ -13,33 +13,33 @@ class kaImages {
 		$thumb=array('resize','mode','width','height','quality');
 		
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='img_resize' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->img['resize']=$row['value1'];
 		$this->img['mode']=$row['value2'];
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='img_size' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->img['width']=$row['value1'];
 		$this->img['height']=$row['value2'];
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='img_quality' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->img['quality']=$row['value1'];
 		
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_resize' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->thumb['resize']=$row['value1'];
 		$this->thumb['mode']=$row['value2'];
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_size' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->thumb['width']=$row['value1'];
 		$this->thumb['height']=$row['value2'];
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_quality' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->thumb['quality']=$row['value1'];
 		}
 	
@@ -74,8 +74,8 @@ class kaImages {
 		$query="SELECT count(*) AS tot FROM `".TABLE_IMG."` WHERE `idimg`>0 ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 
@@ -92,8 +92,8 @@ class kaImages {
 			if($rowcount!="") $query.=",".intval($rowcount);
 			}
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++)
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
 			$output[$i]=$row;
 			if($output[$i]['hotlink']!=""&&$row['filename']!="") {
@@ -132,8 +132,8 @@ class kaImages {
 		$output=array();
 
 		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg)." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if(isset($row['idimg']))
 		{
 			$output=$row;
@@ -174,8 +174,8 @@ class kaImages {
 		if(substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-5)!='.php3') {
 			if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 			
-			$query="INSERT INTO `".TABLE_IMG."` (`filename`,`thumbnail`,`hotlink`,`alt`,`creation_date`) VALUES('".mysql_real_escape_string($filename)."','','','',NOW())";
-			if(mysql_query($query)) $idimg=mysql_insert_id();
+			$query="INSERT INTO `".TABLE_IMG."` (`filename`,`thumbnail`,`hotlink`,`alt`,`creation_date`) VALUES('".ksql_real_escape_string($filename)."','','','',NOW())";
+			if(ksql_query($query)) $idimg=ksql_insert_id();
 			else return false;
 			
 			//copy on the right dir
@@ -200,7 +200,7 @@ class kaImages {
 		$img=$this->getImage($idimg);
 		if($img['idimg']>0) {
 			$query="UPDATE ".TABLE_IMG." SET filename='',hotlink='".$url."' WHERE idimg='".$img['idimg']."' LIMIT 1";
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			}
 		}
 	function setThumb($idimg,$file=null,$filename=null,$resize=true) {
@@ -211,8 +211,8 @@ class kaImages {
 			if($filename==null||$filename==$img['filename']) $filename='t_'.$img['filename'];
 			if($img['thumb']['filename']!="") unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$img['thumb']['filename']);
 			copy($file,BASERELDIR.DIR_IMG.$img['idimg'].'/'.$filename);
-			$query="UPDATE `".TABLE_IMG."` SET `thumbnail`='".mysql_real_escape_string($filename)."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
-			if(!mysql_query($query)) return false;
+			$query="UPDATE `".TABLE_IMG."` SET `thumbnail`='".ksql_real_escape_string($filename)."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
+			if(!ksql_query($query)) return false;
 			if($resize==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->thumb['width'],$this->thumb['height'],$this->thumb['quality'],$this->thumb['mode']);
 			}
 		return true;
@@ -224,8 +224,8 @@ class kaImages {
 		It stores the caption of an image, encoded in JSON as an array where each element is the caption in a different language
 		*/
 		$query="SELECT `alt` FROM `".TABLE_IMG."` WHERE `idimg`=".$idimg." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$caption=json_decode($row['alt'],true);
 		$defaultCaption="";
 		if(empty($caption) || !is_array($caption))
@@ -243,8 +243,8 @@ class kaImages {
 		$caption[$_SESSION['ll']]=$alt;
 		$caption=json_encode($caption);
 
-		$query="UPDATE ".TABLE_IMG." SET alt='".mysql_real_escape_string($caption)."' WHERE `idimg`=".$idimg." LIMIT 1";
-		if(!mysql_query($query)) return false;
+		$query="UPDATE ".TABLE_IMG." SET alt='".ksql_real_escape_string($caption)."' WHERE `idimg`=".$idimg." LIMIT 1";
+		if(!ksql_query($query)) return false;
 		return true;
 		}
 
@@ -254,10 +254,10 @@ class kaImages {
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
 		if($filename!=""&&substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-4)!='.php3') { //aggiornamento dell'alt e dell'immagine
 			$query="SELECT filename FROM ".TABLE_IMG." WHERE idimg=".$idimg;
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			$query="UPDATE ".TABLE_IMG." SET filename='".addslashes($filename)."',hotlink='' WHERE idimg=".$idimg;
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			//copio nella dir assegnata
 			if(!file_exists(BASERELDIR.DIR_IMG.$idimg)) mkdir(BASERELDIR.DIR_IMG.$idimg);
@@ -286,11 +286,11 @@ class kaImages {
 		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
 
 		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg);
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results))
 		{
 			$query="DELETE FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg);
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename'])&&!is_dir(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename']); //delete full size image
 			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/'.$row['thumbnail'])&&!is_dir(BASERELDIR.DIR_IMG.$idimg.'/'.$row['thumbnail'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['thumbnail']); //delete thumbnail
@@ -325,8 +325,8 @@ class kaImages {
 		foreach($search as $s)
 		{
 			$query="SELECT * FROM ".$s[0]." WHERE ".$s[1]." LIKE '%id=\"img".$idimg."\"%' OR ".$s[1]." LIKE '%id=\"thumb".$idimg."\"%'";
-			$results=mysql_query($query);
-			while($row=mysql_fetch_array($results))
+			$results=ksql_query($query);
+			while($row=ksql_fetch_array($results))
 			{
 				if(!isset($row['dir'])) $row['dir']='';
 				$output[]=array(
@@ -349,8 +349,8 @@ class kaImages {
 		foreach($searchID as $s)
 		{
 			$query="SELECT * FROM ".$s[0]." WHERE ".$s[1]."='".intval($idimg)."'";
-			$results=mysql_query($query);
-			while($row=mysql_fetch_array($results))
+			$results=ksql_query($query);
+			while($row=ksql_fetch_array($results))
 			{
 				$output[]=array(
 					"table"=>$s[0],
@@ -364,8 +364,8 @@ class kaImages {
 		
 		// search into gallery
 		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE `idimg`='".intval($idimg)."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results))
 		{
 			$output[]=array(
 				"table"=>$row['tabella'],
@@ -378,8 +378,8 @@ class kaImages {
 		
 		// search into menus
 		$query="SELECT * FROM ".TABLE_MENU." WHERE `photogallery` LIKE '%,".intval($idimg).",%'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results))
 		{
 			$output[]=array(
 				"table"=>TABLE_MENU,

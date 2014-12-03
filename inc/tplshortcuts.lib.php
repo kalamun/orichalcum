@@ -33,7 +33,7 @@ function kInitBettino($dir=false) {
 	if($timezone!="") {
 		date_default_timezone_set($timezone);
 		$query="SET time_zone='".date("P")."'";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		}
 
 
@@ -75,8 +75,8 @@ function kGetVar($var,$value=1,$ll=false) {
 		}
 	else {
 		$query="SELECT value".$value." FROM ".TABLE_CONFIG." WHERE param='".$var."' AND ll='".$ll."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['value'.$value];
 		}
 	}

@@ -12,7 +12,6 @@ class kBanners {
 
 	public function init() {
 		$this->inited=true;
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/connect.inc.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/main.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/documents.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/kalamun.lib.php");
@@ -23,9 +22,9 @@ class kBanners {
 	function getCategories() {
 		if(!$this->inited) $this->init();
 		$cat=array();
-		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `tabella`='".TABLE_BANNER."' AND `ll`='".mysql_real_escape_string(LANG)."' ORDER BY `ordine`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `tabella`='".TABLE_BANNER."' AND `ll`='".ksql_real_escape_string(LANG)."' ORDER BY `ordine`";
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$cat[]=$row;
 			}
 		return $cat;
@@ -45,16 +44,16 @@ class kBanners {
 			if($c['categoria']==$vars['category']) $idcat=$c['idcat'];
 			}
 
-		$query="SELECT * FROM `".TABLE_BANNER."` WHERE `categoria`='".mysql_real_escape_string($idcat)."' AND `ll`='".mysql_real_escape_string(strtoupper($vars['lang']))."' AND `online`='s' ORDER BY ".mysql_real_escape_string($vars['orderby'])."";
+		$query="SELECT * FROM `".TABLE_BANNER."` WHERE `categoria`='".ksql_real_escape_string($idcat)."' AND `ll`='".ksql_real_escape_string(strtoupper($vars['lang']))."' AND `online`='s' ORDER BY ".ksql_real_escape_string($vars['orderby'])."";
 		if((isset($vars['from'])&&$vars['from']>=0)||(isset($vars['limit'])&&$vars['limit']>0)) {
 			if(!isset($vars['from'])||$vars['from']<0) $vars['from']=0;
 			$query.=" LIMIT ".$vars['from'];
 			if(isset($vars['limit'])&&$vars['limit']>0) $query.=",".$vars['limit'];
 			}
 
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$banners[$i]=$row;
 			$b=$this->kDocuments->getList(TABLE_BANNER,$row['idbanner']);
 			if(!isset($b[0])) $b[0]=array();
@@ -69,7 +68,7 @@ class kBanners {
 				}
 			//aumento il counter delle impressioni
 			$query="UPDATE `".TABLE_BANNER."` SET `views`=`views`+1 WHERE `idbanner`='".$row['idbanner']."' LIMIT 1";
-			mysql_query($query);
+			ksql_query($query);
 			}
 
 		return $banners;

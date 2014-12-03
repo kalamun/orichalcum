@@ -17,21 +17,21 @@ if(!isset($_GET['idspay'])) {
 	if(isset($_POST['idspay'])&&is_array($_POST['idspay'])) {
 		for($i=0;isset($_POST['idspay'][$i]);$i++) {
 			$query="UPDATE ".TABLE_SHOP_PAYMENTS." SET ordine=".($i+1)." WHERE ll='".$_SESSION['ll']."' AND idspay=".$_POST['idspay'][$i]." LIMIT 1";
-			mysql_query($query);
+			ksql_query($query);
 			}
 		}
 
 	elseif(isset($_POST['addpayments'])) {
 		$log="";
 		$query="SELECT * FROM ".TABLE_SHOP_PAYMENTS." WHERE ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$ordine=$row['ordine']+1;
 		$gateway="";
 		if(preg_match("/.*Pay.?Pal.*/i",$_POST['name'])) $gateway="paypal";
 		$query="INSERT INTO ".TABLE_SHOP_PAYMENTS." (`name`,`descr`,`zones`,`price`,`pricepercent`,`gateway`,`paypal_account`,`mail_instructions`,`ordine`,`ll`) VALUES('".b3_htmlize($_POST['name'],true,"")."','<p></p>',',','0','0','".$gateway."','','<p></p>',".$ordine.",'".$_SESSION['ll']."')";
-		if(!mysql_query($query)) $log="Errore durante l'inserimento del sistema di pagamento";
-		else $id=mysql_insert_id();
+		if(!ksql_query($query)) $log="Errore durante l'inserimento del sistema di pagamento";
+		else $id=ksql_insert_id();
 
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -49,7 +49,7 @@ if(!isset($_GET['idspay'])) {
 	elseif(isset($_GET['delete'])) {
 		$log="";
 		$query="DELETE FROM ".TABLE_SHOP_PAYMENTS." WHERE ll='".$_SESSION['ll']."' AND idspay=".$_GET['delete']." LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante l'eliminazione";
+		if(!ksql_query($query)) $log="Errore durante l'eliminazione";
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
 			$kaLog->add("ERR",'Shop: Errore nell\'eliminazione del metodo di pagamento <em>ID: '.b3_htmlize($_GET['delete'],true,"").'</em>');
@@ -67,8 +67,8 @@ if(!isset($_GET['idspay'])) {
 	<ul class="DragDeveloper">
 	<?php 
 	$query="SELECT * FROM ".TABLE_SHOP_PAYMENTS." WHERE ll='".$_SESSION['ll']."' ORDER BY ordine";
-	$results=mysql_query($query);
-	while($row=mysql_Fetch_array($results)) { ?>
+	$results=ksql_query($query);
+	while($row=ksql_Fetch_array($results)) { ?>
 		<li onmouseover="showActions(this)" onmouseout="hideActions(this)">
 		<div class="small" style="visibility:hidden;float:right;"><a href="?idspay=<?php  echo $row['idspay']; ?>">Modifica</a> | <a href="?delete=<?php  echo $row['idspay']; ?>" onclick="return confirm('Sei sicuro di voler rimuovere questo corriere?');">Elimina</a></div>
 		<?= $row['name']; ?>
@@ -122,8 +122,8 @@ if(!isset($_GET['idspay'])) {
 else {
 	$zone=array();
 	$query="SELECT * FROM ".TABLE_SHOP_COUNTRIES." GROUP BY zone ORDER BY zone";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
 		$zone[$row['zone']]=true;
 		}
 	
@@ -135,7 +135,7 @@ else {
 			foreach($_POST['zones'] as $ka=>$v) { $zones.=$ka.','; }
 			}
 		$query="UPDATE ".TABLE_SHOP_PAYMENTS." SET `name`='".b3_htmlize($_POST['name'],true,"")."',`descr`='".b3_htmlize($_POST['descr'],true)."',`price`='".round(floatval($_POST['price']),2)."',`pricepercent`='".round(floatval($_POST['pricepercent']),2)."',gateway='".$_POST['gateway']."',`paypal_account`='',zones='".$zones."',`mail_instructions`='".b3_htmlize($_POST['mail_instructions'],true)."' WHERE `idspay`='".intval($_GET['idspay'])."' LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante la scrittura nel database";
+		if(!ksql_query($query)) $log="Errore durante la scrittura nel database";
 		
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -149,8 +149,8 @@ else {
 	/* FINE AZIONI */
 
 	$query="SELECT * FROM ".TABLE_SHOP_PAYMENTS." WHERE idspay='".intval($_GET['idspay'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$payment=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$payment=ksql_fetch_array($results);
 	
 	?>
 

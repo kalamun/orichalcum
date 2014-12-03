@@ -2,13 +2,11 @@
 /* (c) Kalamun.org - GPL 3 */
 
 /* autodetect current language */
-require($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/inc/connect.inc.php');
-
 function kDetectLang() {
 	$codes=array();
 	$query="SELECT * FROM `".TABLE_LINGUE."` WHERE `online`='s' ORDER BY `ordine`";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
 		$codes[$row['ll']]=$row['code'];
 		}
 	if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -49,8 +47,8 @@ if(isset($_GET['lang']) && $_GET['lang']!="") {
 }
 
 // set locale to current language
-$query="SELECT * FROM `".TABLE_LINGUE."` WHERE `online`='s' AND `ll`='".mysql_real_escape_string(LANG)."' LIMIT 1";
-$results=mysql_query($query);
-$row=mysql_fetch_array($results);
+$query="SELECT * FROM `".TABLE_LINGUE."` WHERE `online`='s' AND `ll`='".ksql_real_escape_string(LANG)."' LIMIT 1";
+$results=ksql_query($query);
+$row=ksql_fetch_array($results);
 setlocale(LC_TIME,$row['code']);
 

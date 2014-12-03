@@ -28,7 +28,7 @@ function kInit() {
 		}
 	
 	function kTxtLog($log) {
-		if(defined("MYSQL_LOG")&&MYSQL_LOG==true) {
+		if(defined("ksql_LOG")&&ksql_LOG==true) {
 			$log="\n                      ".date("Y-m-d H:i:s")." ------------------------------\n".number_format($GLOBALS['microseconds'],6)."   ".$log."\n";
 			file_put_contents($_SERVER['DOCUMENT_ROOT'].BASEDIR.'log.txt',$log,FILE_APPEND);
 			}
@@ -344,10 +344,10 @@ function kStatistiche() {
 	/* sposto la roba vecchia in archivio */
 	$q="INSERT INTO `".TABLE_STATS_ARCHIVE."` (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) SELECT `ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll` FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
 	/**/ $GLOBALS['microseconds']=microtime();
-	if(mysql_query($q)) {
+	if(ksql_query($q)) {
 		/**/ kTxtLog($q);
 		$q="DELETE FROM `".TABLE_STATISTICHE."` WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
-		mysql_query($q);
+		ksql_query($q);
 		/**/ kTxtLog($q);
 		}
 
@@ -376,18 +376,18 @@ function kStatistiche() {
 		) {
 
 		/* verifico se e' una nuova visita */
-		$q="SELECT count(*) AS tot FROM ".TABLE_STATISTICHE." WHERE ip='".$ip."' AND system='".mysql_real_escape_string($system)."'";
-		$p=mysql_query($q);
-		$r=mysql_fetch_array($p);
+		$q="SELECT count(*) AS tot FROM ".TABLE_STATISTICHE." WHERE ip='".$ip."' AND system='".ksql_real_escape_string($system)."'";
+		$p=ksql_query($q);
+		$r=ksql_fetch_array($p);
 		if($r['tot']==0) {
 			//nuova visita
-			$q="INSERT INTO ".TABLE_STATISTICHE." (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) VALUES('".$ip."','".date("Y-m-d H:i",time())."','".mysql_real_escape_string($url)."','".mysql_real_escape_string($referer)."','".mysql_real_escape_string($system)."',1,'')";
-			mysql_query($q);
+			$q="INSERT INTO ".TABLE_STATISTICHE." (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) VALUES('".$ip."','".date("Y-m-d H:i",time())."','".ksql_real_escape_string($url)."','".ksql_real_escape_string($referer)."','".ksql_real_escape_string($system)."',1,'')";
+			ksql_query($q);
 			}
 		else {
 			//nuovo contatto
-			$q="UPDATE ".TABLE_STATISTICHE." SET `date`='".date("Y-m-d H:i",time())."',`url`=CONCAT(url,'"."\n".mysql_real_escape_string($url)."'),`contacts`=`contacts`+1 WHERE `ip`='".$ip."' AND system='".mysql_real_escape_string($system)."'";
-			$results=mysql_query($q);
+			$q="UPDATE ".TABLE_STATISTICHE." SET `date`='".date("Y-m-d H:i",time())."',`url`=CONCAT(url,'"."\n".ksql_real_escape_string($url)."'),`contacts`=`contacts`+1 WHERE `ip`='".$ip."' AND system='".ksql_real_escape_string($system)."'";
+			$results=ksql_query($q);
 			}
 		}
 	}

@@ -27,7 +27,7 @@ class kaLog {
 				."'".$type."',"
 				."'".b3_htmlize($descr,true,"strong,em,u,a")."'"
 				.")";
-		if(mysql_query($query)) return mysql_insert_id();
+		if(ksql_query($query)) return ksql_insert_id();
 		else return false;
 		}
 
@@ -36,8 +36,8 @@ class kaLog {
 		$query="SELECT * FROM ".TABLE_LOG." WHERE data<NOW() ";
 		if($conditions!="") $query.="AND (".$conditions.") ";
 		$query.="ORDER BY data DESC LIMIT ".$from.",".$to;
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['dataleggibile']=preg_replace('/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}):(\d{2})/','$3-$2-$1',$row['data']);
 			$output[$i]['oraleggibile']=preg_replace('/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}):(\d{2})/','$4.$5',$row['data']);
@@ -50,7 +50,7 @@ class kaLog {
 		if($exp=="all") $exp=0;
 		$expDate=time()-($exp*24*60*60);
 		$query="DELETE FROM ".TABLE_LOG." WHERE data<'".date("Y-m-d H:i:s",$expDate)."'";
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
@@ -67,8 +67,8 @@ class kaEmailLog {
 		$query="SELECT * FROM ".TABLE_EMAIL_LOG." WHERE `date`<NOW() ";
 		if($conditions!="") $query.="AND (".$conditions.") ";
 		$query.="ORDER BY `date` DESC LIMIT ".$from.",".$to;
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['dataleggibile']=preg_replace('/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}):(\d{2})/','$3-$2-$1',$row['date']);
 			$output[$i]['oraleggibile']=preg_replace('/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}):(\d{2})/','$4.$5',$row['date']);
@@ -78,9 +78,9 @@ class kaEmailLog {
 	
 	function getEmailContent($ideml) {
 		$output="";
-		$query="SELECT html,plain FROM ".TABLE_EMAIL_LOG." WHERE `ideml`='".mysql_real_escape_string($ideml)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT html,plain FROM ".TABLE_EMAIL_LOG." WHERE `ideml`='".ksql_real_escape_string($ideml)."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['html']!="") {
 			$output=$row['html'];
 			$output=str_replace("=\n","",$output);
@@ -94,8 +94,8 @@ class kaEmailLog {
 	function count($conditions="") {
 		$query="SELECT count(*) AS tot FROM ".TABLE_EMAIL_LOG." WHERE `date`<NOW() ";
 		if($conditions!="") $query.="AND (".$conditions.") ";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 	}

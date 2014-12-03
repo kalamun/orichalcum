@@ -12,17 +12,17 @@ if(isset($_GET['checkdburf8'])) {
 	$count=array(0,0);
 	foreach($const['user'] as $k=>$v) {
 		if(substr($k,0,6)=="TABLE_") {
-			$rs=mysql_query("SHOW TABLE STATUS LIKE '".constant($k)."'");
-			if($row=mysql_fetch_array($rs)) {
+			$rs=ksql_query("SHOW TABLE STATUS LIKE '".constant($k)."'");
+			if($row=ksql_fetch_array($rs)) {
 				if($row['Collation']!=""&&$row['Collation']!="utf8_general_ci") {
-					mysql_query("ALTER TABLE `".constant($k)."` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+					ksql_query("ALTER TABLE `".constant($k)."` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 					$count[0]++;
 					}
 
-				$rs=mysql_query("SHOW FULL COLUMNS FROM ".constant($k));
-				while($row=mysql_fetch_array($rs)) {
+				$rs=ksql_query("SHOW FULL COLUMNS FROM ".constant($k));
+				while($row=ksql_fetch_array($rs)) {
 					if($row['Collation']!=""&&$row['Collation']!="utf8_general_ci") {
-						mysql_query("ALTER TABLE `".constant($k)."` CHANGE `".$row['Field']."` `".$row['Field']."` ".$row['Type']." CHARACTER SET utf8 COLLATE utf8_general_ci ".($row['Null']!="NO"?"NOT":"")." NULL ".($row['Default']!=""?"DEFAULT '".$row['Default']."'":""));
+						ksql_query("ALTER TABLE `".constant($k)."` CHANGE `".$row['Field']."` `".$row['Field']."` ".$row['Type']." CHARACTER SET utf8 COLLATE utf8_general_ci ".($row['Null']!="NO"?"NOT":"")." NULL ".($row['Default']!=""?"DEFAULT '".$row['Default']."'":""));
 						$count[1]++;
 						}
 					}

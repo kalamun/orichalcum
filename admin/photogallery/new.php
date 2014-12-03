@@ -70,31 +70,31 @@ if(isset($_POST['save'])) {
 			$addtomenu=explode(",",$_POST['addtomenu']);
 			if($addtomenu[1]=="after") {
 				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
-				$results=mysql_query($query);
-				$row=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$row=ksql_fetch_array($results);
 				$ordine=$row['ordine']+1;
 				$ref=$row['ref'];
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
-				mysql_query($query);
+				ksql_query($query);
 				}
 			elseif($addtomenu[1]=="inside") {
 				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
-				$results=mysql_query($query);
-				$row=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$row=ksql_fetch_array($results);
 				$ordine=$row['ordine']+1;
 				$ref=$addtomenu[0];
 				}
 			elseif($addtomenu[1]=="before") {
 				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
-				$results=mysql_query($query);
-				$row=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$row=ksql_fetch_array($results);
 				$ordine=$row['ordine'];
 				$ref=$row['ref'];
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
-				mysql_query($query);
+				ksql_query($query);
 				}
-			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection) VALUES('".b3_htmlize($_POST['titolo'],true,"")."','".$kaImpostazioni->getVar('dir_photogallery',1)."/".mysql_real_escape_string($_POST['dir'])."','".$ref."','".$ordine."','".$_SESSION['ll']."','".mysql_real_escape_string($row['collection'])."')";
-			if(!mysql_query($query)) $log="Problemi durante l'inserimento nel men&ugrave;";
+			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection) VALUES('".b3_htmlize($_POST['titolo'],true,"")."','".$kaImpostazioni->getVar('dir_photogallery',1)."/".ksql_real_escape_string($_POST['dir'])."','".$ref."','".$ordine."','".$_SESSION['ll']."','".ksql_real_escape_string($row['collection'])."')";
+			if(!ksql_query($query)) $log="Problemi durante l'inserimento nel men&ugrave;";
 			}
 		}
 
@@ -193,8 +193,8 @@ if(isset($_POST['save'])) {
 
 	<?php 
 	$query="SELECT * FROM ".TABLE_MENU." WHERE ref='0' AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	echo b3_create_input("addtomenu","checkbox",$kaTranslate->translate('Photogalleries:Add this gallery to the site menu'),$row['idmenu'].',after',"","",'onchange="selectMenuRef(this)"'); ?><br />
 	<br />
 	<div class="submit" id="submit">

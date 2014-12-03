@@ -115,23 +115,23 @@ class kaPrivate {
 
 		if($permissions==""&&$writepermissions=="") {
 			//if inherit is set, delete any previous entries
-			$query="DELETE FROM ".TABLE_PRIVATE." WHERE `dir`='".mysql_real_escape_string($dir)."'";
+			$query="DELETE FROM ".TABLE_PRIVATE." WHERE `dir`='".ksql_real_escape_string($dir)."'";
 			}
 		else {
 			//else set the new entry
-			$query="SELECT * FROM ".TABLE_PRIVATE." WHERE `dir`='".mysql_real_escape_string($dir)."' LIMIT 1";
-			$results=mysql_query($query);
-			if($row=mysql_fetch_array($results)) $query="UPDATE ".TABLE_PRIVATE." SET `permissions`='".$permissions."',`members`='".mysql_real_escape_string($members)."',`writepermissions`='".$writepermissions."',`writemembers`='".mysql_real_escape_string($writemembers)."' WHERE `idprivate`=".$row['idprivate']." LIMIT 1";
-			else $query="INSERT INTO ".TABLE_PRIVATE." (`dir`,`permissions`,`members`,`writepermissions`,`writemembers`) VALUES('".mysql_real_escape_string($dir)."','".$permissions."','".mysql_real_escape_string($members)."','".$writepermissions."','".mysql_real_escape_string($writemembers)."')";
+			$query="SELECT * FROM ".TABLE_PRIVATE." WHERE `dir`='".ksql_real_escape_string($dir)."' LIMIT 1";
+			$results=ksql_query($query);
+			if($row=ksql_fetch_array($results)) $query="UPDATE ".TABLE_PRIVATE." SET `permissions`='".$permissions."',`members`='".ksql_real_escape_string($members)."',`writepermissions`='".$writepermissions."',`writemembers`='".ksql_real_escape_string($writemembers)."' WHERE `idprivate`=".$row['idprivate']." LIMIT 1";
+			else $query="INSERT INTO ".TABLE_PRIVATE." (`dir`,`permissions`,`members`,`writepermissions`,`writemembers`) VALUES('".ksql_real_escape_string($dir)."','".$permissions."','".ksql_real_escape_string($members)."','".$writepermissions."','".ksql_real_escape_string($writemembers)."')";
 			}
-		if(mysql_query($query)) return true;
+		if(ksql_query($query)) return true;
 		else return false;		
 		}
 	private function getPermissionsList() {
 		$output=array(""=>array("permissions"=>"public","members"=>$this->members,"writepermissions"=>"private","writemembers"=>array(),"inherited"=>false));
 		$query="SELECT * FROM ".TABLE_PRIVATE;
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$m=explode(",",trim($row['members'],","));
 			$m=array_flip($m);
 			$mw=explode(",",trim($row['writemembers'],","));
@@ -186,8 +186,8 @@ class kaPrivate {
 		if(file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$fromdir)&&!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$todir)) {
 			if(rename($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$fromdir,$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$todir)) {
 				//update permission db records
-				$query="UPDATE ".TABLE_PRIVATE." SET `dir`='".mysql_real_escape_string(utf8_encode($todir))."' WHERE `dir`='".mysql_real_escape_string(utf8_encode($fromdir))."'";
-				if(mysql_query($query)) return true;
+				$query="UPDATE ".TABLE_PRIVATE." SET `dir`='".ksql_real_escape_string(utf8_encode($todir))."' WHERE `dir`='".ksql_real_escape_string(utf8_encode($fromdir))."'";
+				if(ksql_query($query)) return true;
 				else return false;
 				}
 			}
@@ -211,8 +211,8 @@ class kaPrivate {
 				if(!rmdir($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$dir)) return false;
 
 				//remove permission db records recursively
-				$query="DELETE FROM ".TABLE_PRIVATE." WHERE `dir`='".mysql_real_escape_string($dir)."'";
-				mysql_query($query);
+				$query="DELETE FROM ".TABLE_PRIVATE." WHERE `dir`='".ksql_real_escape_string($dir)."'";
+				ksql_query($query);
 				}
 			}
 		}

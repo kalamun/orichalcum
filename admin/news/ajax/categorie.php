@@ -9,9 +9,9 @@ $kaCategorie=new kaCategorie();
 
 $catSel=array();
 if($_POST['idnews']>0) {
-	$query="SELECT `categorie` FROM `".TABLE_NEWS."` WHERE `idnews`='".mysql_real_escape_string($_POST['idnews'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$query="SELECT `categorie` FROM `".TABLE_NEWS."` WHERE `idnews`='".ksql_real_escape_string($_POST['idnews'])."' LIMIT 1";
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	foreach(explode(",",$row['categorie']) as $idcat) {
 		if($idcat!="") $catSel[$idcat]=true;
 		}

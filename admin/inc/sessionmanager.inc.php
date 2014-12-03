@@ -24,9 +24,9 @@ else {
 	$admin_password=$_SESSION['password'];
 	}
 
-$query="SELECT * FROM `".TABLE_USERS."` WHERE `username`='".mysql_real_escape_string($admin_username)."' AND `password`='".mysql_real_escape_string($admin_password)."' LIMIT 1";
-$results=mysql_query($query);
-if($row=mysql_fetch_array($results)) {
+$query="SELECT * FROM `".TABLE_USERS."` WHERE `username`='".ksql_real_escape_string($admin_username)."' AND `password`='".ksql_real_escape_string($admin_password)."' LIMIT 1";
+$results=ksql_query($query);
+if($row=ksql_fetch_array($results)) {
 	/*login*/
 	$_SESSION['iduser']=$row['iduser'];
 	$_SESSION['name']=$row['name'];
@@ -38,15 +38,15 @@ if($row=mysql_fetch_array($results)) {
 
 	if(!isset($_SESSION['loggedin'])) {
 		$q="SELECT * FROM `".TABLE_USERS_PROP."` WHERE `iduser`='".intval($row['iduser'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
 			if(!isset($_SESSION[$r['family']])) $_SESSION[$r['family']]=array();
 			$_SESSION[$r['family']][$r['param']]=$r['value'];
 			}
 
 		if(isset($entermode)) { //aggiorno la data di ultimo ingresso
-			$query="UPDATE `".TABLE_USERS."` SET `lastlogin`=NOW() WHERE `iduser`=".mysql_real_escape_string($row['iduser']);
-			mysql_query($query);
+			$query="UPDATE `".TABLE_USERS."` SET `lastlogin`=NOW() WHERE `iduser`=".ksql_real_escape_string($row['iduser']);
+			ksql_query($query);
 			}
 		if(isset($_POST['orichalcum_admin_remember'])) { //setto i cookie se richiesto con scadenza tra 10 anni
 			setcookie("admin_username",$admin_username,time()+315360000,BASEDIR);

@@ -1,9 +1,6 @@
 <?php 
 
 /*
-?TRANSACTION_ID=D3A6BB9FD0224E5DB4B8D0ABAD90A8E9&MERCHANT_ID=NCHTEST&ORDER_ID=LINI0BFC71FE&COD_AUT=TESTOK&IMPORTO=0,01&DIVISA=EUR&MAC=343749B415731E0C984DE077901497B0
-
-
 A tutti gli URL sopra descritti il server E-Gipsy aggiunge i dati necessari ad
 identificare la transazione di pagamento:
 • TRANSACTION_ID identificativo univoco della transazione

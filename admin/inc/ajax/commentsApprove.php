@@ -9,7 +9,7 @@ if(isset($_SESSION['iduser'])&&isset($_POST['idcomm'])&&is_numeric($_POST['idcom
 	if($timezone!="") {
 		date_default_timezone_set($timezone);
 		$query="SET time_zone='".date("P")."'";
-		mysql_query($query);
+		ksql_query($query);
 		}
 
 	require_once("../log.lib.php");
@@ -17,10 +17,10 @@ if(isset($_SESSION['iduser'])&&isset($_POST['idcomm'])&&is_numeric($_POST['idcom
 
 	$log="";
 	$query="SELECT public FROM ".TABLE_COMMENTI." WHERE idcomm='".$_POST['idcomm']."' LIMIT 1";
-	$results=mysql_query($query);
-	if($row=mysql_fetch_array($results)) {
+	$results=ksql_query($query);
+	if($row=ksql_fetch_array($results)) {
 		$query="UPDATE ".TABLE_COMMENTI." SET public='".($row['public']=='n'?'s':'n')."' WHERE idcomm='".$_POST['idcomm']."' LIMIT 1";
-		if(!mysql_query($query)) {
+		if(!ksql_query($query)) {
 			$kaLog->add("ERR",'Errore nella modifica dello stato di approvazione del commento numero <em>'.$_POST['idcomm'].'</em>');
 			echo "Error approving comment";
 			}

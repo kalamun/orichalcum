@@ -19,14 +19,14 @@ if(isset($_POST['copyPages'])&&isset($_POST['sourceLang'])&&isset($_POST['destin
 		//categorie
 		$catMap=array();
 		$q="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND ll='".$_POST['sourceLang']."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($results)) {
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($results)) {
 			$q2="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND ll='".$_POST['destinationLang']."' AND dir='".$r['dir']."' LIMIT 1";
-			$rs2=mysql_query($q2);
-			$r2=mysql_fetch_array($rs2);
+			$rs2=ksql_query($q2);
+			$r2=ksql_fetch_array($rs2);
 			if($r2==false) {
-				$q="INSERT INTO ".TABLE_CATEGORIE." (tabella,categoria,dir,ordine,ll) VALUES('".TABLE_PAGINE."','".mysql_real_escape_string($r['categoria'])."','".mysql_real_escape_string($r['dir'])."','".$r['ordine']."','".$_POST['destinationLang']."')";
-				if(mysql_query($q)) $catMap[$r['idcat']]=mysql_insert_id();
+				$q="INSERT INTO ".TABLE_CATEGORIE." (tabella,categoria,dir,ordine,ll) VALUES('".TABLE_PAGINE."','".ksql_real_escape_string($r['categoria'])."','".ksql_real_escape_string($r['dir'])."','".$r['ordine']."','".$_POST['destinationLang']."')";
+				if(ksql_query($q)) $catMap[$r['idcat']]=ksql_insert_id();
 				}
 			else $catMap[$r['idcat']]=$r2['idcat'];
 			}
@@ -36,15 +36,15 @@ if(isset($_POST['copyPages'])&&isset($_POST['sourceLang'])&&isset($_POST['destin
 			$query.=" OR idpag=".intval($idpag)." ";
 			}
 		$query.=") AND ll='".$_POST['sourceLang']."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$row['dir']==str_replace('/'.strtolower($_POST['sourceLang']).'/','/'.strtolower($_POST['destinationLang']).'/',$row['dir']);
 			$q="SELECT * FROM ".TABLE_PAGINE." WHERE ll='".$_POST['destinationLang']."' AND dir='".$row['dir']."' LIMIT 1";
-			$rs=mysql_query($q);
-			$r=mysql_fetch_array($rs);
+			$rs=ksql_query($q);
+			$r=ksql_fetch_array($rs);
 			if($r!=false&&isset($_POST['overwrite'])) {
 				$q="DELETE FROM ".TABLE_PAGINE." WHERE idpag='".$r['idpag']."'";
-				mysql_query($q);
+				ksql_query($q);
 				}
 			if($r==false||isset($_POST['overwrite'])) {
 				//pagina
@@ -61,32 +61,32 @@ if(isset($_POST['copyPages'])&&isset($_POST['sourceLang'])&&isset($_POST['destin
 				$q=rtrim($q,",");
 				$q.=') VALUES(';
 				foreach($row as $ka=>$v) {
-					if(!is_numeric($ka)) $q.="'".mysql_real_escape_string($v)."',";
+					if(!is_numeric($ka)) $q.="'".ksql_real_escape_string($v)."',";
 					}
 				$q=rtrim($q,",");
 				$q.=')';
-				mysql_query($q);
-				$row['idpag']=mysql_insert_id();
+				ksql_query($q);
+				$row['idpag']=ksql_insert_id();
 				//immagini
 				$q="SELECT * FROM ".TABLE_IMGALLERY." WHERE tabella='".TABLE_PAGINE."' AND id='".$idpag."'";
-				$rs=mysql_query($q);
-				while($r=mysql_fetch_array($rs)) {
+				$rs=ksql_query($q);
+				while($r=ksql_fetch_array($rs)) {
 					$q="INSERT INTO ".TABLE_IMGALLERY." (tabella,id,ordine,idimg) VALUES('".TABLE_PAGINE."','".$row['idpag']."','".$r['ordine']."','".$r['idimg']."')";
-					mysql_query($q);
+					ksql_query($q);
 					}
 				//documenti
 				$q="SELECT * FROM ".TABLE_DOCGALLERY." WHERE tabella='".TABLE_PAGINE."' AND id='".$idpag."'";
-				$rs=mysql_query($q);
-				while($r=mysql_fetch_array($rs)) {
+				$rs=ksql_query($q);
+				while($r=ksql_fetch_array($rs)) {
 					$q="INSERT INTO ".TABLE_DOCGALLERY." (tabella,id,ordine,iddoc) VALUES('".TABLE_PAGINE."','".$row['idpag']."','".$r['ordine']."','".$r['iddoc']."')";
-					mysql_query($q);
+					ksql_query($q);
 					}
 				//metadata
 				$q="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_PAGINE."' AND id='".$idpag."'";
-				$rs=mysql_query($q);
-				while($r=mysql_fetch_array($rs)) {
-					$q="INSERT INTO ".TABLE_METADATA." (tabella,id,param,value) VALUES('".TABLE_PAGINE."','".$row['idpag']."','".mysql_real_escape_string($r['param'])."','".mysql_real_escape_string($r['value'])."')";
-					mysql_query($q);
+				$rs=ksql_query($q);
+				while($r=ksql_fetch_array($rs)) {
+					$q="INSERT INTO ".TABLE_METADATA." (tabella,id,param,value) VALUES('".TABLE_PAGINE."','".$row['idpag']."','".ksql_real_escape_string($r['param'])."','".ksql_real_escape_string($r['value'])."')";
+					ksql_query($q);
 					}
 				}
 			}
@@ -112,9 +112,9 @@ if(isset($log)) {
 	<td><label for="sourceLang"><?= $kaTranslate->translate("Languages:Source language"); ?></label><br />
 		<select name="sourceLang" id="sourceLang" onchange="window.location.href='<?= $_SERVER['PHP_SELF']; ?>?sourceLang='+this.value"><?php 
 		$query="SELECT * FROM ".TABLE_LINGUE." ORDER BY ordine";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		$i=0;
-		while($row=mysql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results)) {
 			?><option value="<?= $row['ll']; ?>"<?= $_GET['sourceLang']==$row['ll']?' selected':''; ?>><?= $row['lingua']; ?></option>
 			<?php  } ?>
 		</select>
@@ -123,9 +123,9 @@ if(isset($log)) {
 	<td><label for="destinationLang"><?= $kaTranslate->translate("Languages:Destination language"); ?></label><br />
 		<select name="destinationLang" id="destinationLang"><?php 
 		$query="SELECT * FROM ".TABLE_LINGUE." ORDER BY ordine";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		$i=0;
-		while($row=mysql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results)) {
 			?><option value="<?= $row['ll']; ?>"><?= $row['lingua']; ?></option>
 			<?php  } ?>
 		</select>
@@ -137,8 +137,8 @@ if(isset($log)) {
 	<table>
 	<?php 
 	$query="SELECT * FROM ".TABLE_PAGINE." WHERE ll='".$_GET['sourceLang']."' ORDER BY titolo";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) { ?>
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) { ?>
 		<tr><td><input type="checkbox" name="copyPage[]" value="<?= $row['idpag']; ?>" id="copyPage<?= $row['idpag']; ?>" /></td><td><label for="copyPage<?= $row['idpag']; ?>"><?= $row['titolo']; ?> <small>(<?= $row['dir']; ?>)</small></label></td></tr>
 		<?php  } ?>
 	</table>

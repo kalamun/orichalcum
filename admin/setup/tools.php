@@ -18,32 +18,32 @@ include_once("../inc/head.inc.php");
 /* AZIONI */
 if(isset($_GET['fixpermalink'])) {
 	$query="SELECT * FROM (SELECT dir,ll,count(*) AS tot FROM ".TABLE_PAGINE." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
-		$q="SELECT idpag FROM ".TABLE_PAGINE." WHERE `dir`='".mysql_real_escape_string($row['dir'])."' AND `ll`='".mysql_real_escape_string($row['ll'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
-			mysql_query("UPDATE ".TABLE_PAGINE." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idpag`=".$r['idpag']);
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
+		$q="SELECT idpag FROM ".TABLE_PAGINE." WHERE `dir`='".ksql_real_escape_string($row['dir'])."' AND `ll`='".ksql_real_escape_string($row['ll'])."'";
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
+			ksql_query("UPDATE ".TABLE_PAGINE." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idpag`=".$r['idpag']);
 			}
 		}
 
 	$query="SELECT * FROM (SELECT dir,ll,count(*) AS tot FROM ".TABLE_NEWS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
-		$q="SELECT idnews FROM ".TABLE_NEWS." WHERE `dir`='".mysql_real_escape_string($row['dir'])."' AND `ll`='".mysql_real_escape_string($row['ll'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
-			mysql_query("UPDATE ".TABLE_NEWS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idnews`=".$r['idnews']);
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
+		$q="SELECT idnews FROM ".TABLE_NEWS." WHERE `dir`='".ksql_real_escape_string($row['dir'])."' AND `ll`='".ksql_real_escape_string($row['ll'])."'";
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
+			ksql_query("UPDATE ".TABLE_NEWS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idnews`=".$r['idnews']);
 			}
 		}
 
 	$query="SELECT * FROM (SELECT dir,ll,count(*) AS tot FROM ".TABLE_SHOP_ITEMS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
-		$q="SELECT idsitem FROM ".TABLE_SHOP_ITEMS." WHERE `dir`='".mysql_real_escape_string($row['dir'])."' AND `ll`='".mysql_real_escape_string($row['ll'])."'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
-			mysql_query("UPDATE ".TABLE_SHOP_ITEMS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idsitem`=".$r['idsitem']);
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
+		$q="SELECT idsitem FROM ".TABLE_SHOP_ITEMS." WHERE `dir`='".ksql_real_escape_string($row['dir'])."' AND `ll`='".ksql_real_escape_string($row['ll'])."'";
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
+			ksql_query("UPDATE ".TABLE_SHOP_ITEMS." SET `dir`=CONCAT('".rand(1000,9999)."-',`dir`) WHERE `idsitem`=".$r['idsitem']);
 			}
 		}
 
@@ -77,15 +77,15 @@ if(isset($_GET['checkorphanimages'])) {
 	asort($tables);
 	
 	$query="SELECT * FROM ".TABLE_IMG;
-	$results_imgs=mysql_query($query);
-	while($img=mysql_fetch_array($results_imgs)) {
+	$results_imgs=ksql_query($query);
+	while($img=ksql_fetch_array($results_imgs)) {
 		$used=false;
 
 		// controlla che non sia usata in qualche galleria
 		// o in qualche menù
 		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE `idimg`='".$img['idimg']."' LIMIT 1";
-		$results=mysql_query($query);
-		if(mysql_fetch_array($results)!=false) {
+		$results=ksql_query($query);
+		if(ksql_fetch_array($results)!=false) {
 			$used=true;
 			}
 		
@@ -94,10 +94,10 @@ if(isset($_GET['checkorphanimages'])) {
 			foreach($tables as $ka=>$t) {
 				$q="SELECT * FROM `".$t."` WHERE ";
 				$query="SHOW COLUMNS FROM `".$t."`";
-				$results=mysql_query($query);
+				$results=ksql_query($query);
 				if($results) {
 					$primary="";
-					while($row=mysql_fetch_array($results)) {
+					while($row=ksql_fetch_array($results)) {
 						if($row['Key']=='PRI') $primary=$row['Field'];
 						if(substr($row['Type'],0,7)=='varchar'||substr($row['Type'],0,4)=='text') {
 							$q.=" `".$row['Field']."` LIKE '%id=\"img".$img['idimg']."\"%' ";
@@ -108,9 +108,9 @@ if(isset($_GET['checkorphanimages'])) {
 						}
 					$q=rtrim($q," OR");
 					if($primary!="") {
-						$rs=mysql_query($q);
+						$rs=ksql_query($q);
 						if($rs!=false) {
-							while($r=mysql_fetch_array($rs)) {
+							while($r=ksql_fetch_array($rs)) {
 								$used=true;
 								}
 							}
@@ -181,17 +181,17 @@ elseif(isset($_GET['checkdburf8'])) {
 	$count=array(0,0);
 	foreach($const['user'] as $k=>$v) {
 		if(substr($k,0,6)=="TABLE_") {
-			$rs=mysql_query("SHOW TABLE STATUS LIKE '".constant($k)."'");
-			$row=mysql_fetch_array($rs);
+			$rs=ksql_query("SHOW TABLE STATUS LIKE '".constant($k)."'");
+			$row=ksql_fetch_array($rs);
 			if($row['Collation']!=""&&$row['Collation']!="utf8_general_ci") {
-				mysql_query("ALTER TABLE `".constant($k)."` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+				ksql_query("ALTER TABLE `".constant($k)."` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 				$count[0]++;
 				}
 			
-			$rs=mysql_query("SHOW FULL COLUMNS FROM ".constant($k));
-			while($row=mysql_fetch_array($rs)) {
+			$rs=ksql_query("SHOW FULL COLUMNS FROM ".constant($k));
+			while($row=ksql_fetch_array($rs)) {
 				if($row['Collation']!=""&&$row['Collation']!="utf8_general_ci") {
-					mysql_query("ALTER TABLE `".constant($k)."` CHANGE `".$row['Field']."` `".$row['Field']."` ".$row['Type']." CHARACTER SET utf8 COLLATE utf8_general_ci ".($row['Null']!="NO"?"NOT":"")." NULL ".($row['Default']!=""?"DEFAULT '".$row['Default']."'":""));
+					ksql_query("ALTER TABLE `".constant($k)."` CHANGE `".$row['Field']."` `".$row['Field']."` ".$row['Type']." CHARACTER SET utf8 COLLATE utf8_general_ci ".($row['Null']!="NO"?"NOT":"")." NULL ".($row['Default']!=""?"DEFAULT '".$row['Default']."'":""));
 					$count[1]++;
 					}
 				}
@@ -220,18 +220,18 @@ elseif(isset($alert)) echo '<div id="MsgAlert">'.$alert.'</div>';
 <?php 
 $output="";
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_PAGINE." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$output.='<li>Pagine: <strong>'.$row['tot'].'</strong> '.$row['dir'].'</li>';
 	}
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_NEWS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$output.='<li>News: <strong>'.$row['tot'].'</strong> '.$row['dir'].'</li>';
 	}
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_SHOP_ITEMS." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$output.='<li>Shop: <strong>'.$row['tot'].'</strong> '.$row['dir'].'</li>';
 	}
 if($output!="") { ?>

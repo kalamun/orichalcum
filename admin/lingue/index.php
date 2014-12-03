@@ -9,7 +9,7 @@ if(isset($_SESSION['iduser'])) {
 		include('../inc/main.lib.php');
 		$log="";
 		$query="DELETE FROM ".TABLE_LINGUE." WHERE idli=".$_GET['delete'];
-		if(!mysql_query($query)) $log="Problemi durante l'eliminazione della voce";
+		if(!ksql_query($query)) $log="Problemi durante l'eliminazione della voce";
 		}
 
 	elseif(isset($_POST['save'])&&isset($_POST['lingua'])) {
@@ -17,7 +17,7 @@ if(isset($_SESSION['iduser'])) {
 		include('../inc/main.lib.php');
 		foreach($_POST['lingua'] as $ka=>$v) {
 			$query="UPDATE ".TABLE_LINGUE." SET ordine=".($ka+1)." WHERE idli=".$v." LIMIT 1";
-			if(!mysql_query($query)) $log="Errore durante il salvataggio nel DB";
+			if(!ksql_query($query)) $log="Errore durante il salvataggio nel DB";
 			}
 		}
 
@@ -26,24 +26,24 @@ if(isset($_SESSION['iduser'])) {
 		include('../inc/main.lib.php');
 		$log="";
 		$query="SELECT * FROM ".TABLE_LINGUE." ORDER BY ordine DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$ordine=$row['ordine']+1;
 
 		isset($_POST['online'])?$online='s':$online='n';
 		isset($_POST['rtl'])?$rtl='s':$rtl='n';
 		$query="INSERT INTO ".TABLE_LINGUE." (ll,lingua,code,online,rtl,ordine) VALUES('".b3_htmlize($_POST['ll'],true,"")."','".b3_htmlize($_POST['lingua'],true,"")."','".b3_htmlize($_POST['code'],true,"")."','".$online."','".$rtl."','".$ordine."')";
-		if(!mysql_query($query)) $log="Errore durante l'inserimento nel database";
+		if(!ksql_query($query)) $log="Errore durante l'inserimento nel database";
 		
 		// copia del config di default
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE ll='".DEFAULT_LANG."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$q="SELECT * FROM ".TABLE_CONFIG." WHERE ll='".$_POST['ll']."' AND param='".$row['param']."' LIMIT 1";
-			$rs=mysql_query($q);
-			if(mysql_fetch_array($rs)==false) {
+			$rs=ksql_query($q);
+			if(ksql_fetch_array($rs)==false) {
 				$q="INSERT INTO ".TABLE_CONFIG." (param,value1,value2,ll) VALUES('".$row['param']."','".addslashes($row['value1'])."','".addslashes($row['value2'])."','".$_POST['ll']."')";
-				mysql_query($q);
+				ksql_query($q);
 				}
 			}
 		}
@@ -56,7 +56,7 @@ if(isset($_SESSION['iduser'])) {
 		isset($_POST['online'])?$online='s':$online='n';
 		isset($_POST['rtl'])?$rtl='s':$rtl='n';
 		$query="UPDATE ".TABLE_LINGUE." SET ll='".b3_htmlize($_POST['ll'],true,"")."',code='".b3_htmlize($_POST['code'],true,"")."',lingua='".b3_htmlize($_POST['lingua'],true,"")."',online='".$online."',rtl='".$rtl."' WHERE idli=".$_POST['idli'];
-		if(!mysql_query($query)) $log="Errore durante il salvataggio nel Database";
+		if(!ksql_query($query)) $log="Errore durante il salvataggio nel Database";
 		}
 
 	/***/
@@ -113,9 +113,9 @@ if(isset($log)) {
 	<div class="DragZone">
 	<ul class="dragdrop lingue"><?php 
 		$query="SELECT * FROM ".TABLE_LINGUE." ORDER BY ordine";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		$i=0;
-		while($row=mysql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results)) {
 			?><li><?php  echo '<strong>'.$row['lingua'].'</strong><div class="small">'.$row['ll'].' - '.($row['online']=='s'?'ONLINE':'OFFLINE').'</div>'; ?><input type="hidden" name="lingua[]" value="<?php  echo $row['idli']; ?>" /><span><a href="javascript:kOpenIPopUp('modifica.php','idli=<?php  echo $row['idli']; ?>','600px','400px')"><img src="<?php  echo ADMINRELDIR; ?>/img/12edit.gif" width="12" height="12" alt="modifica" /></a><a href="?delete=<?php  echo $row['idli']; ?>" onclick="return confirm('Sei sicuro di voler eliminare questa voce?');"><img src="<?php  echo ADMINRELDIR; ?>/img/12close.gif" width="12" height="12" alt="elimina" /></a></span></li><?php  $i++; }
 		?></ul>
 		</div>

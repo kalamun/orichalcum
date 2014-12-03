@@ -18,8 +18,8 @@ class kImages {
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" ORDER BY ".$orderby." ";
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++)
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
 			$output[$i]=$row;
 			if($row['filename']!=""||$output[$i]['hotlink']=="") {
@@ -74,8 +74,8 @@ class kImages {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_IMG." WHERE `idimg`=".intval($idimg)." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if(!isset($row['idimg'])) return false;
 
 		$output=$row;
@@ -154,8 +154,8 @@ class kImgallery {
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$GLOBALS['__images']->getImage($row['idimg']);
 			$output[$i]['idimga']=$row['idimga'];
 			$output[$i]['tabella']=$row['tabella'];
@@ -169,8 +169,8 @@ class kImgallery {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE idimga=".$idimga." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$GLOBALS['__images']->getImage($row['idimg']);
 		$output['idimga']=$row['idimga'];
 		$output['tabella']=$row['tabella'];

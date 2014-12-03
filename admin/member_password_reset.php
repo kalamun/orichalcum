@@ -20,7 +20,7 @@ $timezone=kaGetVar('timezone',1);
 if($timezone=="") $timezone='Europe/Rome';
 date_default_timezone_set($timezone);
 $query="SET time_zone='".date("P")."'";
-mysql_query($query);
+ksql_query($query);
 
 /* load setup variables */
 require_once(ADMINRELDIR."inc/log.lib.php");

@@ -11,8 +11,8 @@ $kaCategorie=new kaCategorie();
 $catSel=array();
 if($_POST['idphg']>0) {
 	$query="SELECT `categories` FROM `".TABLE_PHOTOGALLERY."` WHERE `idphg`='".intval($_POST['idphg'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	foreach(explode(",",$row['categories']) as $idcat) {
 		if($idcat!="") $catSel[$idcat]=true;
 		}

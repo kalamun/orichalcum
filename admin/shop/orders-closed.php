@@ -148,7 +148,7 @@ if(isset($_POST['update'])&&isset($_GET['idord'])) {
 		$conditions.="`order_summary` LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
 		$conditions.="`uid` LIKE '%".b3_htmlize($_GET['search'],true,"")."%'";
 	} else {
-		$conditions.="`date` LIKE '".mysql_real_escape_string($_GET['y'].'-'.str_pad($_GET['m'],2,"0",STR_PAD_LEFT))."%'";
+		$conditions.="`date` LIKE '".ksql_real_escape_string($_GET['y'].'-'.str_pad($_GET['m'],2,"0",STR_PAD_LEFT))."%'";
 	}
 	foreach($kaShop->getOrderList($conditions,'CLS') as $row) {
 		?><tr id="order<?= $row['uid']; ?>">

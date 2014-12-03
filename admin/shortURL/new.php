@@ -13,8 +13,8 @@ if(isset($_POST['save'])) {
 
 	if($log=="") {
 		$query="INSERT INTO ".TABLE_SHORTURL." (`urlfrom`,`urlto`) VALUES('".b3_htmlize($_POST['urlfrom'],true,"")."','".b3_htmlize($_POST['urlto'],true,"")."')";
-		if(!mysql_query($query)) $log="Problemi durante il salvataggio";
-		else $id=mysql_insert_id();
+		if(!ksql_query($query)) $log="Problemi durante il salvataggio";
+		else $id=ksql_insert_id();
 		}
 	
 	if($log!="") {

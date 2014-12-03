@@ -19,9 +19,9 @@ class kPhotogallery {
 
 	public function photogalleryExists($dir=false) {
 		if($dir==false) $dir=$GLOBALS['__subdir__'];
-		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return true;
+		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".ksql_real_escape_string($dir)."') LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return true;
 		else return false;
 		}
 
@@ -38,9 +38,9 @@ class kPhotogallery {
 		$metadata['layout']="";
 		$metadata['featuredimage']=($row['featuredimage']>0 ? $this->imgs->getImage($row['featuredimage']) : array());
 		if(isset($dir[1])&&$dir[1]!="") {
-			$query="SELECT idphg,titolo,traduzioni,template FROM ".TABLE_PHOTOGALLERY." WHERE (`dir`='".b3_htmlize($GLOBALS['__subdir__'],true,"")."' OR `dir`='".mysql_real_escape_string($GLOBALS['__subdir__'])."') AND ll='".$ll."' LIMIT 1";
-				$results=mysql_query($query);
-					$row=mysql_fetch_array($results);
+			$query="SELECT idphg,titolo,traduzioni,template FROM ".TABLE_PHOTOGALLERY." WHERE (`dir`='".b3_htmlize($GLOBALS['__subdir__'],true,"")."' OR `dir`='".ksql_real_escape_string($GLOBALS['__subdir__'])."') AND ll='".$ll."' LIMIT 1";
+				$results=ksql_query($query);
+					$row=ksql_fetch_array($results);
 			$metadata['titolo'].=" &gt; ".$row['titolo'];
 			$metadata['traduzioni']=$row['traduzioni'];
 			if($metadata['template']!="") $metadata['template']=$row['template'];
@@ -48,8 +48,8 @@ class kPhotogallery {
 			}
 		if(isset($idphg)) {
 			$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_PHOTOGALLERY."' AND id='".$idphg."'";
-			$results=mysql_query($query);
-			while($row=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+			while($row=ksql_fetch_array($results)) {
 				$metadata[$row['param']]=$row['value'];
 				}
 			}
@@ -63,9 +63,9 @@ class kPhotogallery {
 		$vars['photogallery']=true; // it needs to be implemented
 
 		$output=array();
-		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE ll='".LANG."' AND data<=NOW() AND (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".ksql_real_escape_string($dir)."') LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$row;
 		
 		if($row['featuredimage']==0) $output['featuredimage']=false;
@@ -136,8 +136,8 @@ class kPhotogallery {
 		if($conditions!="") $query.=" AND(".$conditions.") ";
 		if($options!="") $query.=" ".$options." ";
 		$query.=" AND data<=NOW() ORDER BY ".kGetVar('photogallery-order',1);
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$id=count($output);
 			$output[$id]=$row;
 			$output[$id]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$GLOBALS['__template']->getVar('dir_photogallery',1).'/'.$row['dir'];
@@ -183,31 +183,31 @@ class kPhotogallery {
 	public function getCatByName($name,$ll=false) {
 		if(!$this->inited) $this->init();
 		if($ll==false) $ll=LANG;
-		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE `tabella`='".TABLE_PHOTOGALLERY."' AND (`categoria`='".b3_htmlize($name,true,"")."' OR `categoria`='".mysql_real_escape_string($name)."') AND `ll`='".strtoupper($ll)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row;
+		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE `tabella`='".TABLE_PHOTOGALLERY."' AND (`categoria`='".b3_htmlize($name,true,"")."' OR `categoria`='".ksql_real_escape_string($name)."') AND `ll`='".strtoupper($ll)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
 		}
 	public function getCatById($idcat) {
 		if(!$this->inited) $this->init();
 		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PHOTOGALLERY."' AND idcat='".intval($idcat)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row;
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
 		}
 
 	public function addComment($name,$email,$text,$idphg,$public="n") {
 		if($public!="s") $public="n";
 		$query="INSERT INTO ".TABLE_COMMENTI." (ip,data,tabella,id,autore,email,testo,public) VALUES('".$_SERVER['REMOTE_ADDR']."',NOW(),'".TABLE_PHOTOGALLERY."','".$idphg."','".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($text,true,"")."','".$public."')";
-		mysql_query($query);
-		$idcomm=mysql_insert_id();
+		ksql_query($query);
+		$idcomm=ksql_insert_id();
 		return $idcomm;
 		}
 	public function getComments($idnews) {
 		$output=array();
 		$query="SELECT * FROM ".TABLE_COMMENTI." WHERE tabella='".TABLE_PHOTOGALLERY."' AND id='".intval($idnews)."' AND public='s' ORDER BY data";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['dataleggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).*/","$3-$2-$1 $4:$5",$row['data']);
 			}

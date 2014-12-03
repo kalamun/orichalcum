@@ -29,8 +29,8 @@ $v['shop-mail_sended2']="";
 <form action="" method="post">
 	<?php 
 	$query="SELECT * FROM ".TABLE_CONFIG." WHERE param LIKE 'shop-mail_%' AND ll='".$_SESSION['ll']."'";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
 		$v[$row['param'].'1']=$row['value1'];
 		$v[$row['param'].'2']=$row['value2'];
 		}

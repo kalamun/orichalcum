@@ -17,19 +17,19 @@ if(!isset($_GET['iddel'])) {
 	if(isset($_POST['iddel'])&&is_array($_POST['iddel'])) {
 		for($i=0;isset($_POST['iddel'][$i]);$i++) {
 			$query="UPDATE ".TABLE_SHOP_DELIVERERS." SET ordine=".($i+1)." WHERE iddel=".$_POST['iddel'][$i]." LIMIT 1";
-			mysql_query($query);
+			ksql_query($query);
 			}
 		}
 
 	elseif(isset($_POST['adddeliverer'])) {
 		$log="";
 		$query="SELECT * FROM ".TABLE_SHOP_DELIVERERS." ORDER BY ordine DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$ordine=$row['ordine']+1;
 		$query="INSERT INTO ".TABLE_SHOP_DELIVERERS." (`name`,`zones`,`ordine`) VALUES('".b3_htmlize($_POST['name'],true,"")."',',',".$ordine.")";
-		if(!mysql_query($query)) $log="Errore durante l'inserimento del corriere";
-		else $id=mysql_insert_id();
+		if(!ksql_query($query)) $log="Errore durante l'inserimento del corriere";
+		else $id=ksql_insert_id();
 
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -47,7 +47,7 @@ if(!isset($_GET['iddel'])) {
 	elseif(isset($_GET['delete'])) {
 		$log="";
 		$query="DELETE FROM ".TABLE_SHOP_DELIVERERS." WHERE iddel=".$_GET['delete']." LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante l'eliminazione";
+		if(!ksql_query($query)) $log="Errore durante l'eliminazione";
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
 			$kaLog->add("ERR",'Shop: Errore nell\'eliminazione del corriere <em>ID: '.b3_htmlize($_GET['delete'],true,"").'</em>');
@@ -65,8 +65,8 @@ if(!isset($_GET['iddel'])) {
 	<ul class="DragDeveloper">
 	<?php 
 	$query="SELECT * FROM ".TABLE_SHOP_DELIVERERS." ORDER BY ordine";
-	$results=mysql_query($query);
-	while($row=mysql_Fetch_array($results)) { ?>
+	$results=ksql_query($query);
+	while($row=ksql_Fetch_array($results)) { ?>
 		<li onmouseover="showActions(this)" onmouseout="hideActions(this)">
 		<div class="small" style="visibility:hidden;float:right;"><a href="?iddel=<?php  echo $row['iddel']; ?>">Modifica</a> | <a href="?delete=<?php  echo $row['iddel']; ?>" onclick="return confirm('Sei sicuro di voler rimuovere questo corriere?');">Elimina</a></div>
 		<?= $row['name']; ?>
@@ -119,8 +119,8 @@ if(!isset($_GET['iddel'])) {
 else {
 	$zone=array();
 	$query="SELECT * FROM ".TABLE_SHOP_COUNTRIES." GROUP BY zone ORDER BY zone";
-	$results=mysql_query($query);
-	while($row=mysql_fetch_array($results)) {
+	$results=ksql_query($query);
+	while($row=ksql_fetch_array($results)) {
 		$zone[$row['zone']]=true;
 		}
 	
@@ -132,10 +132,10 @@ else {
 			foreach($_POST['zones'] as $ka=>$v) { $zones.=$ka.','; }
 			}
 		$query="UPDATE ".TABLE_SHOP_DELIVERERS." SET `name`='".b3_htmlize($_POST['name'],true,"")."',zones='".$zones."' WHERE `iddel`='".intval($_GET['iddel'])."' LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante la scrittura nel database";
+		if(!ksql_query($query)) $log="Errore durante la scrittura nel database";
 		
 		$query="DELETE FROM ".TABLE_SHOP_DEL_PRICES." WHERE `iddel`='".intval($_GET['iddel'])."'";
-		if(!mysql_query($query)) $log="Errore durante la pulizia dei vecchi prezzi dal database";
+		if(!ksql_query($query)) $log="Errore durante la pulizia dei vecchi prezzi dal database";
 		
 		if(isset($_POST['weight'])) {
 			foreach($_POST['weight'] as $ka=>$v) {
@@ -147,7 +147,7 @@ else {
 						}
 					$prices=",".implode(",",$prices).",";
 					$query="INSERT INTO ".TABLE_SHOP_DEL_PRICES." (`iddel`,`maxweight`,`prices`) VALUES('".intval($_GET['iddel'])."','".number_format($_POST['weight'][$ka],3)."','".$prices."')";
-					if(!mysql_query($query)) $log="Errore durante l'inserimento dei prezzi nel database";
+					if(!ksql_query($query)) $log="Errore durante l'inserimento dei prezzi nel database";
 					}
 				}
 			}
@@ -164,8 +164,8 @@ else {
 	/* FINE AZIONI */
 
 	$query="SELECT * FROM ".TABLE_SHOP_DELIVERERS." WHERE iddel='".intval($_GET['iddel'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$deliverer=mysql_Fetch_array($results);
+	$results=ksql_query($query);
+	$deliverer=ksql_Fetch_array($results);
 	
 	?>
 
@@ -204,8 +204,8 @@ else {
 			<?php 
 			$c=0;
 			$query="SELECT * FROM ".TABLE_SHOP_DEL_PRICES." WHERE iddel='".$deliverer['iddel']."' ORDER BY maxweight";
-			$results=mysql_query($query);
-			while($row=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+			while($row=ksql_fetch_array($results)) {
 				$prezzi=explode(",",$row['prices']);
 				?>
 				<tr>

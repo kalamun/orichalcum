@@ -29,8 +29,8 @@ if(!isset($_GET['idsman'])) {
 		$kaMenu=new kaMenu();
 
 		$query="SELECT * FROM ".TABLE_SHOP_MANUFACTURERS." WHERE idsman='".$_GET['usePage']."' AND ll='".$_SESSION['ll']."' LIMIT 1";
-		$results=mysql_query($query);
-		if($page=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		if($page=ksql_fetch_array($results))
 		{
 			$vars['title']=$page['name'];
 			$vars['dir']=$page['dir'];
@@ -144,7 +144,7 @@ if(!isset($_GET['idsman'])) {
 			if(isset($_GET['l']) && $_GET['l']!="")
 			{
 				if($_GET['l']=="#") $vars['conditions'].="`name` RLIKE '^[^[A-Za-z].*'";
-				else $vars['conditions'].="`name` LIKE '".mysql_real_escape_string($_GET['l'])."%'";
+				else $vars['conditions'].="`name` LIKE '".ksql_real_escape_string($_GET['l'])."%'";
 			}
 
 			foreach($kaShop->getManufacturersList($vars) as $page) { ?>
@@ -369,8 +369,8 @@ else {
 					$translation=array();
 					$translation_id=array();
 					$query_l="SELECT * FROM ".TABLE_LINGUE." WHERE ll<>'".$page['ll']."' ORDER BY lingua";
-					$results_l=mysql_query($query_l);
-					while($page_l=mysql_fetch_array($results_l)) {
+					$results_l=ksql_query($query_l);
+					while($page_l=ksql_fetch_array($results_l)) {
 						if(!isset($page['traduzioni'][$page_l['ll']])||$page['traduzioni'][$page_l['ll']]=="") {
 							$translation[$page_l['ll']]="";
 							$translation_id[$page_l['ll']]="";

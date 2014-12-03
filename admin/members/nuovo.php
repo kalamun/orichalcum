@@ -15,7 +15,7 @@ if(isset($_POST['insert'])&&$_POST['m_username']!=""&&$_POST['m_name']!=""&&$_PO
 	//$kaMembers->refreshHtpasswd();
 	if($id==false) $log="Problemi durante la creazione del nuovo utente";
 	if($log=="") {
-		$id=mysql_insert_id();
+		$id=ksql_insert_id();
 		$kaLog->add("INS",'Creato un nuovo Membro: <em>'.$_POST['m_name'].'</em> - '.$_POST['m_username'].' (<em>ID: '.$id.'</em>)');
 		echo '<div id="MsgSuccess">Membro inserito con successo</div>';
 		echo '<meta http-equiv="refresh" content="0; url=modifica.php?idmember='.$id.'">';

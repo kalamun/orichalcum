@@ -18,8 +18,8 @@ class kDocuments {
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			if($row['filename']!=""||$row['hotlink']=="") {
 				if(trim($output[$i]['alt'])=="") $output[$i]['alt']=$output[$i]['filename'];
@@ -60,8 +60,8 @@ class kDocuments {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_DOCS." WHERE iddoc=".$iddoc." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$row;
 		if($row['filename']!=""||$row['hotlink']=="") {
 			if(trim($output['alt'])=="") $output['alt']=$output['filename'];
@@ -117,7 +117,6 @@ class kDocgallery {
 	protected $kDocuments;
 	
 	function kDocgallery() {
-		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.'admin/inc/connect.inc.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.'inc/documents.lib.php');
 		$this->kDocuments=new kDocuments();
 		}
@@ -130,8 +129,8 @@ class kDocgallery {
 		if($id!="") $query.=" AND id='".$id."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$this->kDocuments->getDocument($row['iddoc']);
 			$output[$i]['iddocg']=$row['iddocg'];
 			//$output[$i]['ordineg']=$row['ordineg'];
@@ -146,8 +145,8 @@ class kDocgallery {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_DOCGALLERY." WHERE iddocg=".$iddocg." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$this->kDocuments->getDocument($row['iddoc']);
 		$output['iddocg']=$row['iddocg'];
 		$output['ordineg']=$row['ordineg'];

@@ -57,8 +57,8 @@ class kaAdminTranslate {
 		$dir=trim($dir,"/ ");
 		if(!isset($_SESSION['ui']['lang'])||$_SESSION['ui']['lang']=="") {
 			$query="SELECT * FROM ".TABLE_LINGUE." WHERE ll='".DEFAULT_LANG."' LIMIT 1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			$_SESSION['ui']['lang']=$row['code'];
 			}
 		$file=ADMINRELDIR.$dir.'/locale/'.$_SESSION['ui']['lang'].'.txt';
@@ -168,8 +168,8 @@ class kaAdminMenu {
 	function getLanguages() {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_LINGUE."` ORDER BY `ordine`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 		return $output;
@@ -408,7 +408,7 @@ function kaGetVar($param,$num,$ll=false) {
 			else $ll=DEFAULT_LANG;
 			}
 		$query="SELECT value".$num." FROM ".TABLE_CONFIG." WHERE param='".$param."' AND ll='".$ll."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row['value'.$num];
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row['value'.$num];
 		else return false;
 		}

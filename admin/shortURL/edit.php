@@ -8,7 +8,7 @@ include_once("../inc/head.inc.php");
 if(isset($_POST['update'])) {
 	$log="";
 	$query="UPDATE ".TABLE_SHORTURL." SET `urlfrom`='".$_POST['urlfrom']."',`urlto`='".$_POST['urlto']."' WHERE idurl=".$_POST['idurl'];
-	if(!mysql_query($query)) $log="Problemi durante le modifica";
+	if(!ksql_query($query)) $log="Problemi durante le modifica";
 
 	if($log!="") {
 		echo '<div id="MsgAlert">'.$log.'</div>';
@@ -29,8 +29,8 @@ if(!isset($_GET['idurl'])) {
 		<table class="tabella">
 		<tr><th>URL</th><th>Destinazione</th><th>Azioni</th></tr><?php 
 		$query="SELECT * FROM ".TABLE_SHORTURL." ORDER BY `urlfrom`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			echo '<tr>';
 			echo '<td><a href="?idurl='.$row['idurl'].'"><strong>'.SITE_URL.'/'.$row['urlfrom'].'</strong></a></td>';
 			echo '<td style="background-color:#fbf7c5;">'.SITE_URL.'/'.$row['urlto'].'</a></td>';
@@ -47,8 +47,8 @@ else {
 	<br />
 	<?php 
 	$query="SELECT * FROM ".TABLE_SHORTURL." WHERE idurl='".$_GET['idurl']."' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 
 	echo '<form action="?" method="post" enctype="multipart/form-data">';
 		echo b3_create_input("idurl","hidden","",$row['idurl'],"");

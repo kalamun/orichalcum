@@ -11,7 +11,6 @@ class kPages {
 		
 	public function init() {
 		$this->inited=true;
-		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."admin/inc/connect.inc.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."admin/inc/main.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/images.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR."inc/documents.lib.php");
@@ -26,9 +25,9 @@ class kPages {
 		if(!$this->inited) $this->init();
 		if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__'],"/");
 		if($ll==false) $ll=LANG;
-		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".mysql_real_escape_string($dir)."') AND ll='".$ll."' LIMIT 1";
-		$results=mysql_query($query);
-		if(!mysql_fetch_array($results)) return false;
+		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".ksql_real_escape_string($dir)."') AND ll='".$ll."' LIMIT 1";
+		$results=ksql_query($query);
+		if(!ksql_fetch_array($results)) return false;
 		else return true;
 		}
 
@@ -43,9 +42,9 @@ class kPages {
 		$metadata['template']=kGetVar('template',1);
 		$metadata['layout']="";
 		if(isset($dir)&&$dir!="") {
-			$query="SELECT `idpag`,`titolo`,`traduzioni`,`template`,`layout`,`featuredimage` FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND ll='".mysql_real_escape_string($ll)."' LIMIT 1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$query="SELECT `idpag`,`titolo`,`traduzioni`,`template`,`layout`,`featuredimage` FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".ksql_real_escape_string($dir)."') AND ll='".ksql_real_escape_string($ll)."' LIMIT 1";
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			$metadata['titolo']=$row['titolo'];
 			$metadata['traduzioni']=$row['traduzioni'];
 			$metadata['template']=$row['template'];
@@ -55,8 +54,8 @@ class kPages {
 			}
 		if(isset($idpag)) {
 			$query="SELECT * FROM `".TABLE_METADATA."` WHERE `tabella`='".TABLE_PAGINE."' AND `id`='".$idpag."'";
-				$results=mysql_query($query);
-					while($row=mysql_fetch_array($results)) {
+				$results=ksql_query($query);
+					while($row=ksql_fetch_array($results)) {
 				$metadata[$row['param']]=$row['value'];
 				}
 			}
@@ -74,14 +73,14 @@ class kPages {
 			$k=trim($k);
 			if($k!=""&&strlen($k)>3) {
 				$k=b3_htmlize($k,true,"");
-				$query.="(`titolo` LIKE '%".mysql_real_escape_string($k)."%' OR `sottotitolo` LIKE '%".mysql_real_escape_string($k)."%' OR `anteprima` LIKE '%".mysql_real_escape_string($k)."%' OR `testo` LIKE '%".mysql_real_escape_string($k)."%') AND ";
+				$query.="(`titolo` LIKE '%".ksql_real_escape_string($k)."%' OR `sottotitolo` LIKE '%".ksql_real_escape_string($k)."%' OR `anteprima` LIKE '%".ksql_real_escape_string($k)."%' OR `testo` LIKE '%".ksql_real_escape_string($k)."%') AND ";
 				}
 			}
 		if(substr($query,-6)=="WHERE ") return $output; //if no valid keywords return the empty array (prevent to return all pages)
 
 		$query.="`ll`='".LANG."' AND `riservata`='n' ORDER BY `modified`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=array(
 				"title"=>$row['titolo'],
 				"permalink"=>BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$row['dir'],
@@ -107,8 +106,8 @@ class kPages {
 		if($ll==null) $ll=LANG;
 		$output=array();
 		$query="SELECT `dir` FROM `".TABLE_PAGINE."` WHERE `ll`='".$ll."' AND `riservata`='n' ORDER BY `titolo`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results))
 		{
 			$output[] = $this->row2output($row);
 		}
@@ -136,12 +135,12 @@ class kPages {
 		if($conditions!="") $query.="AND (".$conditions.") ";
 		if($cat!=false)
 		{
-			$query.="AND `categorie` LIKE '%,".mysql_real_escape_string($cat).",%' ";
+			$query.="AND `categorie` LIKE '%,".ksql_real_escape_string($cat).",%' ";
 		}
 		if($options!="") $query.=" ".$options." ";
 		$query.=" AND `riservata`='n' ORDER BY `".$orderby."` DESC,`idpag` DESC LIMIT ".intval($from).",".intval($limit)."";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++)
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
 			$output[$i]=$this->row2output($row,$vars);
 		}
@@ -155,16 +154,16 @@ class kPages {
 
 		$output=array();
 
-		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".mysql_real_escape_string($dir)."') AND `riservata`='n' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results))
+		$query="SELECT * FROM `".TABLE_PAGINE."` WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".ksql_real_escape_string($dir)."') AND `riservata`='n' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results))
 		{
 			$output = $this->row2output($row);
 
 		} else {
 			$query="DESCRIBE ".TABLE_PAGINE;
-			$results=mysql_query($query);
-			while($row=mysql_fetch_array($results))
+			$results=ksql_query($query);
+			while($row=ksql_fetch_array($results))
 			{
 				$output[$row['Field']]="";
 			}
@@ -185,24 +184,24 @@ class kPages {
 	public function getPermalinkById($idpag) {
 		if(!$this->inited) $this->init();
 		$query="SELECT `ll`,`dir` FROM `".TABLE_PAGINE."` WHERE `idpag`='".intval($idpag)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$row['dir'];
 		}
 
 	public function getCatByName($name,$ll=false) {
 		if(!$this->inited) $this->init();
 		if($ll==false) $ll=LANG;
-		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND (`categoria`='".b3_htmlize($name,true,"")."' OR `categoria`='".mysql_real_escape_string($name)."') AND ll='".strtoupper($ll)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row;
+		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND (`categoria`='".b3_htmlize($name,true,"")."' OR `categoria`='".ksql_real_escape_string($name)."') AND ll='".strtoupper($ll)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
 		}
 	public function getCatById($idcat) {
 		if(!$this->inited) $this->init();
 		$query="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_PAGINE."' AND idcat='".intval($idcat)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row;
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
 		}
 
@@ -210,8 +209,8 @@ class kPages {
 		if(!$this->inited) $this->init();
 		if($public!="s") $public="n";
 		$query="INSERT INTO ".TABLE_COMMENTI." (ip,data,tabella,id,autore,email,testo,public) VALUES('".$_SERVER['REMOTE_ADDR']."',NOW(),'".TABLE_PAGINE."','".$idpag."','".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($text,true,"")."','".$public."')";
-		mysql_query($query);
-		$idcomm=mysql_insert_id();
+		ksql_query($query);
+		$idcomm=ksql_insert_id();
 		return $idcomm;
 		}
 	
@@ -219,8 +218,8 @@ class kPages {
 		if(!$this->inited) $this->init();
 		$output=array();
 		$query="SELECT * FROM ".TABLE_COMMENTI." WHERE tabella='".TABLE_PAGINE."' AND id='".$idnews."' AND public='s' ORDER BY data";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['dataleggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).*/","$3-$2-$1 $4:$5",$row['data']);
 			}
@@ -352,16 +351,16 @@ class kPages {
 		if(!is_array($vars)) $vars=array("idpag"=>$vars);
 
 		$query="SELECT * FROM `".TABLE_CONVERSIONS."` WHERE ";
-		if(isset($vars['idpag'])) $query.=" `idpag`='".mysql_real_escape_string($vars['idpag'])."' AND ";
+		if(isset($vars['idpag'])) $query.=" `idpag`='".ksql_real_escape_string($vars['idpag'])."' AND ";
 		$query.=" `idpag`>0 LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row==false) {
 			//if there are no records for this page, get an empty array
 			$row=array();
 			$query="DESCRIBE `".TABLE_CONVERSIONS."`";
-			$results=mysql_query($query);
-			while($r=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+			while($r=ksql_fetch_array($results)) {
 				$row[$r['Field']]="";
 				}
 			}

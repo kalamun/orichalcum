@@ -14,7 +14,6 @@ class kUsers {
 		
 	public function init() {
 		$this->inited=true;
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/connect.inc.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/tplshortcuts.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/images.lib.php");
 
@@ -31,15 +30,15 @@ class kUsers {
 			$query.=" `iduser`='".intval($id)."' OR ";
 			}
 		$query.=" `iduser`=0 ORDER BY `name`";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$tmpPublicUsers[$row['iduser']]=$row;
 			$tmpPublicUsers[$row['iduser']]['summary']="";
 			$tmpPublicUsers[$row['iduser']]['description']="";
 			
 			$q="SELECT * FROM ".TABLE_USERS_PROP." WHERE family='info' AND iduser=".$row['iduser'];
-			$rs=mysql_query($q);
-			while($r=mysql_fetch_array($rs)) {
+			$rs=ksql_query($q);
+			while($r=ksql_fetch_array($rs)) {
 				$tmpPublicUsers[$row['iduser']][$r['param']]=$r['value'];
 				}
 
@@ -55,8 +54,8 @@ class kUsers {
 		if(!$this->inited) $this->init();
 		if($username==false) $username=$GLOBALS['__subdir__'];
 		$query="SELECT name FROM ".TABLE_USERS." WHERE username='".b3_htmlize($username,true,"")."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=array();
 		$output['titolo']=$row['name'];
 		$output['traduzioni']="";
@@ -123,7 +122,6 @@ class kMembers {
 		}
 
 	public function init() {
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/connect.inc.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/main.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/tplshortcuts.lib.php");
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/images.lib.php");
@@ -144,11 +142,11 @@ class kMembers {
 		if($expiration!=""&&preg_match("/\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/",$expiration)) $expiration=substr($expiration,0,4).'-'.substr($expiration,5,2).'-'.substr($expiration,8,2).' '.substr($expiration,11,2).':'.substr($expiration,14,2).':'.substr($expiration,17,2);
 		else $expiration="0000-00-00 00:00:00";
 		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE username='".b3_htmlize($username,true,"")."' AND affiliation='".b3_htmlize($affiliation,true,"")."' AND status<>'del' LIMIT 1";
-		$results=mysql_query($query);
-		if(!mysql_fetch_array($results)) {
-			$query="INSERT INTO ".TABLE_MEMBERS." (name,email,username,password,affiliation,created,lastlogin,expiration,status,newsletter_lists) VALUES('".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($username,true,"")."','".mysql_real_escape_string($password)."','".mysql_real_escape_string($affiliation)."',NOW(),NOW(),'".mysql_real_escape_string($expiration)."','".mysql_real_escape_string($status)."',',')";
-			$results=mysql_query($query);
-			if($results) return mysql_insert_id();
+		$results=ksql_query($query);
+		if(!ksql_fetch_array($results)) {
+			$query="INSERT INTO ".TABLE_MEMBERS." (name,email,username,password,affiliation,created,lastlogin,expiration,status,newsletter_lists) VALUES('".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($username,true,"")."','".ksql_real_escape_string($password)."','".ksql_real_escape_string($affiliation)."',NOW(),NOW(),'".ksql_real_escape_string($expiration)."','".ksql_real_escape_string($status)."',',')";
+			$results=ksql_query($query);
+			if($results) return ksql_insert_id();
 			}
 		return false;
 		}
@@ -169,11 +167,11 @@ class kMembers {
 			$param!="status") return false;
 		
 		// get member if it exists
-		$query="SELECT * FROM `".TABLE_MEMBERS."` WHERE (`username`='".b3_htmlize($username,true,"")."' OR `username`='".mysql_real_escape_string($username)."') AND ";
+		$query="SELECT * FROM `".TABLE_MEMBERS."` WHERE (`username`='".b3_htmlize($username,true,"")."' OR `username`='".ksql_real_escape_string($username)."') AND ";
 		if($affiliation!=false) $query.=" `affiliation`='".b3_htmlize($affiliation,true,"")."' AND ";
 		$query.=" `status`<>'del' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if(isset($row['idmember']))
 		{
 			// validate email
@@ -184,8 +182,8 @@ class kMembers {
 				$param=b3_htmlize($param,false,"");
 			}
 			
-			$query="UPDATE ".TABLE_MEMBERS." SET `".mysql_real_escape_string($param)."`='".mysql_real_escape_string($value)."' WHERE `idmember`='".intval($row['idmember'])."' LIMIT 1";
-			if(mysql_query($query)) return true;
+			$query="UPDATE ".TABLE_MEMBERS." SET `".ksql_real_escape_string($param)."`='".ksql_real_escape_string($value)."' WHERE `idmember`='".intval($row['idmember'])."' LIMIT 1";
+			if(ksql_query($query)) return true;
 			return false;
 		}
 		return false;
@@ -193,23 +191,23 @@ class kMembers {
 
 	public function replaceMetadata($username,$param,$value,$affiliation=false) {
 		if(!$this->inited) $this->init();
-		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE (`username`='".b3_htmlize($username,true,"")."' OR `username`='".mysql_real_escape_string($username)."') AND ";
+		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE (`username`='".b3_htmlize($username,true,"")."' OR `username`='".ksql_real_escape_string($username)."') AND ";
 		if($affiliation!=false) $query.=" `affiliation`='".b3_htmlize($affiliation,true,"")."' AND ";
 		$query.=" status<>'del' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if(isset($row['idmember'])) {
 			$query2="SELECT * FROM ".TABLE_METADATA." WHERE `tabella`='".TABLE_MEMBERS."' AND `id`='".$row['idmember']."' AND `param`='".b3_htmlize($param,true,"")."' LIMIT 1";
-			$results2=mysql_query($query2);
-			if($row2=mysql_fetch_array($results2)) {
+			$results2=ksql_query($query2);
+			if($row2=ksql_fetch_array($results2)) {
 				$query3="UPDATE ".TABLE_METADATA." SET `value`='".b3_htmlize($value,true,"")."' WHERE `tabella`='".TABLE_MEMBERS."' AND `id`='".$row['idmember']."' AND `param`='".b3_htmlize($param,true,"")."' LIMIT 1";
-				$results3=mysql_query($query3);
-				if($results3) $id=mysql_insert_id();
+				$results3=ksql_query($query3);
+				if($results3) $id=ksql_insert_id();
 				}
 			else {
 				$query3="INSERT INTO ".TABLE_METADATA." (`tabella`,`id`,`param`,`value`) VALUES('".TABLE_MEMBERS."','".$row['idmember']."','".b3_htmlize($param,true,"")."','".b3_htmlize($value,true,"")."')";
-				$results3=mysql_query($query3);
-				if($results3) $id=mysql_insert_id();
+				$results3=ksql_query($query3);
+				if($results3) $id=ksql_insert_id();
 				}
 			$_SESSION['member']['metadata'][$param]=$value;
 			return $id;
@@ -219,8 +217,8 @@ class kMembers {
 	public function memberExists($username,$affiliation="") {
 		if(!$this->inited) $this->init();
 		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE username='".b3_htmlize($username,true,"")."' AND affiliation='".b3_htmlize($affiliation,true,"")."' AND status<>'del' LIMIT 1";
-		$results=mysql_query($query);
-		if(!mysql_fetch_array($results)) return false;
+		$results=ksql_query($query);
+		if(!ksql_fetch_array($results)) return false;
 		else return true;
 		}
 
@@ -230,8 +228,8 @@ class kMembers {
 		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE idmember>0 ";
 		if($all==false) $query.=" AND (expiration>NOW() OR expiration='0000-00-00 00:00:00') AND status='act' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$row['metadata']=$this->getMetadataByIdmember($row['idmember']);
 			$row['imgs']=$this->imgallery->getList(TABLE_MEMBERS,$row['idmember']);
 			$row['docs']=$this->docgallery->getList(TABLE_MEMBERS,$row['idmember']);
@@ -245,8 +243,8 @@ class kMembers {
 		if($all==false) $query.=" AND (expiration>NOW() OR expiration='0000-00-00 00:00:00') AND status='act' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$row['metadata']=$this->getMetadataByIdmember($row['idmember']);
 			$row['imgs']=$this->imgallery->getList(TABLE_MEMBERS,$row['idmember']);
 			$row['docs']=$this->docgallery->getList(TABLE_MEMBERS,$row['idmember']);
@@ -260,8 +258,8 @@ class kMembers {
 		if($all==false) $query.=" AND (expiration>NOW() OR expiration='0000-00-00 00:00:00') AND status='act' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$row['metadata']=$this->getMetadataByIdmember($row['idmember']);
 			$row['imgs']=$this->imgallery->getList(TABLE_MEMBERS,$row['idmember']);
 			$row['docs']=$this->docgallery->getList(TABLE_MEMBERS,$row['idmember']);
@@ -271,12 +269,12 @@ class kMembers {
 		}
 	public function getByEmail($email,$all=false,$conditions="") {
 		if(!$this->inited) $this->init();
-		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE email='".mysql_real_escape_string($email)."' ";
+		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE email='".ksql_real_escape_string($email)."' ";
 		if($all==false) $query.=" AND (expiration>NOW() OR expiration='0000-00-00 00:00:00') AND status='act' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$row['metadata']=$this->getMetadataByIdmember($row['idmember']);
 			$row['imgs']=$this->imgallery->getList(TABLE_MEMBERS,$row['idmember']);
 			$row['docs']=$this->docgallery->getList(TABLE_MEMBERS,$row['idmember']);
@@ -288,19 +286,19 @@ class kMembers {
 		if(!$this->inited) $this->init();
 		$output=array();
 		$query="SELECT * FROM ".TABLE_METADATA." WHERE tabella='".TABLE_MEMBERS."' AND id='".intval($idmember)."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[$row['param']]=$row['value'];
 			}
 		return $output;
 		}
 	public function subscribeToNewsletter($idmember,$idnl) {
 		$query="UPDATE `".TABLE_MEMBERS."` SET `newsletter_lists`=CONCAT(`newsletter_lists`,'".intval($idnl).",') WHERE `idmember`=".intval($idmember)." AND `newsletter_lists` NOT LIKE '%,".intval($idnl).",%' LIMIT 1";
-		return mysql_query($query);
+		return ksql_query($query);
 		}
 	public function unsubscribeFromNewsletter($idmember,$idnl) {
 		$query="UPDATE `".TABLE_MEMBERS."` SET `newsletter_lists`=REPLACE(`newsletter_lists`,',".intval($idnl).",',',') WHERE `idmember`=".intval($idmember)." AND `newsletter_lists` LIKE '%,".intval($idnl).",%' LIMIT 1";
-		return mysql_query($query);
+		return ksql_query($query);
 		}
 
 	public function isLogged() {
@@ -317,7 +315,7 @@ class kMembers {
 		$m=$this->getByUsername($username);
 		if($m['password']==$password) {
 			$query="UPDATE ".TABLE_MEMBERS." SET lastlogin=NOW() WHERE idmember=".$m['idmember']." LIMIT 1";
-				$results=mysql_query($query);
+				$results=ksql_query($query);
 					$_SESSION['member']=$m;
 			return true;
 			}

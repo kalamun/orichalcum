@@ -13,7 +13,7 @@ $timezone=kaGetVar('timezone',1);
 if($timezone!="") {
 	date_default_timezone_set($timezone);
 	$query="SET time_zone='".date("P")."'";
-	mysql_query($query);
+	ksql_query($query);
 	}
 
 require_once('./log.lib.php');
@@ -210,9 +210,9 @@ if(intval($_GET['idimga'])>0) {
 			foreach($tables as $ka=>$t) {
 				$q="SELECT * FROM ".$t." WHERE ";
 				$query="SHOW COLUMNS FROM ".$t."";
-				$results=mysql_query($query);
+				$results=ksql_query($query);
 				$primary="";
-				while($row=mysql_fetch_array($results)) {
+				while($row=ksql_fetch_array($results)) {
 					if($row['Key']=='PRI') $primary=$row['Field'];
 					if(substr($row['Type'],0,7)=='varchar'||substr($row['Type'],0,4)=='text') {
 						$q.=" `".$row['Field']."` LIKE '%id=\"img".$_GET['idimg']."\"%' ";
@@ -222,8 +222,8 @@ if(intval($_GET['idimga'])>0) {
 					}
 				if($primary!="") {
 					$q.=$primary.'=0 ';
-					$rs=mysql_query($q);
-					while($r=mysql_fetch_array($rs)) { ?>
+					$rs=ksql_query($q);
+					while($r=ksql_fetch_array($rs)) { ?>
 						<tr><td class="small"><?= substr($ka,6); ?></td><td class="small"><?= $r[$primary]; ?></td><td><?= isset($r['titolo'])?$r['titolo']:'<em>Non disponibile</em>'; ?></td>
 						<?php  }
 					}

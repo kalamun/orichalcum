@@ -12,18 +12,18 @@ class kaMedia {
 		$thumb=array('resize','mode','width','height','quality');
 		
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_resize' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->thumb['resize']=$row['value1'];
 		$this->thumb['mode']=$row['value2'];
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_size' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->thumb['width']=$row['value1'];
 		$this->thumb['height']=$row['value2'];
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='thumb_quality' AND ll='*' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$this->thumb['quality']=$row['value1'];
 		}
 	
@@ -50,8 +50,8 @@ class kaMedia {
 		if($id!="") $query.=" AND id='".$id."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 
@@ -69,8 +69,8 @@ class kaMedia {
 			if($rowcount!="") $query.=",".$rowcount;
 			}
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			if($output[$i]['hotlink']!=""&&$row['filename']!="") {
 				$output[$i]['filename']=basename($output[$i]['hotlink']);
@@ -97,8 +97,8 @@ class kaMedia {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_MEDIA." WHERE idmedia=".$idmedia." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$row;
 		if($output['hotlink']!=""&&$row['filename']!="") {
 			$output['filename']=basename($output['hotlink']);
@@ -128,13 +128,13 @@ class kaMedia {
 			
 			/* indice dell'ordine */
 			$query="SELECT ordine FROM ".TABLE_MEDIA." WHERE tabella='".$tabella."' AND id='".$id."' ORDER BY ordine DESC LIMIT 0,1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			if($row['ordine']==false) $row['ordine']=0;
 			$ordine=$row['ordine']+1;
 			
 			$query="INSERT INTO ".TABLE_MEDIA." (filename,thumbnail,hotlink,htmlcode,tabella,id,title,width,height,duration,alt,ordine) VALUES('".addslashes($filename)."','','','','".$tabella."','".$id."','".b3_htmlize($title,true,"")."','".$width."','".$height."','".$duration."','".b3_htmlize($alt,true,"strong,em,u,a,acronym")."',".$ordine.")";
-			if(mysql_query($query)) { $idmedia=mysql_insert_id(); }
+			if(ksql_query($query)) { $idmedia=ksql_insert_id(); }
 			else { return false; }
 			
 			mkdir(BASERELDIR.DIR_MEDIA.$idmedia);
@@ -152,13 +152,13 @@ class kaMedia {
 
 		/* indice dell'ordine */
 		$query="SELECT ordine FROM ".TABLE_MEDIA." WHERE tabella='".$tabella."' AND id='".$id."' ORDER BY ordine DESC LIMIT 0,1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['ordine']==false) $row['ordine']=0;
 		$ordine=$row['ordine']+1;
 		
 		$query="INSERT INTO ".TABLE_MEDIA." (filename,thumbnail,hotlink,htmlcode,tabella,id,title,width,height,duration,alt,ordine) VALUES('','','','".addslashes(stripslashes($htmlcode))."','".$tabella."','".$id."','".b3_htmlize($title,true,"")."','0','0','".$duration."','".b3_htmlize($alt,true,"strong,em,u,a,acronym")."',".$ordine.")";
-		if(mysql_query($query)) { $idmedia=mysql_insert_id(); }
+		if(ksql_query($query)) { $idmedia=ksql_insert_id(); }
 		else { return false; }
 
 		mkdir(BASERELDIR.DIR_MEDIA.$idmedia);
@@ -168,7 +168,7 @@ class kaMedia {
 		$media=$this->getMedia($idmedia);
 		if($media['idmedia']>0) {
 			$query="UPDATE ".TABLE_MEDIA." SET filename='".basename($url)."',hotlink='".$url."' WHERE idmedia='".$media['idmedia']."' LIMIT 1";
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			}
 		return true;
 		}
@@ -180,7 +180,7 @@ class kaMedia {
 				if($media['thumb']['filename']!="") unlink(BASERELDIR.DIR_MEDIA.$idmedia.'/'.$media['thumb']['filename']);
 				copy($file,BASERELDIR.DIR_MEDIA.$media['idmedia'].'/'.$filename);
 				$query="UPDATE ".TABLE_MEDIA." SET thumbnail='".$filename."' WHERE idmedia='".$media['idmedia']."' LIMIT 1";
-				if(!mysql_query($query)) return false;
+				if(!ksql_query($query)) return false;
 				if($resize==true) $this->resize(BASERELDIR.DIR_MEDIA.$idmedia.'/'.$filename,$this->thumb['width'],$this->thumb['height'],$this->thumb['quality'],$this->thumb['mode']);
 				}
 			return true;
@@ -196,7 +196,7 @@ class kaMedia {
 		if($duration!=null) $query.=",duration='".intval($duration)."' ";
 		if($htmlcode!=null) $query.=",htmlcode='".addslashes(stripslashes($htmlcode))."' ";
 		$query.=" WHERE idmedia=".$idmedia;
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		return true;
 		}
 	function updateMedia($idmedia,$file,$filename) {
@@ -205,10 +205,10 @@ class kaMedia {
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
 		if($filename!=""&&substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-4)!='.php3') {
 			$query="SELECT filename FROM ".TABLE_MEDIA." WHERE idmedia=".$idmedia;
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			$query="UPDATE ".TABLE_MEDIA." SET filename='".addslashes($filename)."',hotlink='' WHERE idmedia=".$idmedia;
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			//copio nella dir assegnata
 			if(!file_exists(BASERELDIR.DIR_MEDIA.$idmedia)) mkdir(BASERELDIR.DIR_MEDIA.$idmedia);
@@ -223,12 +223,12 @@ class kaMedia {
 		if(!defined("TABLE_MEDIA")|!defined("DIR_MEDIA")) return false;
 
 		$query="SELECT * FROM ".TABLE_MEDIA." WHERE idmedia=".$idmedia;
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$query="UPDATE FROM ".TABLE_MEDIA." SET ordine=ordine-1 WHERE tabella='".$row['tabella']."' AND id='".$row['id']."' AND ordine>".$row['ordine'];
-			mysql_query($query);
+			ksql_query($query);
 			$query="DELETE FROM ".TABLE_MEDIA." WHERE idmedia=".$idmedia;
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			if($row['filename']!=""&&file_exists(BASERELDIR.DIR_MEDIA.$idmedia.'/'.$row['filename'])) unlink(BASERELDIR.DIR_MEDIA.$idmedia.'/'.$row['filename']); //elimino la vecchia immagine
 			if($row['thumbnail']!=""&&file_exists(BASERELDIR.DIR_MEDIA.$idmedia.'/'.$row['thumbnail'])) unlink(BASERELDIR.DIR_MEDIA.$idmedia.'/'.$row['thumbnail']); //elimino la vecchia thumb
@@ -245,12 +245,12 @@ class kaMedia {
 		$type=array(TABLE_CONFIG=>"Configurazione",TABLE_USERS=>"Utenti",TABLE_BANNER=>"Banner",TABLE_PAGINE=>"Pagina",TABLE_LANDINGPAGE=>"Landing-page",TABLE_LANDINGPAGE_T=>"Landing-page",TABLE_THANKYOUPAGE=>"Thankyou-page",TABLE_NEWS=>"News",TABLE_PHOTOGALLERY=>"Gallerie Fotografiche");
 
 		$query="SELECT * FROM ".TABLE_MEDIA." WHERE idmedia=".$idmedia;
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$descr=$type[$row['tabella']].' ';
 		$query2="SELECT * FROM ".$row['tabella']." WHERE ".$id[$row['tabella']]."=".$row['id']." LIMIT 1";
-		$results2=mysql_query($query2);
-		$row2=mysql_fetch_array($results2);
+		$results2=ksql_query($query2);
+		$row2=ksql_fetch_array($results2);
 		if(!isset($row2['ll'])) $row2['ll']="";
 		if(!isset($row2['dir'])) $row2['dir']="";
 		$descr.='<strong>'.strtolower($row2['ll']).'/'.($row['tabella']==TABLE_NEWS?'news/':'').$row2['dir'].'</strong>';
@@ -269,8 +269,8 @@ class kaMedia {
 		
 		foreach($search as $s) {
 			$query2="SELECT * FROM ".$s[0]." WHERE ".$s[1]." LIKE '%id=\"img".$idmedia."\"%' OR ".$s[1]." LIKE '%id=\"thumb".$idmedia."\"%' LIMIT 1";
-			$results2=mysql_query($query2);
-			while($row2=mysql_fetch_array($results2)) {
+			$results2=ksql_query($query2);
+			while($row2=ksql_fetch_array($results2)) {
 				$descr=$type[$s[0]].' <strong>'.strtolower($row2['ll']).'/'.($s[0]==TABLE_NEWS?'news/':'').$row2['dir'].'</strong>';
 				$url=BASEDIR.strtolower($row2['ll']).'/'.($s[0]==TABLE_NEWS?'news/':'').$row2['dir'];
 				if($url!=$output[0]['url']) $output[]=array("table"=>$s[0],"id"=>$row2[$id[$s[0]]],"descr"=>$descr,"url"=>$url);

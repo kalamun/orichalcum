@@ -11,8 +11,8 @@ class kCommenti {
 		if($to==0) $to=9999;
 		if($lang==false) $lang=$this->ll;
 		$query="SELECT * FROM ".TABLE_COMMENTI." WHERE tabella='".addslashes($tabella)."' AND id='".intval($id)."' ORDER BY data DESC";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			}
 		return $output;
@@ -23,8 +23,8 @@ class kCommenti {
 		$query="SELECT count(*) AS tot FROM ".TABLE_COMMENTI." WHERE tabella='".$tabella."' AND id='".$id."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		$query.=" LIMIT ".$from.",".$to;
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 

@@ -6,13 +6,13 @@ include_once("../inc/head.inc.php");
 include_once("../inc/template.lib.php");
 
 $query="SELECT * FROM ".TABLE_CONFIG." WHERE param='email_template_default' AND ll='".$_SESSION['ll']."' LIMIT 1";
-$results=mysql_query($query);
-$row=mysql_fetch_array($results);
+$results=ksql_query($query);
+$row=ksql_fetch_array($results);
 $default=$row['value1'];
 
 $query="SELECT * FROM ".TABLE_CONFIG." WHERE param='template_default' AND ll='".$_SESSION['ll']."' LIMIT 1";
-$results=mysql_query($query);
-$row=mysql_fetch_array($results);
+$results=ksql_query($query);
+$row=ksql_fetch_array($results);
 $defaulttemplate=$row['value1'];
 
 
@@ -21,10 +21,10 @@ if(isset($_GET['default'])) {
 	if(is_file(BASERELDIR.DIR_TEMPLATE.$defaulttemplate.'/email/'.$_GET['default'])&&trim($_GET['default'],".")!="") {
 		$log="";
 		$query="SELECT * FROM ".TABLE_CONFIG." WHERE param='email_template_default' AND ll='".$_SESSION['ll']."' LIMIT 1";
-		$results=mysql_query($query);
-		if(!mysql_fetch_array($results)) $query="INSERT INTO ".TABLE_CONFIG." (value1,value2,param,ll) VALUES('".$_GET['default']."','','email_template_default','".$_SESSION['ll']."')";
+		$results=ksql_query($query);
+		if(!ksql_fetch_array($results)) $query="INSERT INTO ".TABLE_CONFIG." (value1,value2,param,ll) VALUES('".$_GET['default']."','','email_template_default','".$_SESSION['ll']."')";
 		else $query="UPDATE ".TABLE_CONFIG." SET value1='".$_GET['default']."' WHERE param='email_template_default' AND ll='".$_SESSION['ll']."' LIMIT 1";
-		if(!mysql_query($query)) $log="Errore di salvataggio nel database";
+		if(!ksql_query($query)) $log="Errore di salvataggio nel database";
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
 			$kaLog->add("ERR",'Errore nell\'impostazione di <em>'.$_GET['default'].'</em> come template di default per le e-mail');

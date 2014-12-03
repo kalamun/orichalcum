@@ -138,8 +138,8 @@ class kPrivate {
 		if(!$this->inited) $this->init();
 		$output=array(""=>array("permissions"=>"public","members"=>$this->members,"inherited"=>false,"writepermissions"=>"private","writemembers"=>array()));
 		$query="SELECT * FROM ".TABLE_PRIVATE;
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$m=explode(",",trim($row['members'],","));
 			$m=array_flip($m);
 			$mw=explode(",",trim($row['writemembers'],","));

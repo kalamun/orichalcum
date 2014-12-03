@@ -82,11 +82,11 @@ if(isset($_POST['save'])) {
 
 	//copy contents from another page
 	if(isset($_POST['copyfrom'])) {
-		$query="SELECT * FROM ".TABLE_PAGINE." WHERE `idpag`=".mysql_real_escape_string($_POST['copyfrom'])." LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
-			$query="UPDATE ".TABLE_PAGINE." SET `sottotitolo`='".mysql_real_escape_string($row['sottotitolo'])."',anteprima='".mysql_real_escape_string($row['anteprima'])."',testo='".mysql_real_escape_string($row['testo'])."',template='".mysql_real_escape_string($row['template'])."',layout='".mysql_real_escape_string($row['layout'])."',traduzioni='".mysql_real_escape_string($row['traduzioni'])."' WHERE idpag=".mysql_real_escape_string($id)." LIMIT 1";
-			if(!mysql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while copying contents');
+		$query="SELECT * FROM ".TABLE_PAGINE." WHERE `idpag`=".ksql_real_escape_string($_POST['copyfrom'])." LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
+			$query="UPDATE ".TABLE_PAGINE." SET `sottotitolo`='".ksql_real_escape_string($row['sottotitolo'])."',anteprima='".ksql_real_escape_string($row['anteprima'])."',testo='".ksql_real_escape_string($row['testo'])."',template='".ksql_real_escape_string($row['template'])."',layout='".ksql_real_escape_string($row['layout'])."',traduzioni='".ksql_real_escape_string($row['traduzioni'])."' WHERE idpag=".ksql_real_escape_string($id)." LIMIT 1";
+			if(!ksql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while copying contents');
 			
 			foreach($kaMetadata->getList(TABLE_PAGINE,$row['idpag']) as $ka=>$v) {
 				$kaMetadata->set(TABLE_PAGINE,$id,$ka,$v);

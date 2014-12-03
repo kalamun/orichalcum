@@ -9,12 +9,12 @@ include_once("../inc/head.inc.php");
 if(isset($_GET['delete'])) {
 	$log="";
 	$query="SELECT * FROM ".TABLE_SHORTURL." WHERE idurl=".$_GET['delete']." LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	$old=$row;
 	
 	$query="DELETE FROM ".TABLE_SHORTURL." WHERE idurl=".$_GET['delete'];
-	if(!mysql_query($query)) $log="Problemi durante le modifica";
+	if(!ksql_query($query)) $log="Problemi durante le modifica";
 
 	if($log!="") {
 		echo '<div id="MsgAlert">'.$log.'</div>';
@@ -34,8 +34,8 @@ if(isset($_GET['delete'])) {
 <table class="tabella">
 <tr><th>URL</th><th>Destinazione</th><th>Azioni</th></tr><?php 
 $query="SELECT * FROM ".TABLE_SHORTURL." ORDER BY `urlfrom`";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	echo '<tr>';
 	echo '<td><a href="?delete='.$row['idurl'].'" onclick="return confirm(\'Sei proprio sicuro di voler eliminare questo URL breve?\');"><strong>'.SITE_URL.'/'.$row['urlfrom'].'</strong></a></td>';
 	echo '<td style="background-color:#fbf7c5;">'.SITE_URL.'/'.$row['urlto'].'</a></td>';

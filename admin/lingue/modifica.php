@@ -25,8 +25,8 @@ include('../inc/main.lib.php');
 	<form action="" method="post">
 	<?php 
 	$query="SELECT * FROM ".TABLE_LINGUE." WHERE idli=".$_POST['idli'];
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	echo b3_create_input("lingua","text","Lingua: ",b3_lmthize($row['lingua'],"input"),"300px",64).'<br /><br />';
 	echo b3_create_input("ll","text","Short tag: ",b3_lmthize($row['ll'],"input"),"50px",2,"onfocus=\"alert('Attento!\\nSe cambi questo parametro, perderai il contenuto\\ngi&agrave; inserito relativo a questa lingua.');this.onfocus=null;\"").' ';
 	echo b3_create_input("code","text","Codice ISO: ",b3_lmthize($row['code'],"input"),"70px",5).'<br /><br />';

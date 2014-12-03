@@ -6,14 +6,13 @@ class kTemplate {
 	public $imgDB,$docDB,$mediaDB,$pageDB,$commentDB,$config,$menuStructure,$menuByRef,$contents,$currentConversion; //contents is a temporary recipient
 	
 	public function __construct() {
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/inc/connect.inc.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/setlang.inc.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/images.lib.php");
 
 		$this->config=array();
 		$query="SELECT * FROM `".TABLE_CONFIG."` WHERE `ll`='*' OR `ll`='**' OR `ll`='".LANG."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results))
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results))
 		{
 			$this->config[$row['param']]=$row;
 		}
@@ -36,8 +35,8 @@ class kTemplate {
 		$this->categories=array(); //categories list, key is the id
 		$this->categoriesStructure=array(); //structure of nested categories, key is order
 		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `ll`='".LANG."' ORDER BY `ordine`";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++)
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
 			$this->categories[$row['idcat']]=$row;
 			$this->categories[$row['idcat']]['permalink']=BASEDIR.$this->llurl.$this->getVar('dir_shop',1).'/'.$row['dir'];
@@ -47,7 +46,7 @@ class kTemplate {
 		{
 			if($row['ref']==0)
 			{
-				$this->categoriesStructure[$row['tabella']][$row['ordine']]=$row;
+				$this->categoriesStructure[$row['tabella']][$row['ordine']]['idcat']=$row['idcat'];
 				$this->categoriesStructure[$row['tabella']][$row['ordine']]["childNodes"]=$this->loadSubCategories($row['idcat']);
 			}
 		}
@@ -55,8 +54,8 @@ class kTemplate {
 		//load dictionary terms for the current language
 		$this->dizionario=array();
 		$query="SELECT * FROM `".TABLE_DIZIONARIO."` WHERE `ll`='".LANG."'";
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++)
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
 			$this->dizionario[$i]=array();
 			$this->dizionario[$i]['param']=$row['param'];
@@ -74,9 +73,9 @@ class kTemplate {
 			if(!isset($this->config[$param]['value'.$value])) $this->config[$param]['value'.$value]="";
 			return $this->config[$param]['value'.$value];
 		} else {
-			$query="SELECT `value".$value."` FROM ".TABLE_CONFIG." WHERE param='".mysql_real_escape_string($param)."' AND ll='".mysql_real_escape_string($ll)."' LIMIT 1";
-				$results=mysql_query($query);
-					$row=mysql_fetch_array($results);
+			$query="SELECT `value".$value."` FROM ".TABLE_CONFIG." WHERE param='".ksql_real_escape_string($param)."' AND ll='".ksql_real_escape_string($ll)."' LIMIT 1";
+				$results=ksql_query($query);
+					$row=ksql_fetch_array($results);
 			return $row['value'.$value];
 		}
 	}
@@ -139,9 +138,9 @@ class kTemplate {
 				}
 			}
 		else {
-			$query="SELECT * FROM ".TABLE_DIZIONARIO." WHERE param='".mysql_real_escape_string($param)."' AND ll='".mysql_real_escape_string($ll)."' LIMIT 1";
-			$results=mysql_query($query);
-			if($row=mysql_fetch_array($results)) return $row['testo'];
+			$query="SELECT * FROM ".TABLE_DIZIONARIO." WHERE param='".ksql_real_escape_string($param)."' AND ll='".ksql_real_escape_string($ll)."' LIMIT 1";
+			$results=ksql_query($query);
+			if($row=ksql_fetch_array($results)) return $row['testo'];
 			}
 
 		if(count($args)>0) {
@@ -169,15 +168,15 @@ class kTemplate {
 		/* get all menu's metadata */
 		$meta=array();
 		$query="SELECT * FROM ".TABLE_METADATA." WHERE `tabella`='".TABLE_MENU."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$meta[$row['id']][$row['param']]=$row['value'];
 			}
 		
 		/* get and set menu's data */
-		$query="SELECT * FROM ".TABLE_MENU." WHERE `ll`='".mysql_real_escape_string($ll)."' AND `collection`='".mysql_real_escape_string($this->menuCollection)."' ORDER BY ref";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$query="SELECT * FROM ".TABLE_MENU." WHERE `ll`='".ksql_real_escape_string($ll)."' AND `collection`='".ksql_real_escape_string($this->menuCollection)."' ORDER BY ref";
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			/* populate an array with all params for each menu element */
 			$this->menuContents[$row['idmenu']]=$row;
 			$this->menuContents[$row['idmenu']]['href']="";
@@ -346,8 +345,8 @@ class kTemplate {
 		$output=array();
 		$translations[LANG]=$_SERVER['REQUEST_URI'];
 		$query="SELECT * FROM ".TABLE_LINGUE." WHERE online='s' ORDER BY `ordine`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[$row['ll']]=$row;
 			if(!isset($translations[$row['ll']]) || trim($translations[$row['ll']]," /.")=="") $output[$row['ll']]['url']=BASEDIR.strtolower($row['ll']).'/';
 			else $output[$row['ll']]['url']=$translations[$row['ll']];
@@ -396,18 +395,68 @@ class kTemplate {
 		}
 
 	/* categories */
-	private function loadSubCategories($refId) {
+	
+	// return the list of subcategories recursively. it is only used on init
+	private function loadSubCategories($refId)
+	{
 		$output=array();
-		foreach($this->categories as $k=>$cat) {
-			if($cat['ref']==$refId) {
-				if(!isset($cat['imgs']))
-				{
-					$this->categories[$k]['imgs']=array();
+		foreach($this->categories as $k=>$cat)
+		{
+			if($cat['ref']==$refId)
+			{
+				$output[$cat['ordine']]['idcat']=$cat['idcat'];
+				$output[$cat['ordine']]["childNodes"]=$this->loadSubCategories($cat['idcat']);
+			}
+		}
+		return $output;
+	}
 
-					if(trim($cat['photogallery'],",")!="")
+	public function getCategories($vars)
+	{
+		if(!isset($vars['table'])) return false;
+		if(!isset($vars['ref'])) $vars['ref']=0;
+	
+		$output=array();
+		if(!empty($this->categoriesStructure[$vars['table']]))
+		{
+			$substructure=$this->getCategoryChildsByIdcat($vars['ref'],$this->categoriesStructure[$vars['table']]);
+			$output=$this->getCategoriesBranch($substructure);
+		}
+		return $output;
+	}
+	
+	// starting from a full category structure, it returns only the interested node with subnodes
+	public function getCategoryChildsByIdcat($idcat,$substructure)
+	{
+		if($idcat==0) return $substructure;
+		
+		foreach($substructure as $cat) {
+			if($cat['idcat']==$idcat) return $cat['childNodes'];
+			else {
+				$output=$this->getCategoryChildsByIdcat($idcat,$cat['childNodes']);
+				if($output!=false) return $output;
+			}
+		}
+		return false;
+	}
+	
+	// return a branch of category tree, filled with all the category data
+	public function getCategoriesBranch($substructure)
+	{
+		$output=array();
+		foreach($substructure as $k=>$cat) {
+			if(!empty($this->categories[$cat['idcat']]))
+			{
+
+				// load images (if not already loaded)
+				if(!isset($this->categories[$cat['idcat']]['imgs']))
+				{
+					$this->categories[$cat['idcat']]['imgs']=array();
+
+					if(trim($this->categories[$cat['idcat']]['photogallery'],",")!="")
 					{
 						$conditions="";
-						foreach(explode(",",trim($cat['photogallery'],",")) as $idimg)
+						foreach(explode(",",trim($this->categories[$cat['idcat']]['photogallery'],",")) as $idimg)
 						{
 							$conditions.="`idimg`='".intval($idimg)."' OR ";
 						}
@@ -415,41 +464,23 @@ class kTemplate {
 						
 						$imgs=$GLOBALS['__images']->getList(false,false,false,$conditions);
 						
-						foreach(explode(",",trim($cat['photogallery'],",")) as $idimg)
+						foreach(explode(",",trim($this->categories[$cat['idcat']]['photogallery'],",")) as $idimg)
 						{
 							foreach($imgs as $img)
 							{
-								if($img['idimg']==$idimg) $this->categories[$k]['imgs'][]=$img;
+								if($img['idimg']==$idimg) $this->categories[$cat['idcat']]['imgs'][]=$img;
 							}
 						}
 					}
 				}
-				$output[$cat['ordine']]=$cat;
-				$output[$cat['ordine']]["childNodes"]=$this->loadSubCategories($cat['idcat']);
-				}
+
+				$output[$k]=$this->categories[$cat['idcat']];
+
+				if(!empty($cat['childNodes'])) $output[$k]['childNodes']=$this->getCategoriesBranch($cat['childNodes']);
 			}
+		}
 		return $output;
-		}
-	public function getCategories($vars) {
-		if(!isset($vars['table'])) return false;
-		if(!isset($vars['ref'])) $vars['ref']=0;
-		$output=array();
-		if(isset($this->categoriesStructure[$vars['table']])) {
-			if($vars['ref']==0) return $this->categoriesStructure[$vars['table']];
-			return $this->getCategoriesBranch($vars['ref'],$this->categoriesStructure[$vars['table']]);
-			}
-		else return array();		
-		}
-	public function getCategoriesBranch($idcat,$substructure) {
-		foreach($substructure as $cat) {
-			if($cat['idcat']==$idcat) return $cat['childNodes'];
-			else {
-				$output=$this->getCategoriesBranch($idcat,$cat['childNodes']);
-				if($output!=false) return $output;
-				}
-			}
-		return false;
-		}
+	}
 
 	public function getCategory($vars)
 	{
@@ -715,9 +746,9 @@ class kTemplate {
 		if(!isset($vars['orderby'])) $vars['orderby']='`data` DESC';
 		$output="";
 		
-		$query="SELECT * FROM `".TABLE_COMMENTI."` WHERE `tabella`='".mysql_real_escape_string($vars['table'])."' AND `id`='".intval($vars['id'])."' AND `public`='s' ORDER BY ".$vars['orderby'];
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$query="SELECT * FROM `".TABLE_COMMENTI."` WHERE `tabella`='".ksql_real_escape_string($vars['table'])."' AND `id`='".intval($vars['id'])."' AND `public`='s' ORDER BY ".$vars['orderby'];
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 		
@@ -732,9 +763,9 @@ class kTemplate {
 		if(!isset($vars['text'])) $vars['text']="";
 		if(!isset($vars['public'])||$vars['public']!="s") $vars['public']="n";
 
-		$query="INSERT INTO `".TABLE_COMMENTI."` (`ip`,`data`,`tabella`,`id`,`autore`,`email`,`testo`,`public`) VALUES('".$_SERVER['REMOTE_ADDR']."',NOW(),'".mysql_real_escape_string($vars['table'])."','".intval($vars['id'])."','".b3_htmlize($vars['name'],true,"")."','".b3_htmlize($vars['email'],true,"")."','".b3_htmlize($vars['text'],true,"")."','".$vars['public']."')";
-		$results=mysql_query($query);
-		$idcomm=mysql_insert_id();
+		$query="INSERT INTO `".TABLE_COMMENTI."` (`ip`,`data`,`tabella`,`id`,`autore`,`email`,`testo`,`public`) VALUES('".$_SERVER['REMOTE_ADDR']."',NOW(),'".ksql_real_escape_string($vars['table'])."','".intval($vars['id'])."','".b3_htmlize($vars['name'],true,"")."','".b3_htmlize($vars['email'],true,"")."','".b3_htmlize($vars['text'],true,"")."','".$vars['public']."')";
+		$results=ksql_query($query);
+		$idcomm=ksql_insert_id();
 		
 		//notification
 		if(DEFAULT_LANG=='IT') {

@@ -78,8 +78,8 @@ if(!isset($_GET['idnews'])) {
 		<?php 
 		$tmpyyyy="";
 		$q="SELECT ".$dataRef." FROM ".TABLE_NEWS." WHERE ll='".$_SESSION['ll']."' GROUP BY year(".$dataRef."),month(".$dataRef.") ORDER BY ".$dataRef." DESC";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
 			$yyyy=substr($r[$dataRef],0,4);
 			$mm=substr($r[$dataRef],5,2);
 			if($tmpyyyy!=$yyyy) {
@@ -231,9 +231,9 @@ if(!isset($_GET['idnews'])) {
 	<?php  }
 
 else {
-	$query="SELECT * FROM `".TABLE_NEWS."` WHERE `idnews`=".mysql_real_escape_string($_GET['idnews']);
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$query="SELECT * FROM `".TABLE_NEWS."` WHERE `idnews`=".ksql_real_escape_string($_GET['idnews']);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	$yyyy=substr($row[$dataRef],0,4);
 	$mm=substr($row[$dataRef],5,2);
 	$dd=substr($row[$dataRef],8,2);

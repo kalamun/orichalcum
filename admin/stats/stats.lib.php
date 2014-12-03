@@ -17,17 +17,17 @@ class kaStats {
 	{
 		/* move statistics to archive (a buffer zone before summary) */
 		$q="INSERT INTO ".TABLE_STATS_ARCHIVE." (`ip`,`date`,`url`,`referer`,`system`,`contacts`) SELECT `ip`,`date`,`url`,`referer`,`system`,`contacts` FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
-		if(mysql_query($q))
+		if(ksql_query($q))
 		{
 			$q="DELETE FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
-			mysql_query($q);
+			ksql_query($q);
 		}
 		
 		/* country detection where not assigned yet */
 		$q="SELECT idlog,ip FROM ".TABLE_STATISTICHE." WHERE ll='' OR ll=NULL";
 		if($deepRefresh==true) $q.=" OR ll='**'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs))
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs))
 		{
 			$atonip=ip2long($r['ip']);
 			if(substr($atonip,0,2)<=14) $postfix=10;
@@ -35,17 +35,17 @@ class kaStats {
 			elseif(substr($atonip,0,1)<3) $postfix=2;
 			else $postfix=3;
 			$query="SELECT ll FROM ".TABLE_IP2COUNTRY.$postfix." WHERE ipfrom<='".$atonip."' AND ipto>='".$atonip. "' LIMIT 1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			if($row['ll']=="") $row['ll']='**';
 			$query="UPDATE ".TABLE_STATISTICHE." SET `ll`='".$row['ll']."' WHERE idlog='".$r['idlog']."' LIMIT 1";
-			mysql_query($query);
+			ksql_query($query);
 		}
 
 		$q="SELECT idlog,ip FROM ".TABLE_STATS_ARCHIVE." WHERE ll='' OR ll=NULL";
 		if($deepRefresh==true) $q.=" OR ll='**'";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs))
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs))
 		{
 			$atonip=ip2long($r['ip']);
 			if(substr($atonip,0,2)<=14) $postfix=10;
@@ -53,26 +53,26 @@ class kaStats {
 			elseif(substr($atonip,0,1)<3) $postfix=2;
 			else $postfix=3;
 			$query="SELECT ll FROM ".TABLE_IP2COUNTRY.$postfix." WHERE ipfrom<='".$atonip."' AND ipto>='".$atonip. "' LIMIT 1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			if($row['ll']=="") $row['ll']='**';
 			$query="UPDATE ".TABLE_STATS_ARCHIVE." SET `ll`='".$row['ll']."' WHERE idlog='".$r['idlog']."'";
-			mysql_query($query);
+			ksql_query($query);
 		}
 
 		/* detect expiration if not assigned */
 		if($this->expiration==0)
 		{
 			$q="SELECT min(`date`) AS `start`,max(`date`) AS `end` FROM (SELECT * FROM ".TABLE_STATS_ARCHIVE.") AS s";
-			$rs=mysql_query($q);
-			$row=mysql_fetch_array($rs);
+			$rs=ksql_query($q);
+			$row=ksql_fetch_array($rs);
 			$start=mktime(substr($row['start'],11,2),substr($row['start'],14,2),substr($row['start'],17,2),substr($row['start'],5,2),substr($row['start'],8,2),substr($row['start'],0,4));
 			$end=mktime(substr($row['end'],11,2),substr($row['end'],14,2),substr($row['end'],17,2),substr($row['end'],5,2),substr($row['end'],8,2),substr($row['end'],0,4));
 			$this->expiration=ceil(($end-$start)/86400)+1;
 		}
 		
-		mysql_query("OPTIMIZE TABLE `".TABLE_STATISTICHE."`");
-		mysql_query("OPTIMIZE TABLE `".TABLE_STATS_ARCHIVE."`");
+		ksql_query("OPTIMIZE TABLE `".TABLE_STATISTICHE."`");
+		ksql_query("OPTIMIZE TABLE `".TABLE_STATS_ARCHIVE."`");
 
 	}
 
@@ -88,8 +88,8 @@ class kaStats {
 		{
 			// check if this newsletter was already processed
 			$query="SELECT * FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='newsletter' AND `type`='recipients' AND `reference`='".intval($list['idarch'])."' LIMIT 1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			if($row==false)
 			{
 				$sent=$kaNewsletter->getLogCount(array("idarch"=>$list['idarch'], "readed"=>false));
@@ -102,21 +102,21 @@ class kaStats {
 			}
 		}
 		
-		mysql_query("OPTIMIZE TABLE `".TABLE_EMAIL_LOG."`");
-		mysql_query("OPTIMIZE TABLE `".TABLE_EMAIL_QUEUE."`");
+		ksql_query("OPTIMIZE TABLE `".TABLE_EMAIL_LOG."`");
+		ksql_query("OPTIMIZE TABLE `".TABLE_EMAIL_QUEUE."`");
 	}
 	
 	public function insertSummaryEntry($family, $type, $reference, $count=0, $data='')
 	{
-		$query="INSERT INTO ".TABLE_STATS_SUMMARY." (`family`, `type`, `reference`, `count`, `data`) VALUES('".mysql_real_escape_string($family)."', '".mysql_real_escape_string($type)."', '".mysql_real_escape_string($reference)."', '".intval($count)."', '".mysql_real_escape_string($data)."')";
-		mysql_query($query);
+		$query="INSERT INTO ".TABLE_STATS_SUMMARY." (`family`, `type`, `reference`, `count`, `data`) VALUES('".ksql_real_escape_string($family)."', '".ksql_real_escape_string($type)."', '".ksql_real_escape_string($reference)."', '".intval($count)."', '".ksql_real_escape_string($data)."')";
+		ksql_query($query);
 	}
 	
 	public function getSummaryEntry($family, $type, $reference)
 	{
-		$query="SELECT * FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='".mysql_real_escape_string($family)."' AND `type`='".mysql_real_escape_string($type)."' AND `reference`='".mysql_real_escape_string($reference)."' LIMIT 1";
-		$results=mysql_query($query);
-		return mysql_fetch_array($results);
+		$query="SELECT * FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='".ksql_real_escape_string($family)."' AND `type`='".ksql_real_escape_string($type)."' AND `reference`='".ksql_real_escape_string($reference)."' LIMIT 1";
+		$results=ksql_query($query);
+		return ksql_fetch_array($results);
 	}
 	
 	public function deleteOldStats()
@@ -124,7 +124,7 @@ class kaStats {
 		if($this->expiration>0)
 		{
 			$q="DELETE FROM ".TABLE_STATS_ARCHIVE." WHERE date<'".date("Y-m-d",time()-($this->expiration*24*60*60))." 00:00:00'";
-			mysql_query($q);
+			ksql_query($q);
 		}
 	}
 
@@ -151,8 +151,8 @@ class kaStats {
 		$this->stats['visite']['maxhour']=0;
 
 		$q="SELECT * FROM ".TABLE_STATISTICHE." UNION SELECT * FROM ".TABLE_STATS_ARCHIVE;
-		$p=mysql_query($q);
-		while($r=mysql_fetch_array($p))
+		$p=ksql_query($q);
+		while($r=ksql_fetch_array($p))
 		{
 			$timestamp=mktime(0,0,0,substr($r['date'],5,2),substr($r['date'],8,2),substr($r['date'],0,4));
 			if(!isset($this->contatti[substr($r['date'],0,10)])) { $this->contatti[substr($r['date'],0,10)]=0; }
@@ -183,8 +183,8 @@ class kaStats {
 	public function getRecords() {
 		$output=array();
 		$q="SELECT * FROM ".TABLE_STATISTICHE." UNION SELECT * FROM ".TABLE_STATS_ARCHIVE;
-		$p=mysql_query($q);
-		while($row=mysql_fetch_array($p)) {
+		$p=ksql_query($q);
+		while($row=ksql_fetch_array($p)) {
 			$output[]=$this->prettifyRecord($row);
 			}
 		return $output;
@@ -207,8 +207,8 @@ class kaStats {
 		
 		$output['users']=array();
 		$query="SELECT * FROM ".TABLE_STATISTICHE." WHERE `date`>NOW()-900";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output['users'][]=$this->prettifyRecord($row);
 			}
 		$output['online']=count($output['users']);

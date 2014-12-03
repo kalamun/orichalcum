@@ -16,39 +16,39 @@ if(!isset($_GET['idphg'])) {
 		$log="";
 
 		$query="SELECT * FROM ".TABLE_PHOTOGALLERY." WHERE idphg='".$_GET['usePage']."' AND ll='".$_SESSION['ll']."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$titolo=$row['titolo'];
 			$dir=$kaImpostazioni->getVar('dir_photogallery',1).'/'.$row['dir'];
 			$id=$row['idphg'];
 			$addtomenu=explode(",",$_GET['addtomenu']);
 			if($addtomenu[1]=="after") {
 				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
-				$results=mysql_query($query);
-				$row=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$row=ksql_fetch_array($results);
 				$ordine=$row['ordine']+1;
 				$ref=$row['ref'];
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
-				mysql_query($query);
+				ksql_query($query);
 				}
 			elseif($addtomenu[1]=="inside") {
 				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE ref=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
-				$results=mysql_query($query);
-				$row=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$row=ksql_fetch_array($results);
 				$ordine=$row['ordine']+1;
 				$ref=$addtomenu[0];
 				}
 			elseif($addtomenu[1]=="before") {
 				$query="SELECT ordine,ref,collection FROM ".TABLE_MENU." WHERE idmenu=".$addtomenu[0]." AND ll='".$_SESSION['ll']."' LIMIT 1";
-				$results=mysql_query($query);
-				$row=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$row=ksql_fetch_array($results);
 				$ordine=$row['ordine'];
 				$ref=$row['ref'];
 				$query="UPDATE ".TABLE_MENU." SET ordine=ordine+1 WHERE ref='".$ref."' AND ordine>='".$ordine."' AND ll='".$_SESSION['ll']."'";
-				mysql_query($query);
+				ksql_query($query);
 				}
-			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection) VALUES('".addslashes($titolo)."','".addslashes($dir)."','".$ref."','".$ordine."','".$_SESSION['ll']."','".mysql_real_escape_string($row['collection'])."')";
-			if(!mysql_query($query)) $log="Problemi durante l'inserimento nel men&ugrave;";
+			$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ordine,ll,collection) VALUES('".addslashes($titolo)."','".addslashes($dir)."','".$ref."','".$ordine."','".$_SESSION['ll']."','".ksql_real_escape_string($row['collection'])."')";
+			if(!ksql_query($query)) $log="Problemi durante l'inserimento nel men&ugrave;";
 
 			if($log!="") {
 				echo '<div id="MsgAlert">'.$log.'</div>';
@@ -386,8 +386,8 @@ else {
 					$translation=array();
 					$translation_id=array();
 					$query_l="SELECT * FROM ".TABLE_LINGUE." WHERE ll<>'".$row['ll']."' ORDER BY `lingua`";
-					$results_l=mysql_query($query_l);
-					while($page_l=mysql_fetch_array($results_l)) {
+					$results_l=ksql_query($query_l);
+					while($page_l=ksql_fetch_array($results_l)) {
 						if(!isset($row['traduzioni'][$page_l['ll']])||$row['traduzioni'][$page_l['ll']]=="") {
 							$translation[$page_l['ll']]="";
 							$translation_id[$page_l['ll']]="";

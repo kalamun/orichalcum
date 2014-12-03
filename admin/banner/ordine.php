@@ -10,7 +10,7 @@ if(isset($_POST['save'])) {
 	$log="";
 	foreach($_POST['foto'] as $ka=>$v) {
 		$query="UPDATE ".TABLE_BANNER." SET ordine=".($ka+1)." WHERE idbanner=".$v." LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante il salvataggio nel DB";
+		if(!ksql_query($query)) $log="Errore durante il salvataggio nel DB";
 		}
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Ordine dei banner salvato con successo</div>';
@@ -54,11 +54,11 @@ if(isset($_POST['save'])) {
 	<div class="dragdrop">
 		<div class="DragZone"><?php 
 			$query="SELECT * FROM ".TABLE_BANNER." WHERE ref='".BANNER_REF."' ORDER BY ordine";
-			$results=mysql_query($query);
-			for($i=0;$row=mysql_fetch_array($results);$i++) {
+			$results=ksql_query($query);
+			for($i=0;$row=ksql_fetch_array($results);$i++) {
 				$query_i="SELECT * FROM ".TABLE_IMG." WHERE tabella='".TABLE_BANNER."' AND id='".$row['idbanner']."' LIMIT 1";
-				$results_i=mysql_query($query_i);
-				$row_i=mysql_fetch_array($results_i);
+				$results_i=ksql_query($query_i);
+				$row_i=ksql_fetch_array($results_i);
 				$filename=DIR_IMG.$row_i['idimg'].'/'.$row_i['filename'];
 				?><div><input type="hidden" name="foto[]" value="<?php  echo $row['idbanner']; ?>" /><?php 
 				if(file_exists(BASERELDIR.$filename)) echo '<img src="'.BASERELDIR.$filename.'" alt="'.str_replace('"','&quot;',trim(strip_tags($row_i['alt']))).'" />';

@@ -13,17 +13,17 @@ class kaUsers {
 	public function add($name,$email,$username,$password,$permissions=false) {
 		//check if user exists
 		$query="SELECT * FROM ".TABLE_USERS." WHERE `username`='".b3_htmlize($username,true,"")."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return false;
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return false;
 		else {
 			//if not, create it
 			if($permissions==false||!is_array($permissions)) $permissions=array();
 			$perm=",.,profilo,./.,"; // access to home, profile and exit are granted to all
 			foreach($permissions as $p) {
-				$perm.=mysql_real_escape_string($p).",";
+				$perm.=ksql_real_escape_string($p).",";
 				}
 			$query="INSERT INTO `".TABLE_USERS."` (`name`,`email`,`username`,`password`,`featuredimage`,`permissions`,`created`,`lastlogin`) VALUES('".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($username,true,"")."','".md5($password)."',0,'".$perm."',NOW(),NOW())";
-			return mysql_query($query)?true:false;
+			return ksql_query($query)?true:false;
 			}
 		}
 
@@ -36,25 +36,25 @@ class kaUsers {
 				}
 			}
 		$query="UPDATE `".TABLE_USERS."` SET `name`='".b3_htmlize($name,true,"")."',`email`='".b3_htmlize($email,true,"")."',`username`='".b3_htmlize($username,true,"")."'";
-		if(isset($perm)) $query.=",`permissions`='".mysql_real_escape_string($perm)."'";
-		$query.=", `featuredimage`='".intval($featuredimage)."' WHERE `iduser`=".mysql_real_escape_string($iduser)." LIMIT 1";
-		return mysql_query($query)?true:false;
+		if(isset($perm)) $query.=",`permissions`='".ksql_real_escape_string($perm)."'";
+		$query.=", `featuredimage`='".intval($featuredimage)."' WHERE `iduser`=".ksql_real_escape_string($iduser)." LIMIT 1";
+		return ksql_query($query)?true:false;
 		}
 
 	/* change the password of specified user */
 	public function password($iduser,$password) {
-		$query="UPDATE `".TABLE_USERS."` SET `password`='".md5($password)."' WHERE `iduser`=".mysql_real_escape_string($iduser)." LIMIT 1";
-		return mysql_query($query)?true:false;
+		$query="UPDATE `".TABLE_USERS."` SET `password`='".md5($password)."' WHERE `iduser`=".ksql_real_escape_string($iduser)." LIMIT 1";
+		return ksql_query($query)?true:false;
 		}
 
 	/* delete user */
 	public function del($iduser) {
 		$log=true;
 		$query="DELETE FROM `".TABLE_USERS."` WHERE iduser='".$iduser."' LIMIT 1";
-		if(!mysql_query($query)) $log=false;
+		if(!ksql_query($query)) $log=false;
 		else {
 			$query="DELETE FROM `".TABLE_USERS_PROP."` WHERE iduser='".$iduser."'";
-			if(!mysql_query($query)) $log=false;
+			if(!ksql_query($query)) $log=false;
 			}
 		return $log;
 		}
@@ -63,8 +63,8 @@ class kaUsers {
 	public function getUsersList() {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_USERS."` ORDER BY `name`,`username`,`created`";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$i=count($output);
 			$output[$i]=$row;
 			$output[$i]['created_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['created']);
@@ -75,8 +75,8 @@ class kaUsers {
 	
 	public function getUserFromId($iduser) {
 		$query="SELECT * FROM `".TABLE_USERS."` WHERE `iduser`='".intval($iduser)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$row['created_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['created']);
 		$row['lastlogin_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['lastlogin']);
 		$row=array_merge($row,$this->propGetList($row['iduser']));
@@ -102,9 +102,9 @@ class kaUsers {
 			else return false;
 			}
 		else {
-			$query="SELECT `permissions` FROM `".TABLE_USERS."` WHERE `iduser`='".mysql_real_escape_string($iduser)."' AND `permissions` LIKE '%,".mysql_real_escape_string($id).",%' LIMIT 1";
-			$results=mysql_query($query);
-			if($row=mysql_fetch_array($results)) return true;
+			$query="SELECT `permissions` FROM `".TABLE_USERS."` WHERE `iduser`='".ksql_real_escape_string($iduser)."' AND `permissions` LIKE '%,".ksql_real_escape_string($id).",%' LIMIT 1";
+			$results=ksql_query($query);
+			if($row=ksql_fetch_array($results)) return true;
 			else return false;
 			}
 		}
@@ -113,48 +113,48 @@ class kaUsers {
 	public function propGetList($iduser) {
 		$output=array();
 		$query="SELECT * FROM `".TABLE_USERS_PROP."` WHERE `iduser`='".intval($iduser)."'";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			if(!isset($output[$row['family']])) $output[$row['family']]=array();
 			$output[$row['family']][$row['param']]=$row['value'];
 			}
 		return $output;
 		}
 	public function propGet($iduser,$family,$param) {
-		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduser='".mysql_real_escape_string($iduser)."' AND family='".mysql_real_escape_string($family)."' AND param='".mysql_real_escape_string($param)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduser='".ksql_real_escape_string($iduser)."' AND family='".ksql_real_escape_string($family)."' AND param='".ksql_real_escape_string($param)."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row;
 		}
 	public function propGetValue($iduser,$family,$param) {
-		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduser='".mysql_real_escape_string($iduser)."' AND family='".mysql_real_escape_string($family)."' AND param='".mysql_real_escape_string($param)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduser='".ksql_real_escape_string($iduser)."' AND family='".ksql_real_escape_string($family)."' AND param='".ksql_real_escape_string($param)."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['value'];
 		}
 	public function propGetById($iduprop) {
-		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduprop='".mysql_real_escape_string($iduprop)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduprop='".ksql_real_escape_string($iduprop)."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row;
 		}
 	public function propExists($iduser,$family,$param) {
-		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduser='".mysql_real_escape_string($iduser)."' AND family='".mysql_real_escape_string($family)."' AND param='".mysql_real_escape_string($param)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row;
+		$query="SELECT * FROM ".TABLE_USERS_PROP." WHERE iduser='".ksql_real_escape_string($iduser)."' AND family='".ksql_real_escape_string($family)."' AND param='".ksql_real_escape_string($param)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
 		}
 	public function propAdd($iduser,$family,$param,$value) {
-		$query="INSERT INTO ".TABLE_USERS_PROP." (iduser,family,param,value) VALUES('".mysql_real_escape_string($iduser)."','".mysql_real_escape_string($family)."','".mysql_real_escape_string($param)."','".mysql_real_escape_string($value)."')";
-		if(mysql_query($query)) {
+		$query="INSERT INTO ".TABLE_USERS_PROP." (iduser,family,param,value) VALUES('".ksql_real_escape_string($iduser)."','".ksql_real_escape_string($family)."','".ksql_real_escape_string($param)."','".ksql_real_escape_string($value)."')";
+		if(ksql_query($query)) {
 			if($iduser==$_SESSION['iduser']) $_SESSION[$family][$param]=$value;
-			return mysql_insert_id();
+			return ksql_insert_id();
 			}
 		else return false;
 		}
 	public function propUpdate($iduser,$family,$param,$value) {
-		$query="UPDATE ".TABLE_USERS_PROP." SET value='".mysql_real_escape_string($value)."' WHERE iduser='".mysql_real_escape_string($iduser)."' AND family='".mysql_real_escape_string($family)."' AND param='".mysql_real_escape_string($param)."' LIMIT 1";
-		if(mysql_query($query)) {
+		$query="UPDATE ".TABLE_USERS_PROP." SET value='".ksql_real_escape_string($value)."' WHERE iduser='".ksql_real_escape_string($iduser)."' AND family='".ksql_real_escape_string($family)."' AND param='".ksql_real_escape_string($param)."' LIMIT 1";
+		if(ksql_query($query)) {
 			if($iduser==$_SESSION['iduser']) $_SESSION[$family][$param]=$value;
 			return true;
 			}
@@ -171,13 +171,13 @@ class kaUsers {
 		return $log;
 		}
 	public function propDel($iduser,$family,$param) {
-		$query="DELETE FROM ".TABLE_USERS_PROP." WHERE iduser='".mysql_real_escape_string($iduser)."' AND family='".mysql_real_escape_string($family)."' AND param='".mysql_real_escape_string($param)."'";
-		if(mysql_query($query)) return true;
+		$query="DELETE FROM ".TABLE_USERS_PROP." WHERE iduser='".ksql_real_escape_string($iduser)."' AND family='".ksql_real_escape_string($family)."' AND param='".ksql_real_escape_string($param)."'";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 	public function propDelById($idprop) {
-		$query="DELETE FROM ".TABLE_USERS_PROP." WHERE idprop=".mysql_real_escape_string($idprop);
-		if(mysql_query($query)) return true;
+		$query="DELETE FROM ".TABLE_USERS_PROP." WHERE idprop=".ksql_real_escape_string($idprop);
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 

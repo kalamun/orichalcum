@@ -12,25 +12,25 @@ class kaImpostazioni {
 	public function paramExists($param,$ll=false) {
 		// controllo l'esistenza di un parametro
 		if($ll==false) $ll=$this->ll;
-		$query="SELECT * FROM `".TABLE_CONFIG."` WHERE `param`='".mysql_real_escape_string($param)."' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return true;
+		$query="SELECT * FROM `".TABLE_CONFIG."` WHERE `param`='".ksql_real_escape_string($param)."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return true;
 		else return false;
 		}
 
 	public function addParam($param,$value1,$value2,$ll=false) {
 		// aggiungo un parametro
 		if($ll==false) $ll=$this->ll;
-		$query="INSERT INTO `".TABLE_CONFIG."` (`param`,`value1`,`value2`,`ll`) VALUES('".mysql_real_escape_string($param)."','".mysql_real_escape_string($value1)."','".mysql_real_escape_string($value2)."','".mysql_real_escape_string($ll)."')";
-		if(mysql_query($query)) return true;
+		$query="INSERT INTO `".TABLE_CONFIG."` (`param`,`value1`,`value2`,`ll`) VALUES('".ksql_real_escape_string($param)."','".ksql_real_escape_string($value1)."','".ksql_real_escape_string($value2)."','".ksql_real_escape_string($ll)."')";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 		
 	public function updateParam($param,$value1,$value2,$ll=false) {
 		// aggiungo un parametro
 		if($ll==false) $ll=$this->ll;
-		$query="UPDATE `".TABLE_CONFIG."` SET `value1`='".mysql_real_escape_string($value1)."',`value2`='".mysql_real_escape_string($value2)."' WHERE `param`='".mysql_real_escape_string($param)."' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		$query="UPDATE `".TABLE_CONFIG."` SET `value1`='".ksql_real_escape_string($value1)."',`value2`='".ksql_real_escape_string($value2)."' WHERE `param`='".ksql_real_escape_string($param)."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 		
@@ -47,17 +47,17 @@ class kaImpostazioni {
 
 	public function getParam($param,$ll=false) {
 		if($ll==false) $ll=$this->ll;
-		$query="SELECT * FROM `".TABLE_CONFIG."` WHERE `param`='".mysql_real_escape_string($param)."' AND `ll`='".mysql_real_escape_string($ll)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row;
+		$query="SELECT * FROM `".TABLE_CONFIG."` WHERE `param`='".ksql_real_escape_string($param)."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
 		}
 
 	public function getVar($param,$num,$ll=false) {
 		if($ll==false) $ll=$this->ll;
-		$query="SELECT `value".$num."` FROM `".TABLE_CONFIG."` WHERE `param`='".mysql_real_escape_string($param)."' AND ll='".mysql_real_escape_string($ll)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) return $row['value'.$num];
+		$query="SELECT `value".$num."` FROM `".TABLE_CONFIG."` WHERE `param`='".ksql_real_escape_string($param)."' AND ll='".ksql_real_escape_string($ll)."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return $row['value'.$num];
 		else return false;
 		}
 

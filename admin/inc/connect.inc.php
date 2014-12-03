@@ -1,20 +1,69 @@
 <?php 
 /* (c) Kalamun.org - GNU/GPL 3 */
-global $__db;
 
 require_once('config.inc.php');
 
-/* CONNETTI AL DATABASE */
-$__db['id']=mysql_connect($__db['host'],$__db['user'],$__db['password']);
-if(!$__db['id']) {
-	$message="Si e' verificato un errore di connessione al database.\nSito: ".SITE_URL."\nPagina: ".$_SERVER['PHP_SELF']."\n\nQuesto e' un messaggio generato automaticamente.";
-	//mail(WEBMASTER_MAIL,"[".SITE_URL."] Errore di connessione al database",$message,'From: '.ADMIN_MAIL);
-	die('<h1>Errore di connessione al database.</h1><p>A causa di un errore di connessione al database risulta impossibile utilizzare il sito internet. Siamo spiacenti dell\'inconveniente.<br />Il webmaster &egrave; stato avvisato via e-mail del problema.</p>');
+
+/* MYSQL to PDO */
+function ksql_connect($host,$dbname,$user,$password)
+{
+	try
+	{
+		$GLOBALS['__db']['pdo']=new PDO('mysql:host='.$host.';dbname='.$dbname , $user, $password);
+		$GLOBALS['__db']['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$GLOBALS['__db']['pdo']->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
+	} catch(PDOException $e) {
+		// die if error occurs
+		if(isset($_SESSION['iduser'])) trigger_error($e->errorInfo[2], E_USER_ERROR);
+		else trigger_error('We are sorry, a database error occurred.', E_USER_ERROR);
+		return false;
 	}
-if(!mysql_select_db($__db['name'],$__db['id'])) {
-	$message="Si e' verificato un errore di selezione del database.\nSito: ".SITE_URL."\nPagina: ".$_SERVER['PHP_SELF']."\nDB: ".$__db['name']."\n\nQuesto e' un messaggio generato automaticamente.";
-	//mail(WEBMASTER_MAIL,"[".SITE_URL."] Errore di connessione al database",$message,'From: '.ADMIN_MAIL);
-	die('<h1>Errore durante la selezione del database.</h1><p>A causa di un errore di selezione del database risulta impossibile utilizzare il sito internet. Siamo spiacenti dell\'inconveniente.<br />Il webmaster &egrave; stato avvisato via e-mail del problema.</p>');
+	return $GLOBALS['__db']['pdo'];
+}
+
+function ksql_real_escape_string($string)
+{
+	$string=$GLOBALS['__db']['pdo']->quote($string);
+	$string=substr($string,1,-1);
+	return $string;
+}
+
+function ksql_query($query)
+{
+	try
+	{
+		$results=$GLOBALS['__db']['pdo']->prepare($query);
+		$results->closeCursor();
+		$results->execute();
+	
+	} catch(PDOException $e) {
+		// die if error occurs
+		if(isset($_SESSION['iduser'])) trigger_error($e->errorInfo[2], E_USER_ERROR);
+		else trigger_error('We are sorry, a database error occurred.', E_USER_ERROR);
+		return false;
 	}
-mysql_query("SET NAMES 'UTF8'"); 
+
+	return $results;
+}
+
+function ksql_fetch_array($results)
+{
+	return $results->fetch(PDO::FETCH_ASSOC);
+}
+
+function ksql_insert_id()
+{
+	return $GLOBALS['__db']['pdo']->lastInsertId();
+}
+
+function ksql_close()
+{
+	if(isset($GLOBALS['__db']['pdo'])) unset($GLOBALS['__db']['pdo']);
+}
+
+
+/* CONNECT TO DB */
+$GLOBALS['__db']['id']=ksql_connect($GLOBALS['__db']['host'],$GLOBALS['__db']['name'],$GLOBALS['__db']['user'],$GLOBALS['__db']['password']);
+ksql_query("SET NAMES 'UTF8'"); 
 

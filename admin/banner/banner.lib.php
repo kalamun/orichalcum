@@ -12,18 +12,18 @@ class kaBanner {
 	function add($banner,$title,$description,$url,$categoria,$ll=null) {
 		if($ll==null) $ll=$_SESSION['ll'];
 		$log="";
-		$query="SELECT ordine FROM `".TABLE_BANNER."` WHERE categoria='".mysql_real_escape_string($categoria)."' ORDER BY `ordine` DESC LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT ordine FROM `".TABLE_BANNER."` WHERE categoria='".ksql_real_escape_string($categoria)."' ORDER BY `ordine` DESC LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$ordine=$row['ordine']+1;
 		
-		$query="SELECT MIN(`views`) AS `min` FROM `".TABLE_BANNER."` WHERE `categoria`='".mysql_real_escape_string($categoria)."'";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT MIN(`views`) AS `min` FROM `".TABLE_BANNER."` WHERE `categoria`='".ksql_real_escape_string($categoria)."'";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$offset=$row['min'];
 
 		$query="INSERT INTO `".TABLE_BANNER."` (`online`,`title`,`description`,`url`,`categoria`,`views`,`offset`,`clicks`,`ordine`,`ll`) VALUES('s','".b3_htmlize($title,true,"")."','".b3_htmlize($description,true)."','".b3_htmlize($url,true,"")."','".intval($categoria)."','0','".intval($offset)."','0',".$ordine.",'".$ll."')";
-		if(!mysql_query($query)) { $log="Problemi durante l'inserimento nel database"; } else { $id=mysql_insert_id(); }
+		if(!ksql_query($query)) { $log="Problemi durante l'inserimento nel database"; } else { $id=ksql_insert_id(); }
 		
 		//upload del file del banner
 		if($log==""&&$banner['tmp_name']!="") {
@@ -37,23 +37,23 @@ class kaBanner {
 		if($online!='s') $online='n';
 
 		$query="SELECT `ordine`,`categoria` FROM `".TABLE_BANNER."` WHERE `idbanner`='".intval($idbanner)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$query="UPDATE `".TABLE_BANNER."` SET `title`='".b3_htmlize($title,true,"")."',`description`='".b3_htmlize($description,true)."',`url`='".b3_htmlize($url,true,"")."',`online`='".$online."' WHERE `idbanner`='".intval($idbanner)."' LIMIT 1";
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			if($row['categoria']!=$idcat) {
 				$query="SELECT `ordine` FROM `".TABLE_BANNER."` WHERE `categoria`='".intval($idcat)."' ORDER BY `ordine` LIMIT 1";
-				$results=mysql_query($query);
-				$r=mysql_fetch_array($results);
+				$results=ksql_query($query);
+				$r=ksql_fetch_array($results);
 				if(!isset($r['ordine'])) $r['ordine']=0;
 				$r['ordine']++;
 				
 				$query="UPDATE `".TABLE_BANNER."` SET `ordine`='".$r['ordine']."',`categoria`='".intval($idcat)."' WHERE `idbanner`='".intval($idbanner)."' LIMIT 1";
-				if(!mysql_query($query)) return false;
+				if(!ksql_query($query)) return false;
 				
 				$query="UPDATE `".TABLE_BANNER."` SET `ordine`=`ordine`-1 WHERE `categoria`='".intval($row['categoria'])."' AND `ordine`>'".intval($row['ordine'])."'";
-				if(!mysql_query($query)) return false;
+				if(!ksql_query($query)) return false;
 				
 				}
 			return true;
@@ -91,10 +91,10 @@ class kaBanner {
 		$banner=$this->get($idbanner);
 		
 		$query="DELETE FROM ".TABLE_BANNER." WHERE idbanner=".intval($idbanner)." LIMIT 1";
-		if(!mysql_query($query)) { $log="Problemi durante l'eliminazione dal database"; } else { $id=$idbanner; }
+		if(!ksql_query($query)) { $log="Problemi durante l'eliminazione dal database"; } else { $id=$idbanner; }
 
 		$query="UPDATE ".TABLE_BANNER." SET ordine=ordine-1 WHERE categoria='".$banner['categoria']."' AND ordine>".$banner['ordine'];
-		if(!mysql_query($query)) $log="Problemi durante il riordino del database";
+		if(!ksql_query($query)) $log="Problemi durante il riordino del database";
 
 		if($log==""&&isset($banner['banner']['iddoc'])) {
 			if(!$this->kaDocuments->delete($banner['banner']['iddoc'])) $log.="Errore durante la rimozione del file ".$banner['banner']['name'].".<br />";
@@ -107,8 +107,8 @@ class kaBanner {
 	function get($idbanner) {
 		$output=array();
 		$query="SELECT * FROM ".TABLE_BANNER." WHERE `idbanner`='".intval($idbanner)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$output=$row;
 			}
 		if(!isset($output['idbanner'])) return false;
@@ -120,8 +120,8 @@ class kaBanner {
 	function getList($idcat) {
 		$output=array();
 		$query="SELECT * FROM ".TABLE_BANNER." WHERE categoria='".intval($idcat)."' AND ll='".$_SESSION['ll']."' ORDER BY ordine";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 		return $output;
@@ -133,7 +133,7 @@ class kaBanner {
 		for($i=0;isset($order[$i]);$i++) {
 			$query="UPDATE ".TABLE_BANNER." SET ordine=".($i+1)." WHERE idbanner=".$order[$i]." ";
 			$query.=" AND ll='".$lang."' LIMIT 1";
-			if(!mysql_query($query)) $output=false;
+			if(!ksql_query($query)) $output=false;
 			}
 		return $output;
 		}	

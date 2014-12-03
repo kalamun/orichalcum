@@ -176,7 +176,7 @@ if(!isset($_GET['search'])||$_GET['search']=="")
 		$numberOfItemsInThisView=$vars['limit']*2;
 	}
 	elseif($_GET['l']=="#") $vars['conditions'].="`".$vars['orderby']."` RLIKE '^[^[A-Za-z].*'";
-	else $vars['conditions'].="`".$vars['orderby']."` LIKE '".mysql_real_escape_string($_GET['l'])."%'";
+	else $vars['conditions'].="`".$vars['orderby']."` LIKE '".ksql_real_escape_string($_GET['l'])."%'";
 	
 } else {
 	$vars['conditions'].="(productcode LIKE '%".b3_htmlize($_GET['search'],true,"")."%' OR ";
@@ -794,8 +794,8 @@ else {
 					$translation=array();
 					$translation_id=array();
 					$query_l="SELECT * FROM ".TABLE_LINGUE." WHERE ll<>'".$row['ll']."' ORDER BY `lingua`";
-					$results_l=mysql_query($query_l);
-					while($page_l=mysql_fetch_array($results_l)) {
+					$results_l=ksql_query($query_l);
+					while($page_l=ksql_fetch_array($results_l)) {
 						if(!isset($row['traduzioni'][$page_l['ll']])||$row['traduzioni'][$page_l['ll']]=="") {
 							$translation[$page_l['ll']]="";
 							$translation_id[$page_l['ll']]="";

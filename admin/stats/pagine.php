@@ -28,8 +28,8 @@ $pagine=array();
 $tot=0;
 
 $q="SELECT url FROM ".TABLE_STATISTICHE." UNION SELECT url FROM ".TABLE_STATS_ARCHIVE;
-$p=mysql_query($q);
-while($r=mysql_fetch_array($p)) {
+$p=ksql_query($q);
+while($r=ksql_fetch_array($p)) {
 	$page=explode("\n",trim($r['url']));
 	if($_GET['mode']=='visited') {
 		foreach($page as $pag) {

@@ -131,8 +131,8 @@ $layout=$kaImpostazioni->getParam('admin-shop-layout',"*");
 $layoutmanufacturers=$kaImpostazioni->getParam('admin-manufacturers-layout',"*");
 
 $query="SELECT * FROM ".TABLE_CONFIG." WHERE param LIKE 'shop%' AND ll='".$_SESSION['ll']."'";
-$results=mysql_query($query);
-while($row=mysql_fetch_array($results)) {
+$results=ksql_query($query);
+while($row=ksql_fetch_array($results)) {
 	$v[$row['param'].'1']=$row['value1'];
 	$v[$row['param'].'2']=$row['value2'];
 	}
@@ -247,8 +247,8 @@ $v['shop-pagonline1b']=substr($v['shop-pagonline1'],strpos($v['shop-pagonline1']
 	echo '<h3>Categorie da visualizzare</h3>';
 	echo b3_create_input("cat[all]","checkbox","Tutte (anche quelle future)","*","","",(',*,'==$v['shop2']?'checked':''),true).'<br />';
 	$query_c="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_SHOP_ITEMS."' AND ll='".$_SESSION['ll']."' ORDER BY ordine";
-	$results_c=mysql_query($query_c);
-	while($row_c=mysql_fetch_array($results_c)) {
+	$results_c=ksql_query($query_c);
+	while($row_c=ksql_fetch_array($results_c)) {
 		echo '&nbsp;&nbsp;&nbsp;'.b3_create_input("cat[]","checkbox",$row_c['categoria'],$row_c['idcat'],"","",(strpos($v['shop2'],','.$row_c['idcat'].',')!==false?'checked':''),true).'<br />';
 		}
 	echo '<br /><br />';

@@ -20,13 +20,13 @@ class kaMembers {
 		if(strlen($expiration)==10) $expiration.=" ".date("H:i:s");
 		if($expiration!=""&&preg_match("/\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/",$expiration)) $expiration=substr($expiration,0,4).'-'.substr($expiration,5,2).'-'.substr($expiration,8,2).' '.substr($expiration,11,2).':'.substr($expiration,14,2).':'.substr($expiration,17,2);
 		else $expiration="0000-00-00 00:00:00";
-		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE `username`='".mysql_real_escape_string($username)."' ";
-		if($email!="") $query.=" OR `email`='".mysql_real_escape_string($email)."' ";
+		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE `username`='".ksql_real_escape_string($username)."' ";
+		if($email!="") $query.=" OR `email`='".ksql_real_escape_string($email)."' ";
 		$query.=" LIMIT 1";
-		$results=mysql_query($query);
-		if(!mysql_fetch_array($results)) {
-			$query="INSERT INTO ".TABLE_MEMBERS." (`name`,`email`,`username`,`password`,`affiliation`,`created`,`lastlogin`,`expiration`,`status`,`newsletter_lists`) VALUES('".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($username,true,"")."','".mysql_real_escape_string($password)."','".mysql_real_escape_string($affiliation)."',NOW(),NOW(),'".mysql_real_escape_string($expiration)."','".mysql_real_escape_string($status)."',',')";
-			if(mysql_query($query)) return mysql_insert_id();
+		$results=ksql_query($query);
+		if(!ksql_fetch_array($results)) {
+			$query="INSERT INTO ".TABLE_MEMBERS." (`name`,`email`,`username`,`password`,`affiliation`,`created`,`lastlogin`,`expiration`,`status`,`newsletter_lists`) VALUES('".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($username,true,"")."','".ksql_real_escape_string($password)."','".ksql_real_escape_string($affiliation)."',NOW(),NOW(),'".ksql_real_escape_string($expiration)."','".ksql_real_escape_string($status)."',',')";
+			if(ksql_query($query)) return ksql_insert_id();
 			}
 		return false;
 		}
@@ -52,32 +52,32 @@ class kaMembers {
 		if($expiration!=""&&preg_match("/\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/",$expiration)) $expiration=substr($expiration,0,4).'-'.substr($expiration,5,2).'-'.substr($expiration,8,2).' '.substr($expiration,11,2).':'.substr($expiration,14,2).':'.substr($expiration,17,2);
 		else $expiration="0000-00-00 00:00:00";
 		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE idmember='".intval($idmember)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$query="UPDATE ".TABLE_MEMBERS." SET name='".b3_htmlize($name,true,"")."',email='".b3_htmlize($email,true,"")."',username='".b3_htmlize($username,true,"")."',password='".addslashes(stripslashes($password))."',affiliation='".b3_htmlize($affiliation,true,"")."',expiration='".$expiration."',status='".$status."' WHERE idmember=".intval($idmember);
-			if(mysql_query($query)) return $row['idmember'];
+			if(ksql_query($query)) return $row['idmember'];
 			}
 		return false;
 		}
 
 	public function updateNewsletter($idmember,$newsletter_lists)
 	{
-		$query="UPDATE ".TABLE_MEMBERS." SET `newsletter_lists`='".mysql_real_escape_string($newsletter_lists)."' WHERE idmember=".intval($idmember);
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_MEMBERS." SET `newsletter_lists`='".ksql_real_escape_string($newsletter_lists)."' WHERE idmember=".intval($idmember);
+		if(ksql_query($query)) return true;
 		else return false;
 	}
 
 	public function updateEmail($idmember,$email)
 	{
-		$query="UPDATE ".TABLE_MEMBERS." SET `email`='".mysql_real_escape_string($email)."' WHERE idmember=".intval($idmember);
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_MEMBERS." SET `email`='".ksql_real_escape_string($email)."' WHERE idmember=".intval($idmember);
+		if(ksql_query($query)) return true;
 		else return false;
 	}
 
 	public function password($idmember,$password)
 	{
-		$query="UPDATE ".TABLE_MEMBERS." SET `password`='".mysql_real_escape_string($password)."' WHERE `idmember`=".mysql_real_escape_string($idmember)." LIMIT 1";
-		if(mysql_query($query)) {
+		$query="UPDATE ".TABLE_MEMBERS." SET `password`='".ksql_real_escape_string($password)."' WHERE `idmember`=".ksql_real_escape_string($idmember)." LIMIT 1";
+		if(ksql_query($query)) {
 			if(isset($_SESSION['idmember'])&&$idmember==$_SESSION['idmember']) $_SESSION['password']=$password;
 			return true;
 			}
@@ -88,17 +88,17 @@ class kaMembers {
 	{
 		$log=true;
 		$query="UPDATE ".TABLE_MEMBERS." SET status='del' WHERE idmember='".intval($idmember)."' ";
-		if($affiliation!=null) $query.=" AND affiliation='".mysql_real_escape_string($affiliation)."'";
+		if($affiliation!=null) $query.=" AND affiliation='".ksql_real_escape_string($affiliation)."'";
 		$query.=" LIMIT 1";
-		if(!mysql_query($query)) $log=false;
+		if(!ksql_query($query)) $log=false;
 		return $log;
 	}
 
 	public function delAll($affiliation=null) {
 		$log=true;
 		$query="UPDATE ".TABLE_MEMBERS." SET status='del' ";
-		if($affiliation!=null) $query.=" WHERE affiliation='".mysql_real_escape_string($affiliation)."'";
-		if(!mysql_query($query)) $log=false;
+		if($affiliation!=null) $query.=" WHERE affiliation='".ksql_real_escape_string($affiliation)."'";
+		if(!ksql_query($query)) $log=false;
 		return $log;
 		}
 	
@@ -110,14 +110,14 @@ class kaMembers {
 
 		// filter by email
 		if(isset($vars['email'])) {
-			$query.="`email`='".mysql_real_escape_string($vars['email'])."' AND ";
+			$query.="`email`='".ksql_real_escape_string($vars['email'])."' AND ";
 			}
 		
 		// filter by given array of list ids
 		if(isset($vars['lists'])) {
 			$query.="(";
 			foreach($vars['lists'] as $idlista) {
-				$query.="`newsletter_lists` LIKE '%,".mysql_real_escape_string($idlista).",%' OR ";
+				$query.="`newsletter_lists` LIKE '%,".ksql_real_escape_string($idlista).",%' OR ";
 				}
 			$query.="idmember=0) AND ";
 			}
@@ -125,7 +125,7 @@ class kaMembers {
 		//mandatory fields
 		if(isset($vars['mandatary'])) {
 			foreach($vars['mandatary'] as $field) {
-				$query.="`".mysql_real_escape_string($field)."`<>'' AND ";
+				$query.="`".ksql_real_escape_string($field)."`<>'' AND ";
 				}
 			}
 
@@ -138,15 +138,15 @@ class kaMembers {
 
 		// group by specified field
 		if(isset($vars['groupby'])) {
-			$query.=" GROUP BY `".mysql_real_escape_string($vars['groupby'])."` ";
+			$query.=" GROUP BY `".ksql_real_escape_string($vars['groupby'])."` ";
 			}
 
 		$query.=" ORDER BY ";
 		if(isset($vars['orderby'])) $query.=$vars['orderby'];
 		else $query.="`name`,`username`,`created`";
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		if(!$results) return false;
-		while($row=mysql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results)) {
 			isset($vars['idmemberAsKey'])&&$vars['idmemberAsKey']==true?$i=$row['idmember']:$i=count($output);
 			$output[$i]=$row;
 			$output[$i]['created_friendly']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['created']);
@@ -164,14 +164,14 @@ class kaMembers {
 
 		// filter by email
 		if(isset($vars['email'])) {
-			$query.="`email`='".mysql_real_escape_string($vars['email'])."' AND ";
+			$query.="`email`='".ksql_real_escape_string($vars['email'])."' AND ";
 			}
 		
 		// filter by given array of list ids
 		if(isset($vars['lists'])) {
 			$query.="(";
 			foreach($vars['lists'] as $idlista) {
-				$query.="`newsletter_lists` LIKE '%,".mysql_real_escape_string($idlista).",%' OR ";
+				$query.="`newsletter_lists` LIKE '%,".ksql_real_escape_string($idlista).",%' OR ";
 				}
 			$query.="idmember=0) AND ";
 			}
@@ -179,7 +179,7 @@ class kaMembers {
 		//mandatory fields
 		if(isset($vars['mandatary'])) {
 			foreach($vars['mandatary'] as $field) {
-				$query.="`".mysql_real_escape_string($field)."`<>'' AND ";
+				$query.="`".ksql_real_escape_string($field)."`<>'' AND ";
 				}
 			}
 		
@@ -192,19 +192,19 @@ class kaMembers {
 
 		// group by specified field
 		if(isset($vars['groupby'])) {
-			$query.=" GROUP BY `".mysql_real_escape_string($vars['groupby'])."` ";
+			$query.=" GROUP BY `".ksql_real_escape_string($vars['groupby'])."` ";
 			}
 
-		$results=mysql_query($query);
+		$results=ksql_query($query);
 		if(!$results) return false;
-		$row=mysql_fetch_array($results);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 	
 	public function getUserById($idmember) {
 		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE idmember='".intval($idmember)."' LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$row['created_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['created']);
 			$row['lastlogin_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['lastlogin']);
 			$row['metadata']=$this->kaMetadata->getList(TABLE_MEMBERS,$row['idmember']);
@@ -216,11 +216,11 @@ class kaMembers {
 		}
 
 	public function getUserByUsername($username,$affiliation=null) {
-		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE username='".mysql_real_escape_string($username)."' ";
-		if($affiliation!=null) $query.=" AND affiliation='".mysql_real_escape_string($affiliation)."' ";
+		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE username='".ksql_real_escape_string($username)."' ";
+		if($affiliation!=null) $query.=" AND affiliation='".ksql_real_escape_string($affiliation)."' ";
 		$query.=" ORDER BY status LIMIT 1";
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$row['created_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['created']);
 			$row['lastlogin_leggibile']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['lastlogin']);
 			$row['metadata']=$this->kaMetadata->getList(TABLE_MEMBERS,$row['idmember']);

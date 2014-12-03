@@ -17,8 +17,8 @@ class kaDocuments {
 		if($id!="") $query.=" AND id='".$id."' ";
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row['tot'];
 		}
 
@@ -37,8 +37,8 @@ class kaDocuments {
 			if($rowcount!="") $query.=",".$rowcount;
 			}
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			if(trim($output[$i]['alt'])=="") $output[$i]['alt']=$output[$i]['filename'];
 			if($row['filename']==""&&$row['hotlink']!="") {
@@ -59,8 +59,8 @@ class kaDocuments {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_DOCS." WHERE iddoc=".$iddoc." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$row;
 		if(trim($output['alt'])=="") $output['alt']=$output['filename'];
 		if($row['filename']==""&&$row['hotlink']!="") {
@@ -77,13 +77,13 @@ class kaDocuments {
 
 	function updateAlt($iddoc,$alt) {
 		$query="UPDATE ".TABLE_DOCS." SET alt='".b3_htmlize($alt,true,"strong,em,u,a,acronym")."' WHERE iddoc=".$iddoc;
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		return true;
 		}
 	
 	function updateHotlink($iddoc,$hotlink) {
 		$query="UPDATE ".TABLE_DOCS." SET filename='',hotlink='".b3_htmlize($hotlink,true,"")."' WHERE iddoc=".$iddoc;
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		return true;
 		}
 	
@@ -95,13 +95,13 @@ class kaDocuments {
 
 			/* indice dell'ordine */
 			$query="SELECT ordine FROM ".TABLE_DOCS." WHERE tabella='".$tabella."' AND id='".$id."' ORDER BY ordine DESC LIMIT 0,1";
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			if($row['ordine']==false) $row['ordine']=0;
 			$ordine=++$row['ordine'];
 			
 			$query="INSERT INTO ".TABLE_DOCS." (filename,hotlink,tabella,id,alt,ordine) VALUES('".addslashes($filename)."','','".$tabella."','".$id."','".b3_htmlize($alt,true,"strong,em,u,acronym")."',".$ordine.")";
-			if(mysql_query($query)) { $iddoc=mysql_insert_id(); }
+			if(ksql_query($query)) { $iddoc=ksql_insert_id(); }
 			else { return false; }
 			
 			mkdir(BASERELDIR.DIR_DOCS.$iddoc);
@@ -116,13 +116,13 @@ class kaDocuments {
 	function setHotlink($filename,$tabella,$id,$alt) {
 		$id=intval($id);
 		$query="SELECT ordine FROM ".TABLE_DOCS." WHERE tabella='".$tabella."' AND id='".$id."' ORDER BY ordine DESC LIMIT 0,1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['ordine']==false) $row['ordine']=0;
 		$ordine=++$row['ordine'];
 		
 		$query="INSERT INTO ".TABLE_DOCS." (filename,hotlink,tabella,id,alt,ordine) VALUES('','".b3_htmlize($filename,true,"")."','".$tabella."','".$id."','".b3_htmlize($alt,true,"strong,em,u,acronym")."',".$ordine.")";
-		if(mysql_query($query)) { $iddoc=mysql_insert_id(); }
+		if(ksql_query($query)) { $iddoc=ksql_insert_id(); }
 		else { return false; }
 		
 		mkdir(BASERELDIR.DIR_DOCS.$iddoc);
@@ -136,12 +136,12 @@ class kaDocuments {
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
 		if($filename!=""&&substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-4)!='.php3') { //aggiornamento dell'alt e del documento
 			$query="SELECT filename FROM ".TABLE_DOCS." WHERE iddoc=".intval($iddoc);
-			$results=mysql_query($query);
-			$row=mysql_fetch_array($results);
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
 			$query="UPDATE ".TABLE_DOCS." SET filename='".addslashes($filename)."'";
 			if($alt!=null) $query.=",alt='".b3_htmlize($alt,true,"strong,em,u,acronym")."'";
 			$query.=" WHERE iddoc=".$iddoc;
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			if(!file_exists(BASERELDIR.DIR_DOCS.$iddoc)) mkdir(BASERELDIR.DIR_DOCS.$iddoc);
 			@unlink(BASERELDIR.DIR_DOCS.$iddoc.'/'.$row['filename']); //elimino il vecchio documento
@@ -152,7 +152,7 @@ class kaDocuments {
 
 		else { //aggiornamento solo dell'alt
 			$query="UPDATE ".TABLE_DOCS." SET alt='".b3_htmlize($alt,true,"strong,em,u,acronym")."' WHERE iddoc=".$iddoc;
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			}
 		
 		return $iddoc;
@@ -162,12 +162,12 @@ class kaDocuments {
 		if(!defined("TABLE_DOCS")|!defined("DIR_DOCS")) return false;
 		
 		$query="SELECT * FROM ".TABLE_DOCS." WHERE iddoc=".$iddoc;
-		$results=mysql_query($query);
-		if($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) {
 			$query="UPDATE FROM ".TABLE_DOCS." SET ordine=ordine-1 WHERE tabella='".$row['tabella']."' AND id='".$row['id']."' AND ordine>".$row['ordine'];
-			mysql_query($query);
+			ksql_query($query);
 			$query="DELETE FROM ".TABLE_DOCS." WHERE iddoc=".$iddoc;
-			if(!mysql_query($query)) return false;
+			if(!ksql_query($query)) return false;
 			
 			if($row['filename']!="") {
 				unlink(BASERELDIR.DIR_DOCS.$iddoc.'/'.$row['filename']); //elimino la vecchia immagine
@@ -184,12 +184,12 @@ class kaDocuments {
 		$type=array(TABLE_CONFIG=>"Configurazione",TABLE_USERS=>"Utenti",TABLE_BANNER=>"Banner",TABLE_PAGINE=>"Pagina",TABLE_LANDINGPAGE=>"Landing-page",TABLE_LANDINGPAGE_T=>"Landing page",TABLE_THANKYOUPAGE=>"Conversion page",TABLE_NEWS=>"News");
 
 		$query="SELECT * FROM ".TABLE_DOCS." WHERE iddoc=".$iddoc;
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$descr=$type[$row['tabella']].' ';
 		$query2="SELECT * FROM ".$row['tabella']." WHERE ".$id[$row['tabella']]."=".$row['id']." LIMIT 1";
-		$results2=mysql_query($query2);
-		$row2=mysql_fetch_array($results2);
+		$results2=ksql_query($query2);
+		$row2=ksql_fetch_array($results2);
 		if(!isset($row2['ll'])) $row2['ll']="";
 		if(!isset($row2['dir'])) $row2['dir']="";
 		$descr.='<strong>'.strtolower($row2['ll']).'/'.($row['tabella']==TABLE_NEWS?'news/':'').$row2['dir'].'</strong>';
@@ -208,8 +208,8 @@ class kaDocuments {
 		
 		foreach($search as $s) {
 			$query2="SELECT * FROM ".$s[0]." WHERE ".$s[1]." LIKE '%id=\"doc".$iddoc."\"%' LIMIT 1";
-			$results2=mysql_query($query2);
-			while($row2=mysql_fetch_array($results2)) {
+			$results2=ksql_query($query2);
+			while($row2=ksql_fetch_array($results2)) {
 				$descr=$type[$s[0]].' <strong>'.strtolower($row2['ll']).'/'.($s[0]==TABLE_NEWS?'news/':'').$row2['dir'].'</strong>';
 				$url=BASEDIR.strtolower($row2['ll']).'/'.($s[0]==TABLE_NEWS?'news/':'').$row2['dir'];
 				if($url!=$output[0]['url']) $output[]=array("table"=>$s[0],"id"=>$row2[$id[$s[0]]],"descr"=>$descr,"url"=>$url);

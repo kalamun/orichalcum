@@ -7,8 +7,8 @@ include_once("../inc/head.inc.php");
 /* AZIONI */
 if(isset($_GET['delete'])) {
 	$query="SELECT * FROM ".TABLE_PAGINE." WHERE idpag='".intval($_GET['delete'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	?>
 	<h1><?= $kaTranslate->translate('Pages:You are going to delete the page "%s": are you sure?',$row['titolo']); ?></h1><br />
 	<br />
@@ -27,25 +27,25 @@ if(isset($_GET['delete'])) {
 elseif(isset($_POST['delete'])) {
 	$log="";
 	$query="SELECT * FROM ".TABLE_PAGINE." WHERE idpag='".intval($_POST['idpag'])."' LIMIT 1";
-	$results=mysql_query($query);
-	$old=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$old=ksql_fetch_array($results);
 	
 	if(isset($old['idpag'])&&$old['idpag']!="") {
 		$query="DELETE FROM ".TABLE_PAGINE." WHERE idpag='".intval($old['idpag'])."' LIMIT 1";
-		if(!mysql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while deleting page from database');
+		if(!ksql_query($query)) $log=$kaTranslate->translate('Pages:Errors occurred while deleting page from database');
 		else {
 			$id=$_POST['idpag'];
 			//remove conversions
 			$query="DELETE FROM ".TABLE_CONVERSIONS." WHERE idpag='".intval($old['idpag'])."'";
-			mysql_query($query);
+			ksql_query($query);
 			//remove images and documents galleries (do not delete any file)
 			$query="DELETE FROM ".TABLE_IMGALLERY." WHERE `tabella`='".TABLE_PAGINE."' AND `id`='".intval($old['idpag'])."'";
-			mysql_query($query);
+			ksql_query($query);
 			$query="DELETE FROM ".TABLE_DOCGALLERY." WHERE `tabella`='".TABLE_PAGINE."' AND `id`='".intval($old['idpag'])."'";
-			mysql_query($query);
+			ksql_query($query);
 			//delete comments
 			$query="DELETE FROM ".TABLE_COMMENTI." WHERE `tabella`='".TABLE_PAGINE."' AND `id`='".intval($old['idpag'])."'";
-			mysql_query($query);
+			ksql_query($query);
 			
 			//remove from menu
 			require_once('../menu/menu.lib.php');
@@ -100,8 +100,8 @@ elseif(isset($_POST['delete'])) {
 			}
 		$conditions.="ll='".$_SESSION['ll']."'";
 		$query="SELECT idpag,titolo,dir FROM ".TABLE_PAGINE." WHERE ".$conditions." ORDER BY titolo";
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) { ?>
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) { ?>
 			<tr>
 			<td><h2><a href="?delete=<?= $row['idpag']; ?>"><?= $row['titolo']; ?></a></h2>
 				<small class="actions"><a href="?delete=<?= $row['idpag']; ?>" class="warning"><?= $kaTranslate->translate('Pages:Delete'); ?></a></small>

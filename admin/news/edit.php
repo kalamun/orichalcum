@@ -50,8 +50,8 @@ if(!isset($_GET['idnews'])) {
 		<?php 
 		$tmpyyyy="";
 		$q="SELECT ".$dataRef." FROM ".TABLE_NEWS." WHERE ll='".$_SESSION['ll']."' GROUP BY year(".$dataRef."),month(".$dataRef.") ORDER BY ".$dataRef." DESC";
-		$rs=mysql_query($q);
-		while($r=mysql_fetch_array($rs)) {
+		$rs=ksql_query($q);
+		while($r=ksql_fetch_array($rs)) {
 			$yyyy=substr($r[$dataRef],0,4);
 			$mm=substr($r[$dataRef],5,2);
 			if($tmpyyyy!=$yyyy) {
@@ -517,8 +517,8 @@ else {
 					$translation=array();
 					$translation_id=array();
 					$query_l="SELECT * FROM ".TABLE_LINGUE." WHERE ll<>'".$row['ll']."' ORDER BY `lingua`";
-					$results_l=mysql_query($query_l);
-					while($page_l=mysql_fetch_array($results_l)) {
+					$results_l=ksql_query($query_l);
+					while($page_l=ksql_fetch_array($results_l)) {
 						if(!isset($row['traduzioni'][$page_l['ll']])||$row['traduzioni'][$page_l['ll']]=="") {
 							$translation[$page_l['ll']]="";
 							$translation_id[$page_l['ll']]="";

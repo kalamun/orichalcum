@@ -102,8 +102,8 @@ if(isset($_GET['copyfrom'])) $copyfrom=$kaPages->get($_GET['copyfrom']);
 	<?php 
 	//add to menu checkbox: if menu is empty, don't ask how to locate the link inside menu
 	$query="SELECT * FROM ".TABLE_MENU." WHERE ref='0' AND ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	$additionalAttributes=($row['idmenu']==""?'':'onchange="selectMenuRef(this)"');
 	?>
 	<tr>

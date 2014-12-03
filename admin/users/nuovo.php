@@ -11,7 +11,7 @@ if(isset($_POST['insert'])&&$_POST['n_username']!=""&&$_POST['n_name']!=""&&$_PO
 	$log="";
 	if(!$kaUsers->add($_POST['n_name'],$_POST['n_email'],$_POST['n_username'],$_POST['n_password'],$_POST['n_p'])) $log="Problemi durante la creazione del nuovo utente";
 	if($log=="") {
-		$id=mysql_insert_id();
+		$id=ksql_insert_id();
 		if(!$kaUsers->propReplace($id,'ui','lang',addslashes(stripslashes($_POST['ui_lang'])))) $log.='Impossibile aggiornare la lingua preferita.<br />';
 		$kaLog->add("INS",'Users: Created <em>'.$_POST['n_name'].'</em> - '.$_POST['n_username'].' (<em>ID: '.$id.'</em>)');
 		echo '<div id="MsgSuccess">Utente inserito con successo</div>';

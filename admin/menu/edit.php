@@ -12,8 +12,8 @@ if(isset($_POST['save'])) {
 
 	if(empty($_POST['photogallery'])) $_POST['photogallery']=",";
 	
-	$query="UPDATE ".TABLE_MENU." SET `label`='".b3_htmlize($_POST['label'],true,"")."', `url`='".mysql_real_escape_string($_POST['url'])."', `photogallery`='".mysql_real_escape_string($_POST['photogallery'])."' WHERE idmenu=".intval($_GET['idmenu']);
-	if(!mysql_query($query)) $log="Errore durante il salvataggio nel Database";
+	$query="UPDATE ".TABLE_MENU." SET `label`='".b3_htmlize($_POST['label'],true,"")."', `url`='".ksql_real_escape_string($_POST['url'])."', `photogallery`='".ksql_real_escape_string($_POST['photogallery'])."' WHERE idmenu=".intval($_GET['idmenu']);
+	if(!ksql_query($query)) $log="Errore durante il salvataggio nel Database";
 	
 	if($log=="") echo '<div id="MsgSuccess">Men&ugrave; salvato con successo</div>';
 	else echo '<div id="MsgAlert">'.$log.'</div>';
@@ -50,8 +50,8 @@ if(isset($_POST['save'])) {
 		<form action="?collection=<?= urlencode($_GET['collection']); ?>&idmenu=<?= $_GET['idmenu']; ?>" method="post" enctype="multipart/form-data">
 		<?php 
 		$query="SELECT * FROM `".TABLE_MENU."` WHERE `idmenu`=".intval($_GET['idmenu']);
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		?>
 		<div class="title"><?= b3_create_input("label","text","Titolo: ",b3_lmthize($row['label'],"input"),"300px",64); ?></div><br />
 		<?= b3_create_input("url","text","URL: ",b3_lmthize($row['url'],"input"),"400px",250,'onkeyup="checkURL(this)"'); ?> <span class="help">assoluto o riferito alla <em>root</em></span><br />

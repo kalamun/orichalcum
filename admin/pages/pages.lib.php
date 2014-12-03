@@ -21,12 +21,12 @@ class kaPages {
 		if(!is_array($vars)) $vars=array("idpag"=>$vars);
 
 		$query="SELECT * FROM ".TABLE_PAGINE." WHERE ";
-		if(isset($vars['idpag'])) $query.=" `idpag`='".mysql_real_escape_string($vars['idpag'])."' AND ";
-		if(isset($vars['dir'])) $query.=" `dir`='".mysql_real_escape_string($vars['dir'])."' AND ";
-		if(isset($vars['ll'])) $query.=" `ll`='".mysql_real_escape_string($vars['ll'])."' AND ";
+		if(isset($vars['idpag'])) $query.=" `idpag`='".ksql_real_escape_string($vars['idpag'])."' AND ";
+		if(isset($vars['dir'])) $query.=" `dir`='".ksql_real_escape_string($vars['dir'])."' AND ";
+		if(isset($vars['ll'])) $query.=" `ll`='".ksql_real_escape_string($vars['ll'])."' AND ";
 		$query.=" `idpag`>0 LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$row;
 
 		$output['traduzioni']=array();
@@ -47,8 +47,8 @@ class kaPages {
 
 	public function getTitleById($idpag) {
 		$query="SELECT `titolo`,`dir`,`idpag`,`riservata` FROM ".TABLE_PAGINE." WHERE `idpag`='".intval($idpag)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		return $row;
 		}
 
@@ -57,12 +57,12 @@ class kaPages {
 		if(!isset($vars['limit'])) $vars['limit']=999;
 		$output=array();
 		$query="SELECT * FROM ".TABLE_PAGINE." WHERE `idpag`>0 ";
-		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".mysql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".mysql_real_escape_string($vars['match'])."%')";
-		if(isset($vars['ll'])) $query.=" AND `ll`='".mysql_real_escape_string($vars['ll'])."' ";
-		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".mysql_real_escape_string($vars['exclude_ll'])."' ";
+		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".ksql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".ksql_real_escape_string($vars['match'])."%')";
+		if(isset($vars['ll'])) $query.=" AND `ll`='".ksql_real_escape_string($vars['ll'])."' ";
+		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".ksql_real_escape_string($vars['exclude_ll'])."' ";
 		$query.=" ORDER BY `titolo` LIMIT ".$vars['start'].",".$vars['limit'];
-		$results=mysql_query($query);
-		while($row=mysql_fetch_array($results)) {
+		$results=ksql_query($query);
+		while($row=ksql_fetch_array($results)) {
 			$output[]=$row;
 			}
 		return $output;
@@ -80,9 +80,9 @@ class kaPages {
 		if($vars['dir']=="") $vars['dir']=strtolower(strftime("%d-%B-%Y-%H-%M-%S")).'.html';
 		
 		// check id dir already exists
-		$query="SELECT (`idpag`) as `tot` FROM `".TABLE_PAGINE."` WHERE `dir`='".mysql_real_escape_string($vars['dir'])."' AND `ll`='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT (`idpag`) as `tot` FROM `".TABLE_PAGINE."` WHERE `dir`='".ksql_real_escape_string($vars['dir'])."' AND `ll`='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['tot']>0) $vars['dir']=rand(100000,999999).$vars['dir'];
 		
 		// insert
@@ -107,14 +107,14 @@ class kaPages {
 			VALUES(
 				NOW(),
 				NOW(),
-				'".mysql_real_escape_string($vars['title'])."',
+				'".ksql_real_escape_string($vars['title'])."',
 				'',
 				'<p></p>',
 				'<p></p>',
 				',',
-				'".mysql_real_escape_string($vars['categories'])."',
-				'".mysql_real_escape_string($_SESSION['ll'])."',
-				'".mysql_real_escape_string($vars['dir'])."',
+				'".ksql_real_escape_string($vars['categories'])."',
+				'".ksql_real_escape_string($_SESSION['ll'])."',
+				'".ksql_real_escape_string($vars['dir'])."',
 				'',
 				'',
 				'',
@@ -123,8 +123,8 @@ class kaPages {
 				false,
 				0
 			)";
-		if(!mysql_query($query)) $log='Pages:Errors occurred while saving';
-		else $id=mysql_insert_id();
+		if(!ksql_query($query)) $log='Pages:Errors occurred while saving';
+		else $id=ksql_insert_id();
 
 		if($log!="") return $log;
 
@@ -152,23 +152,23 @@ class kaPages {
 		//copy contents from another page
 		if(isset($vars['copyfrom']) && is_numeric($vars['copyfrom']))
 		{
-			$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `idpag`=".mysql_real_escape_string($vars['copyfrom'])." LIMIT 1";
-			$results=mysql_query($query);
-			if($row=mysql_fetch_array($results))
+			$query="SELECT * FROM `".TABLE_PAGINE."` WHERE `idpag`=".ksql_real_escape_string($vars['copyfrom'])." LIMIT 1";
+			$results=ksql_query($query);
+			if($row=ksql_fetch_array($results))
 			{
 				$query="UPDATE ".TABLE_PAGINE." SET
-					`sottotitolo`='".mysql_real_escape_string($row['sottotitolo'])."',
-					`anteprima`='".mysql_real_escape_string($row['anteprima'])."',
-					`testo`='".mysql_real_escape_string($row['testo'])."',
-					`categorie`='".mysql_real_escape_string($row['categorie'])."',
-					`allowcomments`='".mysql_real_escape_string($row['allowcomments'])."',
-					`allowconversions`='".mysql_real_escape_string($row['allowconversions'])."',
-					`featuredimage`='".mysql_real_escape_string($row['featuredimage'])."',
-					`template`='".mysql_real_escape_string($row['template'])."',
-					`layout`='".mysql_real_escape_string($row['layout'])."',
-					`photogallery`='".mysql_real_escape_string($row['photogallery'])."'
-					WHERE `idpag`=".mysql_real_escape_string($id)." LIMIT 1";
-				if(!mysql_query($query)) $log='Pages:Errors occurred while copying contents';
+					`sottotitolo`='".ksql_real_escape_string($row['sottotitolo'])."',
+					`anteprima`='".ksql_real_escape_string($row['anteprima'])."',
+					`testo`='".ksql_real_escape_string($row['testo'])."',
+					`categorie`='".ksql_real_escape_string($row['categorie'])."',
+					`allowcomments`='".ksql_real_escape_string($row['allowcomments'])."',
+					`allowconversions`='".ksql_real_escape_string($row['allowconversions'])."',
+					`featuredimage`='".ksql_real_escape_string($row['featuredimage'])."',
+					`template`='".ksql_real_escape_string($row['template'])."',
+					`layout`='".ksql_real_escape_string($row['layout'])."',
+					`photogallery`='".ksql_real_escape_string($row['photogallery'])."'
+					WHERE `idpag`=".ksql_real_escape_string($id)." LIMIT 1";
+				if(!ksql_query($query)) $log='Pages:Errors occurred while copying contents';
 				
 				// copy conversions
 				$this->copyConversions($row['idpag'],$id);
@@ -186,9 +186,9 @@ class kaPages {
 		//add to menu
 		if(!empty($vars['addtomenu']))
 		{
-			$query="SELECT `idpag`,`titolo`,`dir` FROM `".TABLE_PAGINE."` WHERE `idpag`='".$id."' AND `ll`='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-			$results=mysql_query($query);
-			if($page=mysql_fetch_array($results))
+			$query="SELECT `idpag`,`titolo`,`dir` FROM `".TABLE_PAGINE."` WHERE `idpag`='".$id."' AND `ll`='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+			$results=ksql_query($query);
+			if($page=ksql_fetch_array($results))
 			{
 				$mvars=array();
 				$mvars['title']=$page['titolo'];
@@ -212,20 +212,20 @@ class kaPages {
 		
 		//modifico o inserisco il record
 		$query="UPDATE ".TABLE_PAGINE." SET ";
-			if(isset($vars['title'])) $query.="`titolo`='".mysql_real_escape_string($vars['title'])."',";
-			if(isset($vars['subtitle'])) $query.="`sottotitolo`='".mysql_real_escape_string($vars['subtitle'])."',";
+			if(isset($vars['title'])) $query.="`titolo`='".ksql_real_escape_string($vars['title'])."',";
+			if(isset($vars['subtitle'])) $query.="`sottotitolo`='".ksql_real_escape_string($vars['subtitle'])."',";
 			if(isset($vars['preview'])) $query.="`anteprima`='".b3_htmlize($vars['preview'],true)."',";
 			if(isset($vars['text'])) $query.="`testo`='".b3_htmlize($vars['text'],true)."',";
 			if(isset($vars['photogallery'])) $query.="`photogallery`='".b3_htmlize($vars['photogallery'],true)."',";
-			if(isset($vars['dir'])) $query.="`dir`='".mysql_real_escape_string($vars['dir'])."',";
-			if(isset($vars['template'])) $query.="`template`='".mysql_real_escape_string($vars['template'])."',";
-			if(isset($vars['layout'])) $query.="`layout`='".mysql_real_escape_string($vars['layout'])."',";
+			if(isset($vars['dir'])) $query.="`dir`='".ksql_real_escape_string($vars['dir'])."',";
+			if(isset($vars['template'])) $query.="`template`='".ksql_real_escape_string($vars['template'])."',";
+			if(isset($vars['layout'])) $query.="`layout`='".ksql_real_escape_string($vars['layout'])."',";
 			if(isset($vars['featuredimage'])) $query.="`featuredimage`='".intval($vars['featuredimage'])."',";
 			if(isset($vars['allowcomments'])) $query.="`allowcomments`='".intval($vars['allowcomments'])."',";
 			if(isset($vars['allowconversions'])) $query.="`allowconversions`='".intval($vars['allowconversions'])."',";
-			if(isset($vars['offline'])&&($vars['offline']=='s'||$vars['offline']=='n')) $query.="`riservata`='".mysql_real_escape_string($vars['offline'])."',";
-			$query.="`categorie`='".mysql_real_escape_string($vars['categories'])."', `modified`=NOW() WHERE `idpag`='".intval($idpag)."' LIMIT 1";
-		if(!mysql_query($query)) return "Pages:An error occurred while saving into the database";
+			if(isset($vars['offline'])&&($vars['offline']=='s'||$vars['offline']=='n')) $query.="`riservata`='".ksql_real_escape_string($vars['offline'])."',";
+			$query.="`categorie`='".ksql_real_escape_string($vars['categories'])."', `modified`=NOW() WHERE `idpag`='".intval($idpag)."' LIMIT 1";
+		if(!ksql_query($query)) return "Pages:An error occurred while saving into the database";
 		else $id=$idpag;
 
 		foreach($vars as $ka=>$v)
@@ -237,13 +237,13 @@ class kaPages {
 	}
 
 	public function setTranslations($idpag,$translations) {
-		$query="UPDATE ".TABLE_PAGINE." SET `traduzioni`='".mysql_real_escape_string($translations)."' WHERE `idpag`='".mysql_real_escape_string($idpag)."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_PAGINE." SET `traduzioni`='".ksql_real_escape_string($translations)."' WHERE `idpag`='".ksql_real_escape_string($idpag)."' LIMIT 1";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 	public function removePageFromTranslations($idpag) {
-		$query="UPDATE ".TABLE_PAGINE." SET `traduzioni`=REPLACE(`traduzioni`,'=".mysql_real_escape_string($idpag)."|','=|') WHERE `traduzioni` LIKE '%=".mysql_real_escape_string($idpag)."%|'";
-		if(mysql_query($query)) return true;
+		$query="UPDATE ".TABLE_PAGINE." SET `traduzioni`=REPLACE(`traduzioni`,'=".ksql_real_escape_string($idpag)."|','=|') WHERE `traduzioni` LIKE '%=".ksql_real_escape_string($idpag)."%|'";
+		if(ksql_query($query)) return true;
 		else return false;
 		}
 
@@ -262,16 +262,16 @@ class kaPages {
 		if(!is_array($vars)) $vars=array("idpag"=>$vars);
 
 		$query="SELECT * FROM ".TABLE_CONVERSIONS." WHERE ";
-		if(isset($vars['idpag'])) $query.=" `idpag`='".mysql_real_escape_string($vars['idpag'])."' AND ";
+		if(isset($vars['idpag'])) $query.=" `idpag`='".ksql_real_escape_string($vars['idpag'])."' AND ";
 		$query.=" `idpag`>0 LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row==false) {
 			//get an empty array;
 			$row=array();
 			$query="DESCRIBE ".TABLE_CONVERSIONS;
-			$results=mysql_query($query);
-			while($r=mysql_fetch_array($results)) {
+			$results=ksql_query($query);
+			while($r=ksql_fetch_array($results)) {
 				$row[$r['Field']]="";
 				}
 			}
@@ -309,13 +309,13 @@ class kaPages {
 		if(!isset($vars['idpag'])) return false;
 
 		//check if conversions record exists for the gived page. if not, create.
-		$query="SELECT `idconv` FROM `".TABLE_CONVERSIONS."` WHERE `idpag`=".mysql_real_escape_string($vars['idpag'])." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$query="SELECT `idconv` FROM `".TABLE_CONVERSIONS."` WHERE `idpag`=".ksql_real_escape_string($vars['idpag'])." LIMIT 1";
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['idconv']==false) {
-			$query="INSERT INTO `".TABLE_CONVERSIONS."` (`idpag`,`moderate`,`create_member`,`create_member_config`,`newsletters_add`,`newsletters_remove`,`private_dir`,`notification_emails`,`notification_from`,`notification_subject`,`notification_text`,`followup_from`,`followup_subject`,`followup_text`,`conversion_code`,`fail_code`,`variables`) VALUES ('".mysql_real_escape_string($vars['idpag'])."',false,false,'','','',false,'','','','','','','','','','')";
-			mysql_query($query);
-			$row['idconv']=mysql_insert_id();
+			$query="INSERT INTO `".TABLE_CONVERSIONS."` (`idpag`,`moderate`,`create_member`,`create_member_config`,`newsletters_add`,`newsletters_remove`,`private_dir`,`notification_emails`,`notification_from`,`notification_subject`,`notification_text`,`followup_from`,`followup_subject`,`followup_text`,`conversion_code`,`fail_code`,`variables`) VALUES ('".ksql_real_escape_string($vars['idpag'])."',false,false,'','','',false,'','','','','','','','','','')";
+			ksql_query($query);
+			$row['idconv']=ksql_insert_id();
 			}
 		if($row['idconv']==false) return false;
 
@@ -323,22 +323,22 @@ class kaPages {
 		$query="UPDATE `".TABLE_CONVERSIONS."` SET ";
 		if(isset($vars['moderate'])) $query.="`moderate`=".($vars['moderate']>0?$vars['moderate']:"0").",";
 		if(isset($vars['create_member'])) $query.="`create_member`=".($vars['create_member']==true?'true':'false').",";
-		if(isset($vars['create_member_config'])) $query.="`create_member_config`='".mysql_real_escape_string($vars['create_member_config'])."',";
+		if(isset($vars['create_member_config'])) $query.="`create_member_config`='".ksql_real_escape_string($vars['create_member_config'])."',";
 		if(isset($vars['private_dir'])) $query.="`private_dir`=".($vars['private_dir']==true?'true':'false').",";
-		if(isset($vars['newsletters_add'])) $query.="`newsletters_add`='".mysql_real_escape_string($vars['newsletters_add'])."',";
-		if(isset($vars['newsletters_remove'])) $query.="`newsletters_remove`='".mysql_real_escape_string($vars['newsletters_remove'])."',";
-		if(isset($vars['variables'])) $query.="`variables`='".mysql_real_escape_string($vars['variables'])."',";
-		if(isset($vars['notification_from'])) $query.="`notification_from`='".mysql_real_escape_string($vars['notification_from'])."',";
-		if(isset($vars['notification_emails'])) $query.="`notification_emails`='".mysql_real_escape_string($vars['notification_emails'])."',";
-		if(isset($vars['notification_subject'])) $query.="`notification_subject`='".mysql_real_escape_string($vars['notification_subject'])."',";
+		if(isset($vars['newsletters_add'])) $query.="`newsletters_add`='".ksql_real_escape_string($vars['newsletters_add'])."',";
+		if(isset($vars['newsletters_remove'])) $query.="`newsletters_remove`='".ksql_real_escape_string($vars['newsletters_remove'])."',";
+		if(isset($vars['variables'])) $query.="`variables`='".ksql_real_escape_string($vars['variables'])."',";
+		if(isset($vars['notification_from'])) $query.="`notification_from`='".ksql_real_escape_string($vars['notification_from'])."',";
+		if(isset($vars['notification_emails'])) $query.="`notification_emails`='".ksql_real_escape_string($vars['notification_emails'])."',";
+		if(isset($vars['notification_subject'])) $query.="`notification_subject`='".ksql_real_escape_string($vars['notification_subject'])."',";
 		if(isset($vars['notification_text'])) $query.="`notification_text`='".b3_htmlize($vars['notification_text'],true)."',";
-		if(isset($vars['followup_from'])) $query.="`followup_from`='".mysql_real_escape_string($vars['followup_from'])."',";
-		if(isset($vars['followup_subject'])) $query.="`followup_subject`='".mysql_real_escape_string($vars['followup_subject'])."',";
+		if(isset($vars['followup_from'])) $query.="`followup_from`='".ksql_real_escape_string($vars['followup_from'])."',";
+		if(isset($vars['followup_subject'])) $query.="`followup_subject`='".ksql_real_escape_string($vars['followup_subject'])."',";
 		if(isset($vars['followup_text'])) $query.="`followup_text`='".b3_htmlize($vars['followup_text'],true)."',";
-		if(isset($vars['conversion_code'])) $query.="`conversion_code`='".mysql_real_escape_string($vars['conversion_code'])."',";
-		if(isset($vars['fail_code'])) $query.="`fail_code`='".mysql_real_escape_string($vars['fail_code'])."',";
-		$query.="`idpag`=".mysql_real_escape_string($vars['idpag'])." WHERE `idconv`=".mysql_real_escape_string($row['idconv'])." LIMIT 1";
-		if(mysql_query($query)) return true;
+		if(isset($vars['conversion_code'])) $query.="`conversion_code`='".ksql_real_escape_string($vars['conversion_code'])."',";
+		if(isset($vars['fail_code'])) $query.="`fail_code`='".ksql_real_escape_string($vars['fail_code'])."',";
+		$query.="`idpag`=".ksql_real_escape_string($vars['idpag'])." WHERE `idconv`=".ksql_real_escape_string($row['idconv'])." LIMIT 1";
+		if(ksql_query($query)) return true;
 		else return false;
 	}
 	
@@ -347,19 +347,19 @@ class kaPages {
 	{
 		// check if conversions are defined
 		$query="SELECT count(`idconv`) as `tot` FROM `".TABLE_CONVERSIONS."` WHERE `idpag`='".intval($from)."' LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		if($row['tot']==0) return true; // no conversions defined
 		
 		// duplicate
 		$query="INSERT INTO `".TABLE_CONVERSIONS."` (`idpag`,`moderate`,`create_member`,`create_member_config`,`newsletters_add`,`newsletters_remove`,`private_dir`,`notification_emails`,`notification_from`,`notification_subject`,`notification_text`,`followup_from`,`followup_subject`,`followup_text`,`conversion_code`,`fail_code`,`variables`)
 			(SELECT `idpag`,`moderate`,`create_member`,`create_member_config`,`newsletters_add`,`newsletters_remove`,`private_dir`,`notification_emails`,`notification_from`,`notification_subject`,`notification_text`,`followup_from`,`followup_subject`,`followup_text`,`conversion_code`,`fail_code`,`variables` FROM `".TABLE_CONVERSIONS."` WHERE `idpag`='".intval($from)."' LIMIT 1)";
-		if(!mysql_query($query)) return false;
-		$id=mysql_insert_id();
+		if(!ksql_query($query)) return false;
+		$id=ksql_insert_id();
 		
 		// change the idpag reference to the new one
 		$query="UPDATE `".TABLE_CONVERSIONS."` SET `idpag`='".intval($to)."' WHERE `idconv`='".$id."' LIMIT 1";
-		if(!mysql_query($query)) return false;
+		if(!ksql_query($query)) return false;
 		return true;
 	}
 }

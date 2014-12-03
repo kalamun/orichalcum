@@ -205,25 +205,25 @@ class kEmails {
 
 	public function archiveMail($uid,$from,$to,$title,$header,$html,$plain,$idarch=0) {
 		if(!$this->inited) $this->init();
-		$from=mysql_real_escape_string($from);
-		$to=mysql_real_escape_string($to);
-		$title=mysql_real_escape_string($title);
-		$header=mysql_real_escape_string($header);
-		$html=mysql_real_escape_string($html);
-		$plain=mysql_real_escape_string($plain);
+		$from=ksql_real_escape_string($from);
+		$to=ksql_real_escape_string($to);
+		$title=ksql_real_escape_string($title);
+		$header=ksql_real_escape_string($header);
+		$html=ksql_real_escape_string($html);
+		$plain=ksql_real_escape_string($plain);
 		if($uid=="") $uid=$this->generateUID();
-		$uid=mysql_real_escape_string($uid);
+		$uid=ksql_real_escape_string($uid);
 		$idarch=intval($idarch);
 		
 		$query="INSERT INTO ".TABLE_EMAIL_LOG." (`date`,`from`,`to`,`title`,`header`,`html`,`plain`,`uid`,`readed`,`idarch`) VALUES(NOW(),'".$from."','".$to."','".$title."','".$header."','".$html."','".$plain."','".$uid."','0000-00-00 00:00:00','".$idarch."')";
-		mysql_query($query);
+		ksql_query($query);
 		return $uid;
 		}
 	
 	public function setAsRead($uid)
 	{
-		$query="UPDATE `".TABLE_EMAIL_LOG."` SET `readed`=NOW() WHERE `uid`='".mysql_real_escape_string($uid)."' LIMIT 1";
-		if(mysql_query($query)) return true;
+		$query="UPDATE `".TABLE_EMAIL_LOG."` SET `readed`=NOW() WHERE `uid`='".ksql_real_escape_string($uid)."' LIMIT 1";
+		if(ksql_query($query)) return true;
 		return false;
 	}
 

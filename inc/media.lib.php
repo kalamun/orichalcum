@@ -16,8 +16,8 @@ class kMedia {
 		if($conditions!="") $query.=" AND (".$conditions.") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 
-		$results=mysql_query($query);
-		for($i=0;$row=mysql_fetch_array($results);$i++) {
+		$results=ksql_query($query);
+		for($i=0;$row=ksql_fetch_array($results);$i++) {
 			$output[$i]=$row;
 			$output[$i]['alt']=strip_tags(trim(str_replace("\n","",$output[$i]['alt'])));
 			$output[$i]['caption']=$row['alt'];
@@ -106,8 +106,8 @@ class kMedia {
 		$output=array();
 
 		$query="SELECT * FROM ".TABLE_MEDIA." WHERE idmedia=".$idmedia." LIMIT 1";
-		$results=mysql_query($query);
-		$row=mysql_fetch_array($results);
+		$results=ksql_query($query);
+		$row=ksql_fetch_array($results);
 		$output=$row;
 		$output['alt']=strip_tags(trim(str_replace("\n","",$output['alt'])));
 		$output['caption']=$row['alt'];

@@ -27,8 +27,8 @@ if(isset($_POST['insert']))
 	if(get_magic_quotes_gpc()==true) $_POST['param']=stripslashes($_POST['param']);
 	$term=cleanTerm($_POST['testo']);
 	
-	$query="INSERT INTO `".TABLE_DIZIONARIO."` (`param`,`testo`,`ll`) VALUES('".mysql_real_escape_string($_POST['param'])."','".$term."','".$_SESSION['ll']."')";
-	if(!mysql_query($query)) $log="Problemi durante il salvataggio nel database";
+	$query="INSERT INTO `".TABLE_DIZIONARIO."` (`param`,`testo`,`ll`) VALUES('".ksql_real_escape_string($_POST['param'])."','".$term."','".$_SESSION['ll']."')";
+	if(!ksql_query($query)) $log="Problemi durante il salvataggio nel database";
 
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine salvato con successo</div>';
@@ -38,8 +38,8 @@ if(isset($_POST['insert']))
 	if(get_magic_quotes_gpc()==true) $_POST['param']=stripslashes($_POST['param']);
 	$term=cleanTerm($_POST['testo']);
 	
-	$query="UPDATE `".TABLE_DIZIONARIO."` SET `param`='".mysql_real_escape_string($_POST['param'])."',`testo`='".$term."' WHERE `iddiz`=".$_POST['iddiz'];
-	if(!mysql_query($query)) $log="Problemi durante il salvataggio nel database";
+	$query="UPDATE `".TABLE_DIZIONARIO."` SET `param`='".ksql_real_escape_string($_POST['param'])."',`testo`='".$term."' WHERE `iddiz`=".$_POST['iddiz'];
+	if(!ksql_query($query)) $log="Problemi durante il salvataggio nel database";
 
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine salvato con successo</div>';
@@ -47,8 +47,8 @@ if(isset($_POST['insert']))
 } elseif(isset($_GET['delete'])) {
 	$log="";
 	if(get_magic_quotes_gpc()==true) $_GET['delete']=stripslashes($_GET['delete']);
-	$query="DELETE FROM `".TABLE_DIZIONARIO."` WHERE `param`='".mysql_real_escape_string($_GET['delete'])."'";
-	if(!mysql_query($query)) $log="Problemi durante la rimozione dal database";
+	$query="DELETE FROM `".TABLE_DIZIONARIO."` WHERE `param`='".ksql_real_escape_string($_GET['delete'])."'";
+	if(!ksql_query($query)) $log="Problemi durante la rimozione dal database";
 
 	if($log!="") echo '<div id="MsgAlert">'.$log.'</div>';
 	else echo '<div id="MsgSuccess">Termine eliminato con successo</div>';
@@ -83,11 +83,11 @@ if(isset($_POST['insert']))
 
 	// insert terms if them doesn't exists yet
 	foreach($entries as $term) {
-		$query="SELECT * FROM ".TABLE_DIZIONARIO." WHERE `param`='".mysql_real_escape_string($term)."' AND `ll`='".$_SESSION['ll']."' LIMIT 1";
-		$results=mysql_query($query);
-		if(!mysql_fetch_array($results)) {
-			$query="INSERT INTO ".TABLE_DIZIONARIO." (`param`,`testo`,`ll`) VALUES('".mysql_real_escape_string($term)."','".b3_htmlize($term,true,"")."','".$_SESSION['ll']."')";
-			if(!mysql_query($query)) $log="An error occurred while inserting `".$term."`, language `".$_SESSION['ll']."`<br />";
+		$query="SELECT * FROM ".TABLE_DIZIONARIO." WHERE `param`='".ksql_real_escape_string($term)."' AND `ll`='".$_SESSION['ll']."' LIMIT 1";
+		$results=ksql_query($query);
+		if(!ksql_fetch_array($results)) {
+			$query="INSERT INTO ".TABLE_DIZIONARIO." (`param`,`testo`,`ll`) VALUES('".ksql_real_escape_string($term)."','".b3_htmlize($term,true,"")."','".$_SESSION['ll']."')";
+			if(!ksql_query($query)) $log="An error occurred while inserting `".$term."`, language `".$_SESSION['ll']."`<br />";
 			}
 		}
 
@@ -116,8 +116,8 @@ if(isset($_GET['addnew'])) { ?>
 /* Edit term GUI */
 elseif(isset($_GET['iddiz'])) {
 	$query="SELECT * FROM `".TABLE_DIZIONARIO."` WHERE `iddiz`=".intval($_GET['iddiz'])." LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	?>
 	<form action="?" method="post">
 		<input type="hidden" name="iddiz" value="<?= $row['iddiz']; ?>" />
@@ -139,8 +139,8 @@ else {
 	<?php 
 	$dizionario=array();
 	$query="SELECT * FROM `".TABLE_DIZIONARIO."` WHERE `ll`='".$_SESSION['ll']."' ORDER BY `param`";
-	$results=mysql_query($query);
-	for($i=0;$row=mysql_fetch_array($results);$i++) {
+	$results=ksql_query($query);
+	for($i=0;$row=ksql_fetch_array($results);$i++) {
 		$dizionario[]=$row;
 		}
 
@@ -154,8 +154,8 @@ else {
 		}
 
 	$query="SELECT * FROM `".TABLE_DIZIONARIO."` GROUP BY `param` ORDER BY `param`";
-	$results=mysql_query($query);
-	for($i=0;$row=mysql_fetch_array($results);$i++) {
+	$results=ksql_query($query);
+	for($i=0;$row=ksql_fetch_array($results);$i++) {
 		$d=findTrad($row['param']);
 		echo '<tr class="'.($i%2==0?'odd':'even').'">';
 		echo '<td class="param">'.$row['param'].'</td>';

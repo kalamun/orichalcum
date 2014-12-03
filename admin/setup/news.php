@@ -156,8 +156,8 @@ $facebook['page']=$kaImpostazioni->getParam('facebook-page');
 	<?php 
 	echo b3_create_input("cat[all]","checkbox","Tutte (anche quelle future)","*","","",(',*,'==$news['value2']?'checked':''),true).'<br />';
 	$query_c="SELECT * FROM ".TABLE_CATEGORIE." WHERE tabella='".TABLE_NEWS."' AND ll='".$_SESSION['ll']."' ORDER BY ordine";
-	$results_c=mysql_query($query_c);
-	while($row_c=mysql_fetch_array($results_c)) {
+	$results_c=ksql_query($query_c);
+	while($row_c=ksql_fetch_array($results_c)) {
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.b3_create_input("cat[]","checkbox",$row_c['categoria'],$row_c['idcat'],"","",(strpos($news['value2'],','.$row_c['idcat'].',')!==false?'checked':''),true).'<br />';
 		}
 	?>

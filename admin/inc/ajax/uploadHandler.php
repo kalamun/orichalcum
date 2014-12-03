@@ -15,7 +15,7 @@ if(isset($_POST['action']))
 		if(!isset($_POST['start'])) $_POST['start']=0;
 		if(!isset($_POST['limit'])) $_POST['limit']=30;
 		if(!isset($_POST['conditions'])) $_POST['conditions']='';
-		if(isset($_POST['search'])&&$_POST['search']!="") $_POST['conditions'].=" AND (`filename` LIKE '%".mysql_real_escape_string($_POST['search'])."%' OR `thumbnail` LIKE '%".mysql_real_escape_string($_POST['search'])."%' OR `hotlink` LIKE '%".mysql_real_escape_string($_POST['search'])."%' OR `alt` LIKE '%".mysql_real_escape_string($_POST['search'])."%' OR `idimg`='".intval($_POST['search'])."')";
+		if(isset($_POST['search'])&&$_POST['search']!="") $_POST['conditions'].=" AND (`filename` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `thumbnail` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `hotlink` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `alt` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `idimg`='".intval($_POST['search'])."')";
 		if(substr($_POST['conditions'],0,5)==' AND ') $_POST['conditions']=substr($_POST['conditions'],5);
 		if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
 

@@ -20,7 +20,7 @@ if(isset($_POST['save'])&&isset($_POST['menu'])) {
 		if(!isset($ordine[$_POST['ref'][$ka]])) $ordine[$_POST['ref'][$ka]]=0;
 		$ordine[$_POST['ref'][$ka]]++;
 		$query="UPDATE ".TABLE_MENU." SET `ordine`=".($ordine[$_POST['ref'][$ka]]).",`ref`='".$_POST['ref'][$ka]."' WHERE `idmenu`='".$v."' AND `ll`='".$_SESSION['ll']."' LIMIT 1";
-		if(!mysql_query($query)) $log="Errore durante il salvataggio nel DB";
+		if(!ksql_query($query)) $log="Errore durante il salvataggio nel DB";
 		}
 	if($log=="") echo '<div id="MsgSuccess">Men&ugrave; salvato con successo</div>';
 	else echo '<div id="MsgAlert">'.$log.'</div>';
@@ -37,13 +37,13 @@ elseif(isset($_GET['delete'])) {
 elseif(isset($_POST['insert'])) {
 	$log="";
 	$query="SELECT ordine FROM ".TABLE_MENU." WHERE `ll`='".$_SESSION['ll']."' AND `ref`='0' ORDER BY ordine DESC LIMIT 1";
-	$results=mysql_query($query);
-	$row=mysql_fetch_array($results);
+	$results=ksql_query($query);
+	$row=ksql_fetch_array($results);
 	$ordine=$row['ordine']+1;
 
 	$query="INSERT INTO ".TABLE_MENU." (label,url,ref,ll,ordine) VALUES('".b3_htmlize($_POST['label'],true,"")."','".b3_htmlize($_POST['url'],true,"")."','0','".$_SESSION['ll']."','".$ordine."')";
-	if(!mysql_query($query)) $log="Errore durante il salvataggio nel Database";
-	else $id=mysql_insert_id();
+	if(!ksql_query($query)) $log="Errore durante il salvataggio nel Database";
+	else $id=ksql_insert_id();
 
 	if($_FILES['img']['name']!="") $kaImages->upload($_FILES['img']['tmp_name'],$_FILES['img']['name'],TABLE_MENU,$id,$_POST['label'],false);
 
@@ -52,18 +52,18 @@ elseif(isset($_POST['insert'])) {
 	}
 elseif(isset($_GET['newCollection'])&&$_GET['collection']!="") {
 	$log="";
-	$query="INSERT INTO ".TABLE_MENU." (collection,label,url,ref,ll,ordine) VALUES('".mysql_real_escape_string($_GET['collection'])."','###placeholder###','#','0','##','1')";
-	if(!mysql_query($query)) $log="Errore durante il salvataggio nel Database";
-	else $id=mysql_insert_id();
+	$query="INSERT INTO ".TABLE_MENU." (collection,label,url,ref,ll,ordine) VALUES('".ksql_real_escape_string($_GET['collection'])."','###placeholder###','#','0','##','1')";
+	if(!ksql_query($query)) $log="Errore durante il salvataggio nel Database";
+	else $id=ksql_insert_id();
 
 	if($log=="") echo '<div id="MsgSuccess">Men&ugrave; creato con successo</div>';
 	else echo '<div id="MsgAlert">'.$log.'</div>';
 	}
 elseif(isset($_GET['deleteCollection'])&&$_GET['collection']!="") {
 	$log="";
-	$query="DELETE FROM ".TABLE_MENU." WHERE collection='".mysql_real_escape_string($_GET['collection'])."'";
-	if(!mysql_query($query)) $log="Errore durante la rimozione dal Database";
-	else $id=mysql_insert_id();
+	$query="DELETE FROM ".TABLE_MENU." WHERE collection='".ksql_real_escape_string($_GET['collection'])."'";
+	if(!ksql_query($query)) $log="Errore durante la rimozione dal Database";
+	else $id=ksql_insert_id();
 
 	if($log=="") {
 		echo '<div id="MsgSuccess">Men&ugrave; rimosso con successo</div>';

@@ -46,18 +46,18 @@ elseif(isset($_POST['private-insert'])) {
 
 if(isset($_POST['insert'])) {
 	$log="";
-	$query="SELECT * FROM ".TABLE_CONFIG." WHERE `param`='home_page' AND `ll`='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-	$results=mysql_query($query);
-	if(!mysql_fetch_array($results)) {
-		$query="INSERT INTO ".TABLE_CONFIG." (`param`,`value1`,`value2`,`ll`) VALUES (`home_page`,'','','".mysql_real_escape_string($_SESSION['ll'])."')";
-		mysql_query($query);
+	$query="SELECT * FROM ".TABLE_CONFIG." WHERE `param`='home_page' AND `ll`='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+	$results=ksql_query($query);
+	if(!ksql_fetch_array($results)) {
+		$query="INSERT INTO ".TABLE_CONFIG." (`param`,`value1`,`value2`,`ll`) VALUES (`home_page`,'','','".ksql_real_escape_string($_SESSION['ll'])."')";
+		ksql_query($query);
 		}
 
-	$query="UPDATE `".TABLE_CONFIG."` SET `value1`='".b3_htmlize($_POST['dir'],true,"")."' WHERE `param`='home_page' AND ll='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-	if(!mysql_query($query)) {
+	$query="UPDATE `".TABLE_CONFIG."` SET `value1`='".b3_htmlize($_POST['dir'],true,"")."' WHERE `param`='home_page' AND ll='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+	if(!ksql_query($query)) {
 		$log=$kaTranslate->translate("Home:Error while setting the new home page");
 		}
-	else $id=mysql_insert_id();
+	else $id=ksql_insert_id();
 
 	if($log=="") {
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate("Home:Successfully saved").'</div>';
@@ -72,9 +72,9 @@ if(isset($_POST['insert'])) {
 /***/
 
 
-$query="SELECT * FROM ".TABLE_CONFIG." WHERE `param`='home_page' AND `ll`='".mysql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
-$results=mysql_query($query);
-$row=mysql_fetch_array($results);
+$query="SELECT * FROM ".TABLE_CONFIG." WHERE `param`='home_page' AND `ll`='".ksql_real_escape_string($_SESSION['ll'])."' LIMIT 1";
+$results=ksql_query($query);
+$row=ksql_fetch_array($results);
 $dir=$row['value1'];
 ?>
 
