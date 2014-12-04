@@ -22,18 +22,19 @@ CREATE TABLE IF NOT EXISTS `k_categorie` (
   `tabella` varchar(250) DEFAULT NULL,
   `ref` int(3) NOT NULL DEFAULT '0',
   `categoria` varchar(250) DEFAULT NULL,
+  `photogallery` text NOT NULL,
   `dir` varchar(64) NOT NULL,
   `ordine` int(3) NOT NULL,
   `ll` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`idcat`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 
-INSERT INTO `k_categorie` (`idcat`, `tabella`, `ref`, `categoria`, `dir`, `ordine`, `ll`) VALUES
-(1, 'k_news', 0, 'Default', 'default', 1, '{VAR_DEFAULT_LANG}'),
-(2, 'k_banner', 0, 'Default', 'default', 1, '{VAR_DEFAULT_LANG}'),
-(3, 'k_pagine', 0, 'Default', 'default', 1, '{VAR_DEFAULT_LANG}'),
-(4, 'k_shop_items', 0, 'Default', 'default', 1, '{VAR_DEFAULT_LANG}');
+INSERT INTO `k_categorie` (`idcat`, `tabella`, `ref`, `categoria`, `photogallery`, `dir`, `ordine`, `ll`) VALUES
+(1, 'k_news', 0, 'Default', ',', 'default', 1, '{VAR_DEFAULT_LANG}'),
+(2, 'k_banner', 0, 'Default', ',', 'default', 1, '{VAR_DEFAULT_LANG}'),
+(3, 'k_pagine', 0, 'Default', ',', 'default', 1, '{VAR_DEFAULT_LANG}'),
+(4, 'k_shop_items', 0, 'Default', ',', 'default', 1, '{VAR_DEFAULT_LANG}');
 
 
 CREATE TABLE IF NOT EXISTS `k_commenti` (
@@ -66,19 +67,19 @@ INSERT INTO `k_config` (`idconf`, `param`, `value1`, `value2`, `ll`) VALUES
 (5, 'footer', '<p><a href="http://www.orichalcum.it">Orichalcum CMS</a> - <a href="http://www.kalamun.org">kalamun</a></p>', '<p></p>\n\n', '{VAR_DEFAULT_LANG}'),
 (6, 'google_analytics', '', '', '{VAR_DEFAULT_LANG}'),
 (7, 'template_default', 'bettino', '', '{VAR_DEFAULT_LANG}'),
-(8, 'img_size', '900', '900', '*'),
+(8, 'img_size', '1200', '900', '*'),
 (9, 'img_resize', 'all', 'inside', '*'),
 (10, 'img_quality', '100', '', '*'),
-(11, 'thumb_size', '160', '160', '*'),
+(11, 'thumb_size', '300', '300', '*'),
 (12, 'thumb_quality', '80', '', '*'),
 (13, 'thumb_resize', '', 'outside', '*'),
 (14, 'utenti_pubblici', ',', '', '{VAR_DEFAULT_LANG}'),
 (15, 'news-commenti', 's', 's', '{VAR_DEFAULT_LANG}'),
 (16, 'news', '8', ',*,', '{VAR_DEFAULT_LANG}'),
 (17, 'news-template', '', '', '{VAR_DEFAULT_LANG}'),
-(19, 'admin-page-layout', ',title,subtitle,preview,text,photogallery,documentgallery,layout,traduzioni,metadata,seo,conversion,', '', '*'),
+(19, 'admin-page-layout', ',title,subtitle,preview,featuredimage,text,photogallery,documentgallery,layout,traduzioni,metadata,seo,conversion,', '', '*'),
 (20, 'admin-editor', 'true', '', '*'),
-(21, 'admin-news-layout', ',title,subtitle,preview,text,categories,home,public,photogallery,translate,seo,', 'elenco', '*'),
+(21, 'admin-news-layout', ',title,subtitle,preview,featuredimage,text,categories,home,public,photogallery,translate,seo,', 'elenco', '*'),
 (22, 'photogallery-order', 'ordine', '', '{VAR_DEFAULT_LANG}'),
 (23, 'photogallery-template', '', '', '{VAR_DEFAULT_LANG}'),
 (24, 'admin-photogallery-layout', ',title,photogallery,text,template,', '', '*'),
@@ -89,7 +90,7 @@ INSERT INTO `k_config` (`idconf`, `param`, `value1`, `value2`, `ll`) VALUES
 (29, 'dir_news', 'blog', '', '{VAR_DEFAULT_LANG}'),
 (30, 'dir_photogallery', 'photogallery', '', '{VAR_DEFAULT_LANG}'),
 (31, 'dir_users', 'users', '', '{VAR_DEFAULT_LANG}'),
-(32, 'dir_privacy', 'privacy', '', '{VAR_DEFAULT_LANG}'),
+(32, 'dir_search', 'search', '', '{VAR_DEFAULT_LANG}'),
 (33, 'dir_feed', 'feed', '', '{VAR_DEFAULT_LANG}'),
 (34, 'shop', '8', ',*,', '{VAR_DEFAULT_LANG}'),
 (35, 'shop-order', 'ordine', '', '{VAR_DEFAULT_LANG}'),
@@ -98,22 +99,24 @@ INSERT INTO `k_config` (`idconf`, `param`, `value1`, `value2`, `ll`) VALUES
 (38, 'shop-paypal', '', '', '{VAR_DEFAULT_LANG}'),
 (39, 'shop-currency', 'EUR', '€', '{VAR_DEFAULT_LANG}'),
 (40, 'dir_shop', 'shop', '', '{VAR_DEFAULT_LANG}'),
-(41, 'admin-shop-layout', ',productcode,title,subtitle,preview,text,price,privatearea,categories,public,expiration,weight,variations,photogallery,translate,metadata,seo,ordersummary,', '', '*'),
-(42, 'shop-mail_from', '', '', '{VAR_DEFAULT_LANG}'),
-(43, 'shop-paypal-return', '', '', '{VAR_DEFAULT_LANG}'),
-(45, 'facebook', 'n', '', '{VAR_DEFAULT_LANG}'),
-(46, 'facebook-config', '', '', '{VAR_DEFAULT_LANG}'),
-(47, 'facebook-location', '', '', '{VAR_DEFAULT_LANG}'),
-(48, 'facebook-address', '', '', '{VAR_DEFAULT_LANG}'),
-(49, 'facebook-country', '', '', '{VAR_DEFAULT_LANG}'),
-(50, 'facebook-contacts', '', '', '{VAR_DEFAULT_LANG}'),
-(51, 'facebook-page', '', '', '{VAR_DEFAULT_LANG}'),
-(52, 'dir_private', 'private', '', '{VAR_DEFAULT_LANG}'),
+(41, 'dir_shop_cart', 'cart', '', '{VAR_DEFAULT_LANG}'),
+(42, 'dir_shop_manufacturers', 'manufacturers', '', '{VAR_DEFAULT_LANG}'),
+(43, 'admin-shop-layout', ',productcode,title,subtitle,featuredimage,preview,text,price,privatearea,categories,public,expiration,weight,variations,photogallery,translate,metadata,seo,ordersummary,', '', '*'),
+(44, 'shop-mail_from', '', '', '{VAR_DEFAULT_LANG}'),
+(45, 'shop-paypal-return', '', '', '{VAR_DEFAULT_LANG}'),
+(46, 'facebook', 'n', '', '{VAR_DEFAULT_LANG}'),
+(47, 'facebook-config', '', '', '{VAR_DEFAULT_LANG}'),
+(48, 'facebook-location', '', '', '{VAR_DEFAULT_LANG}'),
+(49, 'facebook-address', '', '', '{VAR_DEFAULT_LANG}'),
+(50, 'facebook-country', '', '', '{VAR_DEFAULT_LANG}'),
+(51, 'facebook-contacts', '', '', '{VAR_DEFAULT_LANG}'),
+(52, 'facebook-page', '', '', '{VAR_DEFAULT_LANG}'),
+(53, 'dir_private', 'private', '', '{VAR_DEFAULT_LANG}'),
 (54, 'shop-discount', 'never', '', '{VAR_DEFAULT_LANG}'),
-(56, 'sitename', '{VAR_SITE_NAME}', '', '{VAR_DEFAULT_LANG}'),
-(57, 'shop-virtualpay', '|', '', '{VAR_DEFAULT_LANG}'),
-(58, 'pages-commenti', 'n', 'n', '{VAR_DEFAULT_LANG}'),
-(59, 'shop-pagonline', '', '', '{VAR_DEFAULT_LANG}');
+(55, 'sitename', '{VAR_SITE_NAME}', '', '{VAR_DEFAULT_LANG}'),
+(56, 'shop-virtualpay', '|', '', '{VAR_DEFAULT_LANG}'),
+(57, 'pages-commenti', 'n', 'n', '{VAR_DEFAULT_LANG}'),
+(58, 'shop-pagonline', '', '', '{VAR_DEFAULT_LANG}');
 
 
 CREATE TABLE IF NOT EXISTS `k_conversions` (
@@ -224,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `k_ip2country2` (
   `ipfrom` int(15) NOT NULL DEFAULT '0',
   `ipto` int(15) NOT NULL DEFAULT '0',
   `ll` char(2) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 INSERT INTO `k_ip2country2` (`ipfrom`, `ipto`, `ll`) VALUES
@@ -2008,7 +2011,7 @@ CREATE TABLE IF NOT EXISTS `k_ip2country3` (
   `ipfrom` int(15) NOT NULL DEFAULT '0',
   `ipto` int(15) NOT NULL DEFAULT '0',
   `ll` char(2) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 INSERT INTO `k_ip2country3` (`ipfrom`, `ipto`, `ll`) VALUES
@@ -2932,7 +2935,7 @@ CREATE TABLE IF NOT EXISTS `k_ip2country10` (
   `ipfrom` int(15) NOT NULL DEFAULT '0',
   `ipto` int(15) NOT NULL DEFAULT '0',
   `ll` char(2) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 INSERT INTO `k_ip2country10` (`ipfrom`, `ipto`, `ll`) VALUES
@@ -27755,7 +27758,7 @@ CREATE TABLE IF NOT EXISTS `k_ip2country15` (
   `ipfrom` int(15) NOT NULL DEFAULT '0',
   `ipto` int(15) NOT NULL DEFAULT '0',
   `ll` char(2) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 INSERT INTO `k_ip2country15` (`ipfrom`, `ipto`, `ll`) VALUES
@@ -38356,7 +38359,6 @@ CREATE TABLE IF NOT EXISTS `k_log` (
 INSERT INTO `k_log` (`idlog`, `iduser`, `username`, `data`, `ll`, `type`, `descr`) VALUES
 (1, 1, '{VAR_USER_USERNAME}', NOW(), '{VAR_DEFAULT_LANG}', 'GEN', 'Orichalcum installed');
 
-CREATE TABLE IF NOT EXISTS `k_shop_manufacturers` (`idsman` int(4) NOT NULL AUTO_INCREMENT, `dir` varchar(255) NOT NULL, `name` varchar(255) NOT NULL, `subtitle` varchar(255) NOT NULL, `preview` text NOT NULL, `description` text NOT NULL, `featuredimage` int(6) NOT NULL, `created` datetime NOT NULL, `modified` datetime NOT NULL, `translations` text NOT NULL, `ll` varchar(2) NOT NULL, PRIMARY KEY (`idsman`)) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `k_media` (
   `idmedia` int(8) NOT NULL AUTO_INCREMENT,
@@ -38398,15 +38400,11 @@ CREATE TABLE IF NOT EXISTS `k_menu` (
   `label` varchar(64) DEFAULT NULL,
   `url` varchar(250) DEFAULT NULL,
   `ref` int(2) NOT NULL,
-  `photogallery` VARCHAR(255) NOT NULL DEFAULT ',',
+  `photogallery` varchar(255) NOT NULL DEFAULT ',',
   `ll` varchar(2) DEFAULT NULL,
   `ordine` int(2) NOT NULL,
   PRIMARY KEY (`idmenu`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
-
---
--- Dumping data for table `k_menu`
---
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `k_menu` (`idmenu`, `collection`, `label`, `url`, `ref`, `ll`, `ordine`) VALUES
 (1, '', 'Home', 'index.html', 0, '{VAR_DEFAULT_LANG}', 1),
@@ -38428,27 +38426,28 @@ CREATE TABLE IF NOT EXISTS `k_metadata` (
 CREATE TABLE IF NOT EXISTS `k_news` (
   `idnews` int(5) NOT NULL AUTO_INCREMENT,
   `iduser` int(6) NOT NULL,
-  `titolo` varchar(250) DEFAULT NULL,
-  `anteprima` text,
-  `testo` text,
-  `sottotitolo` varchar(250) DEFAULT NULL,
+  `titolo` varchar(250) NOT NULL,
+  `anteprima` text NOT NULL,
+  `testo` text NOT NULL,
+  `sottotitolo` varchar(250) NOT NULL,
   `data` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `pubblica` datetime NOT NULL,
   `starting_date` datetime NOT NULL,
   `scadenza` datetime NOT NULL,
   `modified` datetime NOT NULL,
   `allowcomments` enum('s','n') NOT NULL,
-  `featuredimage` INT( 6 ) NOT NULL,
+  `featuredimage` int(6) NOT NULL,
+  `photogallery` text NOT NULL,
   `home` enum('s','n') NOT NULL DEFAULT 's',
   `calendario` enum('s','n') NOT NULL DEFAULT 's',
-  `template` varchar(255) NOT NULL,
+  `template` varchar(64) NOT NULL,
   `layout` varchar(64) NOT NULL,
   `traduzioni` text NOT NULL,
-  `categorie` varchar(32) DEFAULT NULL,
-  `dir` varchar(64) DEFAULT NULL,
-  `ll` varchar(2) DEFAULT NULL,
+  `categorie` varchar(32) NOT NULL,
+  `dir` varchar(64) NOT NULL,
+  `ll` varchar(2) NOT NULL DEFAULT 'IT',
   PRIMARY KEY (`idnews`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `k_newsletter` (
@@ -38491,37 +38490,42 @@ CREATE TABLE IF NOT EXISTS `k_pagine` (
   `sottotitolo` mediumtext NOT NULL,
   `anteprima` text,
   `testo` text,
+  `photogallery` text NOT NULL,
   `ll` varchar(2) DEFAULT NULL,
   `dir` varchar(64) DEFAULT NULL,
   `riservata` enum('s','n') NOT NULL DEFAULT 'n',
   `categorie` varchar(255) NOT NULL,
   `allowcomments` enum('s','n') NOT NULL DEFAULT 'n',
   `allowconversions` tinyint(1) NOT NULL DEFAULT '0',
-  `featuredimage` INT( 6 ) NOT NULL,
+  `featuredimage` int(6) NOT NULL,
   `template` varchar(250) DEFAULT NULL,
   `layout` varchar(64) NOT NULL,
   `traduzioni` text,
   PRIMARY KEY (`idpag`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 
-INSERT INTO `k_pagine` (`idpag`, `created`, `modified`, `titolo`, `sottotitolo`, `anteprima`, `testo`, `ll`, `dir`, `riservata`, `categorie`, `allowcomments`, `allowconversions`, `template`, `layout`, `traduzioni`) VALUES
-(1, NOW(), NOW(), 'Home Page', '', '', 'Write <a href="admin">/admin</a> to enter into your control panel', '{VAR_DEFAULT_LANG}', 'index.html', 'n', ',,', 'n', 0, '', '', 'IT=1|');
+INSERT INTO `k_pagine` (`idpag`, `created`, `modified`, `titolo`, `sottotitolo`, `anteprima`, `testo`, `photogallery`, `ll`, `dir`, `riservata`, `categorie`, `allowcomments`, `allowconversions`, `featuredimage`, `template`, `layout`, `traduzioni`) VALUES
+(1, NOW(), NOW(), 'Home Page', '', '', 'Write <a href="admin">/admin</a> to enter into your control panel', ',', '{VAR_DEFAULT_LANG}', 'index.html', 'n', ',,', 'n', 0, 0, '', '', '{VAR_DEFAULT_LANG}=1|');
 
 
 CREATE TABLE IF NOT EXISTS `k_photogallery` (
   `idphg` int(6) NOT NULL AUTO_INCREMENT,
   `data` date NOT NULL,
+  `modified` datetime NOT NULL,
   `titolo` varchar(250) DEFAULT NULL,
   `testo` text,
   `dir` varchar(64) NOT NULL,
+  `featuredimage` int(6) NOT NULL,
+  `photogallery` text NOT NULL,
+  `categories` varchar(255) NOT NULL,
   `template` varchar(64) NOT NULL,
   `layout` varchar(64) NOT NULL,
   `traduzioni` text NOT NULL,
   `ordine` int(3) NOT NULL,
   `ll` varchar(2) NOT NULL,
   PRIMARY KEY (`idphg`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `k_private` (
@@ -38552,7 +38556,7 @@ CREATE TABLE IF NOT EXISTS `k_shop_coupons` (
   `starting_date` datetime NOT NULL,
   `expiration_date` datetime NOT NULL,
   PRIMARY KEY (`idscoup`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
 
 CREATE TABLE IF NOT EXISTS `k_shop_coupons_codes` (
@@ -38561,7 +38565,7 @@ CREATE TABLE IF NOT EXISTS `k_shop_coupons_codes` (
   `code` varchar(32) DEFAULT '',
   `valid` tinyint(1) NOT NULL,
   PRIMARY KEY (`idscode`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
 
 CREATE TABLE IF NOT EXISTS `k_shop_customfields` (
@@ -38572,7 +38576,7 @@ CREATE TABLE IF NOT EXISTS `k_shop_customfields` (
   `categories` varchar(255) DEFAULT '',
   `order` int(8) NOT NULL,
   PRIMARY KEY (`idsfield`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
 
 
 CREATE TABLE IF NOT EXISTS `k_shop_deliverers` (
@@ -38595,15 +38599,16 @@ CREATE TABLE IF NOT EXISTS `k_shop_del_prices` (
 
 CREATE TABLE IF NOT EXISTS `k_shop_items` (
   `idsitem` int(11) NOT NULL AUTO_INCREMENT,
-  `online` enum('y','n') NOT NULL DEFAULT 'n',
-  `dir` varchar(128) DEFAULT '',
-  `categorie` varchar(255) DEFAULT '',
-  `productcode` varchar(64) DEFAULT '',
-  `titolo` varchar(255) DEFAULT '',
-  `sottotitolo` varchar(255) DEFAULT '',
+  `online` enum('y','n') DEFAULT 'n',
+  `dir` varchar(128) DEFAULT NULL,
+  `categorie` varchar(255) DEFAULT NULL,
+  `productcode` varchar(64) DEFAULT NULL,
+  `titolo` varchar(255) DEFAULT NULL,
+  `sottotitolo` varchar(255) DEFAULT NULL,
   `anteprima` text,
   `testo` text,
-  `featuredimage` INT( 6 ) NOT NULL,
+  `featuredimage` int(6) NOT NULL,
+  `photogallery` text NOT NULL,
   `prezzo` decimal(8,2) NOT NULL,
   `scontato` decimal(6,2) NOT NULL,
   `created` datetime NOT NULL,
@@ -38616,13 +38621,31 @@ CREATE TABLE IF NOT EXISTS `k_shop_items` (
   `rating` decimal(8,1) NOT NULL DEFAULT '0.0',
   `votes` int(8) NOT NULL DEFAULT '0',
   `customfields` text,
-  `manufacturer` INT( 6 ) NOT NULL,
-  `layout` varchar(255) DEFAULT '',
+  `manufacturer` int(6) NOT NULL,
+  `layout` varchar(255) DEFAULT NULL,
   `ordine` int(8) NOT NULL,
   `traduzioni` text,
-  `ll` varchar(2) DEFAULT '',
-  PRIMARY KEY (`idsitem`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+  `ll` varchar(2) DEFAULT NULL,
+  PRIMARY KEY (`idsitem`),
+  UNIQUE KEY `dir` (`dir`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `k_shop_manufacturers` (
+  `idsman` int(4) NOT NULL AUTO_INCREMENT,
+  `dir` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `subtitle` varchar(255) NOT NULL,
+  `preview` text NOT NULL,
+  `description` text NOT NULL,
+  `featuredimage` int(6) NOT NULL,
+  `photogallery` text NOT NULL,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  `translations` text NOT NULL,
+  `ll` varchar(2) NOT NULL,
+  PRIMARY KEY (`idsman`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `k_shop_orders` (
@@ -38695,7 +38718,7 @@ CREATE TABLE IF NOT EXISTS `k_shop_variations` (
   `default` tinyint(1) NOT NULL DEFAULT '0',
   `order` int(3) NOT NULL,
   PRIMARY KEY (`idsvar`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
 
 CREATE TABLE IF NOT EXISTS `k_shorturl` (
@@ -38730,6 +38753,15 @@ CREATE TABLE IF NOT EXISTS `k_stats_archive` (
   `ll` varchar(2) DEFAULT '',
   PRIMARY KEY (`idlog`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+
+
+CREATE TABLE IF NOT EXISTS `k_stats_summary` (
+  `family` varchar(16) NOT NULL,
+  `type` varchar(16) NOT NULL,
+  `reference` varchar(32) NOT NULL,
+  `count` int(6) NOT NULL,
+  `data` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `k_users` (
