@@ -45,9 +45,27 @@ class kEmails {
 		return $this->$var;
 	}
 
-	public function send($from,$to,$subject,$message,$template="",$idarch=0)
+	public function send($from,$to,$subject,$message,$template="",$idarch=0,$replacements=array())
 	{
 		if(!$this->inited) $this->init();
+		
+		/*
+		REPLACEMENTS keys must corresponds to $to keys
+		eg:
+		$to = array( "info@google.com" , "Roberto Pasini <info@kalamun.org>" );
+		$replacements = array(
+				array(
+					"DESCRIPTION" => "Google",
+					"PASSWORD" => "foobar",
+					"AFFILIATION" => "customers"
+					),
+				array(
+					"DESCRIPTION" => "myself",
+					"PASSWORD" => "spritz",
+					"AFFILIATION" => "selfreferences"
+					)
+			);
+		*/
 		
 		if(empty($to)) return false;
 		if(!is_array($to)) $to=array($to);
@@ -67,9 +85,25 @@ class kEmails {
 
 				$this->uid='*|UID|*';
 				$composition=$this->preview($from,'*|NAME|* <*|EMAIL|*>',$subject,$message,$template,$this->uid);
-				
-				//$composition
 
+				// replace Orichalcum-style placeholders with mailchimp-style placeholders
+				foreach($replacements as $replacement)
+				{
+					foreach($replacement as $n=>$v)
+					{
+						$composition['html']=str_replace('{'.$n.'}','*|'.$n.'|*',$composition['html']);
+						$composition['plain']=str_replace('{'.$n.'}','*|'.$n.'|*',$composition['plain']);
+						$this->subject=str_replace('{'.$n.'}','*|'.$n.'|*',$this->subject);
+					}
+				}
+				$composition['html']=str_replace('{NAME}','*|NAME|*',$composition['html']);
+				$composition['html']=str_replace('{EMAIL}','*|EMAIL|*',$composition['html']);
+				$composition['plain']=str_replace('{NAME}','*|NAME|*',$composition['plain']);
+				$composition['plain']=str_replace('{EMAIL}','*|EMAIL|*',$composition['plain']);
+				$this->subject=str_replace('{NAME}','*|NAME|*',$this->subject);
+				$this->subject=str_replace('{EMAIL}','*|EMAIL|*',$this->subject);
+				
+				// split "from" in "name" and "mail address"
 				$fromname=ADMIN_NAME;
 				$frommail=ADMIN_MAIL;
 				$from=explode("<",$from);
@@ -85,7 +119,7 @@ class kEmails {
 				$recipients=array();
 				$mergevars=array();
 				
-				foreach($to as $t)
+				foreach($to as $k=>$t)
 				{
 					$toname="";
 					$tomail="";
@@ -122,7 +156,18 @@ class kEmails {
 								)
 							)
 						);
-
+					
+					// add mergevars passed by input array $replacements
+					if(!empty($replacements[$k]) && is_array($replacements[$k]))
+					{
+						foreach($replacements[$k] as $n=>$v)
+						{
+							$mergevars[count($mergevars)-1]['vars'][]=array(
+								'name' => $n,
+								'content' => $v
+								);
+						}
+					}
 				}
 
 
@@ -151,7 +196,7 @@ class kEmails {
 					'merge_language' => 'mailchimp',
 					'global_merge_vars' => array(),
 					'merge_vars' => $mergevars,
-					'tags' => array(),
+					'tags' => array('idarch'.$idarch),
 					'subaccount' => null,
 					'google_analytics_domains' => array(),
 					'google_analytics_campaign' => '',
@@ -193,13 +238,20 @@ class kEmails {
 						}
 						
 						$msg=array();
-						$composition['subject']=$subject;
-						foreach( array('html','plain','subject') as $k)
+						$composition['subject']=$this->subject;
+						foreach( array('html','plain','subject') as $part)
 						{
-							$msg[$k]=$composition[$k];
-							$msg[$k]=str_replace("*|NAME|*",$name,$msg[$k]);
-							$msg[$k]=str_replace("*|EMAIL|*",$email,$msg[$k]);
-							$msg[$k]=str_replace("*|UID|*",$uid,$msg[$k]);
+							$msg[$part]=$composition[$part];
+							$msg[$part]=str_replace("*|NAME|*",$name,$msg[$part]);
+							$msg[$part]=str_replace("*|EMAIL|*",$email,$msg[$part]);
+							$msg[$part]=str_replace("*|UID|*",$uid,$msg[$part]);
+							if(!empty($replacements[$k]) && is_array($replacements[$k]))
+							{
+								foreach($replacements[$k] as $n=>$v)
+								{
+									$msg[$part]=str_replace("*|".$n."|*",$v,$msg[$part]);
+								}
+							}
 						}
 						
 						$this->archiveMail($uid,$this->from,$r['email'],$msg['subject'],$composition['headers'],$msg['html'],$msg['plain'],$idarch);
@@ -210,11 +262,39 @@ class kEmails {
 		} else {
 		
 			/* sent each e-mail separately */
-			foreach($this->to as $to)
+			foreach($this->to as $k=>$to)
 			{
 				$this->uid=$this->generateUID();
+				
+				// replace mergevars
+				$msg=$message;
+				$sbj=$subject;
+				if(!empty($replacements[$k]) && is_array($replacements[$k]))
+				{
+					foreach($replacements[$k] as $n=>$v)
+					{
+						$msg=str_replace("{".$n."}",$v,$msg);
+						$sbj=str_replace("{".$n."}",$v,$sbj);
+					}
+				}
+				$toname="";
+				$tomail="";
+				$t=explode("<",$to);
+				if(isset($t[1]) && trim($t[1]," <>")!="")
+				{
+					$toname=trim($t[0]);
+					$tomail=trim($t[1]," <>");
+				} else {
+					$toname=trim($t[0]," <>");
+					$tomail=trim($t[0]," <>");
+				}
+				$msg=str_replace("{NAME}",$toname,$msg);
+				$msg=str_replace("{EMAIL}",$tomail,$msg);
+				$sbj=str_replace("{NAME}",$toname,$sbj);
+				$sbj=str_replace("{EMAIL}",$tomail,$sbj);
 
-				$composition=$this->preview($from,$to,$subject,$message,$template,$this->uid);
+
+				$composition=$this->preview($from,$to,$sbj,$msg,$template,$this->uid);
 
 				$sent=false;
 				if($this->method=="")
@@ -288,7 +368,7 @@ class kEmails {
 
 				if($sent==true)
 				{
-					if($this->log=="true") $this->archiveMail($this->uid,$this->from,$to,$subject,$composition['headers'],$composition['html'],$composition['plain'],$idarch);
+					if($this->log=="true") $this->archiveMail($this->uid,$this->from,$to,$sbj,$composition['headers'],$composition['html'],$composition['plain'],$idarch);
 				} else $output=false;
 			}
 		}
