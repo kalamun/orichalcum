@@ -425,8 +425,8 @@ class kEmails {
 		$composition['message'].="\n".$composition['chunked-plain']."\n\n";
 		$composition['message'].="--".$boundary_main."\n";
 		$composition['message'].="Content-Type: text/html; charset=\"utf-8\"\n";
-		$composition['message'].="Content-Transfer-Encoding: quoted-printable\n";
-		$composition['message'].="\n".$composition['chunked-html'];
+		$composition['message'].="Content-Transfer-Encoding: 7bit\n";
+		$composition['message'].="\n".$composition['html'];
 		$composition['message'].="\n\n--".$boundary_main."--\n\n";
 
 		return $composition;
