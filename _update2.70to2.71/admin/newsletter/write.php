@@ -11,7 +11,8 @@ $kaNewsletter=new kaNewsletter();
 
 
 /* ACTIONS */
-if(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['message']!="") {
+if(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['message']!="")
+{
 	$log="";
 
 	$config=$kaNewsletter->getConfig();
@@ -42,7 +43,8 @@ if(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['message']!="") {
 	//save all e-mails of selected lists in the mail queue
 	if($idarch==false) $log=$kaTranslate->translate('Newsletter:Error while archiving message. No e-mail sent');
 	else {
-		foreach($recipients as $member) {
+		foreach($recipients as $member)
+		{
 			$vars['idarch']=$idarch;
 
 			$vars['to']=$member['name'].' <'.$member['email'].'>';
@@ -58,38 +60,45 @@ if(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['message']!="") {
 			$vars['mergevars']['EXPIRATION']=$member['expiration'];
 			$vars['mergevars']['AFFILIATION']=$member['affiliation'];
 			
-			/*$vars['message']=str_replace("{NAME}",$member['name'],$vars['message']);
-			$vars['message']=str_replace("{EMAIL}",$member['email'],$vars['message']);
-			$vars['message']=str_replace("{USERNAME}",$member['username'],$vars['message']);
-			$vars['message']=str_replace("{PASSWORD}",$member['password'],$vars['message']);
-			$vars['message']=str_replace("{AFFILIATION}",$member['affiliation'],$vars['message']);
-			$vars['message']=str_replace("{EXPIRATION}",$member['expiration'],$vars['message']);*/
-
 			$kaNewsletter->addToQueue($vars);
-			}
 		}
-	if($log!="") {
+	}
+
+	if($log!="")
+	{
 		echo '<div id="MsgAlert">'.$kaTranslate->translate($log).'</div>';
 		$kaLog->add("ERR",'Newsletter: Error while sending e-mail (archiviation)');
-		}
-	else {
+	} else {
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:E-mail added to queue').'</div>';
 		$kaLog->add("INS",'Newsletter: New e-mail added to queue. Subject: <em>'.$mail['subject'].'</em>');
 		$queueCount=$kaNewsletter->getQueueCount();
 		?><script type="text/javascript">processQueue();</script><?php 
-		}
-
 	}
 
+} elseif(isset($_POST['savedraft'])) {
+	$kaImpostazioni->setParam("email_draft",$_POST['subject'],$_POST['message'],"--");
+	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:Draft successfully saved').'</div>';
+	
+} elseif(isset($_POST['loaddraft'])) {
+	$_POST['subject']=$kaImpostazioni->getVar('email_draft',1,"--");
+	$_POST['message']=$kaImpostazioni->getVar('email_draft',2,"--");
+
+} elseif(isset($_POST['deletedraft'])) {
+	$kaImpostazioni->setParam("email_draft","","","--");
+	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:Draft successfully deleted').'</div>';
+	
+}
 
 /* ACTIONS END */
 
-if(isset($_GET['import'])) {
+
+if(isset($_GET['import']))
+{
 	$arch=$kaNewsletter->getFromArchive(array("idarch"=>$_GET['import']));
 	$_POST['subject']=$arch['titolo'];
 	$_POST['message']=$arch['testo'];
 	$_POST['template']=$arch['template'];
-	}
+}
 if(!isset($_POST['subject'])) $_POST['subject']="";
 if(!isset($_POST['message'])) $_POST['message']="";
 if(!isset($_POST['template'])) $_POST['template']="";
@@ -158,7 +167,17 @@ if($queueCount>0&&!(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['messag
 	<div class="submit">
 		<input type="button" value="<?= $kaTranslate->translate('Newsletter:Preview'); ?>" onclick="openPreviewPopup();" class="button" />
 		<input type="submit" name="send" onclick="processQueue();" value="<?= $kaTranslate->translate('Newsletter:Send newsletter'); ?>" class="button" />
-		</div>
+	</div>
+	<div class="note">
+		<input type="submit" name="savedraft" value="<?= htmlentities($kaTranslate->translate('Newsletter:Save draft')); ?>" class="smallbutton">
+
+		<?php
+		if($kaImpostazioni->getVar("email_draft",2,"--")!="" || $kaImpostazioni->getVar("email_draft",1,"--")!="") { ?>
+			<input type="submit" name="loaddraft" value="<?= htmlentities($kaTranslate->translate('Newsletter:Load draft')); ?>" class="smallbutton" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Newsletter:Loading draft you will overwrite current contents: do you want to proceed?')); ?>');">
+			<input type="submit" name="deletedraft" value="<?= htmlentities($kaTranslate->translate('Newsletter:Delete draft')); ?>" class="smallalertbutton" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Newsletter:Do you really want to delete saved draft?')); ?>');">
+		<?php }
+		?>
+	</div>
 
 </form>
 
