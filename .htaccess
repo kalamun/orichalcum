@@ -1,4 +1,6 @@
 # Bettino CMS #
+AddDefaultCharset UTF-8
+
 # deny directory listing #
 Options -Indexes
 
