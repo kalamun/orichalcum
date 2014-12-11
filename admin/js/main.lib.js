@@ -1727,6 +1727,10 @@ function kCreateThumbnailIntoPhotogallery(image)
 	img.style.backgroundImage="url('"+image.dir+encodeURIComponent(image.thumbnail)+"')";
 	imgc.appendChild(img);
 	
+	var caption=document.createElement('H3');
+	caption.appendChild(document.createTextNode(image.image));
+	imgc.appendChild(caption);
+	
 	var remove=document.createElement('DIV');
 	remove.setAttribute("class","remove");
 	remove.setAttribute("id","remove"+c.childNodes.length+1);

@@ -664,6 +664,23 @@ h3 {
 	cursor:grab;
 	transition:opacity .3s linear;
 	}
+#photogallery .imagecontainer h3 {
+	position:absolute;
+	font-size:.8em;
+	bottom:10px;
+	left:10px;
+	right:10px;
+	padding:5px;
+	background:#000;
+	color:#fff;
+	text-align:center;
+	word-wrap:break-word;
+	display:none;
+	cursor:pointer;
+	}
+#photogallery .imagecontainer:hover h3 {
+	display:block;
+	}
 #photogallery .imagecontainer .edit {
 	position:absolute;
 	font-size:.8em;
