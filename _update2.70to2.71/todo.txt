@@ -1,0 +1,2 @@
+ALTER TABLE `monvoyagedurable_com`.`k_shop_items` DROP INDEX `dir` , ADD INDEX `dir` ( `dir` ) 
+ALTER TABLE `monvoyagedurable_com`.`k_news` DROP INDEX `dir` , ADD INDEX `dir` ( `dir` ) 
