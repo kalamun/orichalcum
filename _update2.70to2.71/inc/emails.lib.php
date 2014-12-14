@@ -26,6 +26,7 @@ class kEmails {
 		$this->footer=$GLOBALS['__template']->getVar('newsletter_footer',1);
 		
 		$this->method=$GLOBALS['__template']->getVar('email_method',1);
+		$this->log=$GLOBALS['__template']->getVar('email_log',1);
 		$this->smtp=array();
 		$this->mandrill=array();
 		if($this->method=="smtp")
