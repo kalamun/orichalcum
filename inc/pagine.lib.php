@@ -230,7 +230,6 @@ class kPages {
 	{
 		if(!$this->inited) $this->init();
 
-		if(!isset($vars['ll'])) $vars['ll']= isset($_GET['lang']) ? strtoupper($_GET['lang']) : $_SESSION['ll'];
 		if(!isset($vars['photogallery'])) $vars['photogallery']=true;
 		if(!isset($vars['documentgallery'])) $vars['documentgallery']=true;
 		if(!isset($vars['comments'])) $vars['comments']=true;
@@ -309,7 +308,7 @@ class kPages {
 			}
 		}
 		
-		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI($vars['ll']).$row['dir'];
+		$output['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI($row['ll']).$row['dir'];
 
 		$output['categorie']=array();
 		if(strpos(kGetVar('admin-page-layout',1),",categories,")!==false)
