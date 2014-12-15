@@ -1,0 +1,16 @@
+//LOG
+Log:Activity log				Activity log
+Log:E-mail archive				E-mail archive
+Log:Control-panel activity		Control-panel activity
+Log:Date						Date
+Log:Read on						Read on
+Log:Not read yet				Not read yet
+Log:To							Recipient
+Log:From						From
+Log:Keywords					Keywords
+Log:View e-mail					View e-mail
+Log:Subject						Subject
+Log:Apply						Apply
+Log:Sent on						Sent on
+Log:Filters						Filters
+Log:Apply filters				Apply filters
