@@ -316,7 +316,7 @@ function kGetTitle()
 		elseif(kHaveShop()) $metadata=$GLOBALS['__shop']->getMetadata();
 		else return strip_tags($GLOBALS['__template']->getMenuCrumbs());
 
-		if(trim($metadata['seo_title'])) return $metadata['seo_title'];
+		if(!empty($metadata['seo_title'])) return $metadata['seo_title'];
 		else return $metadata['titolo'];
 	}
 }
@@ -336,16 +336,11 @@ function kGetSeoMetadata($dir=null,$ll=null)
 	$seometadata['robots']=kGetVar('seo_robots',1,$ll);
 	$seometadata['seo_canonical']="";
 	$seometadata['featuredimage']=array();
-	if($GLOBALS['__pages']->pageExists($dir,$ll))
-{ $metadata=$GLOBALS['__pages']->getMetadata($dir); }
-	elseif($GLOBALS['__news']->newsExists($dir,$ll))
-{ $metadata=$GLOBALS['__news']->getMetadata($dir); }
-	elseif($GLOBALS['__photogallery']->photogalleryExists($dir))
-{ $metadata=$GLOBALS['__photogallery']->getMetadata($dir,$ll); }
-	elseif($GLOBALS['__shop']->shopItemExists($dir))
-{ $metadata=$GLOBALS['__shop']->getMetadata($dir,$ll); }
-	elseif($GLOBALS['__shop']->shopManufacturerExists($dir))
-{ $metadata=$GLOBALS['__shop']->getManufacturerMetadata($dir,$ll); }
+	if($GLOBALS['__pages']->pageExists($dir,$ll)) $metadata=$GLOBALS['__pages']->getMetadata($dir);
+	elseif($GLOBALS['__news']->newsExists($dir,$ll)) $metadata=$GLOBALS['__news']->getMetadata($dir);
+	elseif($GLOBALS['__photogallery']->photogalleryExists($dir)) $metadata=$GLOBALS['__photogallery']->getMetadata($dir,$ll);
+	elseif($GLOBALS['__shop']->shopItemExists($dir)) $metadata=$GLOBALS['__shop']->getMetadata($dir,$ll);
+	elseif($GLOBALS['__shop']->shopManufacturerExists($dir)) $metadata=$GLOBALS['__shop']->getManufacturerMetadata($dir,$ll);
 	if(isset($metadata['seo_title'])&&$metadata['seo_title']!="") $seometadata['title']=$metadata['seo_title'];
 	if(isset($metadata['seo_description'])&&$metadata['seo_description']!="") $seometadata['description']=$metadata['seo_description'];
 	if(isset($metadata['seo_keywords'])&&$metadata['seo_keywords']!="") $seometadata['keywords']=$metadata['seo_keywords'];
