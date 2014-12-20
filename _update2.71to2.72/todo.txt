@@ -1,0 +1,2 @@
+ALTER TABLE `k_users` ADD `featuredimage` INT NOT NULL AFTER `permissions` 
+ALTER TABLE `k_news` ADD `online` ENUM( 'y', 'n' ) NOT NULL AFTER `idnews` 
