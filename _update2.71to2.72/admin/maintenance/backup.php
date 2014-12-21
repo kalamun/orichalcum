@@ -75,7 +75,7 @@ elseif(isset($_GET['backupnow']))
 
 			// export database
 			exec('mysqldump --user='.$__db['user'].' --password='.$__db['password'].' --host='.$__db['host'].' --extended-insert=false '.$__db['name'],$return);
-			file_put_contents($mysqldump,"-- ORICHALCUM ".SW_VERSION." (".date("d-m-Y H:i").")\n\n");
+			file_put_contents($mysqldump,"-- ORICHALCUM ".SW_VERSION." (".date("d-m-Y H:i").")\n\n".implode("\n",$return));
 
 			$zip->addFile($mysqldump,basename($mysqldump));
 		}
