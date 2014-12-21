@@ -559,7 +559,12 @@ function kGetMenuId()
 
 function kGetFooter()
 {
-	return kGetVar('footer',1);
+	$kText=new kText();
+	$footer=kGetVar('footer',1);
+	$footer=$kText->formatText($footer);
+	list($footer,$trash)=$kText->embedImg($footer);
+	list($footer,$trash)=$kText->embedDocs($footer);
+	return $footer;
 }
 
 function kGetCopyright()
