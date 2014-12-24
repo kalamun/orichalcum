@@ -22,7 +22,8 @@ class kImages {
 		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
 			$output[$i]=$row;
-			if($row['filename']!=""||$output[$i]['hotlink']=="") {
+			if($row['filename']!=""||$output[$i]['hotlink']=="")
+			{
 				$row['filename']=str_replace(" ","%20",$row['filename']);
 				$row['filename']=str_replace("#","%23",$row['filename']);
 				$row['filename']=str_replace("&","%26",$row['filename']);
@@ -31,16 +32,15 @@ class kImages {
 				$row['filename']=str_replace("@","%40",$row['filename']);
 				$output[$i]['url']=SITE_URL.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'];
 				$output[$i]['hotlink']=false;
-				if($output[$i]['filename']!=""&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['filename'])) $size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['filename']);
+				if($output[$i]['filename']!="" && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['filename'])) $size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['filename']);
 				else $size=array(0,0,0,"");
-				}
-			else {
+			} else {
 				$output[$i]['filename']=basename($row['hotlink']);
 				$output[$i]['url']=$row['hotlink'];
 				$output[$i]['hotlink']=true;
-				if($output[$i]['filename']!=""&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['filename'])) $size=getimagesize($row['hotlink']);
+				if($output[$i]['filename']!="" && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output[$i]['filename'])) $size=getimagesize($row['hotlink']);
 				else $size=array(0,0,0,"");
-				}
+			}
 			$output[$i]['width']=$size[0];
 			$output[$i]['height']=$size[1];
 			$row['thumbnail']=str_replace(" ","%20",$row['thumbnail']);
@@ -79,25 +79,30 @@ class kImages {
 		if(!isset($row['idimg'])) return false;
 
 		$output=$row;
-		if($row['filename']!=""||$output['hotlink']=="") {
+		if($row['filename']!=""||$output['hotlink']=="")
+		{
 			$row['filename']=str_replace(" ","%20",$row['filename']);
 			$row['filename']=str_replace("#","%23",$row['filename']);
 			$row['filename']=str_replace("&","%26",$row['filename']);
 			$row['filename']=str_replace("/","%2F",$row['filename']);
 			$row['filename']=str_replace("?","%3F",$row['filename']);
 			$row['filename']=str_replace("@","%40",$row['filename']);
-			$output['url']=SITE_URL.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'];
 			$output['hotlink']=false;
 			if($output['filename']!=""&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename'])) $size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename']);
 			else $size=array(0,0,0,"");
-			}
-		else {
+			
+			// if mobile version is active and mobile alternative exists
+			if(kGetVar('img_mobile',1,'*')=="y" && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/m_'.$output['filename']) && kIsMobile()) $output['filename']='m_'.$output['filename'];
+print_r($output['filename']);
+			$output['url']=SITE_URL.BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename'];
+
+		} else {
 			$output['filename']=basename($row['hotlink']);
 			$output['url']=$row['hotlink'];
 			$output['hotlink']=true;
-			if($output['filename']!=""&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename'])) $size=getimagesize($row['hotlink']);
+			if($output['filename']!="") $size=getimagesize($row['hotlink']);
 			else $size=array(0,0,0,"");
-			}
+		}
 		$output['width']=$size[0];
 		$output['height']=$size[1];
 		$row['thumbnail']=str_replace(" ","%20",$row['thumbnail']);

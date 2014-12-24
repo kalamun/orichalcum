@@ -88,3 +88,22 @@ Setup:Username										Username
 Setup:Password										Password
 Setup:Welcome page									Page d'accueil
 Setup:Welcome page setup							Configuration de la page d'accueil
+
+Setup:Automatic image resize settings				Réglages automatiques de redimensionnement d'image
+Setup:Well done! Successfully saved					Bravo! Enregistrée avec succès
+Setup:Container size								Taille du cadre
+Setup:Width											Largeur
+Setup:Height										Hauteur
+Setup:Quality										Qualité
+Setup:Resize options								Options de redimensionnement
+Setup:Resize all the images							Redimensionner toutes les images
+Setup:Resize only bigger images						Redimensionner des images plus grandes que
+Setup:Resize only smaller images					Redimensionner des images plus petites que
+Setup:Never resize									Jamais redimensionner
+Setup:Inside the container							A l'intérieur du cadre
+Setup:Outside the container							En dehors du cadre
+Setup:Stretch image to fit the container			Étire l'image pour l'adapter à le cadre
+Setup:Serve a reduced version to mobile devices		Servir une version réduite dans les appareils mobiles
+Setup:Ratio											Rapport
+Setup:Thumbnail										Miniature
+Setup:Thumbnails									Miniatures

@@ -91,7 +91,7 @@ Setup:Welcome page setup							Impostazioni della pagina di benvenuto
 
 Setup:Automatic image resize settings				Impostazioni di ridimensionamento automatico delle immagini
 Setup:Well done! Successfully saved					Evviva! Impostazioni salvate
-Setup:Container size								Dimensione del cornice
+Setup:Container size								Dimensione della cornice
 Setup:Width											Larghezza
 Setup:Height										Altezza
 Setup:Quality										Qualità

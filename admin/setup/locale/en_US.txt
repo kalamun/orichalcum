@@ -88,3 +88,22 @@ Setup:Username										Username
 Setup:Password										Password
 Setup:Welcome page									Welcome page
 Setup:Welcome page setup							Welcome page setup
+
+Setup:Automatic image resize settings				Automatic image resize settings
+Setup:Well done! Successfully saved					Well done! Successfully saved
+Setup:Container size								Container size
+Setup:Width											Width
+Setup:Height										Height
+Setup:Quality										Quality
+Setup:Resize options								Resize options
+Setup:Resize all the images							Resize all the images
+Setup:Resize only bigger images						Resize only bigger images
+Setup:Resize only smaller images					Resize only smaller images
+Setup:Never resize									Never resize
+Setup:Inside the container							Inside the container
+Setup:Outside the container							Outside the container
+Setup:Stretch image to fit the container			Stretch image to fit the container
+Setup:Serve a reduced version to mobile devices		Serve a reduced version to mobile devices
+Setup:Ratio											Ratio
+Setup:Thumbnail										Thumbnail
+Setup:Thumbnails									Thumbnails
