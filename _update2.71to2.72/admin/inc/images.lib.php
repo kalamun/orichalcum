@@ -208,7 +208,6 @@ class kaImages {
 		{
 			$mfile = BASERELDIR.DIR_IMG.$idimg.'/m_'.$filename;
 			copy($ofile, $mfile);
-			$this->mobile['ratio'];
 			$this->mobile['width'] = intval($this->img['width'] / 100 * $this->mobile['ratio']);
 			$this->mobile['height'] = intval($this->img['height'] / 100 * $this->mobile['ratio']);
 			$this->mobile['quality'] = intval($this->img['quality'] / 100 * ($this->mobile['ratio'] + ((100 - $this->mobile['ratio']) / 2)));
@@ -275,54 +274,77 @@ class kaImages {
 		return true;
 		}
 
-	function updateImage($idimg,$file,$filename,$resize=true,$width=0,$height=0) {
-		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
-
+	function updateImage($idimg,$file,$filename,$resize=true,$width=0,$height=0)
+	{
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
-		if($filename!=""&&substr(strtolower($filename),-4)!='.php'&&substr(strtolower($filename),-4)!='.php3') { //aggiornamento dell'alt e dell'immagine
-			$query="SELECT filename FROM ".TABLE_IMG." WHERE idimg=".$idimg;
+		if($filename!="" && substr(strtolower($filename),-4)!='.php' && substr(strtolower($filename),-4)!='.php3')
+		{
+			$query="SELECT `filename` FROM ".TABLE_IMG." WHERE `idimg`=".$idimg;
 			$results=ksql_query($query);
 			$row=ksql_fetch_array($results);
-			$query="UPDATE ".TABLE_IMG." SET filename='".addslashes($filename)."',hotlink='' WHERE idimg=".$idimg;
+			$query="UPDATE `".TABLE_IMG."` SET `filename`='".addslashes($filename)."',hotlink='' WHERE idimg=".$idimg;
 			if(!ksql_query($query)) return false;
-			
-			//copio nella dir assegnata
-			if(!file_exists(BASERELDIR.DIR_IMG.$idimg)) mkdir(BASERELDIR.DIR_IMG.$idimg);
-			if(!copy($file,BASERELDIR.DIR_IMG.$idimg.'/'.$filename)) return false;
-			if($filename!=$row['filename']) @unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename']); //elimino la vecchia immagine
 
-			if($resize==true) {
+			$ffile=BASERELDIR.DIR_IMG.$idimg.'/'.$filename;
+			$mfile=BASERELDIR.DIR_IMG.$idimg.'/m_'.$filename;
+			$ofile=BASERELDIR.DIR_IMG.$idimg.'/-originalsize';
+			
+			// copy image into the right dir
+			if(!file_exists(BASERELDIR.DIR_IMG.$idimg)) mkdir(BASERELDIR.DIR_IMG.$idimg);
+			if(!copy($file, $ffile)) return false;
+			copy($file, BASERELDIR.DIR_IMG.$idimg.'/-originalsize');
+
+
+			// delete old images
+			if($filename!=$row['filename'] && file_exists(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename']);
+			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/m_'.$row['filename'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/m_'.$row['filename']);
+
+			if($resize==true)
+			{
 				$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
-				if($this->needToResize($size[0],$size[1])==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->img['width'],$this->img['height'],$this->img['quality'],$this->img['mode']);
-				}
-			else {
-				if($width>0||$height>0) {
+				if($this->needToResize($size[0],$size[1])==true) $this->resize($ffile, $this->img['width'], $this->img['height'], $this->img['quality'], $this->img['mode']);
+				else $this->recompress($ffile, $this->img['quality']);
+				
+				$this->mobile['width'] = intval($this->img['width'] / 100 * $this->mobile['ratio']);
+				$this->mobile['height'] = intval($this->img['height'] / 100 * $this->mobile['ratio']);
+
+			} else {
+				if($width>0 || $height>0)
+				{
 					$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
 					if($width==0) $width=$size[0]/$size[1]*$height;
 					elseif($height==0) $height=$size[1]/$size[0]*$width;
-					$this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$width,$height,$this->img['quality'],'fit');
-					}
+					$this->resize($ffile,$width,$height,$this->img['quality'],'fit');
+
+					$this->mobile['width'] = intval($width / 100 * $this->mobile['ratio']);
+					$this->mobile['height'] = intval($height / 100 * $this->mobile['ratio']);
 				}
 			}
+
+			// create mobile version, if active
+			if($this->mobile['active']=="y")
+			{
+				copy($ofile, $mfile);
+				$this->mobile['quality'] = intval($this->img['quality'] / 100 * ($this->mobile['ratio'] + ((100 - $this->mobile['ratio']) / 2)));
+				$this->resize($mfile, $this->mobile['width'], $this->mobile['height'], $this->mobile['quality'], $this->img['mode']);
+			}
+
+		}
 		
 		return $idimg;
-		}
+	}
 
 	function delete($idimg)
 	{
-		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
-
-		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg);
+		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg)." LIMIT 1";
 		$results=ksql_query($query);
 		if($row=ksql_fetch_array($results))
 		{
 			$query="DELETE FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg);
 			if(!ksql_query($query)) return false;
 			
-			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename'])&&!is_dir(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename']); //delete full size image
-			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/'.$row['thumbnail'])&&!is_dir(BASERELDIR.DIR_IMG.$idimg.'/'.$row['thumbnail'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['thumbnail']); //delete thumbnail
-			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/-originalsize')) unlink(BASERELDIR.DIR_IMG.$idimg.'/-originalsize'); //delete original size
-			rmdir(BASERELDIR.DIR_IMG.$idimg); //elimino la dir
+			kRemoveDir(BASERELDIR.DIR_IMG.$idimg); // recursive remove
+
 		} else return false;
 		
 		return true;
