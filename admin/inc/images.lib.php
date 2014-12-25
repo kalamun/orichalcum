@@ -285,14 +285,19 @@ class kaImages {
 			$query="UPDATE `".TABLE_IMG."` SET `filename`='".addslashes($filename)."',hotlink='' WHERE idimg=".$idimg;
 			if(!ksql_query($query)) return false;
 
-			$ffile=BASERELDIR.DIR_IMG.$idimg.'/'.$filename;
-			$mfile=BASERELDIR.DIR_IMG.$idimg.'/m_'.$filename;
-			$ofile=BASERELDIR.DIR_IMG.$idimg.'/-originalsize';
+			$ffile=$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/'.$filename;
+			$mfile=$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/m_'.$filename;
+			$ofile=$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/-originalsize';
 			
 			// copy image into the right dir
-			if(!file_exists(BASERELDIR.DIR_IMG.$idimg)) mkdir(BASERELDIR.DIR_IMG.$idimg);
-			if(!copy($file, $ffile)) return false;
-			copy($file, BASERELDIR.DIR_IMG.$idimg.'/-originalsize');
+			if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg)) mkdir($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg);
+			if($file!=$ffile)
+			{
+				if(copy($file, $ffile)) unlink($file);
+				else return false;
+			}
+			
+			copy($ffile, $ofile);
 
 
 			// delete old images

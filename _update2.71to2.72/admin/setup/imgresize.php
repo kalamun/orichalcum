@@ -30,6 +30,23 @@ if(isset($_POST['update'])||isset($_POST['test'])) {
 
 <form action="?" method="post" enctype="multipart/form-data">
 
+<div class="subset">
+	<h2><?= $kaTranslate->translate('Setup:You have %d images in your database', $GLOBALS['kaImages']->countList()); ?></h2>
+	<br>
+	<strong><?= $kaTranslate->translate('Setup:These settings are not retroactive'); ?></strong>.<br>
+	<?= $kaTranslate->translate('Setup:If you want to apply the new settings to the entire image database, you can re-process it from here'); ?>.<br>
+	<br>
+	<input type="button" class="button" value="<?= $kaTranslate->translate('Setup:Re-process the image database'); ?>" onclick="kStartReprocess(<?= intval($GLOBALS['kaImages']->countList()); ?>)">
+	<small><?= $kaTranslate->translate('Setup:Please note that it may take a lot of time'); ?></small><br>
+	<br>
+	<div id="progressBar">
+		<div id="completedBar">
+			<div class="percent"></div>
+		</div>
+	</div>
+	
+</div>
+
 <div class="topset">
 	<h2><?= $kaTranslate->translate('Setup:Images'); ?></h2>
 	<br>
@@ -67,7 +84,7 @@ if(isset($_POST['update'])||isset($_POST['test'])) {
 	</tr>
 	<tr>
 		<td><label for="img_quality1"><?= $kaTranslate->translate('Setup:Quality'); ?></label></td>
-		<td><?= b3_create_input("img_quality1","text","",b3_lmthize($quality,"input"),"50px",5).' px'; ?></td>
+		<td><?= b3_create_input("img_quality1","text","",b3_lmthize($quality,"input"),"50px",5).' %'; ?></td>
 	</tr>
 	</table>
 	<br />
@@ -131,7 +148,7 @@ if(isset($_POST['update'])||isset($_POST['test'])) {
 	</tr>
 	<tr>
 		<td><label for="thumb_quality1"><?= $kaTranslate->translate('Setup:Quality'); ?></label></td>
-		<td><?= b3_create_input("thumb_quality1","text","",b3_lmthize($quality,"input"),"50px",5).' px'; ?></td>
+		<td><?= b3_create_input("thumb_quality1","text","",b3_lmthize($quality,"input"),"50px",5).' %'; ?></td>
 	</tr>
 	</table>
 	<br />
@@ -153,104 +170,13 @@ if(isset($_POST['update'])||isset($_POST['test'])) {
 </div>
 
 
-	<script type="text/javascript">
-		function kRefreshInit()
-		{
-			kAddEvent(document.getElementById('img_mobile1'), "change", kShowMobileRatio);
-			kAddEvent(document.getElementById('img_size1'), "keyup", kRefreshPreview);
-			kAddEvent(document.getElementById('img_size2'), "keyup", kRefreshPreview);
-			kAddEvent(document.getElementById('img_resize2'), "keyup", kRefreshPreview);
-			kAddEvent(document.getElementById('img_resize2'), "change", kRefreshPreview);
-			kAddEvent(document.getElementById('thumb_size1'), "keyup", kRefreshPreview);
-			kAddEvent(document.getElementById('thumb_size2'), "keyup", kRefreshPreview);
-			kAddEvent(document.getElementById('thumb_resize2'), "keyup", kRefreshPreview);
-			kAddEvent(document.getElementById('thumb_resize2'), "change", kRefreshPreview);
-		}
-		
-		function kShowMobileRatio()
-		{
-			cb=document.getElementById('img_mobile1');
-			document.getElementById('img_mobile2container').style.display = cb.checked ? 'inline' : 'none';
-		}
-		kShowMobileRatio();
-
-		function kRefreshPreview()
-		{
-			var prefix = Array( "img", "thumb" );
-			
-			for(var i=0; prefix[i]; i++)
-			{
-				var image_size1=parseInt(document.getElementById(prefix[i]+'_size1').value);
-				var image_size2=parseInt(document.getElementById(prefix[i]+'_size2').value);
-				var image_resize2=document.getElementById(prefix[i]+'_resize2').value;
-
-				var tmpw=100;
-				var tmph=60;
-				var vtmpw=100;
-				var vtmph=80;
-				
-				var previewcontainer=document.getElementById(prefix[i]+'_container');
-				var previewimageh=document.getElementById(prefix[i]+'_imageh');
-				var previewimagev=document.getElementById(prefix[i]+'_imagev');
-				
-				previewcontainer.style.height = parseInt(previewcontainer.offsetWidth/image_size1*image_size2) + 'px';
-				previewcontainer.style.top = - parseInt(previewcontainer.offsetHeight/2) + 'px';
-				
-				previewimageh.style.width = previewcontainer.offsetWidth + 'px';
-				previewimageh.style.height = parseInt(previewcontainer.offsetWidth / tmpw * tmph) + 'px';
-				
-				previewimagev.style.width = previewcontainer.offsetWidth + 'px';
-				previewimagev.style.height = parseInt(previewcontainer.offsetWidth / vtmph * vtmpw) + 'px';
-
-				if(image_resize2=="inside")
-				{
-					if(previewimageh.offsetHeight > previewcontainer.offsetHeight)
-					{
-						previewimageh.style.height = previewcontainer.style.height;
-						previewimageh.style.width = parseInt(previewcontainer.offsetHeight / tmph * tmpw) + 'px';
-					}
-					
-					if(previewimagev.offsetHeight > previewcontainer.offsetHeight)
-					{
-						previewimagev.style.height = previewcontainer.style.height;
-						previewimagev.style.width = parseInt(previewcontainer.offsetHeight / vtmpw * vtmph) + 'px';
-					}
-				
-				} else if(image_resize2=="outside") {
-					if(previewimageh.offsetHeight < previewcontainer.offsetHeight)
-					{
-						previewimageh.style.height = previewcontainer.style.height;
-						previewimageh.style.width = parseInt(previewcontainer.offsetHeight / tmph * tmpw) + 'px';
-					}
-
-					if(previewimagev.offsetHeight < previewcontainer.offsetHeight)
-					{
-						previewimagev.style.height = previewcontainer.style.height;
-						previewimagev.style.width = parseInt(previewcontainer.offsetHeight / vtmph * vtmpw) + 'px';
-					}
-
-				} else {
-					previewimageh.style.height = previewcontainer.style.height;
-					previewimageh.style.width = previewcontainer.offsetWidth + 'px';
-					previewimagev.style.height = previewcontainer.style.height;
-					previewimagev.style.width = previewcontainer.offsetWidth + 'px';
-				}
-				
-				previewimageh.style.top = - parseInt(previewimageh.offsetHeight/2) + 'px';
-				previewimageh.style.left = - parseInt(previewimageh.offsetWidth/2) + 'px';
-				previewimagev.style.top = - parseInt(previewimagev.offsetHeight/2) + 'px';
-				previewimagev.style.left = - parseInt(previewimagev.offsetWidth/2) + 'px';
-			}
-			
-		}
-		
-		kRefreshInit();
-		kRefreshPreview();
-	</script>
 
 	<div class="submit">
 		<input type="submit" name="update" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button">
 	</div>
+
+	<script type="text/javascript" src="js/images.js"></script>
+
 </form>
 </div>
 
