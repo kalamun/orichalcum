@@ -93,7 +93,6 @@ class kImages {
 			
 			// if mobile version is active and mobile alternative exists
 			if(kGetVar('img_mobile',1,'*')=="y" && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$row['idimg'].'/m_'.$output['filename']) && kIsMobile()) $output['filename']='m_'.$output['filename'];
-print_r($output['filename']);
 			$output['url']=SITE_URL.BASEDIR.DIR_IMG.$row['idimg'].'/'.$output['filename'];
 
 		} else {

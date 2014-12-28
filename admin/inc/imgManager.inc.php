@@ -9,11 +9,11 @@ refid=imgallery&mediatable=k_pagine&mediaid=8&start=1&max=999
 */
 
 error_reporting(0);
-require_once('./connect.inc.php');
-require_once('kalamun.lib.php');
-require_once('./sessionmanager.inc.php');
+
 require_once('./main.lib.php');
-$kaTranslate=new kaAdminTranslate();
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(!isset($_SESSION['iduser'])) die($kaTranslate->translate('You don\'t have permission to use this function'));
 
 /* set default timezone in PHP and MySQL */

@@ -4,22 +4,12 @@ if(!isset($_SESSION['iduser'])) die();
 if(!isset($_POST['t'])) die();
 if(!isset($_POST['id'])) die();
 
-require_once("../../inc/config.inc.php");
-if(!isset($db['id'])) require_once("../../inc/connect.inc.php");
-require_once("../../inc/main.lib.php");
-require_once("../../inc/kalamun.lib.php");
+require_once('./main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 require_once("../../inc/comments.lib.php");
 
-/* set default timezone in PHP and MySQL */
-$timezone=kaGetVar('timezone',1);
-if($timezone!="") {
-	date_default_timezone_set($timezone);
-	$query="SET time_zone='".date("P")."'";
-	ksql_query($query);
-	}
-
-
-$kaTranslate=new kaAdminTranslate();
 $kaComments=new kaComments();
 ?>
 

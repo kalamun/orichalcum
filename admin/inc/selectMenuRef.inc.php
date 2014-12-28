@@ -1,13 +1,11 @@
 <?php /* (c) Kalamun.org - GNU/GPL 3 */
 
-require_once('./connect.inc.php');
-require_once('kalamun.lib.php');
-require_once('./sessionmanager.inc.php');
-require_once('./main.lib.php');
-if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
+session_start();
 
-require_once("config.lib.php");
-$GLOBALS['kaImpostazioni']=new kaImpostazioni();
+require_once('./main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
 
 require_once(ADMINRELDIR.'menu/menu.lib.php');
 $kaMenu=new kaMenu();

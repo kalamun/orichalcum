@@ -1,9 +1,9 @@
 <?php /* (c) Kalamun.org - GNU/GPL 3 */
 
-require_once('./connect.inc.php');
-require_once('./kalamun.lib.php');
-require_once('./sessionmanager.inc.php');
-$kaTranslate=new kaAdminTranslate();
+require_once('./main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(!isset($_SESSION['iduser'])) die($kaTranslate->translate('You don\'t have permission to use this function'));
 
 ?>

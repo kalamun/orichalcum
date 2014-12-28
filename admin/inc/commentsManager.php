@@ -1,11 +1,8 @@
 <?php /* (c) Kalamun.org - GNU/GPL 3 */
 
-require_once('./connect.inc.php');
-require_once('kalamun.lib.php');
-require_once('./sessionmanager.inc.php');
 require_once('./main.lib.php');
-require_once("./config.inc.php");
-require_once("./comments.lib.php");
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
 if(!isset($_SESSION['iduser'])) die('You don\'t have permissions to use this page');
 if(!isset($_GET['t'])) die();

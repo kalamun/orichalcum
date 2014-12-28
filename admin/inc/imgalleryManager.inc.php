@@ -1,11 +1,9 @@
 <?php /* (c) Kalamun.org - GNU/GPL 3 */
 
-error_reporting(0);
-require_once('./connect.inc.php');
-require_once('kalamun.lib.php');
-require_once('./sessionmanager.inc.php');
 require_once('./main.lib.php');
-$kaTranslate=new kaAdminTranslate();
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(!isset($_SESSION['iduser'])) die($kaTranslate->translate('You don\'t have permission to use this function'));
 
 /* set default timezone in PHP and MySQL */

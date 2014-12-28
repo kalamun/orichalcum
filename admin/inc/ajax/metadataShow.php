@@ -2,22 +2,10 @@
 session_start();
 if(!isset($_SESSION['iduser'])) die();
 
-include('../../inc/connect.inc.php');
-include('../../inc/kalamun.lib.php');
-include('../../inc/main.lib.php');
-include('../../inc/metadata.lib.php');
+require_once('../main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
-
-/* set default timezone in PHP and MySQL */
-$timezone=kaGetVar('timezone',1);
-if($timezone!="") {
-	date_default_timezone_set($timezone);
-	$query="SET time_zone='".date("P")."'";
-	ksql_query($query);
-	}
-
-$kaTranslate=new kaAdminTranslate();
-$kaMetadata=new kaMetadata();
 ?>
 <table class="metadataList">
 <tr><th>Parametro</th><th>Valore</th></tr><?php 
