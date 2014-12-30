@@ -373,7 +373,9 @@ kZenEditor = function () {
 			tips.className = 'charAlternatives sans';
 
 			var txtnode = document.createElement('DIV');
-			txtnode.appendChild(document.createTextNode(kaDictionary.Edit));
+			var editlabel="Edit";
+			if(typeof kaDictionary!="undefined") editlabel=kaDictionary.Edit;
+			txtnode.appendChild(document.createTextNode(editlabel));
 			kAddEvent(txtnode, "click", function () {
 				editImg(tmp.childNodes[0].getAttribute('id'));
 			});
@@ -883,7 +885,14 @@ kZenEditor = function () {
 			var mediaid = container.getAttribute('mediaid');
 			parent.kZenEditorInsertImg = insertImg;
 			parent.kZenEditorInsertThumb = insertThumb;
-			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?limit=1&submitlabel=' + kaDictionary.Insertimage + '&submitlabel2=' + kaDictionary.Insertthumbnail + '&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
+			var imglabel='Insert image';
+			var thumblabel='Insert thumbnail';
+			if(typeof kaDictionary != "undefined")
+			{
+				imglabel=kaDictionary.Insertimage;
+				thumblabel=kaDictionary.Insertthumbnail;
+			}
+			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?limit=1&submitlabel=' + imglabel + '&submitlabel2=' + thumblabel + '&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
 		} else {
 			setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].filename + '" id="img' + imgs[0].id + '" />');
 			k_closeIframeWindow();
@@ -1937,7 +1946,9 @@ function kCreateThumbnailIntoPhotogallery(image) {
 	var edit = document.createElement('DIV');
 	edit.setAttribute("class", "edit");
 	edit.setAttribute("id", "edit" + c.childNodes.length + 1);
-	edit.appendChild(document.createTextNode(kaDictionary.Edit));
+	var editlabel="Edit";
+	if(typeof kaDictionary!="undefined") editlabel=kaDictionary.Edit;
+	edit.appendChild(document.createTextNode(editlabel));
 	kAddEvent(edit, "click", kEditThumbnailFromPhotogallery);
 	imgc.appendChild(edit);
 

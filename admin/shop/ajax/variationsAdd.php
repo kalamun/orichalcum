@@ -1,16 +1,14 @@
 <?php /* (c) Kalamun.org - GNU/GPL 3 */
 
-require_once('../../inc/connect.inc.php');
-require_once('../../inc/kalamun.lib.php');
-require_once('../../inc/sessionmanager.inc.php');
 require_once('../../inc/main.lib.php');
-require_once('../../inc/config.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(!isset($_SESSION['iduser'])) die('Operation denied');
 if(!isset($_GET['idsitem'])) die('Item index is missing');
 
 require_once('../shop.lib.php');
 $kaShop=new kaShop();
-$kaTranslate=new kaAdminTranslate();
 $kaTranslate->import('shop');
 
 define("PAGE_NAME",$kaTranslate->translate('Shop:Add a new variation'));
@@ -40,11 +38,12 @@ if(isset($_POST['save']))
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="author" content="Roberto Pasini - www.kalamun.org" />
 <meta name="copyright" content="no(c)" />
-<style type="text/css">
-	@import "<?php echo ADMINDIR; ?>css/screen.css?<?= SW_VERSION; ?>";
-	@import "<?php echo ADMINDIR; ?>css/main.lib.css?<?= SW_VERSION; ?>";
-	@import "<?php echo ADMINDIR; ?>css/selectmenuref.css?<?= SW_VERSION; ?>";
-</style>
+
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/init.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/screen.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/main.lib.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/imgmanager.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/kzeneditor.css?<?= SW_VERSION; ?>" type="text/css" />
 
 <script type="text/javascript">var ADMINDIR='<?php echo str_replace("'","\'",ADMINDIR); ?>';</script>
 <script type="text/javascript" src="<?php echo ADMINDIR; ?>js/kalamun.js?<?= SW_VERSION; ?>"></script>

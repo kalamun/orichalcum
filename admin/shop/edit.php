@@ -109,7 +109,7 @@ if(isset($_POST['update'])&&isset($_GET['idsitem'])) {
 	}
 	
 	$vars['prezzo'] = isset($_POST['prezzo']) ? number_format($_POST['prezzo'],2,'.','') : 0;
-	$vars['scontato'] = isset($_POST['scontato']) ? number_format($_POST['prezzo'],2,'.','') : 0;
+	$vars['scontato'] = isset($_POST['scontato']) ? number_format($_POST['scontato'],2,'.','') : 0;
 	$vars['weight'] = isset($_POST['weight']) ? floatval($_POST['weight']) : 0;
 	$vars['qta'] = isset($_POST['qta']) ? intval($_POST['qta']) : 0;
 	$vars['online'] = !isset($_POST['online']) ? 'y' : 'n';

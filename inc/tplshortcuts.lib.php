@@ -2255,12 +2255,12 @@ function kGetShopItemQuickList($vars=0,$limit=10,$conditions="",$options="",$ord
 	return $GLOBALS['__shop']->getItemQuickList($vars);
 }
 
-function kSetShopCartVar($param,$value)
+function kSetShopCartVar($param,$value) //deprecated
 {
 	return $GLOBALS['__shop']->setCartVar($param,$value);
 }
 
-function kGetShopCartVar($param)
+function kGetShopCartVar($param) //deprecated
 {
 	return $GLOBALS['__shop']->getCartVar($param);
 }
@@ -2483,12 +2483,12 @@ function kPrintShopItem($dir=false)
 	echo $GLOBALS['__template']->getSubtemplate('shop_item_page');
 }
 
-function kGetShopCart()
+function kGetShopCart($vars=array())
 {
 	$output=array("items"=>array(),"totalprice"=>0,"totalweight"=>0,"itemsnumber"=>0);
-	$output['items']=$GLOBALS['__shop']->getCart();
+	$output['items']=$GLOBALS['__shop']->getCart($vars);
 	foreach($output['items'] as $item)
-{
+	{
 		$output['totalprice']+=floatval($item['realprice'])*$item['qty'];
 		$output['totalweight']+=floatval($item['weight'])*$item['qty'];
 		$output['itemsnumber']+=$item['qty'];
@@ -2505,9 +2505,9 @@ function kGetShopCartItemsCount($vars=array())
 	return $GLOBALS['__shop']->getCartItemsCount($vars);
 }
 
-function kGetShopCartItemsAmount()
+function kGetShopCartItemsAmount($vars=array())
 {
-	return $GLOBALS['__shop']->getCartItemsPrice();
+	return $GLOBALS['__shop']->getCartItemsPrice($vars);
 }
 
 function kGetShopCartTotalAmount($vars,$iddel=null,$country=null)

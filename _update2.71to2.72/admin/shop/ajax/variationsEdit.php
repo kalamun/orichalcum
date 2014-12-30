@@ -1,42 +1,42 @@
 <?php /* (c) Kalamun.org - GNU/GPL 3 */
 
-require_once('../../inc/connect.inc.php');
-require_once('../../inc/kalamun.lib.php');
-require_once('../../inc/sessionmanager.inc.php');
 require_once('../../inc/main.lib.php');
-require_once('../../inc/config.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(!isset($_SESSION['iduser'])) die('Operation denied');
 if(!isset($_GET['idsvar'])) die('Variation index is missing');
 
 require_once('../shop.lib.php');
 $kaShop=new kaShop();
-$kaTranslate=new kaAdminTranslate();
 $kaTranslate->import('shop');
 
 define("PAGE_NAME",$kaTranslate->translate('Shop:Add a new variation'));
 
-if(isset($_POST['save'])) {
+if(isset($_POST['save']))
+{
 	$vars=array();
 	$vars['idsvar']=$_GET['idsvar'];
 	$vars['name']=$_POST['name'];
-	$vars['descr']=b3_htmlize($_POST['descr'],false);
+	$vars['descr']=b3_htmlize($_POST['variation_descr'],false);
 	$vars['price']=$_POST['price'];
+	$vars['discounted']=$_POST['discounted'];
 	$idsvar=$kaShop->updateVariation($vars);
-	if($idsvar) {
+	if($idsvar)
+	{
 		?><script type="text/javascript">window.parent.k_reloadVariations()</script><?php 
-		echo $kaTranslate->translate('Shop:Successfully updated');
-		}
-	else {
-		echo $kaTranslate->translate('Shop:Ops, some errors occurred while saving. Please retry.');
-		}
-	
+		$showResultMsg = true;
+	} else {
+		$showResultMsg = false;
 	}
+	
+}
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
 <head>
-<title><?php echo ADMIN_NAME." - ".PAGE_NAME; ?></title>
+<title><?= ADMIN_NAME." - ".PAGE_NAME; ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="author" content="Roberto Pasini - www.kalamun.org" />
 <meta name="copyright" content="no(c)" />
@@ -44,13 +44,14 @@ if(isset($_POST['save'])) {
 <link rel="stylesheet" href="<?= ADMINDIR; ?>css/init.css?<?= SW_VERSION; ?>" type="text/css" />
 <link rel="stylesheet" href="<?= ADMINDIR; ?>css/screen.css?<?= SW_VERSION; ?>" type="text/css" />
 <link rel="stylesheet" href="<?= ADMINDIR; ?>css/main.lib.css?<?= SW_VERSION; ?>" type="text/css" />
-<link rel="stylesheet" href="<?= ADMINDIR; ?>css/selectmenuref.css?<?= SW_VERSION; ?>" type="text/css" />
+<link rel="stylesheet" href="<?= ADMINDIR; ?>css/imgmanager.css?<?= SW_VERSION; ?>" type="text/css" />
 <link rel="stylesheet" href="<?= ADMINDIR; ?>css/kzeneditor.css?<?= SW_VERSION; ?>" type="text/css" />
 
-<script type="text/javascript">var ADMINDIR='<?php echo str_replace("'","\'",ADMINDIR); ?>';</script>
-<script type="text/javascript" src="<?php echo ADMINDIR; ?>js/kalamun.js?<?= SW_VERSION; ?>"></script>
-<script type="text/javascript" src="<?php echo ADMINDIR; ?>js/imgframe.js?<?= SW_VERSION; ?>"></script>
-<script type="text/javascript" src="<?php echo ADMINDIR; ?>js/main.lib.js?<?= SW_VERSION; ?>"></script>
+<script type="text/javascript">var ADMINDIR='<?= str_replace("'","\'",ADMINDIR); ?>';</script>
+<script type="text/javascript" src="<?= ADMINDIR; ?>js/kalamun.js?<?= SW_VERSION; ?>"></script>
+<script type="text/javascript" src="<?= ADMINDIR; ?>js/imgframe.js?<?= SW_VERSION; ?>"></script>
+<script type="text/javascript" src="<?= ADMINDIR; ?>js/main.lib.js?<?= SW_VERSION; ?>"></script>
+<script type="text/javascript" src="<?= ADMINDIR; ?>js/dictionary.js.php?<?= SW_VERSION; ?>" charset="utf-8"></script>
 </head>
 
 <body>
@@ -93,10 +94,16 @@ if(isset($_POST['save'])) {
 		<br />
 		</div>
 		
-		<?= b3_create_textarea("descr",$kaTranslate->translate('Shop:Description')."<br />",b3_lmthize($variation['descr'],"textarea"),"100%","100px"); ?>
+		<?= b3_create_textarea("variation_descr", $kaTranslate->translate('Shop:Description')."<br />", b3_lmthize($variation['descr'],"textarea"), "100%", "100px"); ?>
 		<br />
 
 		<?= b3_create_input("price","text",$kaTranslate->translate('Shop:Price')." ",b3_lmthize($variation['price'],"input"),"100px",8,''); ?>
+		<?
+			$pageLayout=$kaImpostazioni->getVar('admin-shop-layout',1,"*");
+			if(strpos($pageLayout,",discounted,")!==false) {
+				echo b3_create_input("discounted","text",$kaTranslate->translate('Shop:Discounted')." ",b3_lmthize($variation['discounted'],"input"),"100px",8,'');
+			}
+		?>
 		<div class="note"><?= $kaTranslate->translate('Shop:You can add, subtract or reset the price using this formulas'); ?>: +1.50 , -7.00 , 15.30 , +10% , -20% , 120%<br />
 			<?= $kaTranslate->translate('Shop:Leave empty to maintain the same price of the item'); ?></div>
 		<br />
@@ -104,9 +111,29 @@ if(isset($_POST['save'])) {
 		</div>
 
 	<div class="submit">
+		<?php 
+		/* display feedback after saving */
+		if(isset($showResultMsg))
+		{
+			if($showResultMsg==true) echo '<div id="MsgSuccess">'.$kaTranslate->translate('Shop:Successfully saved').'</div>';
+			else echo '<div id="MsgAlert">'.$kaTranslate->translate('Shop:Ops, some errors occurred while saving. Please retry').'</div>';
+			?>
+			<script type="text/javascript">
+				function hideResults()
+				{
+					var elm=null;
+					if(document.getElementById('MsgSuccess')) elm=document.getElementById('MsgSuccess');
+					if(document.getElementById('MsgAlert')) elm=document.getElementById('MsgAlert');
+					elm.parentNode.removeChild(elm,true);
+				}
+				setTimeout(hideResults,3000);
+			</script>
+		<?php 
+		}
+		?>
 		<input type="submit" name="save" value="<?= $kaTranslate->translate("UI:Save"); ?>" class="button" />
-		</div>
-	</form>
+	</div>
+</form>
 
 <script type="text/javascript">
 	var txts=new kInitZenEditor;

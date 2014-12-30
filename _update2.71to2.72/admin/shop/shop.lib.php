@@ -633,7 +633,8 @@ class kaShop {
 		
 	/* VARIATIONS */
 	
-	public function getVariationCollections($vars) {
+	public function getVariationCollections($vars)
+	{
 		if(!isset($vars['orderby'])) $vars['orderby']='`collection` ASC';
 		$output=array();
 		
@@ -647,9 +648,10 @@ class kaShop {
 			}
 
 		return $output;
-		}
+	}
 	
-	public function getVariations($vars) {
+	public function getVariations($vars)
+	{
 		if(!isset($vars['orderby'])) $vars['orderby']='`collection` ASC,`order` ASC';
 		$output=array();
 		
@@ -659,14 +661,16 @@ class kaShop {
 		$query.=" `idsvar`<>0 ORDER BY ".$vars['orderby'];
 
 		$results=ksql_query($query);
-		while($row=ksql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results))
+		{
 			$output[]=$row;
-			}
+		}
 
 		return $output;
-		}
+	}
 	
-	public function addVariation($idsitem,$name,$collection,$copy) {
+	public function addVariation($idsitem,$name,$collection,$copy)
+	{
 		$idsitem=intval($idsitem);
 		$name=ksql_real_escape_string($name);
 		$collection=ksql_real_escape_string($collection);
@@ -677,62 +681,68 @@ class kaShop {
 		$row=ksql_fetch_array($results);
 		$order=$row['order']+1;
 		
-		if($copy=="") {
+		if($copy=="")
+		{
 			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`collection`,`order`) VALUES('".$idsitem."','".$name."','','','".$collection."','".$order."')";
 			if(ksql_query($query)) return ksql_insert_id();
-			}
-		else {
+		} else {
 			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`collection`,`order`) SELECT `idsitem`,`name`,`descr`,`price`,`collection`,`order` FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsvar`='".$copy."' LIMIT 1";
-			if(ksql_query($query)){
+			if(ksql_query($query))
+			{
 				$id=ksql_insert_id();
 				$query="UPDATE ".TABLE_SHOP_VARIATIONS." SET `name`='".$name."',`collection`='".$collection."',`order`='".$order."' WHERE idsvar='".$id."' LIMIT 1";
 				if(ksql_query($query)) return $id;
 				return false;
-				}
-			return false;
 			}
-		return false;
+			return false;
 		}
+		return false;
+	}
 	
 	//import variations from another item
-	public function importVariations($from,$to) {
+	public function importVariations($from,$to)
+	{
 		$output=true;
 		$query="SELECT * FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsitem`='".intval($from)."' ORDER BY `collection` ASC,`order` ASC";
 		$results=ksql_query($query);
-		while($row=ksql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results))
+		{
 			$q="SELECT * FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsitem`='".intval($to)."' AND `collection`='".$row['collection']."' ORDER BY `order` DESC LIMIT 1";
 			$rs=ksql_query($q);
 			$r=ksql_fetch_array($rs);
 			$order=$r['order']+1;
 			
-			$q="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`collection`,`name`,`descr`,`price`,`default`,`order`)
-				VALUES('".intval($to)."','".ksql_real_escape_string($row['collection'])."','".ksql_real_escape_string($row['name'])."','".ksql_real_escape_string($row['descr'])."','".ksql_real_escape_string($row['price'])."','".ksql_real_escape_string($row['default'])."','".ksql_real_escape_string($order)."')";
+			$q="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`collection`,`name`,`descr`,`price`,`discounted`,`default`,`order`)
+				VALUES('".intval($to)."','".ksql_real_escape_string($row['collection'])."','".ksql_real_escape_string($row['name'])."','".ksql_real_escape_string($row['descr'])."','".ksql_real_escape_string($row['price'])."','".ksql_real_escape_string($row['discounted'])."','".ksql_real_escape_string($row['default'])."','".ksql_real_escape_string($order)."')";
 			if(!ksql_query($q)) $output=false;
-			}
-		return $output;
 		}
+		return $output;
+	}
 	
-	public function updateVariation($vars) {
+	public function updateVariation($vars)
+	{
 		if(!isset($vars['idsvar'])) return false;
 		
 		$query="UPDATE ".TABLE_SHOP_VARIATIONS." SET ";
-		foreach($vars as $k=>$v) {
+		foreach($vars as $k=>$v)
+		{
 			$vars[$k]=ksql_real_escape_string(trim($v));
 			if($k=='price') $vars[$k]=str_replace(",",".",$vars[$k]);
 			if($k!='idsvar') $query.=" `".$k."`='".$vars[$k]."',";
-			}
+		}
 		$query=rtrim($query,",");
 		$query.=" WHERE `idsvar`='".$vars['idsvar']."' LIMIT 1";
 		
 		if(ksql_query($query)) return true;
 		return false;
-		}
+	}
 	
-	public function deleteVariation($idsvar) {
+	public function deleteVariation($idsvar)
+	{
 		$query="DELETE FROM `".TABLE_SHOP_VARIATIONS."` WHERE `idsvar`='".intval($idsvar)."' LIMIT 1";
 		if(ksql_query($query)) return true;
 		return false;
-		}
+	}
 
 
 	/* COUPONS */
