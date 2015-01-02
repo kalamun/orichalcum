@@ -19,8 +19,19 @@ if(isset($_POST['action']))
 		if(substr($_POST['conditions'],0,5)==' AND ') $_POST['conditions']=substr($_POST['conditions'],5);
 		if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
 
+		$output=array();
+		$images=array();
 		foreach($kaImages->getList($_POST['orderby'],$_POST['conditions'],$_POST['start'],$_POST['limit']) as $img)
 		{
+			$images[$img['idimg']]=$img;
+			$output[$img['idimg']]=$img['filename'];
+		}
+		
+		if(strpos($_POST['orderby'],'filename')!==false) natsort($output); //order by natural sort
+		
+		foreach($output as $idimg=>$filename)
+		{
+			$img=$images[$idimg];
 			echo $img['idimg']."\t".BASEDIR.DIR_IMG.$img['idimg']."/\t".$img['filename']."\t".$img['thumbnail']."\t".$img['width'].'x'.$img['height']."px\t".$img['alt']."\n";
 		}
 		

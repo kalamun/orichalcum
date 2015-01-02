@@ -862,17 +862,24 @@ class kShop {
 		return $output;
 		}
 	
-	public function getVariations($idsitem) {
+	public function getVariations($idsitem)
+	{
 		/* loads from database the variations for a gived item */
 		$output=array();
 		
 		$query="SELECT * FROM `".TABLE_SHOP_VARIATIONS."` WHERE `idsitem`='".intval($idsitem)."' ORDER BY `collection` ASC,`order` ASC";
 		$results=ksql_query($query);
-		while($row=ksql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results))
+		{
+			$row['descr']=$this->kText->formatText($row['descr']);
+			list($row['descr'],$tmp) = $this->kText->embedImg($row['descr']);
+			list($row['descr'],$tmp) = $this->kText->embedDocs($row['descr']);
+			list($row['descr'],$tmp) = $this->kText->embedMedia($row['descr']);
+
 			$output[$row['collection']][]=$row;
-			}
-		return $output;
 		}
+		return $output;
+	}
 
 	public function getItemVariations($vars) {
 		if(!$this->inited) $this->init();
