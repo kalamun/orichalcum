@@ -1,10 +1,8 @@
 <?php 
-session_start();
-
-require_once('../../inc/connect.inc.php');
-require_once('../../inc/kalamun.lib.php');
-require_once('../../inc/sessionmanager.inc.php');
 require_once('../../inc/main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
 
 /* set default timezone in PHP and MySQL */

@@ -1,5 +1,0 @@
-ALTER TABLE `k_users` ADD `featuredimage` INT NOT NULL AFTER `permissions` ;
-ALTER TABLE `k_news` ADD `online` ENUM( 'y', 'n' ) NOT NULL AFTER `idnews` ;
-ALTER TABLE `k_shop_variations` ADD `discounted` VARCHAR( 8 ) NOT NULL AFTER `price` ;
-
-eliminare admin/inc/mailgateway.php

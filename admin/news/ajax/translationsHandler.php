@@ -1,9 +1,9 @@
-<?php session_start();
-if(!isset($_SESSION['exists'])) die();
+<?php
+require_once('../../inc/main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
-require_once("../../inc/config.inc.php");
-if(!isset($db['id'])) require_once("../../inc/connect.inc.php");
-require_once("../../inc/kalamun.lib.php");
+if(!isset($_SESSION['exists'])) die();
 
 require_once('../news.lib.php');
 $kaNews=new kaNews();

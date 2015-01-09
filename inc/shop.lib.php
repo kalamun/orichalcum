@@ -68,7 +68,29 @@ class kShop {
 			$row['categoria']=mb_convert_encoding($row['categoria'],"UTF-8");
 			$this->allthecats[$row['idcat']]=$row;
 			$this->allthecats[$row['idcat']]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$__template->getVar('dir_shop',1).'/'.$row['dir'];
-			$this->allthecats[$row['idcat']]['imgs']=$this->imgallery->getList(TABLE_CATEGORIE,$row['idcat']);
+
+			// get photogallery in the correct order
+			$this->allthecats[$row['idcat']]['imgs']=array();
+			if(trim($row['photogallery'],",")!="" )
+			{
+				$conditions="";
+				foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+				{
+					$conditions.="`idimg`='".intval($idimg)."' OR ";
+				}
+				$conditions.="`idimg`='0'";
+				
+				$imgs=$GLOBALS['__images']->getList(false,false,false,$conditions);
+				
+				foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+				{
+					foreach($imgs as $img)
+					{
+						if($img['idimg']==$idimg) $this->allthecats[$row['idcat']]['imgs'][]=$img;
+					}
+				}
+			}
+
 			if($tmp=="*") $this->allowedcats[$row['idcat']]=true;
 			if(array_search($row['idcat'],$this->allowedcats)!==false) $this->cats[$row['idcat']]=true;
 		}

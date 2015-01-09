@@ -2,22 +2,10 @@
 if(!isset($_SESSION['iduser'])) die("You don't have permissions to access this informations");
 if(!isset($_GET['idnews'])&&!isset($_GET['delete'])) die('Error selecting news');
 
-require_once('../../inc/connect.inc.php');
-require_once('../../inc/kalamun.lib.php');
-require_once('../../inc/sessionmanager.inc.php');
-require_once('../../users/users.lib.php');
 require_once('../../inc/main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
-/* set default timezone in PHP and MySQL */
-$timezone=kaGetVar('timezone',1);
-if($timezone!="") {
-	date_default_timezone_set($timezone);
-	$query="SET time_zone='".date("P")."'";
-	ksql_query($query);
-	}
-
-$kaUsers=new kaUsers();
-$kaTranslate=new kaAdminTranslate();
 $kaTranslate->import('news');
 
 if(!$kaUsers->canIUse('news')) die("You don't have permissions to access this informations");

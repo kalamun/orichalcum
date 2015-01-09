@@ -158,10 +158,12 @@ class kaImages {
 			$output['thumb']['height']=$size[1];
 			
 			$output['alts']=json_decode($output['alt'],true);
-			if($output['alts']!=false)
+			if(!empty($output['alts']) && is_array($output['alts']))
 			{
 				if(!isset($output['alts'][$_SESSION['ll']])) $output['alts'][$_SESSION['ll']]="";
 				$output['alt']=$output['alts'][$_SESSION['ll']];
+			} else {
+				$output['alts']=array($_SESSION['ll'] => $output['alt']);
 			}
 		
 			return $output;
@@ -207,9 +209,11 @@ class kaImages {
 		if($this->mobile['active']=="y")
 		{
 			$mfile = BASERELDIR.DIR_IMG.$idimg.'/m_'.$filename;
+			$mwidth = min($size[0], $this->img['width']);
+			$mheight = min($size[1], $this->img['height']);
 			copy($ofile, $mfile);
-			$this->mobile['width'] = intval($this->img['width'] / 100 * $this->mobile['ratio']);
-			$this->mobile['height'] = intval($this->img['height'] / 100 * $this->mobile['ratio']);
+			$this->mobile['width'] = intval($mwidth / 100 * $this->mobile['ratio']);
+			$this->mobile['height'] = intval($mheight / 100 * $this->mobile['ratio']);
 			$this->mobile['quality'] = intval($this->img['quality'] / 100 * ($this->mobile['ratio'] + ((100 - $this->mobile['ratio']) / 2)));
 			$this->resize($mfile, $this->mobile['width'], $this->mobile['height'], $this->mobile['quality'], $this->img['mode']);
 		}
@@ -640,15 +644,18 @@ class kaImages {
 
 		} elseif($size['mime']=='image/png') {
 			$source=imagecreatefrompng($img);
+			imagealphablending($source,false);
+			imagesavealpha($source,true);
 			imagepng($source,$img,round($quality/100*9));
 			return $img;
 
 		} elseif($size['mime']=='image/gif') {
-			$animated=$this->isAnimatedGif($img);
-			if($animated==true) return $img;
 
-			$source=imagecreatefromgif($img);
-			imagegif($source,$img);
+
+
+
+
+			//no needs to recompress
 			return $img;
 		}
 		return false;

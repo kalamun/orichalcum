@@ -14,10 +14,19 @@ if(isset($_POST['action']))
 		$kaImages=new kaImages();
 		if(!isset($_POST['start'])) $_POST['start']=0;
 		if(!isset($_POST['limit'])) $_POST['limit']=30;
+		if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
+		
+		//if sorted by filename remove the limit because the natural sorting is made by PHP so it needs the entrire list
+		if(strpos($_POST['orderby'],'filename')!==false)
+		{
+			$tmp=array("start"=>$_POST['start'], "limit"=>$_POST['limit']);
+			$_POST['start']=0;
+			$_POST['limit']=false;
+		}
+		
 		if(!isset($_POST['conditions'])) $_POST['conditions']='';
 		if(isset($_POST['search'])&&$_POST['search']!="") $_POST['conditions'].=" AND (`filename` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `thumbnail` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `hotlink` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `alt` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `idimg`='".intval($_POST['search'])."')";
 		if(substr($_POST['conditions'],0,5)==' AND ') $_POST['conditions']=substr($_POST['conditions'],5);
-		if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
 
 		$output=array();
 		$images=array();
@@ -27,7 +36,21 @@ if(isset($_POST['action']))
 			$output[$img['idimg']]=$img['filename'];
 		}
 		
-		if(strpos($_POST['orderby'],'filename')!==false) natsort($output); //order by natural sort
+		//if sorted by filename sort by natural order and apply offset and limit
+		if(strpos($_POST['orderby'],'filename')!==false)
+		{
+			$tmpoutput=$output;
+			$output=array();
+			natsort($tmpoutput); //order by natural sort
+			$i=0;
+			foreach($tmpoutput as $idimg=>$filename)
+			{
+				if($i < $tmp['start']) { $i++; continue; }
+				$output[$idimg]=$filename;
+				if($i >= $tmp['start']+$tmp['limit']) break;
+				$i++;
+			}
+		}
 		
 		foreach($output as $idimg=>$filename)
 		{

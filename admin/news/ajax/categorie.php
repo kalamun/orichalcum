@@ -1,8 +1,8 @@
 <?php 
-session_start();
-include('../../inc/connect.inc.php');
-include('../../inc/kalamun.lib.php');
-include('../../inc/main.lib.php');
+require_once('../../inc/main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 include('../../inc/categorie.lib.php');
 
 $kaCategorie=new kaCategorie();

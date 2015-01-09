@@ -49,7 +49,30 @@ class kNews {
 		while($row=ksql_fetch_array($results)) {
 			$this->categoriesList[$row['ordine']]=$row;
 			$this->categoriesList[$row['ordine']]['permalink']=BASEDIR.$GLOBALS['__template']->getLanguageURI(LANG).$this->dir_news.'/'.$row['dir'];
-			$this->categoriesList[$row['ordine']]['imgs']=$GLOBALS['__images_gallery']->getList(TABLE_CATEGORIE,$row['idcat']);
+			
+			// get photogallery in the correct order
+			$this->categoriesList[$row['ordine']]['imgs']=array();
+			if(trim($row['photogallery'],",")!="" )
+			{
+				$conditions="";
+				foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+				{
+					$conditions.="`idimg`='".intval($idimg)."' OR ";
+				}
+				$conditions.="`idimg`='0'";
+				
+				$imgs=$GLOBALS['__images']->getList(false,false,false,$conditions);
+				
+				foreach(explode(",",trim($row['photogallery'],",")) as $idimg)
+				{
+					foreach($imgs as $img)
+					{
+						if($img['idimg']==$idimg) $this->categoriesList[$row['ordine']]['imgs'][]=$img;
+					}
+				}
+			}
+			
+
 			$this->categoriesList[$row['ordine']]['metadata']=isset($meta[$row['idcat']])?$meta[$row['idcat']]:array();
 			if($allowedCategories=="*") $this->allowedCategories[$row['idcat']]=true;
 			elseif(strpos($allowedCategories,','.$row['idcat'].',')!==false) $this->allowedCategories[$row['idcat']]=true;

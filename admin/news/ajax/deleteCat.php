@@ -1,9 +1,9 @@
 <?php 
-session_start();
+require_once('../../inc/main.lib.php');
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
+
 if(isset($_SESSION['iduser'])) {
-	include('../../inc/connect.inc.php');
-	include('../../inc/main.lib.php');
-	include('../../inc/log.lib.php');
 	include('../../inc/categorie.lib.php');
 
 	$kaLog=new kaLog();
