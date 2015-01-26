@@ -314,17 +314,23 @@ class kMembers {
 			}
 		else return false;
 		}
-	public function logIn($username,$password) {
+	public function logIn($username,$password)
+	{
 		if(!$this->inited) $this->init();
 		$m=$this->getByUsername($username);
-		if($m['password']==$password) {
+		if($m==false) $m=$this->getByEmail($username);
+		if($m==false) return false;
+		
+		if($m['password']==$password)
+		{
 			$query="UPDATE ".TABLE_MEMBERS." SET lastlogin=NOW() WHERE idmember=".$m['idmember']." LIMIT 1";
 				$results=ksql_query($query);
 					$_SESSION['member']=$m;
 			return true;
-			}
-		else return false;
 		}
+		else return false;
+	}
+
 	public function logOut() {
 		if(!$this->inited) $this->init();
 		if(isset($_SESSION['member'])) {
@@ -365,7 +371,7 @@ class kMembers {
 		if($u['email']=="") return false;
 		
 		$token=md5($u['idmember'].$u['username'].$u['password'].$u['created'].$u['lastlogin']);
-		$url=kGetSiteURL().kGetBaseDir().'admin/member_password_reset.php?t='.urlencode(base64_encode($username.'|'.$token));
+		$url=kGetSiteURL().kGetBaseDir().'admin/member_password_reset.php?t='.urlencode(base64_encode($u['username'].'|'.$token));
 
 		$subject=kTranslate("Password Reset");
 		$message=kTranslate("Someone (probably you) asked to reset the password of your user.")."<br>";

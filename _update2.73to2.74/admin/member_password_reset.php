@@ -156,8 +156,12 @@ $kaMembers=new kaMembers();
 			
 			$u=$kaMembers->getUserByUsername($username);
 
-			if(isset($u['idmember'])&&$u['status']=="act"&&(trim($u['expiration'],"0- :")==""||mktime(substr($u['expiration'],11,2),substr($u['expiration'],14,2),substr($u['expiration'],17,2),substr($u['expiration'],5,2),substr($u['expiration'],8,2),substr($u['expiration'],0,4))>time())
-				&&$md5==md5($u['idmember'].$u['username'].$u['password'].$u['created'].$u['lastlogin'])) {
+			if( isset($u['idmember'])
+				&& $u['status']=="act"
+				&& (trim($u['expiration'],"0- :")=="" || mktime(substr($u['expiration'],11,2),substr($u['expiration'],14,2),substr($u['expiration'],17,2),substr($u['expiration'],5,2),substr($u['expiration'],8,2),substr($u['expiration'],0,4))>time())
+				&& $md5==md5($u['idmember'].$u['username'].$u['password'].$u['created'].$u['lastlogin'])
+				)
+				{
 				
 				if(isset($_POST['orichalcum_newpassword'])&&isset($_POST['orichalcum_newpassword_repeat'])&&$_POST['orichalcum_newpassword']==$_POST['orichalcum_newpassword_repeat']&&strlen($_POST['orichalcum_newpassword'])>=6) {
 					if($kaMembers->password($u['idmember'],$_POST['orichalcum_newpassword'])) { ?>
@@ -179,9 +183,8 @@ $kaMembers=new kaMembers();
 					<div class="submit"><input type="submit" id="save" name="login" value="<?= $kaTranslate->translate('UI:Reset your password'); ?>" class="button" disabled></div>
 					</form>
 					<?php  }
-				}
 
-			else { ?>
+			} else { ?>
 				<h2><?= $kaTranslate->translate('UI:Error while processing your request...'); ?></h2>
 				<?php  }
 
