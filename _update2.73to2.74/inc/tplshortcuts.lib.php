@@ -1981,6 +1981,11 @@ function kMemberLogIn($username,$password)
 	return $GLOBALS['__members']->logIn($username,$password);
 }
 
+function kMemberRefresh()
+{
+	return $GLOBALS['__members']->refreshUser();
+}
+
 function kMemberLogOut()
 {
 	return $GLOBALS['__members']->logOut();

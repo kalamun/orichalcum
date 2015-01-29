@@ -177,7 +177,8 @@ class kMembers {
 			// validate email
 			if($param=='email')
 			{
-				if(!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/',$value)) return false;
+				$value=trim($value);
+				if(!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$value)) return false;
 			} elseif($param=='affiliation') {
 				$param=b3_htmlize($param,false,"");
 			}
@@ -324,11 +325,25 @@ class kMembers {
 		if($m['password']==$password)
 		{
 			$query="UPDATE ".TABLE_MEMBERS." SET lastlogin=NOW() WHERE idmember=".$m['idmember']." LIMIT 1";
-				$results=ksql_query($query);
-					$_SESSION['member']=$m;
+			$results=ksql_query($query);
+			$_SESSION['member']=$m;
 			return true;
 		}
 		else return false;
+	}
+
+	public function refreshUser()
+	{
+		if(!$this->inited) $this->init();
+		if(!isset($_SESSION['member']['idmember'])) return false;
+		
+		$m=$this->getByUsername($_SESSION['member']['username']);
+		if($m==false) return false;
+		
+		$query="UPDATE ".TABLE_MEMBERS." SET lastlogin=NOW() WHERE idmember=".$m['idmember']." LIMIT 1";
+		$results=ksql_query($query);
+		$_SESSION['member']=$m;
+		return true;
 	}
 
 	public function logOut() {
