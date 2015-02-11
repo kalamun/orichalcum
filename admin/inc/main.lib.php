@@ -723,7 +723,9 @@ function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$r
 	$random_mode?$rand=rand(1,666):$rand="";
 	$id=preg_replace("/\[|\]/","",$name).$rand;
 	if($label!="") { $string.='<label for="'.preg_replace("/\[|\]/","",$name).$rand.'">'.$label.'</label>'; }
-	$string.='<textarea editor="kzen" name="'.$name.'" id="'.$id.'" style="width:'.$width.';height:'.$height.';">'.$value.'</textarea>';
+	
+	$editor= $rich==false ? "none" : "kzen";
+	$string.='<textarea editor="'.$editor.'" name="'.$name.'" id="'.$id.'" style="width:'.$width.';height:'.$height.';">'.$value.'</textarea>';
 	return $string;
 	}
 
