@@ -212,7 +212,7 @@ class kPhotogallery {
 	public function getPermalinkById($idphg)
 	{
 		if(!$this->inited) $this->init();
-		$query="SELECT `ll`,`dir`,`categorie` FROM `".TABLE_PHOTOGALLERY."` WHERE `idphg`='".intval($idphg)."' LIMIT 1";
+		$query="SELECT `ll`,`dir`,`categories` FROM `".TABLE_PHOTOGALLERY."` WHERE `idphg`='".intval($idphg)."' LIMIT 1";
 		$results=ksql_query($query);
 		$row=ksql_fetch_array($results);
 
@@ -222,7 +222,7 @@ class kPhotogallery {
 		$catresults=ksql_query($catquery);
 		while($catrow=ksql_fetch_array($catresults))
 		{
-			if(strpos($row['categorie'],','.$catrow['idcat'].',')!==false)
+			if(strpos($row['categories'],','.$catrow['idcat'].',')!==false)
 			{
 				$subdir=$catrow['dir'];
 				break;

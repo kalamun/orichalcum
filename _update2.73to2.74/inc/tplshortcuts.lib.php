@@ -1082,6 +1082,11 @@ function kGetPageEmbeddedMedias()
 	return $GLOBALS['__pages']->getPageVar('embeddedmedias');
 }
 
+function kGetPageVar($var)
+{
+	return $GLOBALS['__pages']->getPageVar(ksql_real_escape_string($var));
+}
+
 function kGetPageComments()
 {
 	return $GLOBALS['__pages']->getPageVar('commenti');

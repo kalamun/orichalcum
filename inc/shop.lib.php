@@ -479,7 +479,7 @@ class kShop {
 		$metadata['template']=kGetVar('shop-template',1);
 		$metadata['layout']="";
 		if(isset($dir[2])&&$dir[2]!="") {
-			$query="SELECT `idsitem`,`titolo`,`layout`,`featuredimage` FROM `".TABLE_SHOP_ITEMS."` WHERE `dir`='".b3_htmlize($dir[2],true,"")."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
+			$query="SELECT `idsitem`,`titolo`,`layout`,`featuredimage` FROM `".TABLE_SHOP_ITEMS."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
 			$results=ksql_query($query);
 			$row=ksql_fetch_array($results);
 			$metadata['titolo'].=$row['titolo'];

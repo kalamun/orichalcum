@@ -136,7 +136,7 @@ class kMembers {
 		if(trim($username)=="") return false;
 		$status='act';
 		$email=strtolower($email);
-		if($email!=""&&!preg_match("/.*@.*\..*/",$email)) $email="";
+		if($email!=""&&!preg_match("/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i",$email)) $email="";
 		if($password=="") $password=$this->generatePassword();
 		if(strlen($expiration)==10) $expiration.=" ".date("H:i:s");
 		if($expiration!=""&&preg_match("/\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/",$expiration)) $expiration=substr($expiration,0,4).'-'.substr($expiration,5,2).'-'.substr($expiration,8,2).' '.substr($expiration,11,2).':'.substr($expiration,14,2).':'.substr($expiration,17,2);
@@ -177,7 +177,6 @@ class kMembers {
 			// validate email
 			if($param=='email')
 			{
-				$value=trim($value);
 				if(!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$value)) return false;
 			} elseif($param=='affiliation') {
 				$param=b3_htmlize($param,false,"");
@@ -325,8 +324,8 @@ class kMembers {
 		if($m['password']==$password)
 		{
 			$query="UPDATE ".TABLE_MEMBERS." SET lastlogin=NOW() WHERE idmember=".$m['idmember']." LIMIT 1";
-			$results=ksql_query($query);
-			$_SESSION['member']=$m;
+				$results=ksql_query($query);
+					$_SESSION['member']=$m;
 			return true;
 		}
 		else return false;
