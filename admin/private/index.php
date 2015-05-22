@@ -8,7 +8,8 @@ $_GET['dir']=str_replace("../","",$_GET['dir']);
 require_once('../inc/config.inc.php');
 
 // force download if is a file
-if(isset($_GET['dir'])&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$_GET['dir'])&&!is_dir($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$_GET['dir'])) {
+if(isset($_GET['dir']) && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$_GET['dir']) && !is_dir($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$_GET['dir']))
+{
 	require_once("../inc/connect.inc.php");
 	require_once('../inc/kalamun.lib.php');
 	require_once('../inc/sessionmanager.inc.php');
@@ -18,7 +19,7 @@ if(isset($_GET['dir'])&&file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVAT
 	$kaPrivate=new kaPrivate();
 	$kaPrivate->forceDownload($_GET['dir']);
 	die();
-	}
+}
 
 
 define("PAGE_NAME","Private:Private Area");

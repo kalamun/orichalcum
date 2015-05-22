@@ -418,9 +418,9 @@ kZenEditor = function () {
 			designMode = "rich";
 		}
 		if (designMode == 'rich')
-			swapKeys.className = 'swapKeys';
+			if(swapKeys) swapKeys.className = 'swapKeys';
 		else
-			swapKeys.className = 'swapKeys source';
+			if(swapKeys) swapKeys.className = 'swapKeys source';
 	}
 
 	function addKey(imgname, alt, onclick, CSSclass, kbefore, kafter) {
@@ -1987,7 +1987,6 @@ function kThumbnailOnDrag(e) {
 	}
 }
 function kThumbnailOnDragEnd(e) {
-	console.log(e);
 	if (draggingObject) {
 		draggingObject.className = draggingObject.className.replace(" onDrag", "");
 		photogalleryDD.makeDraggable(draggingObject, kThumbnailOnDragStart, kThumbnailOnDrag, kThumbnailOnDragEnd);

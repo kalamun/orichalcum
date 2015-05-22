@@ -472,7 +472,7 @@ else {
 
 		<div class="submit">
 			<input type="submit" name="update" class="button" value="<?= $kaTranslate->translate('UI:Save'); ?>" />
-			<div class="draft"><?= b3_create_input("riservata","checkbox",$kaTranslate->translate('Pages:DRAFT'),"s","","",($page['riservata']=='s'?'checked':'')); ?></div>
+			<div class="draft"><?= b3_create_input("offline","checkbox",$kaTranslate->translate('Pages:DRAFT'),"s","","",($page['riservata']=='s'?'checked':'')); ?></div>
 		</div>
 		<div style="text-align:center;">
 			<a href="<?= SITE_URL.BASEDIR.strtolower($_SESSION['ll'])."/".$page['dir']; ?>" target="_blank"><?= $kaTranslate->translate('Pages:Visit'); ?></a>

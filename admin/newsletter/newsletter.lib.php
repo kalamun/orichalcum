@@ -38,7 +38,7 @@ class kaNewsletter {
 		{
 			foreach(scandir($dir) as $filename)
 			{
-				if(trim($filename,".")!="" && !is_dir($dir.'/'.$filename))
+				if(trim($filename,".")!="" && !is_dir($dir.'/'.$filename) && preg_match("/.*\.php$/",$filename))
 				{
 					$tmp=array();
 					$tmp['filename']=$filename;
