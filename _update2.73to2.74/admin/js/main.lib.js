@@ -645,7 +645,16 @@ kZenEditor = function () {
 			textarea.value = cnt;
 		}
 	}
-	function insertHTML(html) {
+	
+	function insertElement(elm)
+	{
+		range = iframe.contentWindow.getSelection().getRangeAt(0);
+		range.insertNode(elm);
+		range.setStartAfter(elm);
+	}
+
+	function insertHTML(html)
+	{
 		var tag = document.createElement('DIV');
 		tag.innerHTML = html;
 		for (var i = 0; tag.childNodes[i]; i++) {
@@ -907,7 +916,12 @@ kZenEditor = function () {
 			}
 			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?limit=1&submitlabel=' + imglabel + '&submitlabel2=' + thumblabel + '&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
 		} else {
-			setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].filename + '" id="img' + imgs[0].id + '" />');
+			//setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].filename + '" id="img' + imgs[0].id + '" />');
+			var img = document.createElement('IMG');
+			img.src = imgs[0].dir + imgs[0].filename;
+			img.id = 'img' + imgs[0].id;
+			img.addEventListener("click", onImageClick);
+			insertElement(img);
 			k_closeIframeWindow();
 		}
 	}

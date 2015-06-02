@@ -258,6 +258,7 @@ kZenEditor = function () {
 	};
 
 	var addCSS = function(url) {
+		console.log(url);
 		if(isLoaded==false) {
 			addCSSUrl.push(url);
 			return true;
@@ -320,15 +321,29 @@ kZenEditor = function () {
 		swapDesignMode("rich");
 		
 		isLoaded=true;
-
 		addCSS(ADMINDIR + 'css/richeditor.css');
-		
 		for(var i=0; addCSSUrl[i]; i++) {
 			addCSS(addCSSUrl[i]);
 		}
+		
+		for(var i=0, c=iframe.contentDocument.getElementsByTagName('IMG'); c[i]; i++)
+		{
+			c[i].addEventListener("click", onImageClick);
+		}
+		
 	}
 
-	var iframeOnMouseOver = function () {
+	var onImageClick = function()
+	{
+		iframe.contentWindow.getSelection().removeAllRanges();
+		var range = iframe.contentWindow.document.createRange();
+		range.setStartBefore(this);
+		range.setEndAfter(this);
+		iframe.contentWindow.getSelection().addRange(range);
+	}
+
+	var iframeOnMouseOver = function ()
+	{
 		container.className = container.className.replace('hover', '');
 		container.className += ' hover';
 		if (keysContainer) {
@@ -389,19 +404,14 @@ kZenEditor = function () {
 	}
 
 	this.swapDesignMode = function (mode) {
-		if (!mode)
-			mode = (designMode == 'text' ? 'rich' : 'text');
-		if (mode != "text" && mode != "rich")
-			mode = "text";
+		if (!mode) mode = (designMode == 'text' ? 'rich' : 'text');
+		if (mode != "text" && mode != "rich") mode = "text";
 		swapDesignMode(mode);
 	}
 	function swapDesignMode(mode) {
-		if (typeof mode != 'string')
-			mode = null;
-		if (!mode)
-			mode = (designMode == 'text' ? 'rich' : 'text');
-		if (mode != "text" && mode != "rich")
-			mode = "text";
+		if (typeof mode != 'string') mode = null;
+		if (!mode) mode = (designMode == 'text' ? 'rich' : 'text');
+		if (mode != "text" && mode != "rich") mode = "text";
 		if (mode == designMode) {}
 		else if (mode == "text") {
 			if (iframe)
@@ -417,10 +427,13 @@ kZenEditor = function () {
 			iframe.contentWindow.document.body.innerHTML = cnt;
 			designMode = "rich";
 		}
-		if (designMode == 'rich')
-			if(swapKeys) swapKeys.className = 'swapKeys';
-		else
-			if(swapKeys) swapKeys.className = 'swapKeys source';
+		if (swapKeys)
+		{
+			if (designMode == 'rich')
+				swapKeys.className = 'swapKeys';
+			else
+				swapKeys.className = 'swapKeys source';
+		}
 	}
 
 	function addKey(imgname, alt, onclick, CSSclass, kbefore, kafter) {
@@ -632,7 +645,16 @@ kZenEditor = function () {
 			textarea.value = cnt;
 		}
 	}
-	function insertHTML(html) {
+	
+	function insertElement(elm)
+	{
+		range = iframe.contentWindow.getSelection().getRangeAt(0);
+		range.insertNode(elm);
+		range.setStartAfter(elm);
+	}
+
+	function insertHTML(html)
+	{
 		var tag = document.createElement('DIV');
 		tag.innerHTML = html;
 		for (var i = 0; tag.childNodes[i]; i++) {
@@ -894,7 +916,12 @@ kZenEditor = function () {
 			}
 			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?limit=1&submitlabel=' + imglabel + '&submitlabel2=' + thumblabel + '&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
 		} else {
-			setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].filename + '" id="img' + imgs[0].id + '" />');
+			//setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].filename + '" id="img' + imgs[0].id + '" />');
+			var img = document.createElement('IMG');
+			img.src = imgs[0].dir + imgs[0].filename;
+			img.id = 'img' + imgs[0].id;
+			img.addEventListener("click", onImageClick);
+			insertElement(img);
 			k_closeIframeWindow();
 		}
 	}
@@ -1987,6 +2014,7 @@ function kThumbnailOnDrag(e) {
 	}
 }
 function kThumbnailOnDragEnd(e) {
+	console.log(e);
 	if (draggingObject) {
 		draggingObject.className = draggingObject.className.replace(" onDrag", "");
 		photogalleryDD.makeDraggable(draggingObject, kThumbnailOnDragStart, kThumbnailOnDrag, kThumbnailOnDragEnd);

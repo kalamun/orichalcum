@@ -131,3 +131,7 @@ img.alignright {
 	float:right;
 	margin:0 0 10px 20px;
 	}
+img {
+	position:relative;
+	z-index:200;
+	}
