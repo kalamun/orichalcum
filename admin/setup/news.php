@@ -35,11 +35,8 @@ if(isset($_POST['update'])) {
 	$kaImpostazioni->setParam('news-order',$_POST['news-order'][1],$_POST['news-order'][2]);
 	$kaImpostazioni->setParam('facebook',(isset($_POST['facebook'][1])?'s':'n'),"");
 	$kaImpostazioni->setParam('facebook-config',$_POST['facebook-config'][1],$_POST['facebook-config'][2]);
-	$kaImpostazioni->setParam('facebook-location',$_POST['facebook-location'][1],"");
-	$kaImpostazioni->setParam('facebook-address',$_POST['facebook-address'][1],$_POST['facebook-address'][2]);
-	$kaImpostazioni->setParam('facebook-country',$_POST['facebook-country'][1],$_POST['facebook-country'][2]);
-	$kaImpostazioni->setParam('facebook-contacts',$_POST['facebook-contacts'][1],$_POST['facebook-contacts'][2]);
 	$kaImpostazioni->setParam('facebook-page',$_POST['facebook-page'][1],"");
+	$kaImpostazioni->setParam('facebook-token','','');
 	}
 /* FINE AZIONI */
 
@@ -51,10 +48,6 @@ $layout=$kaImpostazioni->getParam('admin-news-layout',"*");
 $facebook=$kaImpostazioni->getParam('facebook');
 if(!isset($facebook['value1'])) $facebook['value1']="";
 $facebook['config']=$kaImpostazioni->getParam('facebook-config');
-$facebook['location']=$kaImpostazioni->getParam('facebook-location');
-$facebook['address']=$kaImpostazioni->getParam('facebook-address');
-$facebook['country']=$kaImpostazioni->getParam('facebook-country');
-$facebook['contacts']=$kaImpostazioni->getParam('facebook-contacts');
 $facebook['page']=$kaImpostazioni->getParam('facebook-page');
 
 ?>
@@ -169,15 +162,8 @@ $facebook['page']=$kaImpostazioni->getParam('facebook-page');
 	echo b3_create_input("facebook[1]","checkbox","Abilita integrazione con facebook","s","","",($facebook['value1']=="s"?'checked':''),true);
 	?>
 	<table>
-	<tr><td><label for="facebook-config1">API key</label></td><td><?= b3_create_input("facebook-config[1]","text","",b3_lmthize($facebook['config']['value1'],"input"),"120px",255); ?></td></tr>
-	<tr><td><label for="facebook-config2">Security key</label></td><td><?= b3_create_input("facebook-config[2]","text","",b3_lmthize($facebook['config']['value2'],"input"),"220px",255); ?></td></tr>
-	<tr><td><label for="facebook-location1">Location</label></td><td><?= b3_create_input("facebook-location[1]","text","",b3_lmthize($facebook['location']['value1'],"input"),"120px",255); ?></td></tr>
-	<tr><td><label for="facebook-address1">Street</label></td><td><?= b3_create_input("facebook-address[1]","text","",b3_lmthize($facebook['address']['value1'],"input"),"200px",255); ?></td></tr>
-	<tr><td><label for="facebook-address2">City</label></td><td><?= b3_create_input("facebook-address[2]","text","",b3_lmthize($facebook['address']['value2'],"input"),"150px",255); ?></td></tr>
-	<tr><td><label for="facebook-country1">State</label></td><td><?= b3_create_input("facebook-country[1]","text","",b3_lmthize($facebook['country']['value1'],"input"),"50px",255); ?></td></tr>
-	<tr><td><label for="facebook-country2">Country</label></td><td><?= b3_create_input("facebook-country[2]","text","",b3_lmthize($facebook['country']['value2'],"input"),"150px",255); ?></td></tr>
-	<tr><td><label for="facebook-contacts1">Phone</label></td><td><?= b3_create_input("facebook-contacts[1]","text","",b3_lmthize($facebook['contacts']['value1'],"input"),"120px",255); ?></td></tr>
-	<tr><td><label for="facebook-contacts2">E-mail</label></td><td><?= b3_create_input("facebook-contacts[2]","text","",b3_lmthize($facebook['contacts']['value2'],"input"),"200px",255); ?></td></tr>
+	<tr><td><label for="facebook-config1">App ID</label></td><td><?= b3_create_input("facebook-config[1]","text","",b3_lmthize($facebook['config']['value1'],"input"),"120px",255); ?></td></tr>
+	<tr><td><label for="facebook-config2">App Secret</label></td><td><?= b3_create_input("facebook-config[2]","text","",b3_lmthize($facebook['config']['value2'],"input"),"220px",255); ?></td></tr>
 	<tr><td><label for="facebook-page1">Pubblica nella pagina</label></td><td><?= b3_create_input("facebook-page[1]","text","",b3_lmthize($facebook['page']['value1'],"input"),"200px",255); ?> <small>Page ID</small></td></tr>
 	</table>
 	<br /><br />
