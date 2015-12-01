@@ -77,7 +77,7 @@ class kaImages {
 		$output=array();
 
 		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`>0 ";
-		if($conditions!="") $query.=" AND (".$conditions.") ";
+		if($conditions!="") $query.=" AND (".stripslashes($conditions).") ";
 		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
 		if($offset==false) $offset=0;
 		if($offset!=""||$limit!="")

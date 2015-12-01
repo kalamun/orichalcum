@@ -3,8 +3,6 @@ require_once('../../inc/main.lib.php');
 $kaOrichalcum=new kaOrichalcum();
 $kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
-if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
-
 /* set default timezone in PHP and MySQL */
 $timezone=kaGetVar('timezone',1);
 if($timezone!="") {
@@ -44,70 +42,69 @@ define("PAGE_NAME","Facebook");
 <body>
 
 <div id="iPopUpHeader">
-	<h1>Crea un evento su facebook</h1>
+	<h1><?= $kaTranslate->translate('News:Create a facebook post'); ?></h1>
 	<a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><img src="<?= ADMINRELDIR; ?>img/closeWindow.gif" alt="Close" width="9" height="9" /></a>
-	</div>
+</div>
 
 <div style="padding:20px;">
 
 <?php 
 
-if(!isset($_GET['id'])) {
+if(!isset($_GET['id']))
+{
 	/* no id passed */
 	?><div class="alert">Errore di sincronizzazione AJAX</div>
-	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow">chiudi</a></div>
-	<?php  }
+	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><?= $kaTranslate->translate('UI:Close'); ?></a></div>
+	<?php 
 
-elseif($kaConfig->getVar('facebook',1)!='s') {
+} elseif($kaConfig->getVar('facebook',1)!='s') {
 	/* facebook inactive */
 	?><div class="alert">Facebook non attivo</div>
-	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow">chiudi</a></div>
-	<?php  }
-
-elseif(trim($kaConfig->getVar('facebook-config',1))=='') {
+	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><?= $kaTranslate->translate('UI:Close'); ?></a></div>
+	<?php
+	
+} elseif(trim($kaConfig->getVar('facebook-config',1))=='') {
 	/* app_key is missing */
 	?><div class="alert">Devi configurare l'App key sulla <a href="<?= ADMINDIR; ?>impostazioni/news.php">configurazione delle notizie</a></div>
-	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow">chiudi</a></div>
-	<?php  }
-
-elseif(trim($kaConfig->getVar('facebook-config',2))=='') {
+	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><?= $kaTranslate->translate('UI:Close'); ?></a></div>
+	<?php
+	
+} elseif(trim($kaConfig->getVar('facebook-config',2))=='') {
 	/* secret_key is missing */
 	?><div class="alert">Devi configurare la Secret key sulla <a href="<?= ADMINDIR; ?>impostazioni/news.php">configurazione delle notizie</a></div>
-	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow">chiudi</a></div>
-	<?php  }
+	<div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><?= $kaTranslate->translate('UI:Close'); ?></a></div>
+	<?php
 
-else { /* all right! */
+} elseif(trim($kaConfig->getVar('facebook-page',1))=='') {
+    /* secret_key is missing */
+	?><div class="alert">Devi configurare l'ID della pagina sulla <a href="<?= ADMINDIR; ?>impostazioni/news.php">configurazione delle notizie</a></div>
+    <div style="text-align:center;"><br /><a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><?= $kaTranslate->translate('UI:Close'); ?></a></div>
+    <?php
+
+} else {
+	/* all right! */
 	$n=$kaNews->get($_GET['id']);
 	$order=$kaConfig->getVar('news-order',1);
 	$order=str_replace(" DESC","",$order);
-	$data_start=mktime(substr($n[$order],11,2),substr($n[$order],14,2),substr($n[$order],17,2),substr($n[$order],5,2),substr($n[$order],8,2),substr($n[$order],0,4));
-	$data_end=$data_start+1800;
+    $news_category = $n['categorie'][0]["dir"];
+    $news_base_dir = $kaConfig->getVar('dir_news',1);
+    $news_dir = $n['dir'];
+    $link=SITE_URL.BASEDIR.strtolower($_SESSION['ll']).'/'.$news_base_dir.'/'.$news_category.'/'.$news_dir;
 	?>
-	<form action="facebook_create_event.php?id=<?= $_GET['id']; ?>" method="post">
-	<table>
-	<tr><td><label for="name">Name</label></td><td class="title"><?= b3_create_input("name","text","",b3_lmthize($n['titolo'].($n['sottotitolo']!=""?' - '.$n['sottotitolo']:''),"input"),"450px",255); ?></td></tr>
-	<tr><td><label for="description">Description</label></td><td><textarea name="description" id="description" class="arial" style="width:450px;height:100px;"><?= trim(strip_tags(str_replace("<br />","<br />\n\n",str_replace("</p>","</p>\n\n",str_replace("\n","",$n['anteprima'].'<p></p>'.$n['testo']))))); ?></textarea></td></tr>
-	<tr><td></td><td>
-		<label for="start_time">Start time</label> <?= b3_create_input("start_time","text","",date("d-m-Y H:i:s",$data_start),"120px",255); ?> -
-		<label for="end_time">End time</label> <?= b3_create_input("end_time","text","",date("d-m-Y H:i:s",$data_end),"120px",255); ?>
-		<br /><br /></td></tr>
-	<tr><td><label for="location">Location</label></td><td><?= b3_create_input("location","text","",b3_lmthize($kaConfig->getVar('facebook-location',1),"input"),"120px",255); ?></td></tr>
-	<tr><td><label for="street">Street</label></td><td><?= b3_create_input("street","text","",b3_lmthize($kaConfig->getVar('facebook-address',1),"input"),"200px",255); ?></td></tr>
-	<tr><td><label for="city">City</label></td><td><?= b3_create_input("city","text","",b3_lmthize($kaConfig->getVar('facebook-address',2),"input"),"150px",255); ?>
-			<label for="state">State</label> <?= b3_create_input("state","text","",b3_lmthize($kaConfig->getVar('facebook-country',1),"input"),"50px",255); ?></td></tr>
-	<tr><td><label for="country">Country</label></td><td><?= b3_create_input("country","text","",b3_lmthize($kaConfig->getVar('facebook-country',2),"input"),"150px",255); ?></td></tr>
-	<tr><td><label for="phone">Phone</label></td><td><?= b3_create_input("phone","text","",b3_lmthize($kaConfig->getVar('facebook-contacts',1),"input"),"120px",255); ?></td></tr>
-	<tr><td><label for="email">E-mail</label></td><td><?= b3_create_input("email","text","",b3_lmthize($kaConfig->getVar('facebook-contacts',2),"input"),"200px",255); ?></td></tr>
-	</table>
-
-	<br />
-	<div class="submit" id="submit">
-		<input type="submit" name="insert" class="button" value="Crea evento" />
+	<form action="facebook_create_post.php?id=<?= $_GET['id']; ?>" method="post">
+		<table>
+			<tr><td><label for="testo">Text</label></td><td class="title"><?= b3_create_textarea("testo",$kaTranslate->translate('News:Contents')." <br />",b3_lmthize($n['titolo'].($n['sottotitolo']!=""?' - '.$n['sottotitolo']:''),"input"),"450px","200px"); ?></td></tr>
+			<tr><td><label for="link">Link</label></td><td><?= b3_create_input("link","text","",$link,"450px","","readonly") ?></td></tr>
+			<tr><td></td><td><a href="" onClick="window.open('https://developers.facebook.com/tools/debug/og/object?q=<?= urlencode($link); ?>','Windows','width=960,height=700,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no');return false;">Anteprima link</a> (scorrere fino a "When shared...")</td></tr>
+		</table>
+		<br />
+		<div class="submit" id="submit">
+			<input type="submit" name="insert" class="button" value="Crea Post" />
 		</div>
 	</form>
 	<?php 
-	}
-	?>
+}
+?>
 
 	</div>
 

@@ -117,7 +117,7 @@ class kText
 			{
 				// skip latest spaces and tag's closure chars
 				for(; trim($string[$offset])==""; $offset++) {}
-				for(; $string[$offset]=="/" || $string[$offset]==">"; $offset++) {}
+				for(; strlen($string) > $offset && ($string[$offset]=="/" || $string[$offset]==">"); $offset++) {}
 			}
 
 			// look forward for close tag, if no other tags of the same type was opened before

@@ -10,30 +10,61 @@ if(isset($_POST['action']))
 	/* return image list */
 	if($_POST['action']=='getImageList')
 	{
-		require_once('../images.lib.php');
-		$kaImages=new kaImages();
-		if(!isset($_POST['start'])) $_POST['start']=0;
-		if(!isset($_POST['limit'])) $_POST['limit']=30;
-		if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
-		
-		//if sorted by filename remove the limit because the natural sorting is made by PHP so it needs the entrire list
-		if(strpos($_POST['orderby'],'filename')!==false)
+		if($_POST['fileType']=="image")
 		{
-			$tmp=array("start"=>$_POST['start'], "limit"=>$_POST['limit']);
-			$_POST['start']=0;
-			$_POST['limit']=false;
-		}
-		
-		if(!isset($_POST['conditions'])) $_POST['conditions']='';
-		if(isset($_POST['search'])&&$_POST['search']!="") $_POST['conditions'].=" AND (`filename` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `thumbnail` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `hotlink` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `alt` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `idimg`='".intval($_POST['search'])."')";
-		if(substr($_POST['conditions'],0,5)==' AND ') $_POST['conditions']=substr($_POST['conditions'],5);
+			require_once('../images.lib.php');
+			$kaImages=new kaImages();
+			if(!isset($_POST['start'])) $_POST['start']=0;
+			if(!isset($_POST['limit'])) $_POST['limit']=30;
+			if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
+			
+			//if sorted by filename remove the limit because the natural sorting is made by PHP so it needs the entrire list
+			if(strpos($_POST['orderby'],'filename')!==false)
+			{
+				$tmp=array("start"=>$_POST['start'], "limit"=>$_POST['limit']);
+				$_POST['start']=0;
+				$_POST['limit']=false;
+			}
+			
+			if(!isset($_POST['conditions'])) $_POST['conditions']='';
+			if(isset($_POST['search'])&&$_POST['search']!="") $_POST['conditions'].=" AND (`filename` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `thumbnail` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `hotlink` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `alt` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `idimg`='".intval($_POST['search'])."')";
+			if(substr($_POST['conditions'],0,5)==' AND ') $_POST['conditions']=substr($_POST['conditions'],5);
 
-		$output=array();
-		$images=array();
-		foreach($kaImages->getList($_POST['orderby'],$_POST['conditions'],$_POST['start'],$_POST['limit']) as $img)
-		{
-			$images[$img['idimg']]=$img;
-			$output[$img['idimg']]=$img['filename'];
+			$output=array();
+			$images=array();
+			foreach($kaImages->getList($_POST['orderby'],$_POST['conditions'],$_POST['start'],$_POST['limit']) as $img)
+			{
+				$images[$img['idimg']]=$img;
+				$output[$img['idimg']]=$img['filename'];
+			}
+			
+		} elseif($_POST['fileType']=="media") {
+			require_once('../media.lib.php');
+			$kaMedias=new kaMedias();
+			if(!isset($_POST['start'])) $_POST['start']=0;
+			if(!isset($_POST['limit'])) $_POST['limit']=30;
+			if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idmedia` DESC';
+			
+			//if sorted by filename remove the limit because the natural sorting is made by PHP so it needs the entrire list
+			if(strpos($_POST['orderby'],'filename')!==false)
+			{
+				$tmp=array("start"=>$_POST['start'], "limit"=>$_POST['limit']);
+				$_POST['start']=0;
+				$_POST['limit']=false;
+			}
+			
+			if(!isset($_POST['conditions'])) $_POST['conditions']='';
+			if(isset($_POST['search'])&&$_POST['search']!="") $_POST['conditions'].=" AND (`filename` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `thumbnail` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `hotlink` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `alt` LIKE '%".ksql_real_escape_string($_POST['search'])."%' OR `idimg`='".intval($_POST['search'])."')";
+			if(substr($_POST['conditions'],0,5)==' AND ') $_POST['conditions']=substr($_POST['conditions'],5);
+
+			$output=array();
+			$images=array();
+			foreach($kaImages->getList($_POST['orderby'],$_POST['conditions'],$_POST['start'],$_POST['limit']) as $media)
+			{
+				$images[$media['idimg']]=$media;
+				$output[$media['idimg']]=$media['filename'];
+			}
+			
 		}
 		
 		//if sorted by filename sort by natural order and apply offset and limit
