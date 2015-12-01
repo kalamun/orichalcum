@@ -1,5 +1,27 @@
 {
+<<<<<<< HEAD
   "require" : {
     "facebook/php-sdk-v4" : "~5.0"
   }
 }
+=======
+  "config": {
+    "vendor-dir": "vendor"
+  },
+  "require" : {
+    "facebook/php-sdk-v4" : "~5.0",
+    "mandrill/mandrill": "1.0.*",
+    "google/recaptcha": "~1.1"
+  },
+  "name": "kalamun/orichalcum",
+  "description": "Orichalcum è un Content Management System completo, integrato e semplice.",
+  "minimum-stability": "stable",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Roberto Pasini",
+      "email": "info@kalamun.org"
+    }
+  ]
+}
+>>>>>>> origin/master
