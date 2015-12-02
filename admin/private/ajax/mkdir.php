@@ -13,9 +13,6 @@ $kaOrichalcum->init();
 
 $kaTranslate=new kaAdminTranslate();
 
-/*$GLOBALS['kaImpostazioni']=new kaImpostazioni();
-$kaTranslate=new kaAdminTranslate();*/
-
 require_once('../private.lib.php');
 $kaPrivate=new kaPrivate();
 
