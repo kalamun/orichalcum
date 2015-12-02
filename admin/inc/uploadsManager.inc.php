@@ -8,11 +8,11 @@ define("PAGE_NAME",$kaTranslate->translate('Uploads:Uploads'));
 
 
 /*
-filetype = image | document | media
+fileType = image | document | media
 search = search key
 limit = maximum number of items you can upload / select
 */
-if(!isset($_GET['filetype']) || $_GET['filetype']=="") $_GET['filetype']='image';
+if(!isset($_GET['fileType']) || $_GET['fileType']=="") $_GET['fileType']='image';
 if(!isset($_GET['search'])) $_GET['search']="";
 if(!isset($_GET['limit'])) $_GET['limit']=1000;
 if(!isset($_GET['orderby'])) $_GET['orderby']='creation_date';
@@ -45,7 +45,7 @@ $getcollection=substr($getcollection,1);
 
 <script type="text/javascript">
 	var ADMINDIR='<?= str_replace("'","\'",ADMINDIR); ?>';
-	</script>
+</script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/dictionary.js.php?<?= SW_VERSION; ?>" charset="utf-8"></script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/kalamun.js?<?= SW_VERSION; ?>" charset="utf-8"></script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/main.lib.js?<?= SW_VERSION; ?>" charset="utf-8"></script>
@@ -54,7 +54,8 @@ $getcollection=substr($getcollection,1);
 
 <body>
 
-<?php /****************************************
+<?php
+/****************************************
 * UPLOAD
 ****************************************/
 ?>
@@ -62,11 +63,14 @@ $getcollection=substr($getcollection,1);
 	<div id="uploadheader">
 		<a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><img src="<?= ADMINRELDIR; ?>img/closeWindow.gif" alt="Close" width="9" height="9" /></a>
 		<div class="topbar">
+			<input type="hidden" id="fileType" value="<?= $_GET['fileType']; ?>">
 			<input type="text" id="search" placeholder="<?= $kaTranslate->translate('Uploads:search for name, caption, id...'); ?>">
 
 			<div class="orderby">
-				<?= $kaTranslate->translate('Uploads:Order by'); ?> <ul id="filters">
-				<?php 				// filters
+				<?= $kaTranslate->translate('Uploads:Order by'); ?>
+				<ul id="filters">
+				<?php
+ 				// filters
 				$menu=array();
 				$menu['creation_date']=$kaTranslate->translate('Uploads:Date');
 				$menu['filename']=$kaTranslate->translate('Uploads:File name');
@@ -86,16 +90,20 @@ $getcollection=substr($getcollection,1);
 	<div id="uploadcontents">
 
 		<div id="drop"><div class="hover"></div>
+			<div class="uploadinfo">
+				<?= $kaTranslate->translate('Uploads:drag and drop your files here'); ?> <?= $kaTranslate->translate('Uploads:or'); ?>:<br>
+				<span id="browseContainer">
+					<form id="upload" method="post" action="<?= ADMINDIR.'inc/ajax/uploadHandler.php'; ?>" enctype="multipart/form-data">
+						<input type="file" name="fileselect[]" id="browse" multiple="multiple" />
+					</form>
+					<?= $kaTranslate->translate('Uploads:Upload from your computer'); ?></span>
+				<?= $kaTranslate->translate('Uploads:or'); ?>
+				<span id="internetuploadButton"><?= $kaTranslate->translate('Uploads:Upload from the internet'); ?></span>
+			</div>
 			<ul id="uploadedFileList"></ul>
 		</div>		
 		
 		<div id="submit">
-			<form id="upload" method="post" action="<?= ADMINDIR.'inc/ajax/uploadHandler.php'; ?>" enctype="multipart/form-data">
-				<input type="file" name="fileselect[]" id="browse" multiple="multiple" />
-				<span><?= $kaTranslate->translate('Uploads:Click here to choose one or more files from your computer'); ?></span>
-					<?= $kaTranslate->translate('Uploads:or drag and drop them here'); ?>
-			</form>
-
 			<input type="submit" id="submitButton" value="<?= $_GET['submitlabel']; ?>" class="button">
 			<?php if($_GET['submitlabel2']!="") { ?>
 				<input type="submit" id="submitButton2" value="<?= $_GET['submitlabel2']; ?>" class="button">
@@ -110,13 +118,34 @@ $getcollection=substr($getcollection,1);
 	<iframe src=""></iframe>
 </div>
 
+<div id="internetupload">
+	<div class="closeWindow"><img src="<?= ADMINRELDIR; ?>img/closeWindow.gif" alt="Close" width="9" height="9" /></div>
+	<iframe src=""></iframe>
+</div>
+<?php
+require_once($_SERVER['DOCUMENT_ROOT'].ADMINDIR.'inc/images.lib.php');
+$kaImages = new kaImages();
+$kaImages->cleanTmpDir();
+?>
 <script type="text/javascript">
 	var kUploads=new kUploads();
-	kUploads.init(document.getElementById('upload'),document.getElementById('drop'),document.getElementById('browse'),document.getElementById('uploadeditor'),document.getElementById('uploadedFileList'),document.getElementById('search'),document.getElementById('filters'),document.getElementById('submitButton'),document.getElementById('submitButton2'),<?= $_GET['onsubmit']; ?>,<?= $_GET['onsubmit2']; ?>,'<?= $_GET['limit']; ?>');
-
-	<?php 	/* IMAGES */
-	if($_GET['filetype']=='image') { ?>kUploads.loadImages();<?php }
-	?>
+	kUploads.init(
+		document.getElementById('upload'),
+		document.getElementById('drop'),
+		document.getElementById('browse'),
+		document.getElementById('uploadeditor'),
+		document.getElementById('internetupload'),
+		document.getElementById('uploadedFileList'),
+		document.getElementById('search'),
+		document.getElementById('filters'),
+		document.getElementById('submitButton'),
+		document.getElementById('submitButton2'),
+		<?= $_GET['onsubmit']; ?>,
+		<?= $_GET['onsubmit2']; ?>,
+		'<?= $_GET['limit']; ?>'
+		);
+	kUploads.loadImages();
+	kAddEvent(document.getElementById('internetuploadButton'), "click", kUploads.openInternetUploadDialog);
 </script>
 
 
