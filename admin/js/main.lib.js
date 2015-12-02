@@ -258,7 +258,6 @@ kZenEditor = function () {
 	};
 
 	var addCSS = function(url) {
-		console.log(url);
 		if(isLoaded==false) {
 			addCSSUrl.push(url);
 			return true;
@@ -381,7 +380,7 @@ kZenEditor = function () {
 		var tmp = range.cloneContents();
 
 		// image tips
-		if (tmp.childNodes.length == 1 && tmp.childNodes[0].tagName == 'IMG' && (tmp.childNodes[0].getAttribute('id').substr(0, 3) == 'img' || tmp.childNodes[0].getAttribute('id').substr(0, 5) == 'thumb')) {
+		if (tmp.childNodes.length == 1 && tmp.childNodes[0].tagName == 'IMG' && (tmp.childNodes[0].getAttribute('data-orichalcum-id').substr(0, 3) == 'img' || tmp.childNodes[0].getAttribute('data-orichalcum-id').substr(0, 3) == 'thm')) {
 			var pos = range.getBoundingClientRect();
 
 			tips = document.createElement('DIV');
@@ -391,9 +390,12 @@ kZenEditor = function () {
 			var editlabel="Edit";
 			if(typeof kaDictionary!="undefined") editlabel=kaDictionary.Edit;
 			txtnode.appendChild(document.createTextNode(editlabel));
-			kAddEvent(txtnode, "click", function () {
-				editImg(tmp.childNodes[0].getAttribute('id'));
+			
+			kAddEvent(txtnode, "click", function ()
+			{
+				editImg(tmp.childNodes[0].getAttribute('data-orichalcum-id'));
 			});
+			
 			tips.appendChild(txtnode);
 			container.appendChild(tips);
 			tips.style.top = Math.round(pos.top - 3 - tips.offsetHeight) + 'px';
@@ -653,12 +655,14 @@ kZenEditor = function () {
 		range.setStartAfter(elm);
 	}
 
-	function insertHTML(html)
+	function insertHTML(html, empty)
 	{
 		var tag = document.createElement('DIV');
 		tag.innerHTML = html;
 		for (var i = 0; tag.childNodes[i]; i++) {
 			range = iframe.contentWindow.getSelection().getRangeAt(0);
+			if(empty==true) range.deleteContents();
+
 			var tmp = tag.childNodes[i].cloneNode(true);
 			range.insertNode(tmp);
 			range.setStartAfter(tmp);
@@ -903,8 +907,6 @@ kZenEditor = function () {
 	}
 	function insertImg(imgs) {
 		if (!imgs || !imgs[0]) {
-			var mediatable = container.getAttribute('mediatable');
-			var mediaid = container.getAttribute('mediaid');
 			parent.kZenEditorInsertImg = insertImg;
 			parent.kZenEditorInsertThumb = insertThumb;
 			var imglabel='Insert image';
@@ -914,12 +916,11 @@ kZenEditor = function () {
 				imglabel=kaDictionary.Insertimage;
 				thumblabel=kaDictionary.Insertthumbnail;
 			}
-			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?limit=1&submitlabel=' + imglabel + '&submitlabel2=' + thumblabel + '&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
+			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?fileType=image&limit=1&submitlabel=' + imglabel + '&submitlabel2=' + thumblabel + '&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
 		} else {
-			//setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].filename + '" id="img' + imgs[0].id + '" />');
 			var img = document.createElement('IMG');
 			img.src = imgs[0].dir + imgs[0].filename;
-			img.id = 'img' + imgs[0].id;
+			img.setAttribute('data-orichalcum-id', 'img'+imgs[0].id);
 			img.addEventListener("click", onImageClick);
 			insertElement(img);
 			k_closeIframeWindow();
@@ -935,11 +936,14 @@ kZenEditor = function () {
 
 	function insertThumb(imgs) {
 		if (!imgs || !imgs[0]) {
-			var mediatable = container.getAttribute('mediatable');
-			var mediaid = container.getAttribute('mediaid');
-			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?limit=1&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
+			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?fileType=image&limit=10&onsubmit=parent.kZenEditorInsertImg&onsubmit2=parent.kZenEditorInsertThumb');
 		} else {
-			setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].thumbnail + '" id="thumb' + imgs[0].id + '" />');
+			//setHTMLTag('', '<img src="' + imgs[0].dir + imgs[0].thumbnail + '" id="thumb' + imgs[0].id + '" />');
+			var img = document.createElement('IMG');
+			img.src = imgs[0].dir + imgs[0].thumbnail;
+			img.setAttribute('data-orichalcum-id', 'thm'+imgs[0].id);
+			img.addEventListener("click", onImageClick);
+			insertElement(img);
 			k_closeIframeWindow();
 		}
 	}
@@ -955,8 +959,8 @@ kZenEditor = function () {
 				if (iframe.contentWindow.getSelection) { // FF
 					range = iframe.contentWindow.getSelection().getRangeAt(0);
 					for (ancestor = range.commonAncestorContainer; ancestor; ancestor = ancestor.parentNode) {
-						if (ancestor.tagName == 'A' && ancestor.getAttribute('id').match(/doc\d*/))
-							var iddoc = ancestor.getAttribute('id').substring(3);
+						if (ancestor.tagName == 'A' && ancestor.getAttribute('data-orichalcum-id').match(/doc\d*/))
+							var iddoc = ancestor.getAttribute('data-orichalcum-id').substring(3);
 					}
 				}
 			}
@@ -969,36 +973,29 @@ kZenEditor = function () {
 			var mediaid = container.getAttribute('mediaid');
 			k_openIframeWindow(ADMINDIR + 'inc/docManager.inc.php?refid=' + id + '&mediatable=' + mediatable + '&mediaid=' + mediaid + '&iddoc=' + iddoc, '800px', '500px');
 		} else {
-			setHTMLTag('<a href="' + url + '" id="doc' + iddoc + '">', alt + '</a>');
+			setHTMLTag('<a href="' + url + '" data-orichalcum-id="doc' + iddoc + '">', alt + '</a>');
 		}
 	}
 	this.insertDoc = function (iddoc, alt, url) {
 		insertDoc(iddoc, alt, url);
 	}
-	function insertMedia(idmedia, alt, url, width, height) {
-		if (!idmedia) {
-			if (designMode == "rich") {
-				var range = null;
-				var contents = null;
-				if (iframe.contentWindow.getSelection) { // FF
-					range = iframe.contentWindow.getSelection().getRangeAt(0);
-					contents = range.cloneContents();
-					if (contents.childNodes.length == 1 && contents.childNodes[0].nodeType == 1 && contents.childNodes[0].tagName == 'IMG') {
-						if (contents.childNodes[0].getAttribute('id').match(/media\d*/))
-							var idmedia = contents.childNodes[0].getAttribute('id').substring(5);
-					}
-				}
+	function insertMedia(imgs) {
+		if (!imgs || !imgs[0]) {
+			parent.kZenEditorInsertMedia = insertMedia;
+			var imglabel='Insert media';
+			if(typeof kaDictionary != "undefined")
+			{
+				imglabel=kaDictionary.Insertmedia;
 			}
-		}
-		if (!idmedia) {
-			var idmedia = "";
-		}
-		if (!url) {
-			var mediatable = container.getAttribute('mediatable');
-			var mediaid = container.getAttribute('mediaid');
-			k_openIframeWindow(ADMINDIR + 'inc/mediaManager.inc.php?refid=' + id + '&mediatable=' + mediatable + '&mediaid=' + mediaid + '&idmedia=' + idmedia, '800px', '500px');
+			k_openIframeWindow(ADMINDIR + 'inc/uploadsManager.inc.php?fileType=media&limit=1&submitlabel=' + imglabel + '&onsubmit=parent.kZenEditorInsertMedia');
 		} else {
-			setHTMLTag('', '<img src="' + url + '" id="media' + idmedia + '" ' + (width > 0 ? 'width="' + width + '" ' : '') + (height > 0 ? 'height="' + height + '" ' : '') + '/>');
+			//setHTMLTag('', '<img src="' + url + '" data-orichalcum-id="img' + idmedia + '" ' + (width > 0 ? 'width="' + width + '" ' : '') + (height > 0 ? 'height="' + height + '" ' : '') + '/>');
+			var img = document.createElement('IMG');
+			img.src = imgs[0].dir + imgs[0].thumbnail;
+			img.setAttribute('data-orichalcum-id', 'img'+imgs[0].id);
+			img.addEventListener("click", onImageClick);
+			insertElement(img);
+			k_closeIframeWindow();
 		}
 	}
 	this.insertMedia = function (idmedia, alt, url, width, height) {
@@ -1129,89 +1126,88 @@ kZenEditor = function () {
 	}
 
 	/* copy paste and cleaning */
-	function iframeOnPaste(e) {
-		var ibody = iframe.contentWindow.document.ibody;
-		copyPasteTmp = document.createDocumentFragment();
-		copyPasteScrollTop = ibody.scrollTop;
-		var range = iframe.contentWindow.getSelection().getRangeAt(0);
-		copyPasteRange = {
-			startElm : range.startContainer,
-			startOffset : range.startOffset,
-			endElm : range.endContainer,
-			endOffset : range.endOffset
-		};
-		while (ibody.firstChild) {
-			copyPasteTmp.appendChild(ibody.firstChild);
-		}
-		if (e && e.clipboardData && e.clipboardData.getData) { // Webkit
-			if (/text\/html/.test(e.clipboardData.types))
-				iframe.contentWindow.document.ibody.innerHTML = e.clipboardData.getData('text/html');
-			else if (/text\/plain/.test(e.clipboardData.types))
-				iframe.contentWindow.document.ibody.innerHTML = e.clipboardData.getData('text/plain');
-			else
-				iframe.contentWindow.document.ibody.innerHTML = "";
-			waitforpastedata();
-			if (e.preventDefault) {
-				e.stopPropagation();
-				e.preventDefault();
-			}
-			return false;
-		} else { // FF, IE...
-			waitforpastedata();
-			return true;
-		}
+	function iframeOnPaste(e)
+	{
+		var startPaste = iframe.contentWindow.document.getElementById('orichalcumStartPaste');
+		if(startPaste) startPaste.parentNode.removeChild(startPaste,true);
+		insertHTML('<span id="orichalcumStartPaste"></span>');
+		setTimeout(afterPaste, 0);
 	}
-	function waitforpastedata() {
-		var ibody = iframe.contentWindow.document.body;
-		if (ibody.childNodes && ibody.childNodes.length > 0)
-			processpaste();
-		else
-			setTimeout(waitforpastedata, 20);
-	}
-	function processpaste() {
-		var ibody = iframe.contentWindow.document.body;
-		//cleaning pasted data
-		clearNode(ibody);
-		ibody.innerHTML = ibody.innerHTML.replace(/<(\/)b>/i, "<$1strong>");
-		//end cleaning
+	
+	function afterPaste()
+	{
+		var sel = iframe.contentWindow.getSelection();
+		var range = sel.getRangeAt(0);
+		var startPaste = iframe.contentWindow.document.getElementById('orichalcumStartPaste');
+		range.setStartAfter(startPaste, 0);
+		startPaste.parentNode.removeChild(startPaste,true);
 
-		var pastedData = ibody.innerHTML;
-
-		ibody.innerHTML = "";
-		while (copyPasteTmp.childNodes.length > 0) {
-			ibody.appendChild(copyPasteTmp.childNodes[0]);
-		}
-		iframe.contentWindow.getSelection().removeAllRanges();
-		var range = iframe.contentWindow.document.createRange();
-		range.setStart(copyPasteRange.startElm, copyPasteRange.startOffset);
-		range.setEnd(copyPasteRange.endElm, copyPasteRange.endOffset);
-		iframe.contentWindow.getSelection().addRange(range);
+		var tmp = range.cloneContents();
 		range.deleteContents();
-		insertHTML(pastedData);
-		ibody.scrollTop = copyPasteScrollTop;
-		copyPasteRange = null;
-		pastedData = null;
+		cleanNode(tmp);
+		var container = document.createElement('DIV');
+		container.appendChild(tmp);
+
+		cleanFormatting(container);
+		container.innerHTML = autoEmbed(container.innerHTML);
+
+		tmp = null;
+		tmp2 = document.createDocumentFragment();
+		
+		for(var c=container.childNodes; c[0];)
+		{
+			tmp2.appendChild(c[0]);
+		}
+		
+		range.insertNode(tmp2);
+		range.setStart(range.endContainer, range.endOffset);
 	}
-	function clearNode(node) {
+
+	// automatically embed videos and photos from main providers
+	function autoEmbed(html)
+	{
+		// youtube
+		html = html.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/, '<iframe width="560" height="315" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
+		html = html.replace(/https?:\/\/youtu\.be\/([^\s]+)/, '<iframe width="560" height="315" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
+
+		// vimeo
+		html = html.replace(/https?:\/\/vimeo\.com\/([^\s]+)/, '<iframe src="https://player.vimeo.com/video/$1" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');
+		
+		// flickr
+		html = html.replace(/https?:\/\/www\.flickr\.com\/photos\/([^\s]+)/, '<iframe src="https://www.flickr.com/photos/$1player/" height="333" width="500"  frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>');
+		
+		// giphy
+		html = html.replace(/http:\/\/giphy.com\/gifs\/([^\s]+)/, '<iframe src="//giphy.com/embed/$1" width="480" height="304" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>');
+		
+		return html;
+	}
+	
+	// remove deprecated or common non-standard nodes
+	function cleanNode(node) {
 		for (var i = 0; node.childNodes[i]; i++) {
 			if (node.childNodes[i].nodeType > 3 || (node.childNodes[i].nodeType == 1 && node.childNodes[i].tagName.match(/^(TITLE|STYLE|META|W:.*|M:.*|XML)$/i))) {
 				//remove node and contents
 				node.removeChild(node.childNodes[i]);
 				i--;
 			} else if (node.childNodes[i].nodeType == 1 && node.childNodes[i].tagName.match(/^(FONT|SPAN)$/i)) {
-				//remove node but contents
+				//remove node but leave contents
 				for (var j = 0; node.childNodes[i].childNodes[j]; j++) {
 					node.insertBefore(node.childNodes[i].childNodes[j], node.childNodes[i].nextSibling);
 				}
 				node.removeChild(node.childNodes[i]);
 				i--;
 			} else if (node.childNodes[i].nodeType == 1 && node.childNodes[i].childNodes.length > 0)
-				clearNode(node.childNodes[i]);
+				cleanNode(node.childNodes[i]);
 		}
 	}
-	function cleanFormatting() {
-		var range = iframe.contentWindow.getSelection().getRangeAt(0);
-		ancestor = range.commonAncestorContainer;
+	
+	// remove deprecated nodes and clean class, style and other attributes
+	function cleanFormatting(ancestor) {
+		if(!ancestor)
+		{
+			var range = iframe.contentWindow.getSelection().getRangeAt(0);
+			ancestor = range.commonAncestorContainer;
+		}
 
 		/* remove nodes */
 		var tagsToBeRemoved = Array("FONT", "SPAN", "DIV", "U", "ADDRESS"); //remove node, leave contents
@@ -1249,8 +1245,11 @@ kZenEditor = function () {
 			if (DOMnode.nodeType == 1 || DOMnode.nodeType == 2) {
 				DOMnode.removeAttribute('style');
 				DOMnode.removeAttribute('class');
+				DOMnode.removeAttribute('face');
+				DOMnode.removeAttribute('lang');
 				DOMnode.removeAttribute('bgcolor');
 				DOMnode.removeAttribute('border');
+				DOMnode.removeAttribute('cellspacing');
 				DOMnode.removeAttribute('cellpadding');
 				DOMnode.removeAttribute('align');
 				DOMnode.removeAttribute('valign');
@@ -1260,14 +1259,17 @@ kZenEditor = function () {
 				checkChilds(DOMnode.childNodes[i]);
 			}
 		}
+		
 		checkChilds(ancestor);
-		for (var i = 0; nodesToBeDeleted[i]; i++) {
+		for (var i = 0; nodesToBeDeleted[i]; i++)
+		{
 			if (nodesToBeDeleted[i])
 				nodesToBeDeleted[i].parentNode.removeChild(nodesToBeDeleted[i]);
 		}
 
 		/* remove empty links */
-		for(var i=0, c=ancestor.getElementsByTagName('A'); c[i]; i++) {
+		for(var i=0, c=ancestor.getElementsByTagName('A'); c[i]; i++)
+		{
 			if(c[i].innerHTML.replace("/\s/","")=="") c[i].parentNode.removeChild(c[i]);
 		}
 
@@ -1275,7 +1277,12 @@ kZenEditor = function () {
 		var html = ancestor.innerHTML;
 		html = html.replace(/&nbsp;/g, ' ');
 		html = html.replace(/<h[123456]>\s*?<\/h[123456]>/gi, '');
+		html = html.replace(/<p>\s*?<br( \/)?>\s*?<\/p>/gi, '');
 		html = html.replace(/<a [^>]*>\s*?<\/a>/gi, '');
+		html = html.replace("<b>", "<strong>");
+		html = html.replace("</b>", "</strong>");
+		html = html.replace("<i>", "<strong>");
+		html = html.replace("</i>", "</strong>");
 		html = html.replace(/[ \t]+/g, ' ');
 		html = html.replace(/\n+/g, "\n");
 		ancestor.innerHTML = html;

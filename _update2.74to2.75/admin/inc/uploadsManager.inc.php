@@ -45,7 +45,7 @@ $getcollection=substr($getcollection,1);
 
 <script type="text/javascript">
 	var ADMINDIR='<?= str_replace("'","\'",ADMINDIR); ?>';
-	</script>
+</script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/dictionary.js.php?<?= SW_VERSION; ?>" charset="utf-8"></script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/kalamun.js?<?= SW_VERSION; ?>" charset="utf-8"></script>
 <script type="text/javascript" src="<?= ADMINDIR; ?>js/main.lib.js?<?= SW_VERSION; ?>" charset="utf-8"></script>
@@ -129,7 +129,21 @@ $kaImages->cleanTmpDir();
 ?>
 <script type="text/javascript">
 	var kUploads=new kUploads();
-	kUploads.init(document.getElementById('upload'),document.getElementById('drop'),document.getElementById('browse'),document.getElementById('uploadeditor'),document.getElementById('internetupload'),document.getElementById('uploadedFileList'),document.getElementById('search'),document.getElementById('filters'),document.getElementById('submitButton'),document.getElementById('submitButton2'),<?= $_GET['onsubmit']; ?>,<?= $_GET['onsubmit2']; ?>,'<?= $_GET['limit']; ?>');
+	kUploads.init(
+		document.getElementById('upload'),
+		document.getElementById('drop'),
+		document.getElementById('browse'),
+		document.getElementById('uploadeditor'),
+		document.getElementById('internetupload'),
+		document.getElementById('uploadedFileList'),
+		document.getElementById('search'),
+		document.getElementById('filters'),
+		document.getElementById('submitButton'),
+		document.getElementById('submitButton2'),
+		<?= $_GET['onsubmit']; ?>,
+		<?= $_GET['onsubmit2']; ?>,
+		'<?= $_GET['limit']; ?>'
+		);
 	kUploads.loadImages();
 	kAddEvent(document.getElementById('internetuploadButton'), "click", kUploads.openInternetUploadDialog);
 </script>
