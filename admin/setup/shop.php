@@ -64,6 +64,7 @@ if(isset($_POST['update'])) {
 	$kaImpostazioni->setParam('shop-paypal-return',$_POST['shop-paypal-return1'],$_POST['shop-paypal-return2']);
 	$kaImpostazioni->setParam('shop-virtualpay',$_POST['shop-virtualpay1'],$_POST['shop-virtualpay2']);
 	$kaImpostazioni->setParam('shop-pagonline',$_POST['shop-pagonline1'],$_POST['shop-pagonline2']);
+	$kaImpostazioni->setParam('shop-xpay',$_POST['shop-xpay1'],$_POST['shop-xpay2']);
 	$kaImpostazioni->setParam('shop-currency',$_POST['shop-currency1'],$_POST['shop-currency2']);
 	
 	if(!isset($_POST['customFieldsOrder'])) $_POST['customFieldsOrder']=array();
@@ -124,6 +125,8 @@ $v['shop-virtualpay1']="";
 $v['shop-virtualpay2']="";
 $v['shop-pagonline1']="";
 $v['shop-pagonline2']="";
+$v['shop-xpay1']="";
+$v['shop-xpay2']="";
 $v['shop-paypal-return1']="";
 $v['shop-paypal-return2']="";
 $v['shop-currency1']="";
@@ -161,6 +164,11 @@ $v['shop-pagonline1b']=substr($v['shop-pagonline1'],strpos($v['shop-pagonline1']
 	<?= b3_create_input("shop-pagonline2","text","Secret KEY ",b3_lmthize($v['shop-pagonline2'],"input"),"250px",64); ?><br />
 	<br />
 
+	<h3>XPay / Quì Pago / Carta Sì</h3>
+	<?= b3_create_input("shop-xpay1","text","Alias ",b3_lmthize($v['shop-xpay1'],"input"),"200px",20); ?><br />
+	<?= b3_create_input("shop-xpay2","text","Chiave di MAC ",b3_lmthize($v['shop-xpay2'],"input"),"250px",64); ?><br />
+	<br />
+
 	
 	<?= b3_create_input("shop-paypal-return1","text","Pagina di pagamento riuscito ",b3_lmthize($v['shop-paypal-return1'],"input"),"200px",255); ?><br />
 	<?= b3_create_input("shop-paypal-return2","text","Pagina di pagamento fallito ",b3_lmthize($v['shop-paypal-return2'],"input"),"200px",255); ?><br />
@@ -169,14 +177,15 @@ $v['shop-pagonline1b']=substr($v['shop-pagonline1'],strpos($v['shop-pagonline1']
 	<?php 
 	$option=array();
 	$value=array();
-	foreach(file('../shop/currencies.txt') as $line) {
+	foreach(file('../shop/currencies.txt') as $line)
+	{
 		$line=trim($line);
 		if(substr($line,0,1)!="#") {
 			$line=explode("\t",$line);
 			$option[]=$line[1];
 			$value[]=$line[0].' ('.$line[1].')';
-			}
 		}
+	}
 	echo b3_create_select("shop-currency1","Valuta",$value,$option,$v['shop-currency1']);
 	?>
 	<br /><br />

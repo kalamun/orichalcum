@@ -500,12 +500,17 @@ if(!isset($_GET['idsitem'])) { ?>
 				<?php } ?>
 
 				<td class="price">
-				<?php if(strpos($pageLayout,",discounted,")!==false&&$row['scontato']>0) { ?>
-					<del><?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?></del><br />
-					<?= $row['scontato'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
-				<?php } else { ?>
-					<?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
-				<?php } ?>
+				<?php
+				if(strpos($pageLayout,",price,")!==false)
+				{
+					if(strpos($pageLayout,",discounted,")!==false&&$row['scontato']>0) { ?>
+						<del><?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?></del><br />
+						<?= $row['scontato'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
+					<?php } else { ?>
+						<?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
+					<?php }
+				}
+				?>
 				</td>
 				
 				</tr>

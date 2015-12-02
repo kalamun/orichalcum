@@ -11,44 +11,54 @@ include_once("../inc/head.inc.php");
 
 
 <?php 
+
+/* ACTIONS */
 if(!isset($_GET['idspay'])) {
 	
-	/* AZIONI */
-	if(isset($_POST['idspay'])&&is_array($_POST['idspay'])) {
-		for($i=0;isset($_POST['idspay'][$i]);$i++) {
-			$query="UPDATE ".TABLE_SHOP_PAYMENTS." SET ordine=".($i+1)." WHERE ll='".$_SESSION['ll']."' AND idspay=".$_POST['idspay'][$i]." LIMIT 1";
+	if(isset($_POST['idspay'])&&is_array($_POST['idspay']))
+	{
+		for($i=0;isset($_POST['idspay'][$i]);$i++)
+		{
+			$query="UPDATE `".TABLE_SHOP_PAYMENTS."` SET `ordine`='".($i+1)."' WHERE `ll`='".$_SESSION['ll']."' AND `idspay`=".intval($_POST['idspay'][$i])." LIMIT 1";
 			ksql_query($query);
-			}
 		}
 
-	elseif(isset($_POST['addpayments'])) {
+	/* ADD A PAYMENT METHOD */
+	} elseif(isset($_POST['addpayments'])) {
 		$log="";
-		$query="SELECT * FROM ".TABLE_SHOP_PAYMENTS." WHERE ll='".$_SESSION['ll']."' ORDER BY ordine DESC LIMIT 1";
+		$query="SELECT * FROM `".TABLE_SHOP_PAYMENTS."` WHERE `ll`='".$_SESSION['ll']."' ORDER BY `ordine` DESC LIMIT 1";
 		$results=ksql_query($query);
 		$row=ksql_fetch_array($results);
 		$ordine=$row['ordine']+1;
+		
+		// try to auto-fill the gateway
 		$gateway="";
 		if(preg_match("/.*Pay.?Pal.*/i",$_POST['name'])) $gateway="paypal";
-		$query="INSERT INTO ".TABLE_SHOP_PAYMENTS." (`name`,`descr`,`zones`,`price`,`pricepercent`,`gateway`,`paypal_account`,`mail_instructions`,`ordine`,`ll`) VALUES('".b3_htmlize($_POST['name'],true,"")."','<p></p>',',','0','0','".$gateway."','','<p></p>',".$ordine.",'".$_SESSION['ll']."')";
+		elseif(preg_match("/.*Carta.?Sì.*/i",$_POST['name'])) $gateway="xpay";
+		elseif(preg_match("/.*Pagonline.*/i",$_POST['name'])) $gateway="pagonline";
+		elseif(preg_match("/.*VirtualPay.*/i",$_POST['name'])) $gateway="virtualpay";
+		
+		// insert payment method into db
+		$query="INSERT INTO `".TABLE_SHOP_PAYMENTS."` (`name`,`descr`,`zones`,`price`,`pricepercent`,`gateway`,`paypal_account`,`mail_instructions`,`ordine`,`ll`) VALUES('".b3_htmlize($_POST['name'],true,"")."','<p></p>',',','0','0','".$gateway."','','<p></p>',".intval($ordine).",'".$_SESSION['ll']."')";
 		if(!ksql_query($query)) $log="Errore durante l'inserimento del sistema di pagamento";
 		else $id=ksql_insert_id();
 
-		if($log!="") {
+		if($log!="")
+		{
 			echo '<div id="MsgAlert">'.$log.'</div>';
 			$kaLog->add("ERR",'Shop: Errore nella creazione del metodo di pagamento <em>'.b3_htmlize($_POST['name'],true,"").'</em>');
-			}
-		else {
+		} else {
 			$kaLog->add("INS",'Shop: Creato il metodo di pagamento <em>'.$_POST['name'].' (ID: '.$id.')</em>');
 			echo '<div id="MsgSuccess">Metodo di pagamento inserito con successo.<br />Attendi...</div>';
 			echo '<meta http-equiv="refresh" content="0; url=?idspay='.$id.'">';
 			include(ADMINRELDIR.'inc/foot.inc.php');
 			die();
-			}
 		}
-	
-	elseif(isset($_GET['delete'])) {
+
+	/* DELETE A PAYMENT METHOD */
+	} elseif(isset($_GET['delete'])) {
 		$log="";
-		$query="DELETE FROM ".TABLE_SHOP_PAYMENTS." WHERE ll='".$_SESSION['ll']."' AND idspay=".$_GET['delete']." LIMIT 1";
+		$query="DELETE FROM `".TABLE_SHOP_PAYMENTS."` WHERE `ll`='".$_SESSION['ll']."' AND `idspay`='".intval($_GET['delete'])."' LIMIT 1";
 		if(!ksql_query($query)) $log="Errore durante l'eliminazione";
 		if($log!="") {
 			echo '<div id="MsgAlert">'.$log.'</div>';
@@ -60,7 +70,7 @@ if(!isset($_GET['idspay'])) {
 			}
 		}
 	
-	/* FINE AZIONI */
+	/* END OF ACTIONS */
 	
 	?>
 	<form action="" method="post" id="saveOrder">
@@ -123,9 +133,10 @@ else {
 	$zone=array();
 	$query="SELECT * FROM ".TABLE_SHOP_COUNTRIES." GROUP BY zone ORDER BY zone";
 	$results=ksql_query($query);
-	while($row=ksql_fetch_array($results)) {
+	while($row=ksql_fetch_array($results))
+	{
 		$zone[$row['zone']]=true;
-		}
+	}
 	
 	/* AZIONI */
 	if(isset($_POST['update'])) {
@@ -160,8 +171,8 @@ else {
 		</div>
 	<div class="box">
 		<?php 
-		$values=array("","paypal","virtualpay","pagonline");
-		$options=array("","PayPal","VirtualPay","pagonline");
+		$values=array("","paypal","virtualpay","pagonline","xpay");
+		$options=array("Nessun gateway, verifica manuale","PayPal","VirtualPay","Pagonline","XPay / QuìPago / Carta Sì");
 		echo b3_create_select("gateway","Gateway ",$options,$values,$payment['gateway']);
 		?>
 		</div>

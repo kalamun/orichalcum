@@ -1,4 +1,10 @@
 {
+<<<<<<< HEAD
+  "require" : {
+    "facebook/php-sdk-v4" : "~5.0"
+  }
+}
+=======
   "config": {
     "vendor-dir": "vendor"
   },
@@ -18,3 +24,4 @@
     }
   ]
 }
+>>>>>>> origin/master

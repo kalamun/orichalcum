@@ -50,6 +50,7 @@ function kInitBettino($dir=false)
 	require_once($bd."inc/media.lib.php");
 	require_once($bd."inc/template.lib.php");
 	require_once($bd."inc/emails.lib.php");
+	require_once($bd."inc/newsletter.lib.php");
 	require_once($bd."inc/pagine.lib.php");
 	require_once($bd.'inc/news.lib.php');
 	require_once($bd.'inc/shop.lib.php');
@@ -66,6 +67,7 @@ function kInitBettino($dir=false)
 	$GLOBALS['__media']=new kMedia();
 	$GLOBALS['__template']=new kTemplate();
 	$GLOBALS['__emails']=new kEmails();
+	$GLOBALS['__newsletter']=new kNewsletter();
 	$GLOBALS['__pages']=new kPages();
 	$GLOBALS['__news']=new kNews();
 	$GLOBALS['__shop']=new kShop();
@@ -1969,6 +1971,13 @@ function kGetMemberByUsername($username,$affiliation=false)
 	return $GLOBALS['__members']->getByUsername($username,false,$conditions);
 }
 
+function kGetMemberByEmail($email,$affiliation=false)
+{
+	if($affiliation!=false) $conditions="affiliation='".b3_htmlize($affiliation,true,"")."'";
+	else $conditions=false;
+	return $GLOBALS['__members']->getByEmail($email,false,$conditions);
+}
+
 function kGetMemberById($idmember,$affiliation=false)
 {
 	if($affiliation!=false) $conditions="affiliation='".b3_htmlize($affiliation,true,"")."'";
@@ -2078,6 +2087,22 @@ function kMemberPasswordReset($username)
 }
 
 
+
+/* newsletter */
+
+function kNewsletterSubscribe($vars)
+{
+	/*
+	input vars:
+	- name
+	- email
+	- affiliation
+	*/
+	return $GLOBALS['__newsletter']->subscribe($vars);
+}
+
+
+
 /* shop */
 
 function kHaveShop()
@@ -2183,7 +2208,29 @@ function kPrintShopPagOnlineForm()
 	echo $GLOBALS['__template']->getSubtemplate('pagonlineform');
 }
 
+function kGetShopXPayBusinessId()
+{
+	$v=kGetVar('shop-xpay',1);
+	return $v;
+}
+
+function kGetShopXPayKEY()
+{
+	$v=kGetVar('shop-xpay',2);
+	return $v;
+}
+
+function kPrintShopXPayForm()
+{
+	echo $GLOBALS['__template']->getSubtemplate('xpayform');
+}
+
 function kGetShopPayPalReturnPage($success=true)
+{
+	if($success==true) return kGetVar('shop-paypal-return',1);
+	else return kGetVar('shop-paypal-return',2);
+}
+function kGetShopReturnPage($success=true)
 {
 	if($success==true) return kGetVar('shop-paypal-return',1);
 	else return kGetVar('shop-paypal-return',2);
@@ -2561,12 +2608,15 @@ function kGetShopCartPaymentPrice($price=false,$idspay=false,$iddel=false,$count
 
 function kShopAddToCart($idsitem,$qty=1,$variations=array(),$customvariations=array())
 {
-	if(intval($idsitem)<=0) return false;
-	$GLOBALS['__shop']->addItemToCart(intval($idsitem),$qty,$variations,$customvariations);
+	$iditem = intval($idsitem);
+	if($idsitem<=0) return false;
+	$GLOBALS['__shop']->addItemToCart($idsitem,$qty,$variations,$customvariations);
 }
 
 function kShopRemoveFromCart($idsitem,$qty=1,$variations=array(),$customvariations=array())
 {
+	$iditem = intval($idsitem);
+	if($idsitem<=0) return false;
 	$GLOBALS['__shop']->removeItemFromCart($idsitem,$qty,$variations,$customvariations);
 }
 

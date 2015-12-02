@@ -13,9 +13,6 @@ class kShop {
 				$delivererDB,
 				$paymentDB,
 				$payPalBusinessId,
-				$virtualPayBusinessId,
-				$virtualPayABI,
-				$virtualPayKEY,
 				$orderDB,
 				$customFields,
 				$zone,
@@ -50,9 +47,6 @@ class kShop {
 		$this->orderDB=array();
 		$this->zone="";
 		$this->payPalBusinessId="";
-		$this->virtualPayBusinessId="";
-		$this->virtualPayABI="";
-		$this->virtualPayKEY="";
 		$tmp=trim($__template->getVar('shop',2),",");
 		if($tmp!="*")
 		{
@@ -868,6 +862,8 @@ class kShop {
 	public function getItemCustomFields($vars) {
 		if(!$this->inited) $this->init();
 		$output=array();
+		if(!isset($this->loadedItem['customfields'])) $this->loadedItem['customfields']=array();
+		
 		if(isset($vars['name'])) {
 			//filter by field name
 			foreach($this->loadedItem['customfields'] as $f) {
@@ -1117,34 +1113,38 @@ class kShop {
 
 		//if country is not passed, get the first country from the highest zone
 		$idzone=0;
-		if($country==false)
+		foreach($this->getCountries() as $c)
 		{
-			foreach($this->getCountries() as $c)
+			if($country==false)
 			{
 				if($c['zone']>$idzone)
 				{
-					$idzone=$c['zone'];
-					$country=$c['ll'];
+					$idzone = $c['zone'];
+					$country = $c['ll'];
 				}
+			} elseif($c['ll'] == $country) {
+				$idzone = $c['zone'];
 			}
 		}
+		
 		if($idzone==0)
 		{
 			trigger_error('Missing shipping country');
 			return false;
 		}
 		
-		//if courier is not passed, get the first one
-		if($iddel==false)
+		//if carrier is not passed, get the first one
+		if(empty($iddel))
 		{
 			$carriers=$this->getDeliverersByZone($idzone);
 			$iddel=$carriers[0]['iddel'];
 		}
-		if($iddel=="")
+		if(empty($iddel))
 		{
 			trigger_error('Missing carrier');
 			return false;
 		}
+		
 		$this->setDelivererById($iddel);
 		
 		//calculate weight from cart
@@ -1154,7 +1154,8 @@ class kShop {
 			$totalweight+=floatval($item['weight'])*$item['qty'];
 		}
 
-		return $this->getDelivererPriceByKg($totalweight,$idzone);
+		$price = floatval($this->getDelivererPriceByKg($totalweight,$idzone));
+		return $price;
 	}
 
 	public function getCartPaymentPrice($totalamount=false,$idspay=false,$iddel=false,$country=false)
@@ -1182,10 +1183,10 @@ class kShop {
 		if(!isset($vars['idspay'])) $vars['idspay']=false;
 		if(!isset($vars['coupons'])) $vars['coupons']=array();
 		if(!is_array($vars['coupons'])) $vars['coupons']=array($vars['coupons']);
-		
-		$price=$this->getCartItemsPrice();
-		$shippingprice=$this->getCartShippingPrice($vars['iddel'],$vars['country']);
-		$paymentprice=$this->getCartPaymentPrice($price,$vars['idspay']);
+
+		$price=floatval($this->getCartItemsPrice());
+		$shippingprice=floatval($this->getCartShippingPrice($vars['iddel'],$vars['country']));
+		$paymentprice=floatval($this->getCartPaymentPrice($price,$vars['idspay']));
 		
 		/* coupons discounts */
 		$discount=0;
@@ -1234,17 +1235,24 @@ class kShop {
 	/* create a string that identifies the item with his variations */
 	private function getItemUID($idsitem,$variations=array(),$customvariations=array())
 	{
-		if(!is_array($variations)) $variations=array();
+		if(empty($variations) || !is_array($variations)) $variations=array();
+		if(empty($customvariations) || !is_array($customvariations)) $customvariations=array();
+		
 		asort($variations);
+		asort($customvariations);
+		
 		$string=$idsitem;
+		
 		foreach($variations as $k=>$v)
 		{
 			$string.='-'.$k;
 		}
+		
 		foreach($customvariations as $k=>$v)
 		{
 			$string.='-'.$k.':'.$v;
 		}
+		
 		$string=base64_encode($string);
 		return $string;
 	}
@@ -1577,7 +1585,7 @@ class kShop {
 			if($c['ll']==$country) $idzone=$c['zone'];
 		}
 
-		/* deliverer */
+		/* carrier */
 		$iddel=isset($vars['delivery']['carrier']) ? $vars['delivery']['carrier'] : '';
 		if($iddel=="")
 		{
