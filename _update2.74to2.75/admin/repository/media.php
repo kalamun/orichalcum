@@ -12,7 +12,10 @@ if(!isset($_GET['p'])) $_GET['p']=1;
 if(!isset($_GET['q'])) $_GET['q']="";
 ?>
 
-<input type="button" onclick="window.parent.k_openIframeWindow(ADMINDIR+'inc/uploadsManager.inc.php?fileType=media');" class="button" value="<?= $kaTranslate->translate('Repository:Upload a multimedia file'); ?>" />
+<div style="float:right;">
+	<input type="button" onclick="window.parent.k_openIframeWindow(ADMINDIR+'inc/uploadsManager.inc.php?fileType=media');" class="button" value="<?= $kaTranslate->translate('Repository:Upload a multimedia file'); ?>" />
+</div>
+
 <h1><?php  echo PAGE_NAME; ?></h1>
 <br />
 
@@ -29,9 +32,21 @@ if(!isset($_GET['q'])) $_GET['q']="";
 	</div><br />
 
 <table><?php 
-$i=0;
-foreach($kaMedia->getList(false,false,'filename',"`filename` LIKE '%".$_GET['q']."%' OR `alt` LIKE '%".$_GET['q']."%'",(($_GET['p']-1)*$items4page),$items4page) as $media) {
+$i = 0;
+$vars = array();
+$vars['filetype'] = 2; // media
+$vars['orderby'] = 'filename';
+$vars['conditions'] = "`filename` LIKE '%".$_GET['q']."%' OR `alt` LIKE '%".$_GET['q']."%'";
+$vars['offset'] = (($_GET['p']-1)*$items4page);
+$vars['limit'] = $items4page;
+
+foreach($kaImages->getList($vars) as $media) {
 	if($media['thumb']['filename']!=""){
+		
+		$defaultsize = $kaImpostazioni->getParam('thumb_size','*');
+		if(empty($media['thumb']['width'])) $media['thumb']['width'] = $defaultsize['value1'];
+		if(empty($media['thumb']['height'])) $media['thumb']['height'] = $defaultsize['value2'];
+
 		if($media['thumb']['width']>$media['thumb']['height']) {
 			$w=100;
 			$h=100/$media['thumb']['width']*$media['thumb']['height'];
@@ -45,12 +60,12 @@ foreach($kaMedia->getList(false,false,'filename',"`filename` LIKE '%".$_GET['q']
 	?>
 	<td><div class="thumb"><?php  if($media['thumb']['filename']!="") { ?><img src="<?= BASEDIR.$media['thumb']['url']; ?>" width="<?= $w; ?>" height="<?= $h; ?>" alt="<?= BASEDIR.$media['alt']; ?>" /><?php  } else { ?>Nessuna anteprima<?php  } ?></div></td>
 	<td>
-		<strong><?= $media['title']!=""?$media['title']:$media['filename']; ?></strong><br />
-		Dimensioni: <?= $media['width']; ?> x <?= $media['height']; ?> px - Durata: <?= $media['duration']; ?> sec.<br />
-		<div class="small"><?php  if(trim($media['htmlcode'])=="") { ?>Permalink: <?= $media['hotlink']==0?SITE_URL.BASEDIR.$media['url']:$media['url']; } else { ?>Codice incorporato<?php  } ?></div><br />
-		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/mediaManager.inc.php?idmedia=<?php echo $media['idmedia']; ?>&forcerefresh=true&action=fullsize&mediatable=&mediaid=','800px','500px');" class="smallbutton">Guarda</a>
-		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/mediaManager.inc.php?idmedia=<?php echo $media['idmedia']; ?>&forcerefresh=true&action=properties&mediatable=&mediaid=','800px','500px');" class="smallbutton">Modifica</a>
-		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/mediaManager.inc.php?idmedia=<?php echo $media['idmedia']; ?>&forcerefresh=true&action=delete&mediatable=&mediaid=','800px','500px');" class="smallbutton">Elimina</a>
+		<strong><?= $media['alt']!=""?$media['alt']:$media['filename']; ?></strong><br />
+		Dimensioni: <?= $media['width']; ?> x <?= $media['height']; ?> px - Durata: <?= $media['metadata']['duration']; ?> sec.<br />
+		<div class="small"><?php  if(trim($media['metadata']['embeddingcode'])=="") { ?>Permalink: <?= $media['hotlink']==0?SITE_URL.BASEDIR.$media['url']:$media['url']; } else { ?>Codice incorporato<?php  } ?></div><br />
+		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/uploadsManager_edit.inc.php?id=img<?php echo $media['idimg']; ?>');" class="smallbutton"><?= $kaTranslate->translate('Repository:View'); ?></a>
+		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/uploadsManager_edit.inc.php?id=img<?php echo $media['idimg']; ?>');" class="smallbutton"><?= $kaTranslate->translate('UI:Edit'); ?></a>
+		<a href="javascript:window.parent.k_openIframeWindow(ADMINDIR+'inc/uploadsManager_edit.inc.php?id=img<?php echo $media['idimg']; ?>&forcerefresh=true');" class="smallalertbutton"><?= $kaTranslate->translate('UI:Delete'); ?></a>
 		</td>
 	<?php 
 	$i++;

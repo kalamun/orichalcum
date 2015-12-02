@@ -71,53 +71,42 @@ class kaImages {
 		return $row['tot'];
 	}
 
-	// returns an array of images
-	function getList($orderby='`creation_date` DESC', $conditions='', $offset=false, $limit=false)
+	/*
+	returns an array of images
+	input vars:
+	- filetype
+	- orderby
+	- conditions
+	- offset
+	- limit
+	*/
+	function getList($vars=false, $conditions='', $offset=0, $limit=false)
 	{
+		// parse input vars
+		if(!is_array($vars)) {
+			$vars=array("orderby"=>$vars);
+			$vars['conditions'] = $conditions;
+			if(!empty($offset)) $vars['offset'] = $offset;
+			if(!empty($limit)) $vars['limit'] = $limit;
+		}
+		
+		if(empty($vars['orderby'])) $vars['orderby']='`creation_date` DESC';
+		if(empty($vars['filetype'])) $vars['filetype']=1;
+		if(empty($vars['offset'])) $vars['offset']=0;
+		
 		$output=array();
 
-		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`>0 ";
-		if($conditions!="") $query.=" AND (".stripslashes($conditions).") ";
-		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
-		if($offset==false) $offset=0;
-		if($offset!=""||$limit!="")
-		{
-			$query.=" LIMIT ".intval($offset);
-			if($limit!="") $query.=",".intval($limit);
-		}
+		$query="SELECT * FROM `".TABLE_IMG."` WHERE `filetype`='".intval($vars['filetype'])."' ";
+		if($vars['conditions']!="") $query.=" AND (".$vars['conditions'].") ";
+		if($vars['orderby']!="") $query.=" ORDER BY ".$vars['orderby']." ";
+
+		$query.=" LIMIT ".intval($vars['offset']);
+		if(!empty($vars['limit'])) $query.=",".intval($vars['limit']);
 
 		$results=ksql_query($query);
 		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
-			$output[$i]=$row;
-			
-			if($output[$i]['hotlink']!="" && $row['filename']!="")
-			{
-				$output[$i]['filename']=basename($output[$i]['hotlink']);
-				$output[$i]['url']=$output[$i]['hotlink'];
-				$output[$i]['hotlink']=true;
-			} else {
-				$output[$i]['url']=ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['filename'];
-				$output[$i]['hotlink']=false;
-			}
-			
-			if($output[$i]['filename']!="" && file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'])) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']);
-			else $size=array(0,0,0,"");
-
-			$output[$i]['width']=$size[0];
-			$output[$i]['height']=$size[1];
-			$output[$i]['thumb']['filename']=$row['thumbnail'];
-			$output[$i]['thumb']['url']=DIR_IMG.$row['idimg'].'/'.$row['thumbnail'];
-			
-			if($output[$i]['thumbnail']!="" && file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'])) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail']);
-			else $size=array(0,0,0,"");
-			$output[$i]['thumb']['width']=$size[0];
-			$output[$i]['thumb']['height']=$size[1];
-			
-			$output[$i]['alts']=json_decode($output[$i]['alt'],true);
-			if(!is_array($output[$i]['alts'])) $output[$i]['alts']=array($_SESSION['ll']=>$output[$i]['alt']);
-			if(empty($output[$i]['alts'][$_SESSION['ll']])) $output[$i]['alts'][$_SESSION['ll']]="";
-			$output[$i]['alt']=$output[$i]['alts'][$_SESSION['ll']];
+			$output[$i] = $this->row2image($row);
 		}
 		
 		return $output;
@@ -128,31 +117,62 @@ class kaImages {
 	function getImage($idimg)
 	{
 		$output=array();
-
 		$query="SELECT * FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg)." LIMIT 1";
 		$results=ksql_query($query);
 		$row=ksql_fetch_array($results);
-		if(isset($row['idimg']))
-		{
-			$output=$row;
-			$output['url']=ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['filename'];
-			if(isset($output['hotlink'])&&$output['hotlink']!=""&&$row['filename']!="")
-			{
-				$output['filename']=basename($output['hotlink']);
-				$output['url']=$output['hotlink'];
-				$output['hotlink']=true;
-			}
-			else $row['hotlink']=false;
+		if(isset($row['idimg'])) return $this->row2image($row);
+		else return false;
+	}
 
-			if(isset($output['filename']) && $output['filename']!="" && file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']) && filesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']) > 11 && exif_imagetype(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'])!=false) $size = getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']);
-			else $size=array(0,0,0,"");
-			$output['width']=$size[0];
-			$output['height']=$size[1];
-			
+	
+	// process db row and return a full array
+	function row2image($row)
+	{
+		$output=$row;
+		
+		// metadata
+		$output['metadata'] = unserialize($output['metadata']);
+		if(empty($output['metadata']['duration'])) $output['metadata']['duration'] = 0;
+		if(empty($output['metadata']['rotation'])) $output['metadata']['rotation'] = 0;
+		if(empty($output['metadata']['embeddingcode'])) $output['metadata']['embeddingcode'] = '';
+		
+		$output['mime-type'] = $this->getMimeType($row['filename']);
+		
+		if($row['filetype'] == 1) $dir = DIR_IMG;
+		elseif($row['filetype'] == 2) $dir = DIR_MEDIA;
+		elseif($row['filetype'] == 3 || $row['filetype'] == 9) $dir = DIR_DOCS;
+		$dir = ltrim($dir,"./");
+		
+		$output['url']=$dir.$row['idimg'].'/'.$row['filename'];
+		if(isset($output['hotlink'])&&$output['hotlink']!=""&&$row['filename']!="")
+		{
+			$output['filename']=basename($output['hotlink']);
+			$output['url']=$output['hotlink'];
+			$output['hotlink']=true;
+		}
+		else $row['hotlink']=false;
+
+		if(isset($output['filename']) && $output['filename']!="" && file_exists(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']) && filesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']) > 11)
+		{
+			if($row['filetype'] == 1)
+			{
+				if(exif_imagetype(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename'])!=false) $size = getimagesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']);
+				else $size=array(0,0,0,"");
+				$output['width'] = $size[0];
+				$output['height'] = $size[1];
+				
+			} elseif($row['filetype'] == 2) {
+				if(empty($output['metadata']['width'])) $output['metadata']['width']=1280;
+				if(empty($output['metadata']['height'])) $output['metadata']['height']=720;
+				$output['width'] = $output['metadata']['width'];
+				$output['height'] = $output['metadata']['height'];
+				
+			}
+		
 			$output['thumb']['filename']=isset($output['thumbnail'])?$output['thumbnail']:array();
-			$output['thumb']['url']=(isset($row['idimg'])&&isset($row['thumbnail']))?ltrim(DIR_IMG,"./").$row['idimg'].'/'.$row['thumbnail']:'';
+			$output['thumb']['url']=(isset($row['idimg'])&&isset($row['thumbnail']))?$dir.$row['idimg'].'/'.$row['thumbnail']:'';
 			
-			if(isset($output['thumbnail']) && $output['thumbnail']!=""&&file_exists(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail']) && filesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename']) && exif_imagetype(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'])!=false) $size=getimagesize(BASERELDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail']);
+			if(!empty($output['thumbnail']) && file_exists(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail']) && filesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail']) && exif_imagetype(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail'])!=false) $size=getimagesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail']);
 			else $size=array(0,0,0,"");
 			$output['thumb']['width']=$size[0];
 			$output['thumb']['height']=$size[1];
@@ -165,60 +185,162 @@ class kaImages {
 			} else {
 				$output['alts']=array($_SESSION['ll'] => $output['alt']);
 			}
-		
-			return $output;
-
-		} else {
-			return false;
 		}
-	}
 
+		return $output;
+	}
 	
 	// insert an image into db, then create a directory called as the id and upload the file inside
 	function upload($file,$filename)
 	{
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
 		if(substr(strtolower($filename),-4)=='.php' || substr(strtolower($filename),-5)=='.php3') return false;
+
+		/* check filename validity */
+		$filename=trim($filename," ./");
+		$filename=str_replace("/","",$filename);
+
+		// set default metadata
+		$metadata = array();
 		
-		if(!defined("TABLE_IMG")|!defined("DIR_IMG")) return false;
+		// get file type: 1 = images, 2 = media, 9 = documents
+		$filetype = $this->getFileType($filename);
+		if($filetype == 9)
+		{
+			$filename .= '-renamed';
+			$filetype = 3;
+		}
+
+		// set db table and dir according to file type
+		$default_table = "";
+		$default_dir = "";
+		if($filetype==1) $default_dir = DIR_IMG;
+		elseif($filetype==2) $default_dir = DIR_MEDIA;
+		elseif($filetype==3) $default_dir = DIR_DOCS;
 		
-		$query="INSERT INTO `".TABLE_IMG."` (`filename`,`thumbnail`,`hotlink`,`alt`,`creation_date`) VALUES('".ksql_real_escape_string($filename)."','','','',NOW())";
+		// insert into db
+		$query="INSERT INTO `".TABLE_IMG."` (`filetype`,`filename`,`thumbnail`,`hotlink`,`alt`,`creation_date`,`metadata`) VALUES('".$filetype."', '".ksql_real_escape_string($filename)."','','','',NOW(),'".ksql_real_escape_string(serialize($metadata))."')";
 		if(ksql_query($query)) $idimg=ksql_insert_id();
 		else return false;
 		
 		//copy on the right dir
-		if(!file_exists(BASERELDIR.DIR_IMG)) mkdir(BASERELDIR.DIR_IMG);
-		mkdir(BASERELDIR.DIR_IMG.$idimg);
+		if(!file_exists(BASERELDIR.$default_dir)) mkdir(BASERELDIR.$default_dir);
+		if(!file_exists(BASERELDIR.$default_dir.$idimg)) mkdir(BASERELDIR.$default_dir.$idimg);
 
-		$ffile = BASERELDIR.DIR_IMG.$idimg.'/'.$filename;
+		$ffile = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg.'/'.$filename;
 		if(copy($file, $ffile)) unlink($file);
 		else return false;
 		
-		//another copy before resize, to preserve the original version
-		$ofile = BASERELDIR.DIR_IMG.$idimg.'/-originalsize';
-		copy($ffile, $ofile);
-
-		//resize
-		$size=getimagesize($ffile);
-		if($this->needToResize($size[0],$size[1])==true) $this->resize($ffile, $this->img['width'], $this->img['height'], $this->img['quality'], $this->img['mode']);
-		else $this->recompress($ffile, $this->img['quality']);
-		
-		$this->setThumb($idimg);
-
-		// create mobile version, if active
-		if($this->mobile['active']=="y")
+		if($filetype==1)
 		{
-			$mfile = BASERELDIR.DIR_IMG.$idimg.'/m_'.$filename;
-			$mwidth = min($size[0], $this->img['width']);
-			$mheight = min($size[1], $this->img['height']);
-			copy($ofile, $mfile);
-			$this->mobile['width'] = intval($mwidth / 100 * $this->mobile['ratio']);
-			$this->mobile['height'] = intval($mheight / 100 * $this->mobile['ratio']);
-			$this->mobile['quality'] = intval($this->img['quality'] / 100 * ($this->mobile['ratio'] + ((100 - $this->mobile['ratio']) / 2)));
-			$this->resize($mfile, $this->mobile['width'], $this->mobile['height'], $this->mobile['quality'], $this->img['mode']);
+			//another copy before resize, to preserve the original version
+			$ofile = BASERELDIR.$default_dir.$idimg.'/-originalsize';
+			copy($ffile, $ofile);
+
+			//resize
+			$size=getimagesize($ffile);
+			if($this->needToResize($size[0],$size[1])==true) $this->resize($ffile, $this->img['width'], $this->img['height'], $this->img['quality'], $this->img['mode']);
+			else $this->recompress($ffile, $this->img['quality']);
+			
+			$this->setThumb($idimg);
+
+			// create mobile version, if active
+			if($this->mobile['active']=="y")
+			{
+				$mfile = BASERELDIR.$default_dir.$idimg.'/m_'.$filename;
+				$mwidth = min($size[0], $this->img['width']);
+				$mheight = min($size[1], $this->img['height']);
+				copy($ofile, $mfile);
+				$this->mobile['width'] = intval($mwidth / 100 * $this->mobile['ratio']);
+				$this->mobile['height'] = intval($mheight / 100 * $this->mobile['ratio']);
+				$this->mobile['quality'] = intval($this->img['quality'] / 100 * ($this->mobile['ratio'] + ((100 - $this->mobile['ratio']) / 2)));
+				$this->resize($mfile, $this->mobile['width'], $this->mobile['height'], $this->mobile['quality'], $this->img['mode']);
+			}
+
+		} elseif($filetype==2) {
+			// check if ffmpeg is available
+			exec("ffmpeg -h", $output);
+
+			if(!empty($output) && is_array($output) && $output[0] != 1)
+			{
+				unset($output);
+				exec("ffmpeg -i ".escapeshellarg($ffile)." 2>&1", $output);
+
+				// try to find video dimensions, rotation and duration
+				$width = 1280;
+				$height = 720;
+				foreach($output as $line)
+				{
+					$line = trim($line);
+					
+					if(strtolower(substr($line, 0, 7)) == "stream ")
+					{
+						preg_match("/ (\d+)x(\d+),/", $line, $match);
+						if(isset($match[1]))
+						{
+							$width = intval($match[1]);
+							$metadata['width'] = $width;
+						}
+						if(isset($match[2]))
+						{
+							$height = intval($match[2]);
+							$metadata['height'] = $height;
+						}
+
+					} elseif(strtolower(substr($line, 0, 7)) == "rotate ") {
+						preg_match("/ (\d+)/", $line, $match);
+						if(isset($match[1])) $metadata['rotation'] = intval($match[1]);
+
+					} elseif(strtolower(substr($line, 0, 9)) == "duration ") {
+						preg_match("/ (\d{2}:\d{2}:\d{2}\.\d{2})/", $line, $match);
+						if(isset($match[1]))
+						{
+							$match[1] = str_replace(":", "", $match[1]);
+							$metadata['duration'] = floatval($match[1]);
+						}
+					}
+					
+				}
+				
+				$this->updateMetadata($idimg, $metadata);
+				
+				// try to automatically create a thumbnail
+				$tfilename = basename($ffile);
+				$tfilename = substr($tfilename, 0, strrpos($tfilename, ".")).'.png';
+				$tfile = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg.'/'.$tfilename;
+				
+				exec("ffmpeg -i ".escapeshellarg($ffile)." -ss 00:00:01.000 -vframes 1 ".escapeshellarg($tfile)." 2>&1");
+				
+				if(file_exists($tfile))
+				{
+					if($this->setThumb($idimg, $tfile, "t_".$tfilename) == true) unlink($tfile);
+				}
+			}
+			
 		}
+		
 
 		return $idimg;
+	}
+	
+	public function cleanTmpDir()
+	{
+		$dir = $_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMP;
+		if(!file_exists($dir) || !is_dir($dir)) mkdir($dir);
+		
+		foreach(scandir($dir) as $filename)
+		{
+			// remove all the files that...
+			if(strlen($filename) > 8 // are long (the short ones are not upload's temp files)
+				&& substr($filename, 0, 3) == 'tmp' // start with "tmp"
+				&& intval(substr($filename, 3, strlen(time()))) < time()-3600 // are older than 1 hour
+				) unlink($dir.$filename);
+				
+			// remove all the progress files...
+			if(strlen($filename) > 10 // are long (the short ones are not upload's temp files)
+				&& substr($filename, 0, 8) == 'progress' // start with "progress"
+				) unlink($dir.$filename);
+		}
 	}
 	
 	function setHotlink($idimg,$url)
@@ -226,7 +348,17 @@ class kaImages {
 		$img=$this->getImage($idimg);
 		if($img['idimg']>0)
 		{
-			$query="UPDATE ".TABLE_IMG." SET filename='',hotlink='".$url."' WHERE idimg='".$img['idimg']."' LIMIT 1";
+			$query="UPDATE ".TABLE_IMG." SET `filename`='',`hotlink`='".ksql_real_escape_string($url)."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
+			if(!ksql_query($query)) return false;
+		}
+	}
+	
+	function updateMetadata($idimg, $metadata)
+	{
+		$img=$this->getImage($idimg);
+		if($img['idimg']>0)
+		{
+			$query="UPDATE ".TABLE_IMG." SET `metadata`='".ksql_real_escape_string(serialize($metadata))."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
 			if(!ksql_query($query)) return false;
 		}
 	}
@@ -237,15 +369,101 @@ class kaImages {
 		$img=$this->getImage($idimg);
 		if($img['idimg']>0)
 		{
-			if($file==null) $file=BASERELDIR.$img['url'];
+			if($file==null) $file=$_SERVER['DOCUMENT_ROOT'].BASEDIR.$img['url'];
 			if($filename==null||$filename==$img['filename']) $filename='t_'.$img['filename'];
-			if($img['thumb']['filename']!="") unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$img['thumb']['filename']);
-			copy($file,BASERELDIR.DIR_IMG.$img['idimg'].'/'.$filename);
+			
+			if(!file_exists($file) || !is_file($file)) return false;
+			
+			$filetype = $this->getFileType($file);
+			if($filetype != 1) return false; //if is not an image, end
+
+			$dir = trim(dirname($img['url']), "/");
+			
+			if($img['thumb']['filename']!="") unlink($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.'/'.$img['thumb']['filename']);
+			$targetfile = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.'/'.$filename;
+			if(!copy($file, $targetfile)) return false;
+			
 			$query="UPDATE `".TABLE_IMG."` SET `thumbnail`='".ksql_real_escape_string($filename)."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
 			if(!ksql_query($query)) return false;
-			if($resize==true) $this->resize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename,$this->thumb['width'],$this->thumb['height'],$this->thumb['quality'],$this->thumb['mode']);
+			
+			if($resize==true) $this->resize($targetfile, $this->thumb['width'], $this->thumb['height'], $this->thumb['quality'], $this->thumb['mode']);
 		}
 		return true;
+	}
+	
+	/* get file type
+	returns:
+	 1 = image
+	 2 = media
+	 3 = document
+	 9 = document that must be renamed
+	*/
+	function getFileType($file)
+	{
+		$filename=trim(basename($file)," ./");
+		$filename=str_replace("/","",$filename);
+		$fileextension=substr($filename,strrpos($filename,".")+1);
+
+		// images
+		$ext=array_flip(array("png","jpg","jpeg","gif"));
+		if(isset($ext[$fileextension])) return 1;
+		
+		// medias
+		$ext=array_flip(array("mov","mpg","mp3","mp4","webm","ogv","ogg","oga","avi","wmv","flv","f4v","swf"));
+		if(isset($ext[$fileextension])) return 2;
+		
+		// rename file in case of file types not allowed
+		$ext=array_flip(array("php","php3","exe","msi"));
+		if(isset($ext[$fileextension])) return 9;
+		return 3;
+
+		/* mime types, for further use
+		$mime=array_flip(array("image/jpeg","image/pjpeg","image/png","image/gif"));
+		$mime=array_flip(array("video/quicktime","video/mpeg","video/x-mpeg","video/avi","video/msvideo","video/x-flv","video/x-f4v","video/mp4","video/x-ms-wmv","video/ogg","audio/mpeg","audio/x-mpeg","audio/mpeg3","audio/x-mpeg3","audio/ogg","application/x-shockwave-flash"));
+		$mime=array_flip(array("text/php","text/x-php","application/php","application/x-php","application/x-httpd-php","application/x-httpd-php-source","application/x-msdownload"));
+		*/
+	}
+	
+	/* get mime type based on file name */
+	function getMimeType($filename)
+	{
+		$filename=trim(basename($filename)," ./");
+		$filename=str_replace("/","",$filename);
+		$fileextension=substr($filename,strrpos($filename,".")+1);
+		
+		$mime=array(
+			"jpg"=>"image/jpeg",
+			"jpeg"=>"image/jpeg",
+			"png"=>"image/png",
+			"gif"=>"image/gif",
+			"mov"=>"video/quicktime",
+			"mpg"=>"video/mpeg",
+			"avi"=>"video/avi",
+			"wmv"=>"video/msvideo",
+			"flv"=>"video/x-flv",
+			"f4v"=>"video/x-f4v",
+			"mp4"=>"video/mp4",
+			"ogv"=>"video/ogg",
+			"mp3"=>"audio/mpeg",
+			"ogg"=>"audio/ogg",
+			"midi"=>"audio/x-midi",
+			"swf"=>"application/x-shockwave-flash",
+			"php"=>"text/php",
+			"doc"=>"application/msword",
+			"docx"=>"application/vnd.openxmlformats",
+			"ppt"=>"application/vnd.ms-powerpoint",
+			"pptx"=>"application/vnd.openxmlformats",
+			"xls"=>"application/vnd.ms-excel",
+			"xlsx"=>"application/vnd.openxmlformats",
+			"html"=>"text/html",
+			"svg"=>"image/svg+xml",
+			"txt"=>"text/plain",
+			"zip"=>"application/zip",
+			"xml"=>"application/xml",
+			"pdf"=>"application/pdf"
+			);
+		if(!empty($mime[$fileextension])) return $mime[$fileextension];
+		return false;
 	}
 
 	function updateAlt($idimg,$alt) {
@@ -650,11 +868,6 @@ class kaImages {
 			return $img;
 
 		} elseif($size['mime']=='image/gif') {
-
-
-
-
-
 			//no needs to recompress
 			return $img;
 		}
