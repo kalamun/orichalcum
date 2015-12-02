@@ -1,43 +1,12 @@
 <?php 
-<<<<<<< HEAD
 require_once('../../inc/main.lib.php');
 $kaOrichalcum=new kaOrichalcum();
 $kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
-=======
-session_start();
-
-require_once('../../inc/connect.inc.php');
-require_once('../../inc/kalamun.lib.php');
-require_once('../../inc/sessionmanager.inc.php');
-require_once('../../inc/main.lib.php');
-if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
-
-/* set default timezone in PHP and MySQL */
-$timezone=kaGetVar('timezone',1);
-if($timezone!="") {
-	date_default_timezone_set($timezone);
-	$query="SET time_zone='".date("P")."'";
-	ksql_query($query);
-	}
-
-require_once('../../inc/log.lib.php');
-$kaLog=new kaLog();
-
-require_once('../../inc/config.lib.php');
-$kaConfig=new kaImpostazioni();
-
-require_once("../../inc/categorie.lib.php");
-$kaCategorie=new kaCategorie();
->>>>>>> origin/master
 
 /* Require Composer autoloader */
 require_once '../../../vendor/autoload.php';
 
-<<<<<<< HEAD
 define("PAGE_NAME","Facebook: Create Post");
-=======
-define("PAGE_NAME","Facebook");
->>>>>>> origin/master
 $app_id=trim($kaConfig->getVar('facebook-config',1));
 $app_secret=trim($kaConfig->getVar('facebook-config',2));
 $page_id=trim($kaConfig->getVar('facebook-page',1));
@@ -83,11 +52,7 @@ function head(){
     <body>
 
     <div id="iPopUpHeader">
-<<<<<<< HEAD
         <h1><?= $kaTranslate->translate('News:Create facebook post'); ?></h1>
-=======
-        <h1>Crea un evento su facebook</h1>
->>>>>>> origin/master
         <a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><img src="<?= ADMINRELDIR; ?>img/closeWindow.gif" alt="Close" width="9" height="9" /></a>
     </div>
 
@@ -218,13 +183,8 @@ try {
 
 /* Hurrah! */
 ?>
-<<<<<<< HEAD
     <h2><?= $kaTranslate->translate('News:Hurrah, the post was successfully created!'); ?></h2>
     <p><?= $kaTranslate->translate('News:You can view it here'); ?>:<br />
-=======
-    <h2>Evento creato</h2>
-    <p>Puoi visualizzarlo qui:<br />
->>>>>>> origin/master
         <a href="https://www.facebook.com/<?= $response->getGraphNode()['id'] ?>" target="_blank">https://www.facebook.com/<?= $response->getGraphNode()['id']; ?></a>
     </p>
 <?php
