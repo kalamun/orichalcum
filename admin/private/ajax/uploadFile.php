@@ -8,12 +8,14 @@ require_once('../../inc/sessionmanager.inc.php');
 require_once('../../inc/main.lib.php');
 if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
 
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init();
+
 if(!isset($_GET['dir'])) die('Fatal Error: no base directory specified');
 $_GET['dir']=trim($_GET['dir']," ./");
 
 require_once('../private.lib.php');
 $kaPrivate=new kaPrivate();
-
 
 if(isset($_POST['uploadFiles'])) {
 	$log="";
