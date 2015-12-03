@@ -8,6 +8,8 @@ require_once('../../inc/sessionmanager.inc.php');
 require_once('../../inc/main.lib.php');
 if(!isset($_SESSION['iduser'])) die('You are not allowed to use this page');
 
+$kaOrichalcum=new kaOrichalcum();
+$kaOrichalcum->init();
 
 /* check params */
 if(!isset($_GET['dir'])) die('Fatal Error: no base directory specified');
