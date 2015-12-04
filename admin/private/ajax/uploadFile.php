@@ -1,21 +1,14 @@
 <?php 
-session_start();
-
-define("PAGE_ID","private");
-require_once('../../inc/connect.inc.php');
-require_once('../../inc/kalamun.lib.php');
-require_once('../../inc/sessionmanager.inc.php');
 require_once('../../inc/main.lib.php');
-if(!isset($_SESSION['iduser'])) die('Non hai il permesso di utilizzare questa funzione');
-
 $kaOrichalcum=new kaOrichalcum();
-$kaOrichalcum->init();
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
 if(!isset($_GET['dir'])) die('Fatal Error: no base directory specified');
 $_GET['dir']=trim($_GET['dir']," ./");
 
 require_once('../private.lib.php');
 $kaPrivate=new kaPrivate();
+
 
 if(isset($_POST['uploadFiles'])) {
 	$log="";
@@ -27,11 +20,6 @@ if(isset($_POST['uploadFiles'])) {
 	}
 
 else {
-	require_once('../../inc/log.lib.php');
-	$kaLog=new kaLog();
-
-	$kaTranslate=new kaAdminTranslate();
-
 	?>
 	<div id="iPopUpHeader">
 		<h1><?= $kaTranslate->translate('Private:Upload one or more files'); ?></h1>
