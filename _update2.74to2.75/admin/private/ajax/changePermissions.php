@@ -1,7 +1,7 @@
 <?php 
 require_once('../../inc/main.lib.php');
 $kaOrichalcum=new kaOrichalcum();
-$kaOrichalcum->init( array("x-frame-options"=>"") );
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
 /* check params */
 if(!isset($_GET['dir'])) die('Fatal Error: no base directory specified');
@@ -10,7 +10,6 @@ $_GET['dir']=str_replace("../","",$_GET['dir']);
 if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_PRIVATE.$_GET['dir'])) die('The directory you request not exists');
 if($_GET['dir']=="") die('You can\'t change permissions to the root dir');
 
-$kaTranslate=new kaAdminTranslate();
 
 require_once('../private.lib.php');
 $kaPrivate=new kaPrivate();

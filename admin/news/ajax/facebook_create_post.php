@@ -7,11 +7,11 @@ $kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 require_once '../../../vendor/autoload.php';
 
 define("PAGE_NAME","Facebook: Create Post");
-$app_id=trim($kaConfig->getVar('facebook-config',1));
-$app_secret=trim($kaConfig->getVar('facebook-config',2));
-$page_id=trim($kaConfig->getVar('facebook-page',1));
-$access_token=trim($kaConfig->getVar('facebook-token',1)); // User Access Token
-$page_token=trim($kaConfig->getVar('facebook-token',2)); // Page Access Token
+$app_id=trim($kaImpostazioni->getVar('facebook-config',1));
+$app_secret=trim($kaImpostazioni->getVar('facebook-config',2));
+$page_id=trim($kaImpostazioni->getVar('facebook-page',1));
+$access_token=trim($kaImpostazioni->getVar('facebook-token',1)); // User Access Token
+$page_token=trim($kaImpostazioni->getVar('facebook-token',2)); // Page Access Token
 $my_url=SITE_URL.ADMINDIR."news/ajax/facebook_create_post.php";
 $code=isset($_REQUEST["code"])?$_REQUEST["code"]:'';
 
@@ -19,7 +19,7 @@ $code=isset($_REQUEST["code"])?$_REQUEST["code"]:'';
 if(isset($_POST['insert'])) {
     $_SESSION['facebook_tmp']=array();
     $_SESSION['facebook_tmp']['idnews']=intval($_GET['id']);
-    $_SESSION['facebook_tmp']['testo']=$_POST['testo'];
+    $_SESSION['facebook_tmp']['content']=$_POST['fb_post_text'];
     $_SESSION['facebook_tmp']['link']=$_POST['link'];
 }
 
@@ -131,12 +131,12 @@ head();
 
 /* If recevied a code, exchange it with new access tokens, this takes priority over anything else */
 if (!empty($code)) {
-    $kaConfig->setParam('facebook-token','',''); //drop old token config from db
+    $kaImpostazioni->setParam('facebook-token','',''); //drop old token config from db
     $access_token = getNewAccessToken($fb);
     $fb->setDefaultAccessToken($access_token);
     $page_token = getNewPageToken($fb,$page_id);
     $fb->setDefaultAccessToken($page_token);
-    $kaConfig->setParam('facebook-token',$access_token,$page_token); //save token config in db
+    $kaImpostazioni->setParam('facebook-token',$access_token,$page_token); //save token config in db
 
 /* Check with facebook server if page_token from config is valid */
 } elseif ($page_token && $fb->getOAuth2Client()->debugToken($page_token)->getIsValid()) {
@@ -147,11 +147,11 @@ if (!empty($code)) {
     $fb->setDefaultAccessToken($access_token);
     $page_token = getNewPageToken($fb,$page_id);
     $fb->setDefaultAccessToken($page_token);
-    $kaConfig->setParam('facebook-token',$access_token,$page_token); //update token config in db
+    $kaImpostazioni->setParam('facebook-token',$access_token,$page_token); //update token config in db
 
 /* Sorry, no token, no party. We need a new authentication code */
 } else {
-    $kaConfig->setParam('facebook-token','','');  //drop old token config from db
+    $kaImpostazioni->setParam('facebook-token','','');  //drop old token config from db
     $permissions = ['manage_pages','publish_pages'];
     $loginUrl = $fb->getRedirectLoginHelper()->getLoginUrl($my_url, $permissions);
     ?>
@@ -167,17 +167,17 @@ if (!empty($code)) {
 try {
     $linkData = [
         'link' => $_SESSION['facebook_tmp']['link'],
-        'message' => $_SESSION['facebook_tmp']['testo'],
+        'message' => $_SESSION['facebook_tmp']['content'],
     ];
     $response = $fb->post('/'.$page_id.'/feed', $linkData, $page_token);
     unset($_SESSION['facebook_tmp']);
 } catch(Facebook\Exceptions\FacebookResponseException $e) {
     echo '<h2>Graph returned an error: ' . $e->getMessage().'</h2>';
-    $kaConfig->setParam('facebook-token','','');
+    $kaImpostazioni->setParam('facebook-token','','');
     tail();
 } catch(Facebook\Exceptions\FacebookSDKException $e) {
     echo '<h2>Facebook SDK returned an error: ' . $e->getMessage().'</h2>';
-    $kaConfig->setParam('facebook-token','','');
+    $kaImpostazioni->setParam('facebook-token','','');
     tail();
 }
 

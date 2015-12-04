@@ -1,9 +1,8 @@
 <?php 
 require_once('../../inc/main.lib.php');
 $kaOrichalcum=new kaOrichalcum();
-$kaOrichalcum->init( array("x-frame-options"=>"") );
+$kaOrichalcum->init( array("check-permissions"=>false, "x-frame-options"=>"") );
 
-$kaTranslate=new kaAdminTranslate();
 
 require_once('../private.lib.php');
 $kaPrivate=new kaPrivate();
