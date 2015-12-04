@@ -675,50 +675,56 @@ function b3_create_input($name,$type,$label,$value,$width="auto",$maxlength=fals
 	return $string;
 	}
 
-function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$rich=false,$random_mode=false,$mediatable="",$mediaid="",$kaeys=false) {
-	//check the custom height of the user
-	if(isset($GLOBALS['kaUsers'])&&isset($_SESSION['iduser'])) {
+function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$rich=false,$random_mode=false,$mediatable="",$mediaid="",$kaeys=false)
+{
+	//check the custom textarea height in the user preferences
+	if(isset($GLOBALS['kaUsers'])&&isset($_SESSION['iduser']))
+	{
 		$tmpheight=$GLOBALS['kaUsers']->propGetValue($_SESSION['iduser'],'editor',$name.'_height');
 		if($tmpheight>0) $height=$tmpheight.'px';
-		}
+	}
 
-	// update filenames with the real one recorded on db (for images, docs and media), in case the files was changed
-	preg_match_all('/&lt;img .*?id="img(\d*)".*?&gt;/',$value,$matches);
-	foreach($matches[1] as $k=>$v) {
+	// update filenames with the real one recorded into db (for images, docs and media), in case the files was changed
+	preg_match_all('/&lt;img .*?data-orichalcum-id="img(\d*)".*?&gt;/',$value,$matches);
+	foreach($matches[1] as $k=>$v)
+	{
 		$query="SELECT * FROM ".TABLE_IMG." WHERE `idimg`='".$v."' LIMIT 1";
 		$results=ksql_query($query);
-		if($row=ksql_fetch_array($results)) {
+		if($row=ksql_fetch_array($results))
+		{
 			if($row['filename']==""&&$row['hotlink']!="") $row['filename']=$row['hotlink'];
-			$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?id="img'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'].'$3',$value);
+			if($row['filetype']==1)
+			{
+				// for the images, display the full-size image
+				$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?data-orichalcum-id="img'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['filename'].'$3',$value);
+			} elseif($row['filetype']==2) {
+				// for the videos, display the thumbnail
+				$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?data-orichalcum-id="img'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_MEDIA.$row['idimg'].'/'.$row['thumbnail'].'$3',$value);
 			}
 		}
-	preg_match_all('/&lt;img .*?id="thumb(\d*)".*?&gt;/',$value,$matches);
-	foreach($matches[1] as $k=>$v) {
+	}
+	preg_match_all('/&lt;img .*?data-orichalcum-id="thm(\d*)".*?&gt;/',$value,$matches);
+	foreach($matches[1] as $k=>$v)
+	{
 		$query="SELECT * FROM ".TABLE_IMG." WHERE `idimg`='".$v."' LIMIT 1";
 		$results=ksql_query($query);
 		if($row=ksql_fetch_array($results)) {
 			if($row['thumbnail']==""&&$row['hotlink']!="") $row['thumbnail']=$row['hotlink'];
-			$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?id="thumb'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'].'$3',$value);
-			}
+			$value=preg_replace('/(&lt;img .*?src=")([^"]*?)(" [^&]*?data-orichalcum-id="thm'.$v.'"[^&]*?&gt;)/','$1'.BASEDIR.DIR_IMG.$row['idimg'].'/'.$row['thumbnail'].'$3',$value);
 		}
+	}
+	
 	preg_match_all('/&lt;a .*?id="doc(\d*)".*?&gt;/',$value,$matches);
-	foreach($matches[1] as $k=>$v) {
+	foreach($matches[1] as $k=>$v)
+	{
 		$query="SELECT * FROM ".TABLE_DOCS." WHERE `iddoc`='".$v."' LIMIT 1";
 		$results=ksql_query($query);
-		if($row=ksql_fetch_array($results)) {
+		if($row=ksql_fetch_array($results))
+		{
 			$value=preg_replace('/(&lt;a .*?href=")([^"]*)(" .*?id="doc'.$v.'".*?&gt;)/','$1'.BASEDIR.DIR_DOCS.$row['iddoc'].'/'.$row['filename'].'$3',$value);
-			}
 		}
-	preg_match_all('/&lt;img .*?id="media(\d*)".*?&gt;/',$value,$matches);
-	foreach($matches[1] as $k=>$v) {
-		$query="SELECT * FROM ".TABLE_MEDIA." WHERE `idmedia`='".$v."' LIMIT 1";
-		$results=ksql_query($query);
-		if($row=ksql_fetch_array($results)) {
-			if($row['thumbnail']!="") $url=BASEDIR.DIR_MEDIA.$row['idmedia'].'/'.$row['thumbnail'];
-			else $url=ADMINDIR.'img/media_placeholder.png';
-			$value=preg_replace('/(&lt;img .*?src=")([^"]*)(" .*?id="media'.$v.'".*?&gt;)/','$1'.$url.'$3',$value);
-			}
-		}
+	}
+
 
 	$string="";
 	$random_mode?$rand=rand(1,666):$rand="";
@@ -728,7 +734,7 @@ function b3_create_textarea($name,$label,$value,$width="200px",$height="50px",$r
 	$editor= $rich==false ? "none" : "kzen";
 	$string.='<textarea editor="'.$editor.'" name="'.$name.'" id="'.$id.'" style="width:'.$width.';height:'.$height.';">'.$value.'</textarea>';
 	return $string;
-	}
+}
 
 function b3_create_select($name,$label,$labels,$values,$selected="",$width="auto",$random_mode=false,$add="") {
 	$string="";

@@ -231,10 +231,9 @@ class kText
 		{
 			$idimg=0;
 			$attributes=$images[$i]['attributes'];
-			if(isset($attributes['id']))
+			if(isset($attributes['data-orichalcum-id']))
 			{
-				if(substr($attributes['id'],0,3)=="img") $idimg=intval(substr($attributes['id'],3));
-				elseif(substr($attributes['id'],0,5)=="thumb") $idimg=intval(substr($attributes['id'],5));
+				$idimg=intval(substr($attributes['data-orichalcum-id'],3));
 			}
 
 			if($idimg>0)
@@ -269,9 +268,21 @@ class kText
 				}
 				$embeddedimages[]=$__template->imgDB;
 				
-				// load image or thumbnail template
-				if(substr($attributes['id'],0,3)=="img") $tpl=$__template->getSubTemplate('image');
-				else $tpl=$__template->getSubTemplate('thumbnail');
+				// load template
+				if($__template->imgDB['filetype'] == 1)
+				{
+					// images
+					if(substr($attributes['data-orichalcum-id'],0,3)=="img") $tpl=$__template->getSubTemplate('image');
+					else $tpl=$__template->getSubTemplate('thumbnail');
+					
+				} elseif($__template->imgDB['filetype'] == 2) {
+					// media
+					$tpl=$__template->getSubTemplate('media');
+					
+				} elseif($__template->imgDB['filetype'] == 3) {
+					// documents
+					$tpl=$__template->getSubTemplate('document');
+				}
 				
 				// replace the old image with the new one
 				$string=substr_replace($string,$tpl,$images[$i]['start'],$images[$i]['end']-$images[$i]['start']);

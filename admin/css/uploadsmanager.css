@@ -313,3 +313,7 @@ table.properties label {
 table.properties input[type=checkbox] + label {
 	display:inline;
 }
+table.properties input[type=number] {
+	width:80px;
+	text-align:right;
+}

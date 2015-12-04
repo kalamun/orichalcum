@@ -47,7 +47,7 @@ function kInitBettino($dir=false)
 	require_once($bd."inc/config.lib.php");
 	require_once($bd."inc/images.lib.php");
 	require_once($bd."inc/documents.lib.php");
-	require_once($bd."inc/media.lib.php");
+	//require_once($bd."inc/media.lib.php");
 	require_once($bd."inc/template.lib.php");
 	require_once($bd."inc/emails.lib.php");
 	require_once($bd."inc/newsletter.lib.php");
@@ -64,7 +64,7 @@ function kInitBettino($dir=false)
 	$GLOBALS['__images_gallery']=new kImgallery();
 	$GLOBALS['__documents']=new kDocuments();
 	$GLOBALS['__documents_gallery']=new kDocgallery();
-	$GLOBALS['__media']=new kMedia();
+	//$GLOBALS['__media']=new kMedia();
 	$GLOBALS['__template']=new kTemplate();
 	$GLOBALS['__emails']=new kEmails();
 	$GLOBALS['__newsletter']=new kNewsletter();
@@ -745,7 +745,6 @@ function kGetDocumentHeight()
 }
 
 /* media */
-
 function kGetMediasDir()
 {
 	return DIR_MEDIA;
@@ -753,27 +752,27 @@ function kGetMediasDir()
 
 function kSetMedia($mediaArray)
 {
-	return $GLOBALS['__template']->mediaDB=$mediaArray;
+	return $GLOBALS['__template']->imgDB=$mediaArray;
 }
 
 function kMediaIsHotlink()
 {
-	return $GLOBALS['__template']->mediaDB['hotlink']!=false?true:false;
+	return !empty($GLOBALS['__template']->imgDB['hotlink']) ? true : false;
 }
 
 function kMediaIsHtmlCode()
 {
-	return $GLOBALS['__template']->mediaDB['htmlcode']!=false?true:false;
+	return !empty($GLOBALS['__template']->imgDB['metadata']['embedcode']) ? true : false;
 }
 
 function kGetMediaId()
 {
-	return $GLOBALS['__template']->mediaDB['idmedia'];
+	return $GLOBALS['__template']->imgDB['idmedia'];
 }
 
 function kGetMediaFilename()
 {
-	return $GLOBALS['__template']->mediaDB['filename'];
+	return $GLOBALS['__template']->imgDB['filename'];
 }
 
 function kGetMediaFilesize($um="Kb",$dec=0)
@@ -782,82 +781,82 @@ function kGetMediaFilesize($um="Kb",$dec=0)
 	elseif($um=="Mb") $divide=1024*1024;
 	elseif($um=="Gb") $divide=1024*1024*1024;
 	else $divide=1;
-	return number_format($GLOBALS['__template']->mediaDB['filesize']/$divide,$dec);
+	return number_format($GLOBALS['__template']->imgDB['filesize']/$divide,$dec);
 }
 
 function kGetMediaWidth()
 {
-	return $GLOBALS['__template']->mediaDB['width'];
+	return $GLOBALS['__template']->imgDB['width'];
 }
 
 function kGetMediaHeight()
 {
-	return $GLOBALS['__template']->mediaDB['height'];
+	return $GLOBALS['__template']->imgDB['height'];
 }
 
 function kGetMediaURL()
 {
-	return $GLOBALS['__template']->mediaDB['url'];
+	return $GLOBALS['__template']->imgDB['url'];
 }
 
 function kGetMediaAlt()
 {
-	return $GLOBALS['__template']->mediaDB['alt'];
+	return $GLOBALS['__template']->imgDB['alt'];
 }
 
 function kGetMediaTitle()
 {
-	return $GLOBALS['__template']->mediaDB['title'];
+	return $GLOBALS['__template']->imgDB['alt'];
 }
 
 function kGetMediaDuration()
 {
-	return $GLOBALS['__template']->mediaDB['duration'];
+	return $GLOBALS['__template']->imgDB['metadata']['duration'];
 }
 
 function kGetMediaMimeType()
 {
-	return $GLOBALS['__template']->mediaDB['mimetype'];
+	return $GLOBALS['__template']->imgDB['mimetype'];
 }
 
 function kGetMediaHtmlCode()
 {
-	return $GLOBALS['__template']->mediaDB['htmlcode'];
+	return $GLOBALS['__template']->imgDB['metadata']['embedcode'];
 }
 
 function kGetMediaCaption()
 {
-	return $GLOBALS['__template']->mediaDB['caption'];
+	return $GLOBALS['__template']->imgDB['caption'];
 }
 
 function kGetMediaThumbFilename()
 {
-	return $GLOBALS['__template']->mediaDB['thumb']['filename'];
+	return $GLOBALS['__template']->imgDB['thumb']['filename'];
 }
 
 function kGetMediaThumbWidth()
 {
-	return $GLOBALS['__template']->mediaDB['thumb']['width'];
+	return $GLOBALS['__template']->imgDB['thumb']['width'];
 }
 
 function kGetMediaThumbHeight()
 {
-	return $GLOBALS['__template']->mediaDB['thumb']['height'];
+	return $GLOBALS['__template']->imgDB['thumb']['height'];
 }
 
 function kGetMediaThumbURL()
 {
-	return $GLOBALS['__template']->mediaDB['thumb']['url'];
+	return $GLOBALS['__template']->imgDB['thumb']['url'];
 }
 
 function kGetMediaThumbAlt()
 {
-	return $GLOBALS['__template']->mediaDB['alt'];
+	return $GLOBALS['__template']->imgDB['alt'];
 }
 
 function kGetMediaThumbCaption()
 {
-	return $GLOBALS['__template']->mediaDB['caption'];
+	return $GLOBALS['__template']->imgDB['caption'];
 }
 
 /* comments */
@@ -2208,29 +2207,7 @@ function kPrintShopPagOnlineForm()
 	echo $GLOBALS['__template']->getSubtemplate('pagonlineform');
 }
 
-function kGetShopXPayBusinessId()
-{
-	$v=kGetVar('shop-xpay',1);
-	return $v;
-}
-
-function kGetShopXPayKEY()
-{
-	$v=kGetVar('shop-xpay',2);
-	return $v;
-}
-
-function kPrintShopXPayForm()
-{
-	echo $GLOBALS['__template']->getSubtemplate('xpayform');
-}
-
 function kGetShopPayPalReturnPage($success=true)
-{
-	if($success==true) return kGetVar('shop-paypal-return',1);
-	else return kGetVar('shop-paypal-return',2);
-}
-function kGetShopReturnPage($success=true)
 {
 	if($success==true) return kGetVar('shop-paypal-return',1);
 	else return kGetVar('shop-paypal-return',2);
@@ -2608,15 +2585,12 @@ function kGetShopCartPaymentPrice($price=false,$idspay=false,$iddel=false,$count
 
 function kShopAddToCart($idsitem,$qty=1,$variations=array(),$customvariations=array())
 {
-	$iditem = intval($idsitem);
-	if($idsitem<=0) return false;
-	$GLOBALS['__shop']->addItemToCart($idsitem,$qty,$variations,$customvariations);
+	if(intval($idsitem)<=0) return false;
+	$GLOBALS['__shop']->addItemToCart(intval($idsitem),$qty,$variations,$customvariations);
 }
 
 function kShopRemoveFromCart($idsitem,$qty=1,$variations=array(),$customvariations=array())
 {
-	$iditem = intval($idsitem);
-	if($idsitem<=0) return false;
 	$GLOBALS['__shop']->removeItemFromCart($idsitem,$qty,$variations,$customvariations);
 }
 
