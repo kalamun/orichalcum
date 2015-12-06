@@ -72,6 +72,7 @@ define("DIR_IMG","arch/img/");
 define("DIR_DOCS","arch/docs/");
 define("DIR_MEDIA","arch/media/");
 define("DIR_PRIVATE","arch/private/");
+define("DIR_TMP","arch/tmp/");
 //define("DEBUG","true");
 
 ?>

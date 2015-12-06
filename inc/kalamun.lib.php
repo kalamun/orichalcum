@@ -304,9 +304,9 @@ class kText
 		{
 			$iddoc=0;
 			$attributes=$documents[$i]['attributes'];
-			if(isset($attributes['id']))
+			if(isset($attributes['data-orichalcum-id']))
 			{
-				if(substr($attributes['id'],0,3)=="doc") $iddoc=intval(substr($attributes['id'],3));
+				if(substr($attributes['data-orichalcum-id'],0,3)=="doc") $iddoc=intval(substr($attributes['data-orichalcum-id'],3));
 			}
 
 			if($iddoc>0)
