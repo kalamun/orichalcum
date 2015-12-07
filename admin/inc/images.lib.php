@@ -100,8 +100,11 @@ class kaImages {
 		if($vars['conditions']!="") $query.=" AND (".$vars['conditions'].") ";
 		if($vars['orderby']!="") $query.=" ORDER BY ".$vars['orderby']." ";
 
-		$query.=" LIMIT ".intval($vars['offset']);
-		if(!empty($vars['limit'])) $query.=",".intval($vars['limit']);
+		if($vars['offset']>0 || !empty($vars['limit']))
+		{
+			$query.=" LIMIT ".intval($vars['offset']);
+			if(!empty($vars['limit'])) $query.=",".intval($vars['limit']);
+		}
 
 		$results=ksql_query($query);
 		for($i=0;$row=ksql_fetch_array($results);$i++)
@@ -151,6 +154,9 @@ class kaImages {
 			$output['hotlink']=true;
 		}
 		else $row['hotlink']=false;
+
+		$output['width'] = 0;
+		$output['height'] = 0;
 
 		if(isset($output['filename']) && $output['filename']!="" && file_exists(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']) && filesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']) > 11)
 		{

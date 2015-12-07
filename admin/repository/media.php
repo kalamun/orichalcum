@@ -41,24 +41,26 @@ $vars['offset'] = (($_GET['p']-1)*$items4page);
 $vars['limit'] = $items4page;
 
 foreach($kaImages->getList($vars) as $media) {
-	if($media['thumb']['filename']!=""){
+	
+	if(!empty($media['thumb']['filename']))
+	{
 		
 		$defaultsize = $kaImpostazioni->getParam('thumb_size','*');
 		if(empty($media['thumb']['width'])) $media['thumb']['width'] = $defaultsize['value1'];
 		if(empty($media['thumb']['height'])) $media['thumb']['height'] = $defaultsize['value2'];
 
-		if($media['thumb']['width']>$media['thumb']['height']) {
+		if($media['thumb']['width']>$media['thumb']['height'])
+		{
 			$w=100;
 			$h=100/$media['thumb']['width']*$media['thumb']['height'];
-			}
-		else {
+		} else {
 			$h=100;
 			$w=100/$media['thumb']['height']*$media['thumb']['width'];
-			}
 		}
+	}
 	if($i%2==0) echo '<tr>';
 	?>
-	<td><div class="thumb"><?php  if($media['thumb']['filename']!="") { ?><img src="<?= BASEDIR.$media['thumb']['url']; ?>" width="<?= $w; ?>" height="<?= $h; ?>" alt="<?= BASEDIR.$media['alt']; ?>" /><?php  } else { ?>Nessuna anteprima<?php  } ?></div></td>
+	<td><div class="thumb"><?php  if(!empty($media['thumb']['filename'])) { ?><img src="<?= BASEDIR.$media['thumb']['url']; ?>" width="<?= $w; ?>" height="<?= $h; ?>" alt="<?= BASEDIR.$media['alt']; ?>" /><?php  } else { ?>Nessuna anteprima<?php  } ?></div></td>
 	<td>
 		<strong><?= $media['alt']!=""?$media['alt']:$media['filename']; ?></strong><br />
 		Dimensioni: <?= $media['width']; ?> x <?= $media['height']; ?> px - Durata: <?= $media['metadata']['duration']; ?> sec.<br />

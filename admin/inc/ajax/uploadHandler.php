@@ -14,7 +14,7 @@ if(isset($_POST['action']))
 		$kaImages=new kaImages();
 		if(!isset($_POST['start'])) $_POST['start']=0;
 		if(!isset($_POST['limit'])) $_POST['limit']=30;
-		if(!isset($_POST['orderby'])||$_POST['orderby']=="") $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
+		if(empty($_POST['orderby'])) $_POST['orderby']='`creation_date` DESC, `idimg` DESC';
 		if(!isset($_POST['fileType'])) $_POST['fileType']="image";
 		
 		//if sorted by filename remove the limit because the natural sorting is made by PHP so it needs the entrire list
@@ -27,7 +27,7 @@ if(isset($_POST['action']))
 		
 		$vars=array();
 		$vars['start'] = $_POST['start'];
-		$vars['limit'] = $_POST['limit'];
+		if(!empty($_POST['limit'])) $vars['limit'] = $_POST['limit'];
 		$vars['orderby'] = $_POST['orderby'];
 		
 		if(!isset($_POST['conditions'])) $_POST['conditions']='';
@@ -49,7 +49,6 @@ if(isset($_POST['action']))
 			$images[$img['idimg']]=$img;
 			$output[$img['idimg']]=$img['filename'];
 		}
-
 		//if sorted by filename sort by natural order and apply offset and limit
 		if(strpos($_POST['orderby'],'filename')!==false)
 		{

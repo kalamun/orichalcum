@@ -46,7 +46,7 @@ if($_GET['q']!="") $conditions.="`filename` LIKE '%".ksql_real_escape_string($_G
 		foreach($kaImages->getList('`filename`',$conditions,(($_GET['p']-1)*$items4page),$items4page) as $img) {
 			?>
 			<div class="image">
-				<div class="thumb" style="background-image:url('<?= addslashes(BASEDIR.$img['thumb']['url']); ?>');" /></div>
+				<div class="thumb" style="background-image:url('<?= (!empty($img['thumb']['url']) ? addslashes(BASEDIR.$img['thumb']['url']) : ''); ?>')" /></div>
 				<?= ($img['alt']!="" ? $img['alt'] : $kaTranslate->translate('Repository:No caption defined')); ?><br />
 				<small>
 					<?= $img['filename']; ?><br />
