@@ -116,15 +116,35 @@ class kShop {
 
 	}
 	
-	public function shopExists($dir=null,$ll=null) {
+	
+	// returns true if current dir is inside the shop
+	public function shopExists($dir=null,$ll=null)
+	{
 		if($ll==null) $ll=LANG;
 		if($dir==null) $dir=array($GLOBALS['__dir__']);
 		else $dir=explode("/",trim($dir,"/"));
 		if($dir[0]!=kGetVar('dir_shop')) return false;
 		return true;
-		}
+	}
 
-	public function shopItemExists($dir=null,$ll=null) {
+	// returns true if current dir is a shop category
+	public function shopCategoryExists($dir=null,$ll=null)
+	{
+		if($ll==null) $ll=LANG;
+		if($dir==null) $dir=array($GLOBALS['__dir__'],$GLOBALS['__subdir__'],$GLOBALS['__subsubdir__']);
+		else $dir=explode("/",$dir);
+		if($dir[0]!=kGetVar('dir_shop')) return false;
+		if(!isset($dir[2])) $dir[2]="";
+
+		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND ll='".ksql_real_escape_string(strtoupper($ll))."' LIMIT 1";
+		$results=ksql_query($query);
+		if($row=ksql_fetch_array($results)) return true;
+		else return false;
+	}
+
+	// returns true if current dir is a shop item
+	public function shopItemExists($dir=null,$ll=null)
+	{
 		if($ll==null) $ll=LANG;
 		if($dir==null) $dir=array($GLOBALS['__dir__'],$GLOBALS['__subdir__'],$GLOBALS['__subsubdir__']);
 		else $dir=explode("/",$dir);
@@ -138,7 +158,7 @@ class kShop {
 		$results=ksql_query($query);
 		if($row=ksql_fetch_array($results)) return true;
 		else return false;
-		}
+	}
 
 	public function shopManufacturerExists($dir=null,$ll=null) {
 		if($ll==null) $ll=LANG;
