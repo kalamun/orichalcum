@@ -116,7 +116,7 @@ if(isset($_GET['idcat'])) {
 
 		<div class="topset">
 			<input type="hidden" name="idcat" value="<?= $cat['idcat']; ?>" />
-			<div class="title"><?= b3_create_input("categoria","text","Nome della categoria<br />",b3_lmthize($cat['categoria'],"input"),"70%",250); ?></div>
+			<div class="title"><?= b3_create_input("categoria","text",$kaTranslate->translate("Shop:Category name")."<br />",b3_lmthize($cat['categoria'],"input"),"70%",250); ?></div>
 			<div class="URLBox"><?= b3_create_input("dir","text","Indirizzo della pagina: ".BASEDIR.strtolower($_SESSION['ll'])."/".$kaImpostazioni->getVar('dir_shop',1).'/[categoria]/',b3_lmthize($cat['dir'],"input"),"400px",64,'onkeyup="checkURL(this)"'); ?> <span id="dirYetExists" style="display:none;">Questo indirizzo esiste gi&agrave;!</span></div>
 			<script type="text/javascript">
 				var target=document.getElementById('dir');
