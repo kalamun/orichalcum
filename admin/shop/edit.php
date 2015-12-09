@@ -456,7 +456,9 @@ if(!isset($_GET['idsitem'])) { ?>
 					<th><?= $kaTranslate->translate('Shop:Visible from'); ?></th>
 				<?php } ?>
 				
-				<th><?= $kaTranslate->translate('Shop:Price'); ?></th>
+				<?php if(strpos($pageLayout,",price,")!==false) { ?>
+					<th><?= $kaTranslate->translate('Shop:Price'); ?></th>
+				<?php } ?>
 			</tr>
 
 			<tbody class="DragZone">
@@ -510,19 +512,19 @@ if(!isset($_GET['idsitem'])) { ?>
 					</td>
 				<?php } ?>
 
-				<td class="price">
 				<?php
 				if(strpos($pageLayout,",price,")!==false)
 				{
+					?><td class="price"><?php
 					if(strpos($pageLayout,",discounted,")!==false&&$row['scontato']>0) { ?>
 						<del><?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?></del><br />
 						<?= $row['scontato'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
 					<?php } else { ?>
 						<?= $row['prezzo'].' '.$kaImpostazioni->getVar('shop-currency',2); ?>
 					<?php }
+					?></td><?php
 				}
 				?>
-				</td>
 				
 				</tr>
 			<?php  } ?>
