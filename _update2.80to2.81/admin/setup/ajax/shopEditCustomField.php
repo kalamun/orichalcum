@@ -43,7 +43,7 @@ $field=$kaShop->getCustomFields(array("id"=>$_POST['idsfield']));
 			<input type="checkbox" value="*" <?= strpos($field[0]['categories'],',*,')!==false?'checked':''; ?> name="categories[]" id="categoryall" /> <label for="categoryall"><?= $kaTranslate->translate('Setup:All the categories, even those that do not yet exist'); ?></label><br />
 			<?php 
 			foreach($kaShop->getItemCategories() as $cat) { ?>
-				<input type="checkbox" value="<?= $cat['idcat']; ?>" <?= strpos($field[0]['categories'],','.$cat['idcat'].',')!==false?'checked':''; ?> name="categories[]" id="category<?= $cat['idcat']; ?>" /> <label for="category<?= $cat['idcat']; ?>"><?= $cat['categoria']; ?></label><br />
+				<input type="checkbox" value="<?= $cat['idcat']; ?>" <?= isset($field[0]['categories']) && strpos($field[0]['categories'],','.$cat['idcat'].',')!==false?'checked':''; ?> name="categories[]" id="category<?= $cat['idcat']; ?>" /> <label for="category<?= $cat['idcat']; ?>"><?= $cat['categoria']; ?></label><br />
 				<?php  } ?>
 			</td>
 		</tr>

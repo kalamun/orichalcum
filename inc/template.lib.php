@@ -2,7 +2,7 @@
 
 /* TEMPLATE */
 class kTemplate {
-	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList,$llurl;
+	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList,$llurl,$kText;
 	public $imgDB,$docDB,$mediaDB,$pageDB,$commentDB,$config,$menuStructure,$menuByRef,$contents,$currentConversion; //contents is a temporary recipient
 	
 	public function __construct() {
@@ -16,6 +16,8 @@ class kTemplate {
 		{
 			$this->config[$row['param']]=$row;
 		}
+
+		$this->kText = new kText();
 
 		// prevent language indication in URLs for default language if this option is turned on in Settings > General Settings
 		$this->llurl=strtolower(LANG)."/";
@@ -474,6 +476,15 @@ class kTemplate {
 						}
 					}
 				}
+
+				$this->categories[$cat['idcat']]['featuredimage'] = ($this->categories[$cat['idcat']]['featuredimage']>0 ? $GLOBALS['__images']->getImage($this->categories[$cat['idcat']]['featuredimage']) : array());
+				
+				$this->categories[$cat['idcat']]['description'] = $this->kText->formatText($this->categories[$cat['idcat']]['description']);
+				$tmp=$this->kText->embedImg($this->categories[$cat['idcat']]['description']);
+				$tmp=$this->kText->embedDocs($tmp[0]);
+				$tmp=$this->kText->embedMedia($tmp[0]);
+				$this->categories[$cat['idcat']]['description'] = $tmp[0];
+				$this->categories[$this->categories[$cat['idcat']]['idcat']]['description'] = $this->categories[$cat['idcat']]['description'];
 
 				$output[$k]=$this->categories[$cat['idcat']];
 

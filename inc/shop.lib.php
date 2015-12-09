@@ -134,9 +134,9 @@ class kShop {
 		if($dir==null) $dir=array($GLOBALS['__dir__'],$GLOBALS['__subdir__'],$GLOBALS['__subsubdir__']);
 		else $dir=explode("/",$dir);
 		if($dir[0]!=kGetVar('dir_shop')) return false;
-		if(!isset($dir[2])) $dir[2]="";
+		if(!isset($dir[1])) $dir[1]="";
 
-		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND ll='".ksql_real_escape_string(strtoupper($ll))."' LIMIT 1";
+		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `tabella`='".TABLE_SHOP_ITEMS."' AND (`dir`='".b3_htmlize($dir[1],true,"")."' OR `dir`='".ksql_real_escape_string($dir[1])."') AND ll='".ksql_real_escape_string(strtoupper($ll))."' LIMIT 1";
 		$results=ksql_query($query);
 		if($row=ksql_fetch_array($results)) return true;
 		else return false;

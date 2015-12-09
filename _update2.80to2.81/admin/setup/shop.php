@@ -80,7 +80,7 @@ if(isset($_POST['update']))
 	$vars['values']=$_POST['values'];
 	
 	if(!isset($_POST['categories'])) $_POST['categories']=array();
-	if(isset($_POST['categories'][0]) && $_POST['categories'][0] == "*") $vars['categories'] = array("*");
+	if(isset($_POST['categories'][0]) && $_POST['categories'][0] == "*") $vars['categories'] = ",*,";
 	else $vars['categories']=",".implode(",",$_POST['categories']).",";
 	
 	$kaShop->addCustomField($vars);

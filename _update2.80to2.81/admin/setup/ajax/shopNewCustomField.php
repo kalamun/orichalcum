@@ -37,7 +37,7 @@ $kaShop=new kaShop();
 			</td>
 		<td>
 			<label for="values"><?= $kaTranslate->translate('Setup:Use into the following categories'); ?></label><br />
-			<input type="checkbox" value="*" <?= strpos($field[0]['categories'],',*,')!==false?'checked':''; ?> name="categories[]" id="categoryall" /> <label for="categoryall"><?= $kaTranslate->translate('Setup:All the categories, even those that do not yet exist'); ?></label><br />
+			<input type="checkbox" value="*" <?= isset($field[0]['categories']) && strpos($field[0]['categories'],',*,')!==false?'checked':''; ?> name="categories[]" id="categoryall" /> <label for="categoryall"><?= $kaTranslate->translate('Setup:All the categories, even those that do not yet exist'); ?></label><br />
 			<?php 
 			foreach($kaShop->getItemCategories() as $cat) { ?>
 				<input type="checkbox" value="<?= $cat['idcat']; ?>" name="categories[]" id="category<?= $cat['idcat']; ?>" /> <label for="category<?= $cat['idcat']; ?>"><?= $cat['categoria']; ?></label><br />
