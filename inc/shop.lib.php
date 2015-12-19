@@ -344,8 +344,7 @@ class kShop {
 		if(!isset($vars['category_operator'])) $vars['category_operator']='OR';
 		$vars['category_operator']=strtoupper($vars['category_operator']);
 
-		if($vars['orderby']=="") $orderby="public";
-		if($vars['orderby']=="created"||$vars['orderby']=="public"||$vars['orderby']=="expired") $dataRef=$vars['orderby']; else $dataRef='titolo';
+		if($vars['orderby'] == "") $orderby = "public DESC";
 		if(!isset($vars['expired'])) $vars['expired']=$GLOBALS['__template']->getVar('shop-order',2);
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
 
