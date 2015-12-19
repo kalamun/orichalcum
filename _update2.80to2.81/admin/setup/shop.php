@@ -246,8 +246,12 @@ $v['shop-pagonline1b']=substr($v['shop-pagonline1'],strpos($v['shop-pagonline1']
 	}
 	echo b3_create_select("shop-template2","Layout di default per il negozio ",$value,$option,$v['shop-template2']).'<br /><br />';
 
-	$option=array("ordine","titolo","sottotitolo","created","public","expired");
-	$value=array("Ordinamento manuale","Nome dell'oggetto","Sottotitolo dell'oggetto","Data di inserimento","Data di pubblicazione","Data di scadenza");
+	$option=array("ordine","titolo ASC","titolo DESC","sottotitolo ASC","sottotitolo DESC","created ASC","created DESC","public ASC","public DESC","expired ASC","expired DESC");
+	$value=array("Ordinamento manuale","Nome dell'oggetto ascendente","Nome dell'oggetto discendente",
+	             "Sottotitolo dell'oggetto ascendente","Sottotitolo dell'oggetto discendente",
+	             "Data di inserimento ascendente","Data di inserimento discendente",
+	             "Data di pubblicazione ascendente","Data di pubblicazione discendente",
+	             "Data di scadenza ascendente","Data di scadenza discendente");
 	echo b3_create_select("shop-order1","Ordina il negozio per ",$value,$option,$v['shop-order1']).'<br />';
 	
 	$option=array("","nascondi");
