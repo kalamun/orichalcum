@@ -1,4 +1,0 @@
-ALTER TABLE `k_categorie` ADD `description` TEXT NOT NULL AFTER `categoria` , ADD `featuredimage` INT NOT NULL AFTER `description` 
-
-ALTER TABLE `k_categorie` ADD `translations` TEXT NOT NULL 
-
