@@ -12,7 +12,7 @@ $pageMode=$kaImpostazioni->getVar('admin-news-layout',2,"*");
 
 $kaNews=new kaNews();
 $kaMetadata=new kaMetadata;
-$dataRef=preg_replace('/ DESC$/i','',$kaImpostazioni->getVar('news-order',1));
+$dataRef=preg_replace('/ DESC$| ASC$/i','',$kaImpostazioni->getVar('news-order',1));
 
 if(isset($_GET['m'])) $currMonth=$_GET['m'];
 else $currMonth=date("n");
