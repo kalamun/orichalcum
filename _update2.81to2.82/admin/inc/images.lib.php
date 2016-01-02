@@ -511,7 +511,7 @@ class kaImages {
 	function updateImage($idimg,$file,$filename,$resize=true,$width=0,$height=0)
 	{
 		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
-		if($filename!="" && substr(strtolower($filename),-4)!='.php' && substr(strtolower($filename),-4)!='.php3')
+		if($filename!="" && substr($this->getMimeType($filename),0,6) == "image/")
 		{
 			$query="SELECT `filename` FROM ".TABLE_IMG." WHERE `idimg`=".$idimg;
 			$results=ksql_query($query);
@@ -544,8 +544,9 @@ class kaImages {
 				if($this->needToResize($size[0],$size[1])==true) $this->resize($ffile, $this->img['width'], $this->img['height'], $this->img['quality'], $this->img['mode']);
 				else $this->recompress($ffile, $this->img['quality']);
 				
-				$this->mobile['width'] = intval($this->img['width'] / 100 * $this->mobile['ratio']);
-				$this->mobile['height'] = intval($this->img['height'] / 100 * $this->mobile['ratio']);
+				$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
+				$this->mobile['width'] = intval($size[0] / 100 * $this->mobile['ratio']);
+				$this->mobile['height'] = intval($size[1] / 100 * $this->mobile['ratio']);
 
 			} else {
 				if($width>0 || $height>0)
@@ -563,11 +564,14 @@ class kaImages {
 			// create mobile version, if active
 			if($this->mobile['active']=="y")
 			{
+				$mwidth = min($size[0], $this->img['width']);
+				$mheight = min($size[1], $this->img['height']);
 				copy($ofile, $mfile);
+				$this->mobile['width'] = intval($mwidth / 100 * $this->mobile['ratio']);
+				$this->mobile['height'] = intval($mheight / 100 * $this->mobile['ratio']);
 				$this->mobile['quality'] = intval($this->img['quality'] / 100 * ($this->mobile['ratio'] + ((100 - $this->mobile['ratio']) / 2)));
 				$this->resize($mfile, $this->mobile['width'], $this->mobile['height'], $this->mobile['quality'], $this->img['mode']);
 			}
-
 		}
 		
 		return $idimg;

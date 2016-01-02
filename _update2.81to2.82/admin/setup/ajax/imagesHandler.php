@@ -10,7 +10,6 @@ if(isset( $_GET['reprocess'] ))
 {
 
 	$images = $kaImages->getList(array( "filetype"=>1, "orderby"=>'`idimg`', "offset"=>intval($_GET['reprocess']), "limit"=>5 ));
-	
 	foreach($images as $img)
 	{
 		$ffile = $_SERVER['DOCUMENT_ROOT'] . BASEDIR . $img['url'];
@@ -23,7 +22,7 @@ if(isset( $_GET['reprocess'] ))
 		if(!file_exists($file)) $file=$ffile;
 		$kaImages->updateImage($img['idimg'],$file,basename($ffile),true);
 		
-		// update all thumbnails but custom ones
+		// also update thumbnails when it's not custom
 		if($img['thumbnail']=='t_'.$img['filename']) $kaImages->setThumb($img['idimg']);
 	}
 	
