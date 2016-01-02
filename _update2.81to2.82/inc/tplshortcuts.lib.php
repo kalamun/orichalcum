@@ -72,7 +72,7 @@ function kInit($dir=false)
 
 	$GLOBALS['__config']=new kImpostazioni();
 	$GLOBALS['__images']=new kImages();
-	$GLOBALS['__images_gallery']=new kImgallery();
+	//$GLOBALS['__images_gallery']=new kImgallery();
 	$GLOBALS['__documents']=new kDocuments();
 	$GLOBALS['__documents_gallery']=new kDocgallery();
 	//$GLOBALS['__media']=new kMedia();
@@ -668,6 +668,26 @@ function kGetImageAlt()
 function kGetImageCaption()
 {
 	return $GLOBALS['__template']->imgDB['caption'];
+}
+
+function kGetImageMediumFilename()
+{
+	return $GLOBALS['__template']->imgDB['medium']['filename'];
+}
+
+function kGetImageMediumWidth()
+{
+	return $GLOBALS['__template']->imgDB['medium']['width'];
+}
+
+function kGetImageMediumHeight()
+{
+	return $GLOBALS['__template']->imgDB['medium']['height'];
+}
+
+function kGetImageMediumURL()
+{
+	return $GLOBALS['__template']->imgDB['medium']['url'];
 }
 
 function kGetThumbFilename()

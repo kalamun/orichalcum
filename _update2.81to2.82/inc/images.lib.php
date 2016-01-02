@@ -69,17 +69,13 @@ class kImages {
 			$row['filename']=str_replace("?","%3F",$row['filename']);
 			$row['filename']=str_replace("@","%40",$row['filename']);
 			
-			if( $output['filetype'] == 1 )
-			{
-				// if mobile version is active and mobile alternative exists, get it
-				if(kGetVar('img_mobile',1,'*')=="y" && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/m_'.$output['filename']) && kIsMobile()) $output['filename']='m_'.$output['filename'];
-				// else get the normal file
-				elseif(!empty($output['filename']) && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$output['filename']) ) $size = getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$output['filename']);
-			}
-			
+			$output['path'] = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$output['filename'];
+
+			// get size from image, or get size from metadata
+			if( $output['filetype'] == 1 && !empty($output['filename']) && file_exists($output['path']) ) $size = getimagesize($output['path']);
 			if(empty($size)) $size=array($output['metadata']['width'], $output['metadata']['height'], 0 , "");
 			
-			$output['url']=SITE_URL.BASEDIR.$dir.$row['idimg'].'/'.$output['filename'];
+			$output['url'] = SITE_URL.BASEDIR.$dir.$row['idimg'].'/'.$output['filename'];
 
 		} else {
 			// hotlink
@@ -91,11 +87,31 @@ class kImages {
 			if(empty($size)) $size=array($output['metadata']['width'], $output['metadata']['height'], 0 , "");
 		}
 
-		$output['width']=$size[0];
-		$output['height']=$size[1];
+		$output['width'] = $size[0];
+		$output['height'] = $size[1];
 		
 		// medium size
+		$output['medium'] = array();
+		$output['medium']['filename'] = $output['filename'];
+		$output['medium']['url'] = $output['url'];
+		$output['medium']['width'] = $output['width'];
+		$output['medium']['height'] = $output['height'];
+		
+		// if medium size exists, update data
+		if($row['filetype'] == 1 && $output['hotlink']==false && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/m_'.$output['filename']))
+		{
+			$output['medium']['filename'] = 'm_'.$output['filename'];
+			$output['medium']['path'] = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$output['medium']['filename'];
 
+			$size = getimagesize($output['medium']['path']);
+			if($size!==false)
+			{
+				$output['medium']['width'] = $size[0];
+				$output['medium']['height'] = $size[1];
+			}
+		
+			$output['medium']['url'] = SITE_URL.BASEDIR.$dir.$row['idimg'].'/m_'.$output['filename'];
+		}
 
 		// thumbnail (it is always an image)
 		$row['thumbnail']=str_replace(" ","%20",$row['thumbnail']);
@@ -126,9 +142,10 @@ class kImages {
 		$output['filesize']=0;
 		if($output['hotlink']==false)
 		{
-			if(file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$output['filename'])) $output['filesize']=filesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$output['filename']);
+			if(file_exists($output['path'])) $output['filesize'] = filesize($output['path']);
 		} else {
-			if(substr($output['url'],0,4)=='http') {
+			if(substr($output['url'],0,4)=='http')
+			{
 				$x=array_change_key_case(get_headers($output['url'],1),CASE_LOWER);
 				if(strcasecmp($x[0],'HTTP/1.1 200 OK')!=0) $output['filesize'] = $x['content-length'][1];
 				else $output['filesize'] = $x['content-length'];
