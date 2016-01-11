@@ -114,7 +114,7 @@ class kaAdminTranslate
 }
 
 
-/* get country list in the current language, with ISO 3166-1 as key and country name as value
+/* get a list of world countries translated in the current language, with ISO 3166-1 as key and country name as value, alphabetic order asc for country name
 input vars:
 - ll (note that this is the language code, eg: it_IT, and not the ISO 3166-1 code
 */
@@ -142,6 +142,7 @@ function kaGetCountries($vars = array())
 		$line = explode("\t", $line);
 		$output[$line[0]] = $line[1];
 	}
+	asort($output);
 	
 	return $output;
 }

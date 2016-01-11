@@ -904,6 +904,12 @@ function kGetMediaThumbCaption()
 	return $GLOBALS['__template']->imgDB['caption'];
 }
 
+function kGetMediaSubtitles()
+{
+	if(empty($GLOBALS['__template']->imgDB['metadata']['subtitles'])) $GLOBALS['__template']->imgDB['metadata']['subtitles'] = array();
+	return $GLOBALS['__template']->imgDB['metadata']['subtitles'];
+}
+
 /* comments */
 
 function kSetComment($c)

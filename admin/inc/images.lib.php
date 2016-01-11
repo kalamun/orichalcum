@@ -144,6 +144,7 @@ class kaImages {
 		if(empty($output['metadata']['duration'])) $output['metadata']['duration'] = 0;
 		if(empty($output['metadata']['rotation'])) $output['metadata']['rotation'] = 0;
 		if(empty($output['metadata']['embeddingcode'])) $output['metadata']['embeddingcode'] = '';
+		if(empty($output['metadata']['subtitles'])) $output['metadata']['subtitles'] = array();
 		
 		$output['mime-type'] = $this->getMimeType($row['filename']);
 		
@@ -205,8 +206,7 @@ class kaImages {
 	// insert an image into db, then create a directory called as the id and upload the file inside
 	function upload($file,$filename)
 	{
-		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'_',$filename);
-		if(substr(strtolower($filename),-4)=='.php' || substr(strtolower($filename),-5)=='.php3') return false;
+		$filename=preg_replace("/([^A-Za-z0-9\._-])+/i",'-',$filename);
 
 		/* check filename validity */
 		$filename=trim($filename," ./");
@@ -335,6 +335,44 @@ class kaImages {
 		return $idimg;
 	}
 	
+	/*
+	Add a file into the same subdirectory of the main file
+	*/
+	public function addFile($id, $file)
+	{
+		if($file['error']>0) return false;
+
+		$filename = $file['name'];
+		$tmpfilename = $file['tmp_name'];
+
+		// check if ID is valid
+		$img = $this->getImage($id);
+		if(empty($img['idimg'])) return false;
+
+		// clean file name
+		$filename = preg_replace("/([^A-Za-z0-9\._-])+/i",'-',$filename);
+		
+		// check that file name is different from image and thumbnail name
+		if($img['filename'] == $filename || $img['thumbnail'] == $filename) return false;
+		
+		// check if filename is valid
+		if($this->getFileType($filename) == 9) return false;
+		
+		// get the path
+		$default_dir = "";
+		if($img['filetype']==1) $default_dir = DIR_IMG;
+		elseif($img['filetype']==2) $default_dir = DIR_MEDIA;
+		elseif($img['filetype']==3) $default_dir = DIR_DOCS;
+		$path = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.'/'.$id.'/';
+		
+		// copy file
+		copy($file['tmp_name'], $path.$filename);
+		return $filename;
+	}
+	
+	/*
+	Clean temporary directory from failed uploads
+	*/
 	public function cleanTmpDir()
 	{
 		$dir = $_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMP;
@@ -373,6 +411,7 @@ class kaImages {
 			$query="UPDATE ".TABLE_IMG." SET `metadata`='".ksql_real_escape_string(serialize($metadata))."' WHERE `idimg`='".$img['idimg']."' LIMIT 1";
 			if(!ksql_query($query)) return false;
 		}
+		return true;
 	}
 
 	function setThumb($idimg,$file=null,$filename=null,$resize=true)

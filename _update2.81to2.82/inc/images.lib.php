@@ -138,7 +138,7 @@ class kImages {
 		$output['caption']=$output['alt'];
 		$output['alt']=strip_tags(trim(str_replace("\n","",$output['alt'])));
 
-		//retrieve filesize
+		// retrieve filesize
 		$output['filesize']=0;
 		if($output['hotlink']==false)
 		{
@@ -149,6 +149,16 @@ class kImages {
 				$x=array_change_key_case(get_headers($output['url'],1),CASE_LOWER);
 				if(strcasecmp($x[0],'HTTP/1.1 200 OK')!=0) $output['filesize'] = $x['content-length'][1];
 				else $output['filesize'] = $x['content-length'];
+			}
+		}
+		
+		// subtitles for medias
+		if($output['filetype'] == 2)
+		{
+			if(!isset($output['metadata']['subtitles'])) $output['metadata']['subtitles'] = array();
+			foreach($output['metadata']['subtitles'] as $k=>$filename)
+			{
+				$output['metadata']['subtitles'][$k] = BASEDIR.$dir.$row['idimg'].'/'.$filename;
 			}
 		}
 		
