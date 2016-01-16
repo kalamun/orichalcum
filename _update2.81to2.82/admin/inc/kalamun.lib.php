@@ -113,46 +113,10 @@ class kaAdminTranslate
 	}
 }
 
-
-/* get a list of world countries translated in the current language, with ISO 3166-1 as key and country name as value, alphabetic order asc for country name
-input vars:
-- ll (note that this is the language code, eg: it_IT, and not the ISO 3166-1 code
-*/
-function kaGetCountries($vars = array())
-{
-	if(empty($vars['ll']))
-	{
-		if(empty($_SESSION['ui']['lang']))
-		{
-			$query="SELECT * FROM ".TABLE_LINGUE." WHERE ll='".DEFAULT_LANG."' LIMIT 1";
-			$results=ksql_query($query);
-			$row=ksql_fetch_array($results);
-			$_SESSION['ui']['lang']=$row['code'];
-		}
-		$vars['ll'] = $_SESSION['ui']['lang'];
-	}
-
-	$file = ADMINRELDIR.'inc/locale/countries-'.$vars['ll'].'.txt';
-	if(!file_exists($file)) return false;
-	
-	$output = array();
-	foreach(file($file) as $line)
-	{
-		if(substr($line,0,1) == "#") continue;
-		$line = explode("\t", $line);
-		$output[$line[0]] = $line[1];
-	}
-	asort($output);
-	
-	return $output;
-}
-
-
-/* get the HTML output for the admin main menu */
 class kaAdminMenu {
 	protected $menu,$fullmenu,$sel,$kaTranslate;
 	
-	function kaAdminMenu() {
+	function __construct() {
 		$this->menu=array();
 		$this->sel=array();
 		global $kaTranslate;
