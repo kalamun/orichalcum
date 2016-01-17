@@ -717,7 +717,7 @@ class kShop {
 		if($orderby=="") $orderby="titolo";
 		$output['categories']=array();
 		$subdir="";
-		var_dump($this->cats);
+
 		foreach($this->cats as $cat=>$true)
 		{
 			if(strpos($row['categorie'],','.$cat.',')!==false)
