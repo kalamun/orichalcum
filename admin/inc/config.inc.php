@@ -15,10 +15,11 @@ $__db['host']="{VAR_DB_HOST}";
 $__db['user']="{VAR_DB_USER}";
 $__db['password']="{VAR_DB_PASSWORD}";
 $__db['name']="{VAR_DB_NAME}";
-define("DEFAULT_LANG","{VAR_DEFAULT_LANG}"); //lingua di partenza
-define("SW_VERSION","2.70"); //versione del software
+$__db['port']=""; //leave empty for default port
+define("DEFAULT_LANG","{VAR_DEFAULT_LANG}"); //default language
+define("SW_VERSION","2.70");
 
-/*tabelle*/
+/*db tables*/
 define("TABLE_USERS","k_users");
 define("TABLE_USERS_PROP","k_users_prop");
 define("TABLE_LINGUE","k_lingue");
@@ -66,7 +67,7 @@ define("TABLE_MEMBERS","k_members");
 define("TABLE_PRIVATE","k_private");
 
 
-/*upload*/
+/*upload dirs*/
 define("DIR_TEMPLATE","template/");
 define("DIR_IMG","arch/img/");
 define("DIR_DOCS","arch/docs/");
