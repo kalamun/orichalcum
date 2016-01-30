@@ -1504,8 +1504,9 @@ kZenEditor = function () {
 }
 
 function onScrollHandler(e) {
-	document.getElementById('menu').className = (window.pageYOffset > document.getElementById('header').offsetHeight ? 'fixed' : '');
-	document.body.style.paddingTop = (window.pageYOffset > document.getElementById('header').offsetHeight ? document.getElementById('header').offsetHeight + 'px' : '0');
+	var header = document.getElementsByTagName('header')[0];
+	document.getElementById('menu').className = (window.pageYOffset > header.offsetHeight ? 'fixed' : '');
+	document.body.style.paddingTop = (window.pageYOffset > header.offsetHeight ? header.offsetHeight + 'px' : '0');
 }
 
 function kCheckMessages() {

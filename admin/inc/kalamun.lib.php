@@ -139,21 +139,39 @@ class kaAdminMenu {
 				for($j=0;isset($xml[$i][$j]);$j++) {
 					$tmp=$xml[$i][$j];
 					$xml[$i][$j]=array();
-					$xml[$i][$j]['title']=preg_match('/.*title="([^"]*)".*/',$tmp)?trim(preg_replace('/.*title="([^"]*)".*/','$1',$tmp)):'';
-					$xml[$i][$j]['title']=$this->kTranslate->translate($xml[$i][$j]['title']);
-					$xml[$i][$j]['id']=preg_match('/.*id="([^"]*)".*/',$tmp)?trim(preg_replace('/.*id="([^"]*)".*/','$1',$tmp)):'';
-					$xml[$i][$j]['url']=preg_match('/.*url="([^"]*)".*/',$tmp)?trim(preg_replace('/.*url="([^"]*)".*/','$1',$tmp)):'';
-					if($j==0) $menu[count($menu)]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url'],"submenu"=>array());
-					elseif(strpos($_SESSION['permissions'],",".$xml[$i][$j]['id'].",")!==false) $menu[(count($menu)-1)]['submenu'][]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url']);
-					if($j==0) $fullmenu[count($fullmenu)]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url'],"submenu"=>array());
-					else $fullmenu[(count($fullmenu)-1)]['submenu'][]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url']);
-					}
-				if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
+					
+					// get the title
+					preg_match('/title="(.*?)"/', $tmp, $match);
+					$xml[$i][$j]['title'] = !empty($match[1]) ? $this->kTranslate->translate($match[1]) : '';
+
+					// get the id (the directoty of the correspondant module)
+					preg_match('/id="(.*?)"/', $tmp, $match);
+					$xml[$i][$j]['id'] = !empty($match[1]) ? $match[1] : '';
+					
+					// get the url (optional)
+					preg_match('/url="(.*?)"/', $tmp, $match);
+					$xml[$i][$j]['url'] = !empty($match[1]) ? $match[1] : '';
+					
+					// get the icon
+					preg_match('/icon="(.*?)"/', $tmp, $match);
+					$xml[$i][$j]['icon'] = !empty($match[1]) ? $match[1] : '';
+					
+		
+					// populate an array with only active elements for the current user
+					if($j==0) $menu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
+					elseif(strpos($_SESSION['permissions'], ",".$xml[$i][$j]['id'].",") !== false) $menu[(count($menu)-1)]['submenu'][] = $xml[$i][$j];
+					
+					// populate an array with all the elements, indipendently of permissions
+					if($j==0) $fullmenu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
+					else $fullmenu[(count($fullmenu)-1)]['submenu'][] = $xml[$i][$j];
 				}
+				if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
 			}
+		}
 
 		/* get and parse add-ons menu (if exists) */
-		if(file_exists(ADMINRELDIR."addons/menu.xml")) {
+		if(file_exists(ADMINRELDIR."addons/menu.xml"))
+		{
 			$xml=file_get_contents(ADMINRELDIR."addons/menu.xml");
 
 			//parsing
@@ -167,14 +185,32 @@ class kaAdminMenu {
 					for($j=0;isset($xml[$i][$j]);$j++) {
 						$tmp=$xml[$i][$j];
 						$xml[$i][$j]=array();
-						$xml[$i][$j]['title']=preg_match('/.*title="([^"]*)".*/',$tmp)?trim(preg_replace('/.*title="([^"]*)".*/','$1',$tmp)):'';
-						//$xml[$i][$j]['title']=$this->kTranslate->translate($xml[$i][$j]['title']);
-						$xml[$i][$j]['id']=preg_match('/.*id="([^"]*)".*/',$tmp)?trim(preg_replace('/.*id="([^"]*)".*/','$1',$tmp)):'';
-						$xml[$i][$j]['url']=preg_match('/.*url="([^"]*)".*/',$tmp)?trim(preg_replace('/.*url="([^"]*)".*/','$1',$tmp)):'';
-						if($j==0) $menu[count($menu)]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url'],"perm"=>$xml[$i][$j]['title'],"submenu"=>array());
-						elseif(strpos($_SESSION['permissions'],",".$xml[$i][$j]['id'].",")!==false) $menu[(count($menu)-1)]['submenu'][]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url'],"perm"=>$xml[$i][$j]['title']);
-						if($j==0) $fullmenu[count($fullmenu)]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url'],"perm"=>$xml[$i][$j]['title'],"submenu"=>array());
-						else $fullmenu[(count($fullmenu)-1)]['submenu'][]=array("title"=>$xml[$i][$j]['title'],"id"=>$xml[$i][$j]['id'],"url"=>$xml[$i][$j]['url'],"perm"=>$xml[$i][$j]['title']);
+
+						// get the title
+						preg_match('/title="(.*?)"/', $tmp, $match);
+						$xml[$i][$j]['title'] = !empty($match[1]) ? $this->kTranslate->translate($match[1]) : '';
+
+						// get the id (the directoty of the correspondant module)
+						preg_match('/id="(.*?)"/', $tmp, $match);
+						if($match[1] == '{SITE_URL}') $match[1] = SITE_URL;
+						$xml[$i][$j]['id'] = !empty($match[1]) ? $match[1] : '';
+						
+						// get the url (optional)
+						preg_match('/url="(.*?)"/', $tmp, $match);
+						$xml[$i][$j]['url'] = !empty($match[1]) ? $match[1] : '';
+						
+						// get the icon
+						preg_match('/icon="(.*?)"/', $tmp, $match);
+						$xml[$i][$j]['icon'] = !empty($match[1]) ? $match[1] : '';
+						
+			
+						// populate an array with only active elements for the current user
+						if($j==0) $menu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
+						elseif(strpos($_SESSION['permissions'], ",".$xml[$i][$j]['id'].",") !== false) $menu[(count($menu)-1)]['submenu'][] = $xml[$i][$j];
+						
+						// populate an array with all the elements, indipendently of permissions
+						if($j==0) $fullmenu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
+						else $fullmenu[(count($fullmenu)-1)]['submenu'][] = $xml[$i][$j];
 						}
 					if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
 					}
@@ -182,25 +218,32 @@ class kaAdminMenu {
 			}
 		$this->menu=$menu;
 		$this->fullmenu=$fullmenu;
-		}
-	function getStructure() {
+	}
+	
+	function getStructure()
+	{
 		return $this->menu;
-		}
-	function getFullStructure() {
+	}
+	
+	function getFullStructure()
+	{
 		return $this->fullmenu;
-		}
+	}
 
-	function getLanguages() {
+	function getLanguages()
+	{
 		$output=array();
 		$query="SELECT * FROM `".TABLE_LINGUE."` ORDER BY `ordine`";
 		$results=ksql_query($query);
-		while($row=ksql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results))
+		{
 			$output[]=$row;
-			}
-		return $output;
 		}
+		return $output;
+	}
 
-	function get() {
+	function get()
+	{
 		$output="";
 		if(!defined("PAGE_ID")) define("PAGE_ID",substr(dirname($_SERVER['PHP_SELF']),strrpos(dirname($_SERVER['PHP_SELF']),"/")+1));
 
@@ -210,58 +253,71 @@ class kaAdminMenu {
 		$languages=$this->getLanguages();
 		if(!defined("TRANSLATIONS")) define("TRANSLATIONS",true);
 
-		$output.='<div class="lingue">';
+		$output.='<div class="languages">';
 		$output.=$this->kTranslate->translate('Menu:Languages').' <ul>';
 		
 		//maintain GET variables
 		$append_var=$_SERVER['QUERY_STRING'];
-		foreach($_GET as $kaey => $value) {
-			if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm") {
+		foreach($_GET as $kaey => $value)
+		{
+			if($kaey=="chg_lang"||$kaey=="delete"||$kaey=="confirm")
+			{
 				$append_var=preg_replace("/".$kaey."=?[^&]*&?/","",$append_var);
-				}
 			}
+		}
 
-		foreach($languages as $row) {
+		foreach($languages as $row)
+		{
 			$output.='<a href="'.ADMINDIR.PAGE_ID.'/'.basename($_SERVER['PHP_SELF']).'?chg_lang='.$row['ll'].'&'.$append_var.'" class="lingua';
 			if($row['ll']==$_SESSION['ll']) { $output.=' sel'; }
 			$output.='">';
 			if(file_exists(BASERELDIR.'img/lang/'.strtolower($row['ll']).'.gif')) $output.='<img src="'.BASERELDIR.'img/lang/'.strtolower($row['ll']).'.gif'.'" width="16" height="11" title="'.$row['lingua'].'" /> ';
 			$output.=$row['ll'].'</a>';
-			}
+		}
+
 		$output.='</ul></div>';
 		if(!defined("TRANSLATIONS")) define("TRANSLATIONS",false);
 		
 		// get selected language
 		$this->sel=array('parent'=>'','id'=>'','url'=>'','title'=>'','perm'=>'');
-		foreach($this->menu as $ka=>$v) {
-			for($i=0;isset($v['submenu'][$i]['id']);$i++) {
-				if(PAGE_ID==$v['submenu'][$i]['id']) {
+		foreach($this->menu as $ka=>$v)
+		{
+			for($i=0;isset($v['submenu'][$i]['id']);$i++)
+			{
+				if(PAGE_ID==$v['submenu'][$i]['id'])
+				{
 					$this->sel=$v['submenu'][$i];
 					$this->sel['parent']=$ka;
 					break(2);
-					}
 				}
 			}
+		}
 
 		//create menu
 		$output.='<ul>';
-		foreach($this->menu as $ka=>$v) {
+		foreach($this->menu as $ka=>$v)
+		{
 			$output.='<li><a '.($ka==$this->sel['parent']?' class="sel"':'').'>'.$v['title'].'</a>';
 			$output.='<ul>';
-			for($i=0;isset($v['submenu'][$i]['title']);$i++) {
-				if(!isset($v['submenu'][$i]['url'])) $v['url'][$i]="";
-				$output.='<li><a href="'.ADMINDIR.$v['submenu'][$i]['id'].'/'.$v['submenu'][$i]['url'].'"';
-				if(PAGE_ID==$v['submenu'][$i]['id']) $output.=' class="sel"';
-				$output.='>'.$v['submenu'][$i]['title'].'</a></li>';
-				}
+			for($i=0;isset($v['submenu'][$i]['title']);$i++)
+			{
+				if(empty($v['submenu'][$i]['url'])) $v['url'][$i] = "";
+				
+				$url = $v['submenu'][$i]['id']=='{SITE_URL}' ? SITE_URL.BASEDIR : ADMINDIR.$v['submenu'][$i]['id'].'/'.$v['submenu'][$i]['url'];
+				$output .= '<li><a href="'.$url.'"';
+				if(PAGE_ID==$v['submenu'][$i]['id']) $output .= ' class="sel"';
+				$output.= '>';
+				if(!empty($v['submenu'][$i]['icon'])) $output .= '<span class="icon">'.$v['submenu'][$i]['icon'].'</span>';
+				$output.= $v['submenu'][$i]['title'].'</a></li>';
+			}
 			$output.='</ul>';
 			$output.='</li>';
-			}
+		}
 		$output.='</ul>';
 		$output.='</div>';
 
 		return $output;
-		}
+	}
 	
 	function getSelected($ref=false) {
 		if(!$ref) return $this->sel;
