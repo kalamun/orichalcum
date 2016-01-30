@@ -606,14 +606,17 @@ header .logout .icon {
 	}
 .homeicon a {
 	display:block;
-	padding:5px 10px;
+	padding:10px 10px;
+	color:#444;
 	}
-.homeicon a img {
-	opacity:.7;
+.homeicon a .icon {
+	font-size:1.2em;
+	width:1.5em;
 	margin:10px;
+	color:#aaa;
 	}
-.homeicon a:hover img {
-	opacity:1;
+.homeicon a:hover .icon {
+	color:inherit;
 	}
 .siteboard .sitenotes {
 	width:60%;
