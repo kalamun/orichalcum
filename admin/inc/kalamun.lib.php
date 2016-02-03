@@ -179,16 +179,19 @@ class kaAdminMenu {
 			$xml=preg_replace('/<[^ ]*>/','',$xml);
 			$xml=preg_replace('/<\/[^>]*>/','',$xml);
 			$xml=explode('<mainNode',trim($xml));
-			for($i=0;isset($xml[$i]);$i++) {
-				if($xml[$i]!="") {
+			for($i=0;isset($xml[$i]);$i++)
+			{
+				if($xml[$i]!="")
+				{
 					$xml[$i]=explode('<subNode',$xml[$i]);
-					for($j=0;isset($xml[$i][$j]);$j++) {
+					
+					for($j=0;isset($xml[$i][$j]);$j++)
+					{
 						$tmp=$xml[$i][$j];
 						$xml[$i][$j]=array();
-
 						// get the title
 						preg_match('/title="(.*?)"/', $tmp, $match);
-						$xml[$i][$j]['title'] = !empty($match[1]) ? $this->kTranslate->translate($match[1]) : '';
+						$xml[$i][$j]['title'] = !empty($match[1]) ? $match[1] : '';
 
 						// get the id (the directoty of the correspondant module)
 						preg_match('/id="(.*?)"/', $tmp, $match);
@@ -202,7 +205,6 @@ class kaAdminMenu {
 						// get the icon
 						preg_match('/icon="(.*?)"/', $tmp, $match);
 						$xml[$i][$j]['icon'] = !empty($match[1]) ? $match[1] : '';
-						
 			
 						// populate an array with only active elements for the current user
 						if($j==0) $menu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
@@ -211,11 +213,11 @@ class kaAdminMenu {
 						// populate an array with all the elements, indipendently of permissions
 						if($j==0) $fullmenu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
 						else $fullmenu[(count($fullmenu)-1)]['submenu'][] = $xml[$i][$j];
-						}
-					if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
 					}
+					if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
 				}
 			}
+		}
 		$this->menu=$menu;
 		$this->fullmenu=$fullmenu;
 	}
@@ -299,6 +301,7 @@ class kaAdminMenu {
 		{
 			$output.='<li><a '.($ka==$this->sel['parent']?' class="sel"':'').'>'.$v['title'].'</a>';
 			$output.='<ul>';
+
 			for($i=0;isset($v['submenu'][$i]['title']);$i++)
 			{
 				if(empty($v['submenu'][$i]['url'])) $v['url'][$i] = "";
