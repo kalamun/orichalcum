@@ -30,6 +30,8 @@ if(isset($_GET['fixpermalink']))
 			return $dir;
 	}
 
+	$log="";
+	
 	foreach( array(TABLE_PAGINE => "idpag", TABLE_NEWS => "idnews", TABLE_SHOP_ITEMS => "idsitem") as $table=>$id )
 	{
 		$query="SELECT * FROM (SELECT `dir`,`ll`,count(*) AS `tot` FROM ".$table." GROUP BY `dir`,`ll`) AS `subtable` WHERE `tot`>1 ORDER BY `tot` DESC";
@@ -42,7 +44,7 @@ if(isset($_GET['fixpermalink']))
 			{
 				$newdir = createNewDir($row['dir']);
 				ksql_query("UPDATE ".$table." SET `dir`='".ksql_real_escape_string($newdir)."' WHERE `".$id."`=".$r[$id]);
-				echo $kaTranslate->translate("Maintenance:Changed <em>%s</em> to <em>%s</em>", $row['dir'], $newdir);
+				$log .= $kaTranslate->translate("Maintenance:Changed <em>%s</em> to <em>%s</em><br>", $row['dir'], $newdir);
 			}
 		}
 	}
@@ -58,6 +60,12 @@ elseif(isset($alert)) echo '<div id="MsgAlert">'.$alert.'</div>';
 <br />
 
 <?php 
+
+if(!empty($log))
+{
+	echo $log.'<br><br>';
+}
+
 $output="";
 $query="SELECT * FROM (SELECT dir,count(*) AS tot FROM ".TABLE_PAGINE." GROUP BY `dir`,`ll`) AS subtable WHERE tot>1 ORDER BY tot DESC";
 $results=ksql_query($query);

@@ -52,7 +52,7 @@ function head(){
     <body>
 
     <div id="iPopUpHeader">
-        <h1><?= $kaTranslate->translate('News:Create facebook post'); ?></h1>
+        <h1><?= $GLOBALS['kaTranslate']->translate('News:Create facebook post'); ?></h1>
         <a href="javascript:window.parent.k_closeIframeWindow();" class="closeWindow"><img src="<?= ADMINRELDIR; ?>img/closeWindow.gif" alt="Close" width="9" height="9" /></a>
     </div>
 
@@ -183,8 +183,8 @@ try {
 
 /* Hurrah! */
 ?>
-    <h2><?= $kaTranslate->translate('News:Hurrah, the post was successfully created!'); ?></h2>
-    <p><?= $kaTranslate->translate('News:You can view it here'); ?>:<br />
+    <h2><?= $GLOBALS['kaTranslate']->translate('News:Hurrah, the post was successfully created!'); ?></h2>
+    <p><?= $GLOBALS['kaTranslate']->translate('News:You can view it here'); ?>:<br />
         <a href="https://www.facebook.com/<?= $response->getGraphNode()['id'] ?>" target="_blank">https://www.facebook.com/<?= $response->getGraphNode()['id']; ?></a>
     </p>
 <?php
