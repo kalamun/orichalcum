@@ -168,7 +168,7 @@ class kaConfigInc
 			$this->log = "Config.inc: You are not allowed to write the file ".$this->filename." ... check permissions";
 		}
 
-		if($this->kaConfigInc()==false)
+		if($this->__construct()==false)
 		{
 			$this->log = "Config.inc: Error while saving the file config.inc.php";
 		}
