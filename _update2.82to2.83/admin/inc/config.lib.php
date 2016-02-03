@@ -33,7 +33,6 @@ class kaImpostazioni
 	/* update a parameter that already exists in db */
 	public function updateParam($param,$value1,$value2,$ll=false)
 	{
-		// aggiungo un parametro
 		if($ll==false) $ll=$this->ll;
 		$query="UPDATE `".TABLE_CONFIG."` SET `value1`='".ksql_real_escape_string($value1)."',`value2`='".ksql_real_escape_string($value2)."' WHERE `param`='".ksql_real_escape_string($param)."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
 		if(ksql_query($query)) return true;
@@ -48,7 +47,7 @@ class kaImpostazioni
 	}
 	public function setParam($param,$value1,$value2,$ll=false)
 	{
-		return $this->replaceParam($param,$value1,$value2,$ll=false);
+		return $this->replaceParam($param,$value1,$value2,$ll);
 	}
 
 	/* returns the param array as in db: param, value1, value2, language */
