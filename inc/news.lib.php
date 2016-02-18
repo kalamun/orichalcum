@@ -546,7 +546,6 @@ class kNews {
 			$query.=") ";
 			$query.="ORDER BY ".$orderby." LIMIT ".$limit;
 			$results=ksql_query($query);
-			$results=ksql_query($query);
 			while($row=ksql_fetch_array($results)) {
 				$output[]=$this->row2output($row, array("orderby"=>$orderby));
 				}
