@@ -300,13 +300,17 @@ class kaShop {
 		return $output;
 		}
 
-	public function getOrderById($idord) {
+	public function getOrderById($idord)
+	{
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'admin/members/members.lib.php');
+
 		$kaMembers=new kaMembers();
 		$output=array();
+
 		$query="SELECT * FROM `".TABLE_SHOP_ORDERS."` WHERE idord='".intval($idord)."' LIMIT 1";
 		$results=ksql_query($query);
-		if($row=ksql_fetch_array($results)) {
+		if($row=ksql_fetch_array($results))
+		{
 			$output=$row;
 			$output['friendlydate']=preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 $4:$5",$row['date']);
 			if($row['idmember']>0) $output['member']=$kaMembers->getUserById($row['idmember']);
@@ -321,9 +325,10 @@ class kaShop {
 			
 			// the items list is json encoded
 			$output['items']=json_decode($row['items'],true);
-			}
-		return $output;
 		}
+
+		return $output;
+	}
 
 	public function addPayment($idord,$value,$idspay,$details,$currency=false) {
 		if($value>0) {
@@ -354,25 +359,56 @@ class kaShop {
 			return true;
 			}
 		}
-	public function reprocessPayment($idord) {
+
+	public function reprocessPayment($idord)
+	{
 		$o=$this->getOrderById($idord);
+	
 		$totalamount=0;
-		if(count($o['transactions'])>0) {
-			foreach($o['transactions'] as $t) {
+		if(count($o['transactions'])>0)
+		{
+			foreach($o['transactions'] as $t)
+			{
 				$totalamount+=$t['value'];
-				}
 			}
-		if($totalamount>=$o['totalprice']) {
+		}
+		
+		if($totalamount>=$o['totalprice'])
+		{
 			$query="UPDATE `".TABLE_SHOP_ORDERS."` SET payed='s' WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
 			if(!ksql_query($query)) return false;
 			if($o['member']['email']!="") $this->sendEmail('payed',$o['idord']);
 			
 			//set permissions for private area folders
 			if(!$this->applyPrivatePermissions($idord)) return false;
-			}
-		return true;
 		}
-	public function reportShipment($idord,$iddel,$tracking_number,$tracking_url) {
+		return true;
+	}
+	
+	// remove an item from order and recalculate the price
+	public function removeItemFromOrder($idord, $idsitem)
+	{
+		$o=$this->getOrderById($idord);
+		$removefromtotal = 0;
+		
+		foreach($o['items'] as $i=>$item)
+		{
+			if($item['idsitem'] == $idsitem)
+			{
+				$removefromtotal += $item['totalprice'];
+				unset($o['items'][$i]);
+			}
+		}
+		array_values($o['items']);
+		$o['totalprice'] -= $removefromtotal;
+		
+		$query = "UPDATE `".TABLE_SHOP_ORDERS."` SET `items` = '".json_encode($o['items'])."', `totalprice` = '".floatval($o['totalprice'])."' WHERE `idord`=".intval($idord)." LIMIT 1";
+		if(ksql_query($query)) return true;
+		return false;
+	}
+
+	public function reportShipment($idord,$iddel,$tracking_number,$tracking_url)
+	{
 		$d=$this->getDelivererById($iddel);
 		if($d['iddel']=="") return false;
 		$o=$this->getOrderById($idord);
@@ -382,7 +418,7 @@ class kaShop {
 		if(!$this->applyPrivatePermissions($idord)) return false;
 		$this->sendEmail('sended',$o['idord']);
 		return true;
-		}
+	}
 
 		
 	/* change the status of the order */

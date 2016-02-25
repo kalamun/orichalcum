@@ -67,38 +67,51 @@ function kXmlParser($string) {
 	
 	<?php 
 	$totalamount=0;
-	if(count($o['transactions'])>0) {
-		foreach($o['transactions'] as $t) {
+	if(count($o['transactions'])>0)
+	{
+		foreach($o['transactions'] as $t)
+		{
 			$totalamount+=$t['value'];
-			}
 		}
+	}
 
 	/* ACTIONS */
+	//remove an item from the current order
+	if(isset($_GET['removefromorder']))
+	{
+		$kaShop->removeItemFromOrder($_GET['idord'], $_GET['removefromorder']);
+		
+	
 	//report shipment
-	if(isset($_POST['reportshipment'])) {
-		if($kaShop->reportShipment($o['idord'],$_POST['method'],$_POST['tracking_number'],$_POST['tracking_url'])) {
+	} elseif(isset($_POST['reportshipment'])) {
+		if($kaShop->reportShipment($o['idord'],$_POST['method'],$_POST['tracking_number'],$_POST['tracking_url']))
+		{
 			echo '<div id="MsgSuccess">'.$kaTranslate->translate('Shop:Successfully saved').'</div>';
 			echo $kaTranslate->translate('Shop:This order was moved into CLOSED orders list');
 			$o=$kaShop->getOrderById($_GET['idord']);
 			?><script type="text/javascript">window.parent.markShipment('<?= $o['uid']; ?>');</script><?php 
-			}
-		else echo '<div id="MsgAlert">'.$kaTranslate->translate('Shop:Sorry, error while saving').'</div>';
-		}
+		
+		} else echo '<div id="MsgAlert">'.$kaTranslate->translate('Shop:Sorry, error while saving').'</div>';
+
 	//report payment
-	elseif(isset($_POST['reportpayment'])) {
-		if($kaShop->addPayment($o['idord'],$_POST['value'],$_POST['method'],$_POST['details'])) {
+	} elseif(isset($_POST['reportpayment'])) {
+		if($kaShop->addPayment($o['idord'],$_POST['value'],$_POST['method'],$_POST['details']))
+		{
 			echo '<div id="MsgSuccess">'.$kaTranslate->translate('Shop:Successfully saved').'</div>';
 			$o=$kaShop->getOrderById($o['idord']);
 			$totalamount=0;
-			if(count($o['transactions'])>0) {
-				foreach($o['transactions'] as $t) {
+			if(count($o['transactions'])>0)
+			{
+				foreach($o['transactions'] as $t)
+				{
 					$totalamount+=$t['value'];
-					}
 				}
-			if($totalamount>=$o['totalprice']) { ?><script type="text/javascript">window.parent.markPayment('<?= $o['uid']; ?>');</script><?php  }
 			}
-		else echo '<div id="MsgAlert">'.$kaTranslate->translate('Shop:Sorry, error while saving').'</div>';
-		}
+			
+			if($totalamount>=$o['totalprice']) { ?><script type="text/javascript">window.parent.markPayment('<?= $o['uid']; ?>');</script><?php  }
+		
+		} else echo '<div id="MsgAlert">'.$kaTranslate->translate('Shop:Sorry, error while saving').'</div>';
+	}
 	?>
 
 	<div class="column left">
@@ -106,7 +119,7 @@ function kXmlParser($string) {
 		<table>
 			<tr><th><?= $kaTranslate->translate('Shop:Date'); ?></th><td><?= str_replace(" ",' <img src="../../img/clock10.png" width="10" height="10" /> ',$o['friendlydate']); ?></td></tr>
 			<tr><th><?= $kaTranslate->translate('Shop:Total amount'); ?></th><td><?= $o['totalprice']; ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td></tr>
-			</table>
+		</table>
 	</div>
 	
 	<div class="column right">
@@ -130,7 +143,7 @@ function kXmlParser($string) {
 				<?php
 			}
 			?>
-			</table>
+		</table>
 	</div>
 	
 	<div class="clearBoth"></div>
@@ -145,9 +158,14 @@ function kXmlParser($string) {
 				<th>&nbsp;</th>
 			</tr>
 			<?php 
-			foreach($o['items'] as $item) { ?>
-				<tr><td class="qty"><?= $item['qty']; ?></td>
-					<td class="item"><strong><?= $item['productcode']; ?></strong>
+			foreach($o['items'] as $item)
+			{ ?>
+				<tr>
+					<td class="qty">
+						<?= $item['qty']; ?>
+					</td>
+					<td class="item">
+						<strong><?= $item['productcode']; ?></strong>
 						<?php 
 						echo $item['title'];
 						echo $item['subtitle']!="" ? '<br>'.$item['subtitle'] : '';
@@ -172,11 +190,17 @@ function kXmlParser($string) {
 							}
 							echo '</small>';
 						}
-						?></td>
+						?>
+					</td>
 					<td class="price"><?= number_format($item['totalprice'],2); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td>
-					<td class="actions"><small><a href="<?= ADMINRELDIR; ?>shop/edit.php?idsitem=<?= $item['idsitem']; ?>" target="_blank"><?= $kaTranslate->translate('Shop:Sheet'); ?></a></small></td>
-					</tr>
-				<?php  }
+					<td class="actions">
+						<small>
+							<a href="<?= ADMINRELDIR; ?>shop/edit.php?idsitem=<?= $item['idsitem']; ?>" target="_blank"><?= $kaTranslate->translate('Shop:Open product sheet'); ?></a><br>
+							<a href="?idord=<?= $_GET['idord']; ?>&removefromorder=<?= $item['idsitem']; ?>" class="warning" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Shop:Do you really want to remove this item from order?')); ?>');"><?= $kaTranslate->translate('Shop:Remove from order'); ?></a><br>
+						</small>
+					</td>
+				</tr>
+				<?php }
 			?>
 		</table>
 	</div>
