@@ -116,9 +116,19 @@ function kXmlParser($string) {
 			<tr><th><?= $kaTranslate->translate('Shop:E-mail'); ?></th><td><?= $o['member']['email']; ?></td></tr>
 			<tr><th><?= $kaTranslate->translate('Shop:Username'); ?></th><td><a href="<?= ADMINDIR; ?>members/modifica.php?idmember=<?= $o['member']['idmember']; ?>" target="__top"><?= $o['member']['username']; ?></a></td></tr>
 			<?php 
-			foreach(kXmlParser($o['invoice_data']) as $ka=>$v) { ?>
+			foreach(kXmlParser($o['invoice_data']) as $ka=>$v)
+			{
+				if(empty(trim($v))) continue;
+
+				if(strpos($ka,"country") !== false && strlen($v)==2)
+				{
+					// get country name
+					$v = kaGetCountry(array("country"=>$v));
+				}
+				?>
 				<tr><th><?= $ka; ?></th><td><?= $v; ?></td></tr>
-				<?php  }
+				<?php
+			}
 			?>
 			</table>
 	</div>
@@ -141,11 +151,15 @@ function kXmlParser($string) {
 						<?php 
 						echo $item['title'];
 						echo $item['subtitle']!="" ? '<br>'.$item['subtitle'] : '';
-						if(isset($item['variations'])&&is_array($item['variations'])) {
-							foreach($item['variations'] as $v) {
+
+						if(isset($item['variations'])&&is_array($item['variations']))
+						{
+							foreach($item['variations'] as $v)
+							{
 								echo ', '.$v['collection'].' '.$v['name'];
-								}
 							}
+						}
+
 						if(isset($item['customvariations'])&&is_array($item['customvariations']))
 						{
 							echo '<br><small>';
@@ -180,22 +194,28 @@ function kXmlParser($string) {
 			}
 		?></table>
 
-		<?php  if($o['payed']=='n') { ?>
-		<div class="reportPayment">
-			<div class="button" onclick="javascript:document.getElementById('reportPayment').style.display='block';"><?= $kaTranslate->translate('Shop:Mark as payed'); ?></div>
-			<form action="?idord=<?= $_GET['idord']; ?>" method="post">
-			<div id="reportPayment" style="display:none;">
-				<table>
-				<?php  foreach($kaShop->getPaymentMethodsByZone($o['idzone']) as $p) {
-					$option[]=$p['name'];
-					$value[]=$p['idspay'];
-					} ?>
-				<tr><td><label for="method"><?= $kaTranslate->translate('Shop:Payment method'); ?></label></td><td><?= b3_create_select("method","",$option,$value,$o['idspay']); ?></td></tr>
-				<tr><td><label for="value"><?= $kaTranslate->translate('Shop:Amount'); ?></label></td><td><?= b3_create_input("value","text","",number_format($o['totalprice']-$totalamount,2),"50px",8); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td></tr>
-				<tr><td><label for="details"><?= $kaTranslate->translate('Shop:Details'); ?></label></td><td><?= b3_create_textarea("details","","","200px","50px"); ?></td></tr>
-				<tr><td colspan="2" class="submit" style="vertical-align:bottom;"><input type="submit" value="<?= $kaTranslate->translate('Shop:Report'); ?>" class="button" name="reportpayment" /></td></tr>
-				</table>
-				</form>
+		<?php
+		if($o['payed']=='n')
+		{
+			?>
+			<div class="reportPayment">
+				<div class="button" onclick="javascript:document.getElementById('reportPayment').style.display='block';"><?= $kaTranslate->translate('Shop:Mark as payed'); ?></div>
+				<div id="reportPayment" style="display:none;">
+					<form action="?idord=<?= $_GET['idord']; ?>" method="post">
+						<table>
+						<?php
+						foreach($kaShop->getPaymentMethodsByZone($o['idzone']) as $p)
+						{
+							$option[]=$p['name'];
+							$value[]=$p['idspay'];
+						}
+						?>
+						<tr><td><label for="method"><?= $kaTranslate->translate('Shop:Payment method'); ?></label></td><td><?= b3_create_select("method","",$option,$value,$o['idspay']); ?></td></tr>
+						<tr><td><label for="value"><?= $kaTranslate->translate('Shop:Amount'); ?></label></td><td><?= b3_create_input("value","text","",number_format($o['totalprice']-$totalamount,2),"50px",8); ?> <?= $kaImpostazioni->getVar('shop-currency',2); ?></td></tr>
+						<tr><td><label for="details"><?= $kaTranslate->translate('Shop:Details'); ?></label></td><td><?= b3_create_textarea("details","","","200px","50px"); ?></td></tr>
+						<tr><td colspan="2" class="submit" style="vertical-align:bottom;"><input type="submit" value="<?= $kaTranslate->translate('Shop:Report'); ?>" class="button" name="reportpayment" /></td></tr>
+						</table>
+					</form>
 				</div>
 			</div>
 			<?php  } ?>
@@ -205,9 +225,23 @@ function kXmlParser($string) {
 		<h2><?= $kaTranslate->translate('Shop:Invoice data'); ?></h2>
 		<table>
 		<?php 
-		foreach(kXmlParser($o['invoice_data']) as $ka=>$v) { ?>
+		foreach(kXmlParser($o['invoice_data']) as $ka=>$v)
+		{
+			if(empty(trim($v))) continue;
+
+			if(strpos($ka, "country") !== false && strlen($v)==2)
+			{
+				// get country name
+				$v = kaGetCountry(array("country"=>$v));
+
+			} elseif(strpos($ka, "method") !== false && is_numeric($v)) {
+				// get method name
+				$v = $o['payment_method']['name'];
+			}
+			?>
 			<tr><th><?= $ka; ?></th><td><?= $v; ?></td></tr>
-			<?php  }
+			<?php
+		}
 		?></table>
 	</div>
 	
@@ -253,9 +287,20 @@ function kXmlParser($string) {
 		<h2><?= $kaTranslate->translate('Shop:Shipment data'); ?></h2>
 		<table>
 		<?php 
-		foreach(kXmlParser($o['shipping_address']) as $ka=>$v) { ?>
+		foreach(kXmlParser($o['shipping_address']) as $ka=>$v)
+		{
+			if(empty(trim($v))) continue;
+
+			if(strpos($ka, "country") !== false && strlen($v)==2)
+			{
+				// get country name
+				$v = kaGetCountry(array("country"=>$v));
+				
+			}
+			?>
 			<tr><th><?= $ka; ?></th><td><?= $v; ?></td></tr>
-			<?php  }
+			<?php
+		}
 		?></table>
 	</div>
 	

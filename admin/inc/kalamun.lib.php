@@ -113,6 +113,60 @@ class kaAdminTranslate
 	}
 }
 
+/* get a list of world countries translated in the current language, with ISO 3166-1 as key and country name as value, alphabetic order asc for country name
+input vars:
+- ll (note that this is the language code, eg: it_IT, and not the ISO 3166-1 code
+*/
+function kaGetCountries($vars = array())
+{
+	if(empty($vars['ll']))
+	{
+		if(empty($_SESSION['ui']['lang']))
+		{
+			$query="SELECT * FROM ".TABLE_LINGUE." WHERE ll='".DEFAULT_LANG."' LIMIT 1";
+			$results=ksql_query($query);
+			$row=ksql_fetch_array($results);
+			$_SESSION['ui']['lang']=$row['code'];
+		}
+		$vars['ll'] = $_SESSION['ui']['lang'];
+	}
+
+	$file = ADMINRELDIR.'inc/locale/countries-'.$vars['ll'].'.txt';
+	if(!file_exists($file)) return false;
+	
+	$output = array();
+	foreach(file($file) as $line)
+	{
+		if(substr($line,0,1) == "#") continue;
+		$line = explode("\t", $line);
+		$output[$line[0]] = $line[1];
+	}
+	asort($output);
+	
+	return $output;
+}
+
+/* get the translated version of the requested country
+input vars:
+- country (the ISO 3166-1 code of the country)
+- ll (note that this is the language code, eg: it_IT, and not the ISO 3166-1 code
+*/
+function kaGetCountry($vars = array())
+{
+	if(empty($vars['country'])) return false;
+	if(empty($vars['ll'])) $vars['ll']="";
+	
+	foreach(kaGetCountries(array("ll"=>$vars['ll'])) as $code => $country)
+	{
+		if($code == $vars['country']) return $country;
+	}
+	
+	// if no country was found, return the ISO code
+	return $vars['country'];
+}
+
+
+/* get the HTML output for the admin main menu */
 class kaAdminMenu {
 	protected $menu,$fullmenu,$sel,$kaTranslate;
 	
