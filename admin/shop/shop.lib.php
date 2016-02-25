@@ -383,31 +383,57 @@ class kaShop {
 		$this->sendEmail('sended',$o['idord']);
 		return true;
 		}
-	public function cancelOrder($idord) {
+
+		
+	/* change the status of the order */
+	public function openOrder($idord)
+	{
+		$o=$this->getOrderById($idord);
+		if($o['idord']=="") return false;
+		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `status`='OPN' WHERE idord='".intval($o['idord'])."' LIMIT 1";
+		if(!ksql_query($query)) return false;
+		$this->orderUpdateNotes($idord, "[".date("d-m-Y H:i")."] Order marked as OPEN by ".$_SESSION['name'], true);
+		return true;
+	}
+	public function cancelOrder($idord)
+	{
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `status`='CNC' WHERE idord='".intval($o['idord'])."' LIMIT 1";
 		if(!ksql_query($query)) return false;
+		$this->orderUpdateNotes($idord, "[".date("d-m-Y H:i")."] Order marked as CANCELED by ".$_SESSION['name'], true);
 		return true;
-		}
-	public function closeOrder($idord) {
+	}
+	public function closeOrder($idord)
+	{
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `status`='CLS' WHERE idord='".intval($o['idord'])."' LIMIT 1";
 		if(!ksql_query($query)) return false;
 		if(!$this->applyPrivatePermissions($idord)) return false;
+		$this->orderUpdateNotes($idord, "[".date("d-m-Y H:i")."] Order marked as CLOSED by ".$_SESSION['name'], true);
 		return true;
-		}
-	public function deleteOrder($idord) {
+	}
+	public function deleteOrder($idord)
+	{
 		$o=$this->getOrderById($idord);
 		if($o['idord']=="") return false;
 		$query="DELETE FROM `".TABLE_SHOP_ORDERS."` WHERE `idord`='".intval($o['idord'])."' LIMIT 1";
 		if(!ksql_query($query)) return false;
+		$this->orderUpdateNotes($idord, "[".date("d-m-Y H:i")."] Order marked as DELETED by ".$_SESSION['name'], true);
 		return true;
-		}
-	public function orderUpdateNotes($idord,$notes)
+	}
+		
+
+	/* update the note, choosing if concatenate or not */
+	public function orderUpdateNotes($idord,$notes,$add=false)
 	{
-		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `notes`='".ksql_real_escape_string($notes)."' WHERE `idord`='".intval($idord)."' LIMIT 1";
+		$query="UPDATE `".TABLE_SHOP_ORDERS."` SET `notes`=";
+
+		if($add==true) $query.="CONCAT(`notes`,'\n".ksql_real_escape_string($notes)."')";
+		else $query.="'".ksql_real_escape_string($notes)."'";
+
+		$query.=" WHERE `idord`='".intval($idord)."' LIMIT 1";
 		if(!ksql_query($query)) return false;
 		return true;
 	}
