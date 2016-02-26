@@ -690,6 +690,16 @@ function kGetImageMediumURL()
 	return $GLOBALS['__template']->imgDB['medium']['url'];
 }
 
+function kGetImageHTML()
+{
+	return $GLOBALS['__template']->imgDB['html'];
+}
+
+function kGetImageSrcset()
+{
+	return $GLOBALS['__template']->imgDB['srcset'];
+}
+
 function kGetThumbFilename()
 {
 	return $GLOBALS['__template']->imgDB['thumb']['filename'];

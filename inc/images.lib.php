@@ -135,8 +135,8 @@ class kImages {
 			if(!isset($output['alts'][LANG])) $output['alts'][LANG] = "";
 			$output['alt'] = $output['alts'][LANG];
 		}
-		$output['caption']=$output['alt'];
-		$output['alt']=strip_tags(trim(str_replace("\n","",$output['alt'])));
+		$output['caption'] = $output['alt'];
+		$output['alt'] = strip_tags(trim(str_replace("\n","",$output['alt'])));
 
 		// retrieve filesize
 		$output['filesize']=0;
@@ -152,6 +152,9 @@ class kImages {
 			}
 		}
 		
+		// srcset attribute
+		$output['srcset'] = $output['medium']['url']." ".$output['medium']['width']."w, ".$output['url']." ".$output['width']."w";
+		
 		// subtitles for medias
 		if($output['filetype'] == 2)
 		{
@@ -160,6 +163,26 @@ class kImages {
 			{
 				$output['metadata']['subtitles'][$k] = BASEDIR.$dir.$row['idimg'].'/'.$filename;
 			}
+		}
+		
+		// default HTML ouput
+		$output['html'] = "";
+		if($output['filetype'] == 1)
+		{
+			$output['html'] = '<figure><img src="'.htmlentities($output['url']).'" width="'.$output['width'].'" height="'.$output['height'].'" srcset="'.$output['srcset'].'" alt="'.htmlentities($output['alt']).'"><caption>'.$output['caption'].'</caption></figure>';
+			
+		} if($output['filetype'] == 2) {
+			if(substr($output['mimetype'], 0, 5) == "video") {
+				$output['html'] = '<video width="'.$output['width'].'" height="'.$output['height'].'" controls><source src="'.$output['url'].'" type="'.$output['mimetype'].'">';
+				foreach($output['metadata']['subtitles'] as $language => $uri)
+				{
+					$output['html'] .= '<track label="'.$language.' subtitles" kind="subtitles" srclang="'.$language.'" src="'.$uri.'">';
+				}
+				$output['html'] .= 'Your browser does not support the video tag.</video>';
+			
+			} elseif(substr($output['mimetype'], 0, 5) == "audio") {
+				$output['html'] = '<audio controls><source src="'.$output['url'].'" type="'.$output['mimetype'].'">Your browser does not support the video tag.</audio>';
+			}			
 		}
 		
 		return $output;
@@ -208,45 +231,3 @@ class kImages {
 	}
 	
 }
-
-/*
-class kImgallery {
-	
-	function kImgallery() {
-		}
-	
-	function getList($tabella=false,$id=false,$orderby='ordine',$conditions='') {
-		$output=array();
-
-		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE idimga>0 ";
-		if($tabella!="") $query.=" AND tabella='".$tabella."' ";
-		if($id!="") $query.=" AND id='".$id."' ";
-		if($conditions!="") $query.=" AND (".$conditions.") ";
-		if($orderby!="") $query.=" ORDER BY ".$orderby." ";
-
-		$results=ksql_query($query);
-		for($i=0;$row=ksql_fetch_array($results);$i++) {
-			$output[$i]=$GLOBALS['__images']->getImage($row['idimg']);
-			$output[$i]['idimga']=$row['idimga'];
-			$output[$i]['tabella']=$row['tabella'];
-			$output[$i]['id']=$row['id'];
-			}
-		
-		return $output;
-		}
-	
-	function getImage($idimga) {
-		$output=array();
-
-		$query="SELECT * FROM ".TABLE_IMGALLERY." WHERE idimga=".$idimga." LIMIT 1";
-		$results=ksql_query($query);
-		$row=ksql_fetch_array($results);
-		$output=$GLOBALS['__images']->getImage($row['idimg']);
-		$output['idimga']=$row['idimga'];
-		$output['tabella']=$row['tabella'];
-		$output['id']=$row['id'];
-		
-		return $output;
-		}
-	}
-*/
