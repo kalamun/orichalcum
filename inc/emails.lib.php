@@ -458,15 +458,17 @@ class kEmails {
 	public function getMailSubTemplate($f)
 	{
 		if(!$this->inited) $this->init();
-		$template=$GLOBALS['__template']->getTemplateDir().'email/inc/'.$f.'.php';
+		$template = $GLOBALS['__template']->getTemplateDir().'email/inc/'.$f.'.php';
+
 		if(!file_exists($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) return false;
-		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template)) {
+		if(is_file($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template))
+		{
 			ob_start();
 			include($_SERVER['DOCUMENT_ROOT'].'/'.BASEDIR.$template);
 			$contents=ob_get_contents();
 			ob_end_clean();
 			return $contents;
-			}
+		}
 		return false;
 	}
 

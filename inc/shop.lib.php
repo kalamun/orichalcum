@@ -2043,53 +2043,62 @@ class kShop {
 			$countries = $this->getCountries($o['idzone']);
 			
 			// create the items table
-			$items = '<table class="items"><tr><th>'.kTranslate('Article').'</th><th>'.kTranslate('Quantity').'</th><th>'.kTranslate('Price').'</th>';
-			foreach($o['items'] as $item)
+			$items = $GLOBALS['__emails']->getMailSubTemplate('shop_order_items_list');
+			if(empty($items))
 			{
-				$items .= '<tr>';
-				$items .= '<td class="name"><a href="'.SITE_URL.$item['permalink'].'">';
-				$items .= $item['title'];
-				if(!empty($item['subtitle'])) $items .= ' - '.$item['subtitle'];
-				if(!empty($item['productcode'])) $items .= ' ('.$item['productcode'].')';
-				$items .= '</a>';
-				if(!empty($item['variations']))
+				$items = '<table class="items"><tr><th>'.kTranslate('Article').'</th><th>'.kTranslate('Quantity').'</th><th>'.kTranslate('Price').'</th>';
+				foreach($o['items'] as $item)
 				{
-					foreach($item['variations'] as $variation)
+					$items .= '<tr>';
+					$items .= '<td class="name"><a href="'.SITE_URL.$item['permalink'].'">';
+					$items .= $item['title'];
+					if(!empty($item['subtitle'])) $items .= ' - '.$item['subtitle'];
+					if(!empty($item['productcode'])) $items .= ' ('.$item['productcode'].')';
+					$items .= '</a>';
+					
+					if(!empty($item['variations']))
 					{
-						$items .= '<br>'.$variation['collection'].': '.$variation['name'];
-					}
+						foreach($item['variations'] as $variation)
+						{
+							$items .= '<br>'.$variation['collection'].': '.$variation['name'];
+						}
 
-					foreach($item['customvariations'] as $k=>$variation)
-					{
-						$items .= '<br>'.$k.': '.$variation;
+						foreach($item['customvariations'] as $k=>$variation)
+						{
+							$items .= '<br>'.$k.': '.$variation;
+						}
 					}
+					
+					$items .= '</td>';
+					$items .= '<td class="qty">'.$item['qty'].'</td>';
+					$items .= '<td class="price">'.number_format($item['totalprice'], 2).' '.kGetShopCurrency("symbol").'</td>';
+					$items .= '</tr>';
 				}
-				$items .= '</td>';
-				$items .= '<td class="qty">'.$item['qty'].'</td>';
-				$items .= '<td class="price">'.number_format($item['totalprice'], 2).' '.kGetShopCurrency("symbol").'</td>';
-				$items .= '</tr>';
+				$items .= '</table>';
 			}
-			$items .= '</table>';
 
-			
+			// the address of customer
 			$address = $GLOBALS['__emails']->getMailSubTemplate('shop_order_address');
 			if(empty($address))
 			{
 				$personal_data = nl2br(strip_tags($o['personal_data']));
 			}
 			
+			// the personal data
 			$personal_data = $GLOBALS['__emails']->getMailSubTemplate('shop_order_personal_data');
 			if(empty($personal_data))
 			{
 				$personal_data = nl2br(strip_tags($o['personal_data']));
 			}
 
+			// the shipping address
 			$shipping_address = $GLOBALS['__emails']->getMailSubTemplate('shop_order_shipping_address');
 			if(empty($shipping_address))
 			{
 				$shipping_address = nl2br(strip_tags($o['shipping_address']));
 			}
 
+			// the invoice data
 			$invoice_data = $GLOBALS['__emails']->getMailSubTemplate('shop_order_invoice_data');
 			if(empty($invoice_data))
 			{
