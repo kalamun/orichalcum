@@ -618,8 +618,21 @@ class kNews {
 		if(!$this->inited) $this->init();
 		if(!isset($vars['ll'])||$vars['ll']=="") $vars['ll']=LANG;
 
-		if(!isset($vars['orderby'])||$vars['orderby']=="") $vars['orderby']=$this->orderby;
-		if(strpos($vars['orderby'],"`")===false) $vars['orderby']=$vars['orderby'];
+		if(empty($vars['offset'])) $vars['offset'] = 0;
+		if(empty($vars['limit'])) $vars['limit'] = 10;
+		if(empty($vars['orderby'])) $vars['orderby'] = $this->orderby;
+		if($vars['orderby']=="") $vars['orderby'] = "pubblica";
+		
+		if(empty($vars['order']))
+		{
+			$vars['order'] = 'DESC';
+			if(strpos($vars['orderby'], " ASC")) $vars['order'] = 'ASC';
+		}
+		$vars['orderby'] = str_replace(" ASC", "", $vars['orderby']);
+		$vars['orderby'] = str_replace(" DESC", "", $vars['orderby']);
+		$vars['orderby'] = str_replace("`", "", $vars['orderby']);
+		$vars['orderby'] = trim($vars['orderby']);
+
 		if(strpos($vars['orderby'],"scadenza")!==false) $sortingDate="scadenza";
 		elseif(strpos($vars['orderby'],"starting_date")!==false) $sortingDate="starting_date";
 		elseif(strpos($vars['orderby'],"data")!==false) $sortingDate="data";
@@ -660,14 +673,7 @@ class kNews {
 			else $query.=" AND `calendario`='n' ";
 		}
 		
-		$query.="ORDER BY ".ksql_real_escape_string($vars['orderby']).",`idnews` DESC ";
-
-		if(isset($vars['offset'])||isset($vars['limit']))
-		{
-			if(!isset($vars['offset'])) $vars['offset']=0;
-			$query.=" LIMIT ".intval($vars['offset']);
-			if(isset($vars['limit'])) $query.=",".intval($vars['limit']);
-		}
+		$query .= "ORDER BY `".ksql_real_escape_string($vars['orderby'])."` ".$vars['order'].", `idnews` DESC LIMIT ".intval($vars['limit'])." OFFSET ".intval($vars['offset'])."";
 
 		$results=ksql_query($query);
 		for($i=0;$row=ksql_fetch_array($results);$i++)
@@ -703,6 +709,8 @@ class kNews {
 		}
 		$vars['orderby'] = str_replace(" ASC", "", $vars['orderby']);
 		$vars['orderby'] = str_replace(" DESC", "", $vars['orderby']);
+		$vars['orderby'] = str_replace("`", "", $vars['orderby']);
+		$vars['orderby'] = trim($vars['orderby']);
 
 		// find the date to refer as main field for date sorting
 		if(strpos($vars['orderby'],"scadenza")!==false) $sortingDate = "scadenza";
