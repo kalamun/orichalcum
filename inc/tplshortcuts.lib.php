@@ -617,7 +617,13 @@ function kGetImagesDir()
 
 function kSetImage($imgArray)
 {
-	return $GLOBALS['__template']->imgDB=$imgArray;
+	// set image by ID
+	if(is_numeric($imgArray)) $GLOBALS['__template']->imgDB = $GLOBALS['__images']->getImage($imgArray);
+	
+	// set image by passed array
+	else $GLOBALS['__template']->imgDB = $imgArray;
+	
+	return true;
 }
 
 function kGetImageId()
