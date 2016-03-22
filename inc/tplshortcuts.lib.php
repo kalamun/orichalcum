@@ -1608,18 +1608,24 @@ function kGetNewsArchive($type="month",$cat=false,$count=false)
 	if($cat=="*") $GLOBALS['__news']->setCatByDir();
 	else $GLOBALS['__news']->setCatByDir($cat);
 	if($type=="categories")
-{
+	{
 		$output=$GLOBALS['__news']->getCategories($count);
-	}
-	else {
+
+	} else {
 		$orderby=kGetVar('news-order',1);
 		if($orderby=="") $orderby="pubblica DESC";
 		$dataRef=preg_replace('/ desc$/i','',$orderby);
 		
 		$vars=array();
-		$vars['options']="GROUP BY year(".$dataRef.")".($type=="month"||$type=="day"?",month(".$dataRef.")":"").($type=="day"?",day(".$dataRef.")":"");
+		
+		$vars['options'] = "GROUP BY year(".ksql_real_escape_string($dataRef).")";
+		if($type=="month" || $type=="day") $vars['options'] .= ", month(".ksql_real_escape_string($dataRef).")";
+		if($type=="day") $vars['options'] .= ", day(".ksql_real_escape_string($dataRef).")";
+		
+		$vars['limit'] = 9999;
+		
 		foreach($GLOBALS['__news']->getList($vars) as $n)
-{
+		{
 			$output[]=$n;
 		}
 	}
