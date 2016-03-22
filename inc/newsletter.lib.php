@@ -134,11 +134,11 @@ class kNewsletter {
 		
 		$to = $member['name'].' <'.$member['email'].'>';
 
-		$subject = kGetVar('newsletter_benvenuto', 1);
-		if(empty(trim($subject))) return true;
+		$subject = trim(kGetVar('newsletter_benvenuto', 1));
+		if(empty($subject)) return true;
 
 		$message = kGetVar('newsletter_benvenuto', 2);
-		if(empty(trim(strip_tags($message)))) return true;
+		if(trim(strip_tags($message))=="") return true;
 
 		$message = str_replace("{NAME}", $member['name'], $message);
 		$message = str_replace("{EMAIL}", $member['email'], $message);
