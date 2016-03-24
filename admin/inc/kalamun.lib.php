@@ -548,13 +548,333 @@ function kDirCopy($source,$dest,$options=array('folderPermission'=>0755,'filePer
 	return $result;
 	} 
 
-function kaGetVar($param,$num,$ll=false) {
-		if($ll==false) {
+function kaGetVar($param,$num,$ll=false)
+{
+		if($ll==false)
+		{
 			if(isset($_SESSION['ll'])) $ll=$_SESSION['ll'];
 			else $ll=DEFAULT_LANG;
-			}
+		}
 		$query="SELECT value".$num." FROM ".TABLE_CONFIG." WHERE param='".$param."' AND ll='".$ll."' LIMIT 1";
 		$results=ksql_query($query);
 		if($row=ksql_fetch_array($results)) return $row['value'.$num];
 		else return false;
+	}
+
+	
+/*
+Utilities for text elaboration
+*/	
+class kaTexts
+{
+	
+	public function __construct()
+	{
+		
+	}
+
+	/*
+	strip all the possible dirty format from a string
+	options are:
+	- word -> remove the Microsoft Word and OpenOffice tags
+	- deprecated_tags -> remove or convert the old tags such as <font>, <b>, etc...
+	- empty_tags -> remove the empty tags
+	- attributes -> remove some attributes from tags
+	- scripts -> remove the javascript
+	- comments -> remove the HTML comments
+	*/
+	public function cleanFormatting($string, $options=array())
+	{
+		foreach( array("word", "deprecated_tags", "empty_tags", "attributes", "scripts", "comments") as $param)
+		{
+			if(!isset($options[$param])) $options[$param]=true;
 		}
+		
+		$tagsToBeRemoved = array(); //remove node, leave contents
+		$tagsToBeDeleted = array(); //remove node and contents
+		$tagsToBeConverted = array(); //convert a tag to another
+		$attributesToBeRemoved = array(); //remove some attributes
+		$tagList = $this->getTagsList($string); //list of tags used inside string
+		
+		// close unclosed tags and open unopened tags
+		foreach($tagList as $tag)
+		{
+			$string = $this->closeTag($string, $tag);
+		}
+
+		// remove word tags
+		if($options['word'] == true)
+		{
+			$tagsToBeRemoved = array_merge($tagsToBeRemoved, array("o:p"));
+		}
+		
+		// remove deprecated tags
+		if($options['deprecated_tags'] == true)
+		{
+			$tagsToBeRemoved = array_merge($tagsToBeRemoved, array("font", "span", "u", "address"));
+			$tagsToBeDeleted = array_merge($tagsToBeDeleted, array("style", "xml", "script", "meta"));
+			$tagsToBeConverted = array_merge($tagsToBeConverted, array("b" => "strong", "i" => "em"));
+		}
+		
+		// remove scripts
+		if($options['scripts'] == true)
+		{
+			$tagsToBeDeleted = array_merge($tagsToBeDeleted, array("script"));
+		}
+
+		// remove attributes
+		if($options['attributes'] == true)
+		{
+			$attributesToBeRemoved = array_merge($attributesToBeRemoved, array("lang", "style", "class", "align"));
+		}
+		
+		// remove comments
+		if($options['comments'] == true)
+		{
+			$string = preg_replace("/<!--.*?-->/s", "", $string);
+			$string = preg_replace("/<\/!.*?>/s", "", $string);
+		}
+		
+		// finally filter tags
+		foreach($tagsToBeRemoved as $tag)
+		{
+			$t = $this->tagParser($string, $tag);
+			$t = array_merge($t, $this->tagParser($string, strtoupper($tag)));
+			for($i=count($t)-1; $i>=0; $i--)
+			{
+				$string = substr($string, 0, $t[$i]['start']) . $t[$i]['innerHTML'] . substr($string, $t[$i]['end']);
+			}
+		}
+		
+		foreach($tagsToBeDeleted as $tag)
+		{
+			$t = $this->tagParser($string, $tag);
+			$t = array_merge($t, $this->tagParser($string, strtoupper($tag)));
+			for($i=count($t)-1; $i>=0; $i--)
+			{
+				$string = substr($string, 0, $t[$i]['start']) . substr($string, $t[$i]['end']);
+			}
+		}
+
+		foreach($tagsToBeConverted as $tag => $newtag)
+		{
+			$string = str_replace('<'.$tag.' ', '<'.$newtag.' ', $string);
+			$string = str_replace('<'.strtoupper($tag).' ', '<'.$newtag.' ', $string);
+			$string = str_replace('<'.$tag.'>', '<'.$newtag.'>', $string);
+			$string = str_replace('<'.strtoupper($tag).'>', '<'.$newtag.'>', $string);
+			$string = str_replace('</'.$tag.'>', '</'.$newtag.'>', $string);
+			$string = str_replace('</'.strtoupper($tag).'>', '</'.$newtag.'>', $string);
+		}
+		
+		// remove double spaces
+		$string = trim($string);
+		$string = preg_replace("/(\s)+/", "$1", $string);
+		$string = preg_replace("/&nbsp;(\s)+/", "$1", $string);
+		$string = preg_replace("/(\s)+&nbsp;/", "$1", $string);
+		$string = str_replace("&nbsp;", " ", $string);
+		$string = preg_replace("/>\s+</", "><", $string);
+		$string = str_replace("<br>", "<br />", $string);
+		$string = preg_replace("/ +>/", ">", $string);
+		$string = preg_replace("/^(<p><br \/><\/p>)+/", "", $string);
+		$string = preg_replace("/(<p><br \/><\/p>)+$/", "", $string);
+		$string = preg_replace("/^(<br \/>)+/", "", $string);
+		$string = preg_replace("/(<br \/>)+$/", "", $string);
+
+		
+		// parse each tag
+		foreach($tagList as $tag)
+		{
+			// remove attributes
+			$t = $this->tagParser($string, $tag);
+			for($i=count($t)-1; $i>=0; $i--)
+			{
+				if(!empty($t[$i]['attributes']))
+				{
+					foreach($attributesToBeRemoved as $att)
+					{
+						if(isset($t[$i]['attributes'][$att])) {
+							$t[$i]['source'] = preg_replace('/(<[^>]+) '.$att.'=".*?"/s', '$1', $t[$i]['source']);
+						}
+					}
+				}
+				$string = substr($string, 0, $t[$i]['start']) . $t[$i]['source'] . substr($string, $t[$i]['end']);
+			}
+			
+			// strip empty tags
+			$t = $this->tagParser($string, $tag);
+			for($i=count($t)-1; $i>=0; $i--)
+			{
+				if(strtolower($t[$i]['name'])!='br' && strtolower($t[$i]['name'])!='hr' && trim(strip_tags($t[$i]['innerHTML'],'<img><embed><video><audio>'))=='' && empty($t[$i]['attributes'])) 
+				{
+					$string = substr($string, 0, $t[$i]['start']) . substr($string, $t[$i]['end']);
+				}
+			}
+
+		}
+
+		// close unclosed tags and open unopened tags
+		foreach($tagList as $tag)
+		{
+			$string = $this->closeTag($string, $tag);
+		}
+
+		// fine tuning
+		$string = preg_replace("/ +>/", ">", $string);
+		$string = preg_replace("/^(<h\d><br \/><\/h\d>)+/", "", $string);
+		$string = preg_replace("/(<h\d><br \/><\/h\d>)+$/", "", $string);
+		$string = preg_replace("/^(<p><br \/><\/p>)+/", "", $string);
+		$string = preg_replace("/(<p><br \/><\/p>)+$/", "", $string);
+
+		return $string;
+	}
+	
+	/* return the list of tags used inside a string */
+	function getTagsList($string)
+	{
+		$tags = array();
+		
+		foreach(explode("<", $string) as $tag)
+		{
+			if(empty($tag)) continue;
+			if(empty($tag{0})) continue;
+			if($tag{0}=="/") $tag=substr($tag,1);
+
+			if(trim($tag{0})!="" && !is_numeric($tag{0}))
+			{
+				preg_match("/^([^\s>]+)/", $tag, $match);
+				if(!empty($match[1])) $tags[ $match[1] ] = true;
+			}
+		}
+		
+		return array_keys($tags);
+	}
+
+	/* close unclosed tags, and open unopened tags */
+	function closeTag($string, $tag)
+	{
+		if($tag=="img" || $tag=="br" || $tag=="hr") return $string;
+
+		$opens = substr_count($string, "<".$tag." ") + substr_count($string, "<".$tag.">");
+		$closes = substr_count($string, "</".$tag.">");
+
+		for($i=0; $i < $opens-$closes; $i++)
+		{
+			$string.='</'.$tag.'>';
+		}
+		
+		$offset = -1;
+		for($i=0; $i < $closes-$opens; $i++)
+		{
+			$string = '<'.$tag.'>'.$string;
+		}
+
+		return $string;
+	}
+	
+	/* parse requested tag and extract their position in string and their attributes */
+	function tagParser($string,$tagref)
+	{
+		$tags=array();
+		$offset=0;
+		while(strpos($string,"<".$tagref, $offset)!==false)
+		{
+			if(trim($string[($offset + strlen("<".$tagref))])!="" && $string[($offset + strlen("<".$tagref))]!=">")
+			{
+				$offset += strlen("<".$tagref);
+				continue;
+			}
+
+			$tag=array();
+			$tag['start']=strpos($string,"<".$tagref,$offset);
+			$tag['name']=$tagref;
+			$tag['attributes']=array();
+			$tag['innerHTML']="";
+			$offset=$tag['start']+strlen($tagref)+1;
+			$end=false;
+			
+			// parse every attribute till the end of tag
+			while(strlen($string) > $offset)
+			{
+				// skip spaces
+				for(; trim($string[$offset])==""; $offset++) {}
+				// check the end of the tag
+				if(strlen($string)-1 < $offset || $string[$offset]==">" || $string[$offset]=="/") break;
+				
+				$tagname="";
+				// parse letters till "="
+				while(strlen($string) > $offset && $string[$offset]!="=")
+				{
+					$tagname.=$string[$offset];
+					$offset++;
+				}
+				
+				// =
+				$offset++;
+
+				// skip spaces
+				for(; strlen($string)>$offset && trim($string[$offset])==""; $offset++) {}
+				
+				// check boundaries
+				$bound="";
+				if(strlen($string) > $offset && ($string[$offset]=="'" || $string[$offset]=='"'))
+				{
+					$bound=$string[$offset];
+					$offset++;
+				}
+				
+				// find the value, considering escape chars and the end of the tag
+				$value="";
+				while (
+					strlen($string) > $offset &&
+					(
+						trim($string[$offset])!=$bound ||
+						$string[$offset-1]=="\\"
+					)
+				)
+				{
+					// when no boundary is defined and there are spaces or >, skip
+					if($bound=="" && (trim($string[$offset])=="" || $string[$offset]==">"))
+					{
+						$offset++;
+						continue;
+					}
+
+					$value.=$string[$offset];
+					$offset++;
+				}
+				
+				$offset++;
+				$tag['attributes'][trim($tagname)]=$value;
+				
+			}
+
+			if(strlen($string) > $offset)
+			{
+				// skip latest spaces and tag's closure chars
+				for(; trim($string[$offset])==""; $offset++) {}
+				for(; strlen($string) > $offset && ($string[$offset]=="/" || $string[$offset]==">"); $offset++) {}
+			}
+
+			// look forward for close tag, if no other tags of the same type was opened before
+			if(strlen($string)>$offset && strpos($string,"</".$tagref.">",$offset)!==false)
+			{
+				$closeoffset=strpos($string,"</".$tagref.">",$offset);
+				if(strpos($string,"<".$tagref,$offset)===false || strpos($string,"<".$tagref,$offset)>$closeoffset)
+				{
+					// there are a valid close tag
+					$tag['innerHTML']=substr($string,$offset,$closeoffset-$offset);
+					$offset=$closeoffset+strlen("</".$tagref.">");
+				}
+			}
+			
+			$tag['end']=$offset;
+			$tag['source']=substr($string,$tag['start'],$tag['end']-$tag['start']);
+
+			$tags[]=$tag;
+
+			if(strlen($string)<$offset) break;
+		}
+
+		return $tags;
+	}
+}
