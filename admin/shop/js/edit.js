@@ -47,7 +47,7 @@ function checkURL(urlField) {
 function title2url() {
 	var titleField=document.getElementById('titolo');
 	var urlField=document.getElementById('dir');
-	if(!urlField.getAttribute("completed")&&titleField.value!="") urlField.value=titleField.value.replace(/[^\w\/\.\-À-퟿Ⰰ-퟿]+/g,"-").toLowerCase()+'.html';
+	if(!urlField.getAttribute("completed")&&titleField.value!="") urlField.value=titleField.value.replace(/[^\w\/\.\-À-퟿Ⰰ-퟿]+/g,"-").toLowerCase();
 	checkURL(urlField);
 	}
 function titleBlur() {

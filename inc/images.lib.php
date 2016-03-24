@@ -153,7 +153,7 @@ class kImages {
 		}
 		
 		// srcset attribute
-		$output['srcset'] = $output['medium']['url']." ".$output['medium']['width']."w, ".$output['url']." ".$output['width']."w";
+		$output['srcset'] = $output['thumb']['url']." ".$output['thumb']['width']."w, ".$output['medium']['url']." ".$output['medium']['width']."w, ".$output['url']." ".$output['width']."w";
 		
 		// subtitles for medias
 		if($output['filetype'] == 2)

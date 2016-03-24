@@ -47,7 +47,7 @@ function checkURL(urlField) {
 function title2url() {
 	var titleField=document.getElementById('titolo');
 	var urlField=document.getElementById('dir');
-	if(!urlField.getAttribute("completed")&&titleField.value!="") urlField.value=titleField.value.replace(/[^\w\/\.\-\u00C0-\uD7FF\u2C00-\uD7FF]+/g,"-").toLowerCase()+'.html';
+	if(!urlField.getAttribute("completed")&&titleField.value!="") urlField.value=titleField.value.replace(/[^\w\/\.\-\u00C0-\uD7FF\u2C00-\uD7FF]+/g,"-").toLowerCase();
 	checkURL(urlField);
 	}
 function titleBlur() {
