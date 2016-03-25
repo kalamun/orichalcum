@@ -91,7 +91,7 @@ class kaShop {
 		if(!isset($vars['orderby'])) $vars['orderby']='`titolo`';
 		$output=array();
 		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE `idsitem`>0 ";
-		if($vars['conditions']!="") $query.=" AND (".$vars['conditions'].") ";
+		if(!empty($vars['conditions'])) $query.=" AND (".$vars['conditions'].") ";
 		if(isset($vars['match'])) $query.=" AND (`titolo` LIKE '%".ksql_real_escape_string($vars['match'])."%' OR `dir` LIKE '%".ksql_real_escape_string($vars['match'])."%')";
 		if(isset($vars['ll'])) $query.=" AND `ll`='".ksql_real_escape_string($vars['ll'])."' ";
 		if(isset($vars['exclude_ll'])) $query.=" AND `ll`<>'".ksql_real_escape_string($vars['exclude_ll'])."' ";
