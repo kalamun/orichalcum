@@ -85,8 +85,10 @@ if($refreshTimeout>0&&$mailInQueue>0) { ?><meta http-equiv="refresh" content="<?
 	/***************************/
 	if($mailInQueue>0)
 	{
+		$method = $kaImpostazioni->getVar('email_method',1,"*");
+		
 		/* mail() or smtp sending method */
-		if($kaImpostazioni->getVar('email_method',1,"*") == "" || $kaImpostazioni->getVar('email-queue-mailperhour',1,"*") == "smtp")
+		if($method == "" || $method == "smtp")
 		{
 			foreach($kaNewsletter->getQueueList(array("limit"=>$mailLimitCycle)) as $mail)
 			{
@@ -99,7 +101,7 @@ if($refreshTimeout>0&&$mailInQueue>0) { ?><meta http-equiv="refresh" content="<?
 			}
 		
 		/* mandrill sending method */
-		} elseif($kaImpostazioni->getVar('email_method',1,"*") == "mandrill") {
+		} elseif($method == "mandrill" || $method == "sparkpost") {
 			$to=array();
 			$mergevars=array();
 			$idemlq=array();

@@ -3,9 +3,22 @@
 /* E-MAIL GATEWAY */
 /* note that this class is also used by the admin panel to send e-mails */
 
-class kEmails {
+class kEmails
+{
 	protected $inited;
-	private $from,$to,$subject,$message,$footer,$template,$uid,$attachments,$log,$method,$smtp,$mandrill;
+	private $from,
+			$to,
+			$subject,
+			$message,
+			$footer,
+			$template,
+			$uid,
+			$attachments,
+			$log,
+			$method,
+			$smtp,
+			$mandrill,
+			$sparkpost;
 
 	public function __construct()
 	{
@@ -15,11 +28,13 @@ class kEmails {
 	public function init()
 	{
 		$this->inited=true;
+		
 		if(!isset($GLOBALS['__template']))
 		{
 			require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/template.lib.php');
 			$GLOBALS['__template']=new kTemplate();
 		}
+		
 		$this->template=$GLOBALS['__template']->getVar('email_template_default',1);
 		if($this->template=="") $this->template="default.php";
 		
@@ -29,6 +44,9 @@ class kEmails {
 		$this->log=$GLOBALS['__template']->getVar('email_log',1);
 		$this->smtp=array();
 		$this->mandrill=array();
+		$this->sparkpost=array();
+		
+		// load parameters of sending methods
 		if($this->method=="smtp")
 		{
 			$this->smtp['host']=$GLOBALS['__template']->getVar('email_smtp_server',1);
@@ -36,8 +54,12 @@ class kEmails {
 			if($this->smtp['port']=="") $this->smtp['port']=25;
 			$this->smtp['username']=$GLOBALS['__template']->getVar('email_smtp_account',1);
 			$this->smtp['password']=$GLOBALS['__template']->getVar('email_smtp_account',2);
+		
 		} elseif($this->method=="mandrill") {
 			$this->mandrill['api_key']=$GLOBALS['__template']->getVar('email_mandrill_api',1);
+			
+		} elseif($this->method=="sparkpost") {
+			$this->sparkpost['api_key']=$GLOBALS['__template']->getVar('email_sparkpost_api',1);
 		}
 	}
 	
@@ -257,6 +279,122 @@ class kEmails {
 						
 						if($this->log=="true") $this->archiveMail($uid,$this->from,$r['email'],$msg['subject'],$composition['headers'],$msg['html'],$msg['plain'],$idarch);
 					}
+				}
+			}
+			
+		/* sparkpost api: send all mails in a single session */
+		} elseif($this->method=="sparkpost") {
+			
+			require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/sparkpost/tinysparkpost.php');
+			$sparkpost = new TinySparkPost($this->sparkpost['api_key']);
+
+			$this->uid='{{UID}}';
+			$composition=$this->preview($from,'{{NAME}} <{{EMAIL}}>',$subject,$message,$template,$this->uid);
+
+			// replace Orichalcum-style placeholders with mailchimp-style placeholders
+			foreach($replacements as $replacement)
+			{
+				foreach($replacement as $n=>$v)
+				{
+					$composition['html']=str_replace('{'.$n.'}','{{'.$n.'}}',$composition['html']);
+					$composition['plain']=str_replace('{'.$n.'}','{{'.$n.'}}',$composition['plain']);
+					$this->subject=str_replace('{'.$n.'}','{{'.$n.'}}',$this->subject);
+				}
+			}
+			$composition['html']=str_replace('{NAME}','{{NAME}}',$composition['html']);
+			$composition['html']=str_replace('{EMAIL}','{{EMAIL}}',$composition['html']);
+			$composition['plain']=str_replace('{NAME}','{{NAME}}',$composition['plain']);
+			$composition['plain']=str_replace('{EMAIL}','{{EMAIL}}',$composition['plain']);
+			$this->subject=str_replace('{NAME}','{{NAME}}',$this->subject);
+			$this->subject=str_replace('{EMAIL}','{{EMAIL}}',$this->subject);
+			
+			// split "from" in "name" and "mail address"
+			$fromname=ADMIN_NAME;
+			$frommail=ADMIN_MAIL;
+			$from=explode("<",$from);
+			if(isset($from[1]) && trim($from[1]," <>")!="")
+			{
+				$fromname=trim($from[0]);
+				$frommail=trim($from[1]," <>");
+			} else {
+				$frommail=trim($from[0]," <>");
+			}
+			
+			// collect recipients and substitution data
+			$recipients=array();
+			$substitution_data=array();
+			
+			foreach($to as $k=>$t)
+			{
+				$toname="";
+				$tomail="";
+				$t=explode("<",$t);
+				if(isset($t[1]) && trim($t[1]," <>")!="")
+				{
+					$toname=trim($t[0]);
+					$tomail=trim($t[1]," <>");
+				} else {
+					$toname=trim($t[0]," <>");
+					$tomail=trim($t[0]," <>");
+				}
+
+				$recipients[]=array(
+					'address' => array(
+						'email' => $tomail,
+						'name' => $toname
+						),
+					'substitution_data' => array_merge(
+						array(
+							'NAME' => $toname,
+							'EMAIL' => $tomail,
+							'UID' => $this->generateUID()
+							),
+						$replacements[$k]
+						)
+					);
+			}
+			
+			$sparkpost->setRecipients($recipients);
+
+			// set contents
+			$content = array(
+				'from' => array("name" => $fromname, "email" => $frommail),
+				'html' => $composition['html'],
+				'text' => $composition['plain'],
+				'subject' => $this->subject
+			);
+
+			$sparkpost->setContent($content);
+				
+			$result = $sparkpost->sendEmail();
+
+			// archiveMail
+			if(!empty($result))
+			{
+				foreach($recipients as $r)
+				{
+					$uid = $r['substitution_data']['UID'];
+					$name = $r['address']['name'];
+					$email = $r['address']['email'];
+					
+					$msg=array();
+					$composition['subject'] = $this->subject;
+					foreach( array('html','plain','subject') as $part)
+					{
+						$msg[$part]=$composition[$part];
+						$msg[$part]=str_replace("{{NAME}}",$name,$msg[$part]);
+						$msg[$part]=str_replace("{{EMAIL}}",$email,$msg[$part]);
+						$msg[$part]=str_replace("{{UID}}",$uid,$msg[$part]);
+						if(!empty($replacements[$k]) && is_array($replacements[$k]))
+						{
+							foreach($replacements[$k] as $n=>$v)
+							{
+								$msg[$part]=str_replace("{{".$n."}}",$v,$msg[$part]);
+							}
+						}
+					}
+					
+					if($this->log=="true") $this->archiveMail($uid, $this->from, $r['address']['email'], $msg['subject'], $composition['headers'], $msg['html'], $msg['plain'], $idarch);
 				}
 			}
 			

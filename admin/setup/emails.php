@@ -16,6 +16,7 @@ if(isset($_POST['update'])) {
 	$kaImpostazioni->setParam("email_smtp_server",$_POST['email_smtp_server'][1],$_POST['email_smtp_server'][2],"*");
 	$kaImpostazioni->setParam("email_smtp_account",$_POST['email_smtp_account'][1],$_POST['email_smtp_account'][2],"*");
 	$kaImpostazioni->setParam("email_mandrill_api",$_POST['email_mandrill_api'][1],"","*");
+	$kaImpostazioni->setParam("email_sparkpost_api",$_POST['email_sparkpost_api'][1],"","*");
 
 	$kaImpostazioni->setParam("newsletter_mittente",$_POST['sender'][1],$_POST['sender'][2]);
 	$kaImpostazioni->setParam("newsletter_pretitolo",$_POST['pretitle'][1],"");
@@ -51,22 +52,27 @@ $optout=$kaImpostazioni->getParam('newsletter_addio');
 	<h2><?= $kaTranslate->translate('Setup:E-mail delivery method'); ?></h2>
 	<br>
 	<div style="float:left;margin-right:50px;">
-		<?= b3_create_input("email_method[1]","radio",$kaTranslate->translate('Setup:Send mails via PHP mail() function (default)'),"","","",($kaImpostazioni->getVar('email_method',1,"*")==""?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
-		<?= b3_create_input("email_method[1]","radio",$kaTranslate->translate('Setup:Send mails via SMTP'),"smtp","","",($kaImpostazioni->getVar('email_method',1,"*")=="smtp"?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
-		<?= b3_create_input("email_method[1]","radio",$kaTranslate->translate('Setup:Send mails via Mandrill'),"mandrill","","",($kaImpostazioni->getVar('email_method',1,"*")=="mandrill"?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
+		<?= b3_create_input("email_method[1]","radio"," ".$kaTranslate->translate('Setup:PHP mail() function (default)'),"","","",($kaImpostazioni->getVar('email_method',1,"*")==""?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
+		<?= b3_create_input("email_method[1]","radio"," ".$kaTranslate->translate('Setup:SMTP'),"smtp","","",($kaImpostazioni->getVar('email_method',1,"*")=="smtp"?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
+		<?= b3_create_input("email_method[1]","radio"," ".$kaTranslate->translate('Setup:Mandrill'),"mandrill","","",($kaImpostazioni->getVar('email_method',1,"*")=="mandrill"?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
+		<?= b3_create_input("email_method[1]","radio"," ".$kaTranslate->translate('Setup:SparkPost'),"sparkpost","","",($kaImpostazioni->getVar('email_method',1,"*")=="sparkpost"?'checked':'').' onclick="kShowDeliveryOptions()"',true); ?><br>
 	</div>
 
 	<div style="float:left;">
 		<table id="email_method_1">
 			<tr><td colspan="2"><h3>SMTP configuration</h3></td></tr>
 			<tr><td><label for="email_smtp_server1"><?= $kaTranslate->translate('Setup:Host'); ?></label></td><td><?= b3_create_input("email_smtp_server[1]","text","",b3_lmthize($kaImpostazioni->getVar('email_smtp_server',1,"*"),"input"),"200px",250); ?></td></tr>
-			<tr><td><label for="email_smtp_server2"><?= $kaTranslate->translate('Setup:Port'); ?></label></td><td><?= b3_create_input("email_smtp_server[2]","text","",b3_lmthize($kaImpostazioni->getVar('email_smtp_server',2,"*"),"input"),"50px",4); ?> <small>(<?= $kaTranslate->translate('Usually 25'); ?>)</small></td></tr>
+			<tr><td><label for="email_smtp_server2"><?= $kaTranslate->translate('Setup:Port'); ?></label></td><td><?= b3_create_input("email_smtp_server[2]","text","",b3_lmthize($kaImpostazioni->getVar('email_smtp_server',2,"*"),"input"),"50px",4); ?> <small>(<?= $kaTranslate->translate('Setup:Usually 25'); ?>)</small></td></tr>
 			<tr><td><label for="email_smtp_account1"><?= $kaTranslate->translate('Setup:Username'); ?></label></td><td><?= b3_create_input("email_smtp_account[1]","text","",b3_lmthize($kaImpostazioni->getVar('email_smtp_account',1,"*"),"input"),"200px",250); ?></td></tr>
 			<tr><td><label for="email_smtp_account2"><?= $kaTranslate->translate('Setup:Password'); ?></label></td><td><?= b3_create_input("email_smtp_account[2]","password","",b3_lmthize($kaImpostazioni->getVar('email_smtp_account',2,"*"),"input"),"200px",250); ?></td></tr>
 		</table>
 		<table id="email_method_2">
 			<tr><td colspan="2"><h3>Mandrill API configuration</h3></td></tr>
 			<tr><td><label for="email_mandrill_api"><?= $kaTranslate->translate('Setup:API Key'); ?></label></td><td><?= b3_create_input("email_mandrill_api[1]","text","",b3_lmthize($kaImpostazioni->getVar('email_mandrill_api',1,"*"),"input"),"200px",250); ?></td></tr>
+		</table>
+		<table id="email_method_3">
+			<tr><td colspan="2"><h3>SparkPost API configuration</h3></td></tr>
+			<tr><td><label for="email_sparkpost_api"><?= $kaTranslate->translate('Setup:API Key'); ?></label></td><td><?= b3_create_input("email_sparkpost_api[1]","text","",b3_lmthize($kaImpostazioni->getVar('email_sparkpost_api',1,"*"),"input"),"200px",250); ?></td></tr>
 		</table>
 	</div>
 	
