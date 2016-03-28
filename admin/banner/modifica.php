@@ -10,22 +10,26 @@ $kaCategorie=new kaCategorie();
 /* AZIONI */
 if(isset($_POST['update'])) {
 	$log="";
-	$_POST['online']=!isset($_POST['online'])?'s':'n';
-	if(!$kaBanner->update($_POST['idbanner'],$_POST['alt'],$_POST['description'],$_POST['url'],$_POST['idcat'],$_POST['online'])) $log=$kaTranslate->translate('Banner:Error while updating database');
-	if(isset($_FILES['banner']['tmp_name'])) {
-		$w=$kaMetadata->get(TABLE_CATEGORIE,$_POST['idcat'],'width');
-		$h=$kaMetadata->get(TABLE_CATEGORIE,$_POST['idcat'],'height');
-		$r=$kaMetadata->get(TABLE_CATEGORIE,$_POST['idcat'],'resize');
-		if(!$kaBanner->updateFile($_POST['idbanner'],$_FILES['banner'],$_POST['alt'],intval($w['value']),intval($h['value']),$r['value'])) $log=$kaTranslate->translate('Banner:Error while uploading the new file');
-		}
+	$_POST['online'] = !isset($_POST['online']) ? 's' : 'n';
+	
+	$vars = array();
+	$vars['idbanner'] = $_POST['idbanner'];
+	$vars['type'] = $_POST['type'];
+	$vars['online'] = $_POST['online'];
+	$vars['title'] = $_POST['title'];
+	$vars['idcat'] = $_POST['idcat'];
+	$vars['description'] = $_POST['description'];
+	$vars['featuredimage'] = $_POST['featuredimage'];
+	
+	if(!$kaBanner->update($_POST['idbanner'], $vars)) $log=$kaTranslate->translate('Banner:Error while updating database');
 
 	if($log!="") {
 		echo '<div id="MsgAlert">'.$log.'</div>';
-		$kaLog->add("ERR",'Banner: Error while updating banner "'.$_POST['alt'].'"(<em>ID: '.$_POST['idbanner'].'</em>)');
+		$kaLog->add("ERR",'Banner: Error while updating banner "'.$_POST['title'].'"(<em>ID: '.$_POST['idbanner'].'</em>)');
 		}
 	else {
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate('Banner:Successfully Updated').'</div>';
-		$kaLog->add("UPD",'Banner: Successfully updated banner "'.$_POST['alt'].'" (<em>ID: '.$_POST['idbanner'].'</em>)');
+		$kaLog->add("UPD",'Banner: Successfully updated banner "'.$_POST['title'].'" (<em>ID: '.$_POST['idbanner'].'</em>)');
 		}
 	}
 
@@ -45,110 +49,234 @@ elseif(isset($_POST['idbanner'])&&count($_POST['idbanner'])>0) {
 <br />
 
 <?php 
-if(!isset($_GET['idbanner'])) { ?>
-	<div class="tab"><dl>
-		<?php 		foreach($kaCategorie->getList(TABLE_BANNER) as $c) {
-			if(!isset($_GET['idcat'])) $_GET['idcat']=$c['idcat'];
+/* BANNERS LIST */
+if(!isset($_GET['idbanner']))
+{ ?>
+	<div class="tab">
+		<dl>
+		<?php
+		$currentCategory = array();
+		
+ 		foreach($kaCategorie->getList(TABLE_BANNER) as $c)
+		{
+			if(!isset($_GET['idcat'])) $_GET['idcat'] = $c['idcat'];
+			if($_GET['idcat'] == $c['idcat']) $currentCategory = $c;
 			?>
 			<dt>
-				<a href="?idcat=<?= urlencode($c['idcat']); ?>" class="<?= ($c['idcat']==$_GET['idcat']?'sel':''); ?>"><?= $c['categoria']; ?></a>
-				</dt>
-			<?php } ?>
-		</dl></div>
+				<a href="?idcat=<?= $c['idcat']; ?>" class="<?= ($c['idcat']==$_GET['idcat']?'sel':''); ?>"><?= $c['categoria']; ?></a>
+			</dt>
+			<?php
+		}
+		
+		$orderby = $kaMetadata->get(TABLE_CATEGORIE, $currentCategory['idcat'], 'orderby');
+		$currentCategory['orderby'] = $orderby['value'];
+		?>
+		</dl>
+	</div>
 	<br />
 
-
-	<script type="text/javascript" src="<?php  echo ADMINDIR; ?>/js/drag_and_drop.js"></script>
-	<script type="text/javascript">
-		kDragAndDrop=new kDrago();
-		kDragAndDrop.dragClass("DragZone");
-		kDragAndDrop.dropClass("DragZone");
-		kDragAndDrop.containerTag('TR');
-		kDragAndDrop.onDrag(function (drag,target) {
-			var container=drag.parentNode.childNodes;
-			if(target.className!='DragZone'&&target!=drag) {
-				if((parseInt(target.getAttribute("ddTop"))+target.offsetHeight/2)>kWindow.mousePos.y) target.parentNode.insertBefore(drag,target);
-				else target.parentNode.insertBefore(drag,target.nextSibling);
-				}
-			kDragAndDrop.savePosition();
+	<?php
+	// load js libraries for manual sorting
+	if($currentCategory['orderby'] == 'ordine')
+	{ ?>
+		<script type="text/javascript" src="<?= ADMINDIR; ?>/js/drag_and_drop.js"></script>
+		<script type="text/javascript">
+			kDragAndDrop=new kDrago();
+			kDragAndDrop.dragClass("DragZone");
+			kDragAndDrop.dropClass("DragZone");
+			kDragAndDrop.containerTag('TR');
+			kDragAndDrop.onDrag(function (drag,target) {
+				var container=drag.parentNode.childNodes;
+				if(target.className!='DragZone'&&target!=drag) {
+					if((parseInt(target.getAttribute("ddTop"))+target.offsetHeight/2)>kWindow.mousePos.y) target.parentNode.insertBefore(drag,target);
+					else target.parentNode.insertBefore(drag,target.nextSibling);
+					}
+				kDragAndDrop.savePosition();
 			});
-		kDragAndDrop.onDrop(function (drag,target) {
-			b3_openMessage('Salvataggio in corso',false);
-			document.getElementById('orderby').submit();
+			kDragAndDrop.onDrop(function (drag,target) {
+				b3_openMessage('Salvataggio in corso',false);
+				document.getElementById('orderby').submit();
 			});
 		</script>
+		<?php
+	}
+	?>
 
 	<div>
 		<form action="" method="post" id="orderby">
 			<table class="tabella">
-			<thead><tr><th><?= $kaTranslate->translate('Banner:Title'); ?></th><th><?= $kaTranslate->translate('Banner:Target URL'); ?></th><th><?= $kaTranslate->translate('Banner:Views'); ?></th><th>Ordine</th></thead>
+			<thead>
+				<tr>
+					<th><?= $kaTranslate->translate('Banner:Title'); ?></th>
+					<th><?= $kaTranslate->translate('Banner:Target URL'); ?></th>
+					<th><?= $kaTranslate->translate('Banner:Views'); ?></th>
+					<?php if($currentCategory['orderby'] == 'ordine') { ?><th><?= $kaTranslate->translate('Banner:Order'); ?></th><?php } ?>
+				</tr>
+			</thead>
 			<tbody  class="DragZone">
 			<?php 
-				foreach($kaBanner->getList($_GET['idcat']) as $banner) {
-					?><tr>
-						<td><a href="?idcat=<?= $_GET['idcat']; ?>&idbanner=<?= $banner['idbanner']; ?>"><?php  echo $banner['title']; ?></a>
-							<?php  if($banner['online']=='n') echo '<small class="alert">'.$kaTranslate->translate('Banner:DRAFT').'</small>'; ?><br />
-							<small class="actions"><a href="?idcat=<?= $_GET['idcat']; ?>&idbanner=<?= $banner['idbanner']; ?>">Modifica</a></small>
-						<td class="percorso"><?= $banner['url']; ?></td>
-						<td class="views"><?= $banner['views']; ?></td>
-						<td class="sposta"><input type="hidden" name="idbanner[]" value="<?= $banner['idbanner']; ?>" /><img src="<?= ADMINRELDIR; ?>img/drag_v.gif" width="18" height="18" alt="Sposta" /> Sposta</td>
-						</tr>
-						<?php 
-					}
-				?></tbody></table>
-			</form>
-		</div>
+			foreach($kaBanner->getList($_GET['idcat']) as $banner)
+			{
+				?><tr>
+					<td>
+						<a href="?idcat=<?= $_GET['idcat']; ?>&idbanner=<?= $banner['idbanner']; ?>"><?php  echo $banner['title']; ?></a>
+						<?php  if($banner['online']=='n') echo '<small class="alert">'.$kaTranslate->translate('Banner:DRAFT').'</small>'; ?><br />
+						<small class="actions"><a href="?idcat=<?= $_GET['idcat']; ?>&idbanner=<?= $banner['idbanner']; ?>">Modifica</a></small>
+					</td>
+					<td class="percorso"><?= $banner['url']; ?></td>
+					<td class="views"><?= $banner['views']; ?></td>
+					<?php if($currentCategory['orderby'] == 'ordine') { ?>
+						<td class="sposta">
+							<input type="hidden" name="idbanner[]" value="<?= $banner['idbanner']; ?>" />
+							<img src="<?= ADMINRELDIR; ?>img/drag_v.gif" width="18" height="18" alt="Sposta" /> Sposta
+						</td>
+					<?php } ?>
+				</tr>
+				<?php 
+			}
+			?>
+			</tbody>
+			</table>
+		</form>
+	</div>
 
-<?php  }
+<?php
 
-else { ?>
+
+/* EDIT A SINGLE BANNER*/
+} else { ?>
 	<div class="bannerList">
-		<form action="" method="post" enctype="multipart/form-data">
+		<form action="" method="post">
 			<?php 
-			$banner=$kaBanner->get($_GET['idbanner']);
-			$w=$kaMetadata->get(TABLE_CATEGORIE,$banner['categoria'],'width');
-			$h=$kaMetadata->get(TABLE_CATEGORIE,$banner['categoria'],'height');
-			$r=$kaMetadata->get(TABLE_CATEGORIE,$banner['categoria'],'resize');
-			$banner['width']=intval($w['value']);
-			$banner['height']=intval($h['value']);
-			$banner['resize']=intval($r['value']);
-
-			if(isset($banner['banner']['url'])) {
-				$ext=strtolower(substr($banner['banner']['url'],strrpos($banner['banner']['url'],".")));
-				if($ext=='.jpg'||$ext=='.gif'||$ext=='.png') {
-					$size=getimagesize(BASERELDIR.$banner['banner']['url']);
-					?><div class="bannerPreview"><img src="<?= BASEDIR.$banner['banner']['url']; ?>" width="<?= $size[0]; ?>" alt="" /></div><br /><br /><?php 
-					}
-				}
+			$banner = $kaBanner->get($_GET['idbanner']);
+			$w = $kaMetadata->get(TABLE_CATEGORIE, $banner['categoria'], 'width');
+			$h = $kaMetadata->get(TABLE_CATEGORIE, $banner['categoria'], 'height');
+			$o = $kaMetadata->get(TABLE_CATEGORIE, $banner['categoria'], 'orderby');
+			$banner['width'] = intval($w['value']);
+			$banner['height'] = intval($h['value']);
+			$banner['orderby'] = intval($o['value']);
+			if($banner['width'] == 0) $banner['width']=300;
 			?>
 			<input type="hidden" name="idbanner" value="<?= $banner['idbanner']; ?>" />
-			<table width="700">
-			<tr><th><label for="idcat"><?= $kaTranslate->translate('Banner:Category'); ?></label></th><td><?php 
-				$option=array();
-				$value=array();
-				foreach($kaCategorie->getList(TABLE_BANNER) as $c) {
-					$option[]=$c['idcat'];
-					$value[]=$c['categoria'];
-					}
-				echo b3_create_select("idcat","",$value,$option,$banner['categoria']);
+			
+			<div class="box">
+			<?php 
+			$option=array("image", "text", "code");
+			$value=array($kaTranslate->translate("Banner:Image"), $kaTranslate->translate("Banner:Text"), $kaTranslate->translate("Banner:External code"));
+			echo b3_create_select("type", $kaTranslate->translate("Banner:Banner type").' ', $value, $option, $banner['type']);
+			?></div><br>
 
-				b3_create_input("alt","text","",$banner['title'],"300px");
-				?></td></tr>
-			<tr><th><label for="alt"><?= $kaTranslate->translate('Banner:Title'); ?></label></th><td><?= b3_create_input("alt","text","",$banner['title'],"300px"); ?></td></tr>
-			<tr><th><label for="description"><?= $kaTranslate->translate('Banner:Short description'); ?></label></th><td><?= b3_create_textarea("description","",b3_lmthize($banner['description'],"textarea"),"99%","100px",RICH_EDITOR,false,TABLE_BANNER,$banner['idbanner']); ?></td></tr>
-			<tr><th><label for="banner"><?= $kaTranslate->translate('Banner:New File'); ?></label></th><td><?= b3_create_input("banner","file","",""); ?>
-				<?php  if($banner['width']>0) { ?><small>(<?= $banner['width']; ?> x <?= $banner['height']; ?> px)</small><?php  } ?>
-				</td></tr>
-			<tr><th><label for="url"><?= $kaTranslate->translate('Banner:Target URL'); ?></label></th><td><?= b3_create_input("url","text","",$banner['url'],"300px"); ?></td></tr>
-			<tr><th><label><?= $kaTranslate->translate('Banner:Views'); ?></label></th><td><?= $banner['views']; ?></td></tr>
-			</table>
-			<br />
-			<div class="submit">
-				<input type="submit" name="update" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" onclick="b3_openMessage('<?= addslashes($kaTranslate->translate('Banner:Saving...')); ?>');" />
-				<div class="draft"><?= b3_create_input("online","checkbox",$kaTranslate->translate('Banner:DRAFT'),"n","","",($banner['online']=='n'?'checked':'')); ?></div>
-				</div>
-			</form>
-		</div><?php 
-	}
+
+			<div class="box">
+				<?= $kaTranslate->translate('Banner:Category'); ?><br>
+				<?php
+				$kaCategorie=new kaCategorie();
+
+				$i=0;
+				foreach($kaCategorie->getList(TABLE_BANNER) as $cat)
+				{
+					$w = $kaMetadata->get(TABLE_CATEGORIE, $cat['idcat'], 'width');
+					$h = $kaMetadata->get(TABLE_CATEGORIE, $cat['idcat'], 'height');
+
+					echo b3_create_input("idcat", "radio", ' '.$cat['categoria'].' ('.$w['value'].' x '.$h['value'].')', $cat['idcat'], "", "", ( $cat['idcat']==$banner['categoria'] ? 'checked="checked"' : ''), true).'<br>';
+					$i++;
+				}
+				?>
+			</div><br>
+			<br>
+
+			<div class="title"><?= b3_create_input("title","text",$kaTranslate->translate('Banner:Title').'<br>', $banner['title'], "100%"); ?></div><br>
+			
+			<div class="hidewhencode">
+				<?= b3_create_textarea("description",$kaTranslate->translate('Banner:Short description').'<br>', ($banner['type'] != 'code' ? $banner['description'] : ''), "100%","100px",RICH_EDITOR); ?><br><br>
+			</div>
+			
+			<div class="hidewhenimage hidewhentext">
+				<?= b3_create_textarea("code",$kaTranslate->translate('Banner:Code').'<br>', ($banner['type'] == 'code' ? $banner['description'] : ''), "100%","100px",false); ?><br><br>
+			</div>
+
+			<div class="hidewhencode hidewhentext">
+				<fieldset class="box" style="max-width:<?= $banner['width']; ?>px;"><legend><?= $kaTranslate->translate('News:Featured Image'); ?></legend>
+					<div id="featuredImageContainer"><?php
+					if($banner['featuredimage']!=0)
+					{
+						?><img src="<?= BASEDIR.$banner['banner']['thumb']['url']; ?>"><?php
+					}
+					?></div>
+					<input type="hidden" name="featuredimage" id="featuredimage" value="<?= $banner['featuredimage']; ?>">
+					<a href="javascript:k_openIframeWindow('../inc/uploadsManager.inc.php?limit=1&submitlabel=<?= urlencode($kaTranslate->translate('Banner:Set featured image')); ?>&onsubmit=setFeaturedImage','90%','90%');" class="smallbutton"><?= $kaTranslate->translate('News:Choose banner image'); ?></a><br>
+					<small><a href="javascript:removeFeaturedImage();" id="removeFeaturedImage" class="warning" style="display:none;"><?= $kaTranslate->translate('UI:Delete'); ?></a></small>
+				</fieldset>
+				<script type="text/javascript">
+				var setFeaturedImage=function(ids)
+				{
+					var inpt=document.getElementById('featuredimage');
+					if(inpt)
+					{
+						inpt.value=ids[0].id;
+						var imgcontainer=document.getElementById('featuredImageContainer');
+						imgcontainer.innerHTML='';
+						var img=document.createElement('IMG');
+						img.src=ids[0].dir + ids[0].thumbnail;
+						imgcontainer.appendChild(img);
+						var imgcontainer=document.getElementById('removeFeaturedImage').style.display='';
+					}
+					k_closeIframeWindow();
+				}
+				
+				var removeFeaturedImage=function(ids)
+				{
+					var inpt=document.getElementById('featuredimage');
+					if(inpt)
+					{
+						inpt.value='';
+						var imgcontainer=document.getElementById('featuredImageContainer');
+						imgcontainer.innerHTML='';
+						var imgcontainer=document.getElementById('removeFeaturedImage').style.display='none';
+					}
+				}
+				</script>
+			</div>
+			<br>
+
+			<div class="hidewhencode">
+				<?= b3_create_input("url", "text", $kaTranslate->translate('Banner:Target URL'), "http://","100%"); ?><br><br>
+			</div>
+
+			<label><?= $kaTranslate->translate('Banner:Views'); ?>:</label> <?= $banner['views']; ?><br>
+			<br>
+			
+			<div class="submit"><input type="submit" name="update" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" onclick="b3_openMessage('<?= addslashes($kaTranslate->translate('Banner:Saving...')); ?>');" /></div>
+		</form>
+	</div>
+
+	<script>
+		function setType()
+		{
+			var type = document.getElementById('type').value;
+			for(var i=0, c=document.querySelectorAll('.hidewhenimage'); c[i]; i++)
+			{
+				c[i].style.display = 'block';
+			}
+			for(var i=0, c=document.querySelectorAll('.hidewhentext'); c[i]; i++)
+			{
+				c[i].style.display = 'block';
+			}
+			for(var i=0, c=document.querySelectorAll('.hidewhencode'); c[i]; i++)
+			{
+				c[i].style.display = 'block';
+			}
+			for(var i=0, c=document.querySelectorAll('.hidewhen'+type); c[i]; i++)
+			{
+				c[i].style.display = 'none';
+			}
+		}
+		kAddEvent(document.getElementById('type'), "change", setType);
+		setType();
+	</script>
+			
+			
+	<?php 
+}
 
 include_once("../inc/foot.inc.php");
