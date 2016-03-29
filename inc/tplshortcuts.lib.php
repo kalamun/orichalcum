@@ -1036,8 +1036,8 @@ function kSetPageTemplate($dir=false)
 {
 	if($dir==false) $dir=trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__'],"/");
 	$p=$GLOBALS['__pages']->getPage($dir);
+	if(!empty($p['template'])) $GLOBALS['__template']->setTemplate($p['template']);
 	if(!isset($p['layout'])) $p['layout']="";
-	$GLOBALS['__template']->setTemplate($p['template']);
 	$GLOBALS['__template']->setLayout($p['layout']);
 }
 
@@ -1913,8 +1913,9 @@ function kGetPhotogalleryCategoryById($idcat)
 
 function kGetBannerList($vars=null,$from=-1,$limit=null,$orderby=false)
 {
+	echo 'getbannerlist<br>';
 	if(!is_array($vars))
-{
+	{
 		$vars=array("category"=>$vars);
 		$vars['from']=$from;
 		$vars['limit']=$limit;
@@ -2894,3 +2895,11 @@ function kGetUploadHandlerURL()
 {
 	return BASEDIR.'inc/uploadHandler.php';
 }
+
+
+/* statistics */
+function kRegisterEvent($family, $event, $ref)
+{
+	return registerEvent($family, $event, $ref);
+}
+

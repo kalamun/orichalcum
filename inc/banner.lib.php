@@ -4,75 +4,86 @@
 /* PAGINE */
 class kBanners {
 	protected $inited;
-	protected $bannerDB,$kDocuments;
+	protected $bannerDB;
 
-	public function __construct() {
+	public function __construct()
+	{
 		$this->inited=false;
-		}
+	}
 
-	public function init() {
+	public function init()
+	{
 		$this->inited=true;
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."admin/inc/main.lib.php");
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/documents.lib.php");
-		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/kalamun.lib.php");
-		$this->kDocuments=new kDocuments();
 		$this->bannerDB=array();
-		}
+	}
 
-	function getCategories() {
+	function getCategories()
+	{
 		if(!$this->inited) $this->init();
+
 		$cat=array();
 		$query="SELECT * FROM `".TABLE_CATEGORIE."` WHERE `tabella`='".TABLE_BANNER."' AND `ll`='".ksql_real_escape_string(LANG)."' ORDER BY `ordine`";
 		$results=ksql_query($query);
-		while($row=ksql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results))
+		{
 			$cat[]=$row;
-			}
-		return $cat;
 		}
+		return $cat;
+	}
 
-	function getBanners($vars=array()) {
+	// get banners for a single category
+	function getBanners($vars=array())
+	{
 		if(!$this->inited) $this->init();
+
 		$banners=array();
 		
-		if(!isset($vars['orderby'])||$vars['orderby']==false) $vars['orderby']="`ordine`";
-		if(!isset($vars['lang'])||$vars['lang']==false) $vars['lang']=LANG;
+		if(empty($vars['orderby'])) $vars['orderby'] = "`ordine`";
+		if(empty($vars['lang'])) $vars['lang'] = LANG;
 	
-		$cat=$this->getCategories();
-		if(!isset($vars['category'])||$vars['category']==false) $vars['category']=$cat[0]['category'];
-		else $vars['category']=b3_htmlize($vars['category'],false,"");
-		foreach($cat as $c) {
-			if($c['categoria']==$vars['category']) $idcat=$c['idcat'];
+		// get the current category
+		$cat = $this->getCategories();
+		if(empty($vars['category'])) $vars['category'] = $cat[0]['category'];
+		else $vars['category'] = $vars['category'];
+		foreach($cat as $c)
+		{
+			if($c['categoria'] == $vars['category']
+				|| $c['categoria'] == b3_htmlize($vars['category'],false,"")
+				|| $c['dir'] == $vars['category']
+				|| $c['idcat'] == $vars['category']
+				)
+			{
+				$idcat = $c['idcat'];
+				break;
 			}
+		}
 
-		$query="SELECT * FROM `".TABLE_BANNER."` WHERE `categoria`='".ksql_real_escape_string($idcat)."' AND `ll`='".ksql_real_escape_string(strtoupper($vars['lang']))."' AND `online`='s' ORDER BY ".ksql_real_escape_string($vars['orderby'])."";
-		if((isset($vars['from'])&&$vars['from']>=0)||(isset($vars['limit'])&&$vars['limit']>0)) {
-			if(!isset($vars['from'])||$vars['from']<0) $vars['from']=0;
-			$query.=" LIMIT ".$vars['from'];
-			if(isset($vars['limit'])&&$vars['limit']>0) $query.=",".$vars['limit'];
-			}
+		$query = "SELECT * FROM `".TABLE_BANNER."` WHERE `categoria`='".ksql_real_escape_string($idcat)."' AND `ll`='".ksql_real_escape_string(strtoupper($vars['lang']))."' AND `online`='s' ORDER BY ".ksql_real_escape_string($vars['orderby'])."";
+		
+		if(isset($vars['from'])) $vars['offset'] = $vars['from']; //backwards compatibility
+		if((isset($vars['limit'])&&$vars['limit']>=0)) $query .= " LIMIT ".intval($vars['limit'])." ";
+		if((isset($vars['offset'])&&$vars['offset']>=0)) $query .= " OFFSET ".intval($vars['offset'])." ";
 
-		$results=ksql_query($query);
+		$results = ksql_query($query);
 
-		for($i=0;$row=ksql_fetch_array($results);$i++) {
-			$banners[$i]=$row;
-			$b=$this->kDocuments->getList(TABLE_BANNER,$row['idbanner']);
-			if(!isset($b[0])) $b[0]=array();
-			$banners[$i]['banner']=$b[0];
-			$banners[$i]['permalink']=SITE_URL.BASEDIR.DIR_DOCS.$banners[$i]['banner']['iddoc'].'/'.$banners[$i]['banner']['filename'];
-			$banners[$i]['width']=0;
-			$banners[$i]['height']=0;
-			$size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_DOCS.$banners[$i]['banner']['iddoc'].'/'.$banners[$i]['banner']['filename']);
-			if($size!=false) {
-				$banners[$i]['width']=$size[0];
-				$banners[$i]['height']=$size[1];
-				}
-			//aumento il counter delle impressioni
-			$query="UPDATE `".TABLE_BANNER."` SET `views`=`views`+1 WHERE `idbanner`='".$row['idbanner']."' LIMIT 1";
+		for($i=0; $row=ksql_fetch_array($results); $i++)
+		{
+			$banners[$i] = $row;
+			if($row['featuredimage'] > 0 && $row['type']=='image') $banners[$i]['featuredimage'] = $GLOBALS['__images']->getImage($row['featuredimage']);
+			else $row['featuredimage'] = array();
+			
+			// url to register click
+			$banners[$i]['register_click_url'] = SITE_URL . BASEDIR . 'inc/event_logger.php?family=banner&event=click&ref=' . urlencode($row['idbanner'].': '.date("Y-m-d"));
+			
+			// increase the views counter
+			$query="UPDATE `".TABLE_BANNER."` SET `views`=(`views`+1) WHERE `idbanner`='".$row['idbanner']."' LIMIT 1";
 			ksql_query($query);
-			}
+
+			registerEvent("banner", "view", $row['idbanner'].': '.date("Y-m-d"));
+		}
 
 		return $banners;
-		}
+	}
 
 	function setBanner($bannerDB) {
 		if(!$this->inited) $this->init();

@@ -342,7 +342,7 @@ class kText
 	}
 
 
-/* statistiche */
+/* statistics */
 function kStatistiche() {
 	/* sposto la roba vecchia in archivio */
 	$q="INSERT INTO `".TABLE_STATS_ARCHIVE."` (`ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll`) SELECT `ip`,`date`,`url`,`referer`,`system`,`contacts`,`ll` FROM ".TABLE_STATISTICHE." WHERE `date`<'".date("Y-m-d H:i",time()-3600)."'";
@@ -394,4 +394,37 @@ function kStatistiche() {
 		}
 	}
 
+	
+function registerEvent($family, $event, $ref)
+{
+	// filter inputs
+	if(empty($family)) { trigger_error('No family defined'); return false; }
+	if(empty($event)) { trigger_error('No event defined'); return false; }
+	if(empty($ref)) { trigger_error('No reference defined'); return false; }
 
+	// filter unknown browsers */
+	if(strpos($_SERVER['HTTP_USER_AGENT'], "MSIE")===false
+		&& strpos($_SERVER['HTTP_USER_AGENT'], "Firefox")===false
+		&& strpos($_SERVER['HTTP_USER_AGENT'], "Chrome")===false
+		&& strpos($_SERVER['HTTP_USER_AGENT'], "Safari")===false
+		&& strpos($_SERVER['HTTP_USER_AGENT'], "Opera")===false
+		) { trigger_error("Browser unknow"); return false; }
+		
+	// deny double requests on the same page
+	if(isset($GLOBALS['registerEvents'][$family.'-'.$event.'-'.$ref])) return false;
+	$GLOBALS['registerEvents'][$family.'-'.$event.'-'.$ref] = true;
+
+	$query = "SELECT * FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='".ksql_real_escape_string($family)."' AND  `type`='".ksql_real_escape_string($event)."' AND  `reference`='".ksql_real_escape_string($ref)."' LIMIT 1";
+	$results = ksql_query($query);
+	if(ksql_fetch_array($results))
+	{
+		// record already exists... increment by 1
+		ksql_query("UPDATE `".TABLE_STATS_SUMMARY."` SET `count` = (`count`+1) WHERE `family`='".ksql_real_escape_string($family)."' AND  `type`='".ksql_real_escape_string($event)."' AND  `reference`='".ksql_real_escape_string($ref)."' LIMIT 1");
+		
+	} else {
+		// add new record
+		ksql_query("INSERT INTO `".TABLE_STATS_SUMMARY."` (`family`, `type`, `reference`, `count`, `data`) VALUES('".ksql_real_escape_string($family)."', '".ksql_real_escape_string($event)."', '".ksql_real_escape_string($ref)."', 1, '')");
+	}
+	
+	return true;
+}

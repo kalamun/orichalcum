@@ -593,12 +593,15 @@ class kTemplate {
 			}
 		return false;
 		}
-		
-	function get($tpl=false) {
+	
+	// load actual template	
+	function get($tpl=false)
+	{
 		$__template=$this;
 		$file="";
-		if($tpl==false||trim($tpl)=="") $tpl=$this->tpl;
-		if($this->layout!=false) $file='layouts/'.$this->layout;
+
+		if(empty($tpl)) $tpl = $this->tpl;
+		if(!empty($this->layout)) $file='layouts/'.$this->layout;
 		else {
 			if($this->isHome()) $file="home.php";
 			elseif($this->isNews()) $file="news.php";
@@ -611,27 +614,38 @@ class kTemplate {
 			elseif($this->isFeed()) $file="feed.php";
 			elseif($this->isSearch()) $file="search.php";
 			elseif($this->isSitemap()) $file="sitemap.php";
-			elseif(!$GLOBALS['__pages']->pageExists(trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__'],"/"))) { header("HTTP/1.0 404 Not Found"); $file="404.php"; }
-			else $file="index.php";
-			}
+			elseif(!$GLOBALS['__pages']->pageExists(trim($GLOBALS['__dir__'].'/'.$GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__'],"/"))) {
+				header("HTTP/1.0 404 Not Found");
+				$file="404.php";
+			} else $file="index.php";
+		}
+
 		set_include_path(get_include_path().PATH_SEPARATOR.$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl);
-		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file)) {
+
+		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file))
+		{
 			if(file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/index.php')) $file="index.php";
 			else $tpl=$this->tpl;
-			}
+		}
+		
 		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file)) $file="index.php";
-		if(is_file($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file)) {
+		
+		if(is_file($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file))
+		{
 			$this->setTemplate($tpl);
 			if(ob_get_length()>0) { ob_clean(); }
+
 			ob_start();
 			include($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$tpl.'/'.$file);
-			$contents=ob_get_contents();
+			$contents = ob_get_contents();
 			ob_end_clean();
+
 			echo $contents;
 			return true;
-			}
-		return false;
 		}
+
+		return false;
+	}
 	
 	public function getTemplateDir() {
 		$tpl=$this->tpl;
