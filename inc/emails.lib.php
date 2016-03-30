@@ -338,6 +338,8 @@ class kEmails
 					$tomail=trim($t[0]," <>");
 				}
 
+				if(!isset($replacements[$k])) $replacements[$k]=array();
+
 				$recipients[]=array(
 					'address' => array(
 						'email' => $tomail,
