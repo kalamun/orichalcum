@@ -1913,7 +1913,6 @@ function kGetPhotogalleryCategoryById($idcat)
 
 function kGetBannerList($vars=null,$from=-1,$limit=null,$orderby=false)
 {
-	echo 'getbannerlist<br>';
 	if(!is_array($vars))
 	{
 		$vars=array("category"=>$vars);
