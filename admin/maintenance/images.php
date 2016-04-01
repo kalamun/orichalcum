@@ -3,22 +3,24 @@
 
 
 
-define("PAGE_NAME","Verifica delle immagini orfane");
+define("PAGE_NAME","Operazioni sulle immagini");
 include_once("../inc/head.inc.php");
 
 /* AZIONI */
-if(isset($_GET['removeimages'])&&isset($_POST['idimg'])) {
+if(isset($_GET['removeimages'])&&isset($_POST['idimg']))
+{
 	require_once(ADMINRELDIR."inc/images.lib.php");
 	$kaImages=new kaImages();
 	$log="";
-	foreach($_POST['idimg'] as $idimg) {
+	foreach($_POST['idimg'] as $idimg)
+	{
 		if(!$kaImages->delete($idimg)) $log.="Errore durante la rimozione dell'immagine con ID ".$idimg."<br />";
-		}
+	}
+	
 	if($log!="") $alert=$log;
 	else $success="Immagini eliminate con successo";
-	}
 
-if(isset($_GET['checkorphanimages'])) {
+} elseif(isset($_GET['checkorphanimages'])) {
 	$unused=array();
 	
 	$tables=array();
@@ -163,6 +165,53 @@ if(isset($_GET['checkorphanimages'])) {
 		include_once("../inc/foot.inc.php");
 		die();
 	}
+
+/* set the first image of the page gallery as featured image */
+} elseif(isset($_GET['setfeaturedimage'])) {
+	
+	/* PAGES */
+	$query = "SELECT `idpag`, `photogallery`, `featuredimage` FROM `".TABLE_PAGINE."`";
+	$results = ksql_query($query);
+	while($row = ksql_fetch_array($results))
+	{
+		if($row['featuredimage']>0) continue; // skip when already set
+		
+		$phg = explode(",", trim($row['photogallery'],","));
+		if(!isset($phg[0])) continue; // skip when no images are defined in photogallery
+		
+		if(!ksql_query("UPDATE `".TABLE_PAGINE."` SET `featuredimage` = '".intval($phg[0])."' WHERE `idpag`='".$row['idpag']."'")) $alert="Errore durante l'impostazione di alcune immagini di presentazione";
+	}
+	
+	/* NEWS */
+	$query = "SELECT `idnews`, `photogallery`, `featuredimage` FROM `".TABLE_NEWS."`";
+	$results = ksql_query($query);
+	while($row = ksql_fetch_array($results))
+	{
+		if($row['featuredimage']>0) continue; // skip when already set
+		
+		$phg = explode(",", trim($row['photogallery'],","));
+		if(!isset($phg[0])) continue; // skip when no images are defined in photogallery
+		
+		if(!ksql_query("UPDATE `".TABLE_NEWS."` SET `featuredimage` = '".intval($phg[0])."' WHERE `idnews`='".$row['idnews']."'")) $alert="Errore durante l'impostazione di alcune immagini di presentazione";
+	}
+	
+	if(!isset($alert)) $success = "Tutte le immagini di presentazione sono state impostate";
+
+	/* SHOP */
+	$query = "SELECT `idsitem`, `photogallery`, `featuredimage` FROM `".TABLE_SHOP_ITEMS."`";
+	$results = ksql_query($query);
+	while($row = ksql_fetch_array($results))
+	{
+		if($row['featuredimage']>0) continue; // skip when already set
+		
+		$phg = explode(",", trim($row['photogallery'],","));
+		if(!isset($phg[0])) continue; // skip when no images are defined in photogallery
+		
+		if(!ksql_query("UPDATE `".TABLE_SHOP_ITEMS."` SET `featuredimage` = '".intval($phg[0])."' WHERE `idsitem`='".$row['idsitem']."'")) $alert="Errore durante l'impostazione di alcune immagini di presentazione";
+	}
+	
+	if(!isset($alert)) $success = "Tutte le immagini di presentazione sono state impostate";
+
 }
 
 
@@ -171,11 +220,18 @@ elseif(isset($alert)) echo '<div id="MsgAlert">'.$alert.'</div>';
 /* FINE AZIONI */
 
 ?>
-<h1><?php  echo PAGE_NAME; ?></h1>
+<h1><?= $kaTranslate->translate('Maintenance:Check for orphan images'); ?></h1>
 <br />
-
 <p>Le immagini orfane sono le immagini che sono in archivio ma non risultano utilizzate in nessuna pagina</p>
 <a href="?checkorphanimages" class="smallbutton">Clicca qui per verificare</a><br />
+<br>
+<br>
+
+<h1><?= $kaTranslate->translate('Maintenance:Set the first image on page gallery as featured image'); ?></h1>
+<br />
+<a href="?setfeaturedimage" class="smallbutton">Clicca qui per impostare</a><br />
+<br>
+<br>
 
 
 <?php 
