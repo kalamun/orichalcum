@@ -15,6 +15,7 @@ $kaStats=new kaStats(array("visits"=>true, "newsletter"=>true));
 <li><a href="pagine.php"><?= $kaTranslate->translate('Statistics:Pages'); ?></a></li>
 <li><a href="sistemi.php"><?= $kaTranslate->translate('Statistics:Systems and Browsers'); ?></a></li>
 <li><a href="referer.php"><?= $kaTranslate->translate('Statistics:Referer'); ?></a></li>
+<li><a href="banners.php"><?= $kaTranslate->translate('Statistics:Banners'); ?></a></li>
 </ul>
 
 <?php 

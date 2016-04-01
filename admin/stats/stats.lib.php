@@ -112,11 +112,21 @@ class kaStats {
 		ksql_query($query);
 	}
 	
+	/* returns the row of the summary table for given params */
 	public function getSummaryEntry($family, $type, $reference)
 	{
-		$query="SELECT * FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='".ksql_real_escape_string($family)."' AND `type`='".ksql_real_escape_string($type)."' AND `reference`='".ksql_real_escape_string($reference)."' LIMIT 1";
+		$query="SELECT * FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='".ksql_real_escape_string($family)."' AND `type`='".ksql_real_escape_string($type)."' AND `reference` LIKE '".ksql_real_escape_string($reference)."' LIMIT 1";
 		$results=ksql_query($query);
 		return ksql_fetch_array($results);
+	}
+	
+	/* returns the sum of the count column of the summary table for given params */
+	public function getSummaryCount($family, $type, $reference)
+	{
+		$query="SELECT sum(`count`) as `total` FROM `".TABLE_STATS_SUMMARY."` WHERE `family`='".ksql_real_escape_string($family)."' AND `type`='".ksql_real_escape_string($type)."' AND `reference` LIKE '".ksql_real_escape_string($reference)."'";
+		$results=ksql_query($query);
+		if($row = ksql_fetch_array($results)) return $row['total'];
+		return false;
 	}
 	
 	public function deleteOldStats()
@@ -303,6 +313,7 @@ class kaStats {
 		elseif(strpos($s,"iPad")!==false) { $output['os']='iPad'; $output['mobile']=true; }
 		
 		return $output;
-		}
 	}
+
+}
 
