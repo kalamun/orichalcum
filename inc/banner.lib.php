@@ -38,7 +38,6 @@ class kBanners {
 
 		$banners=array();
 		
-		if(empty($vars['orderby'])) $vars['orderby'] = "`ordine`";
 		if(empty($vars['lang'])) $vars['lang'] = LANG;
 	
 		// get the current category
@@ -56,6 +55,16 @@ class kBanners {
 				$idcat = $c['idcat'];
 				break;
 			}
+		}
+
+		if(empty($vars['orderby']))
+		{
+			// get order from category metadata
+			$query="SELECT * FROM `".TABLE_METADATA."` WHERE `tabella`='".TABLE_CATEGORIE."' AND `id`='".intval($idcat)."' AND `param`='orderby' LIMIT 1";
+			$results = mysql_query($query);
+			$row = mysql_fetch_array($results);
+			$vars['orderby'] = "`".mysql_real_escape_string($row['value'])."`";
+			if($vars['orderby']=='clicks') $vars['orderby']='RAND()';
 		}
 
 		$query = "SELECT * FROM `".TABLE_BANNER."` WHERE `categoria`='".ksql_real_escape_string($idcat)."' AND `ll`='".ksql_real_escape_string(strtoupper($vars['lang']))."' AND `online`='s' ORDER BY ".ksql_real_escape_string($vars['orderby'])."";
