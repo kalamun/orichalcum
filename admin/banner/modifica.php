@@ -18,8 +18,19 @@ if(isset($_POST['update'])) {
 	$vars['online'] = $_POST['online'];
 	$vars['title'] = $_POST['title'];
 	$vars['idcat'] = $_POST['idcat'];
-	$vars['description'] = $_POST['description'];
-	$vars['featuredimage'] = $_POST['featuredimage'];
+
+	if($_POST['type']=="image")
+	{
+		$vars['featuredimage'] = $_POST['featuredimage'];
+		$vars['description'] = $_POST['description'];
+		
+	} elseif($_POST['type']=="text") {
+		$vars['description'] = $_POST['description'];
+		
+	} elseif($_POST['type']=="code") {
+		$vars['description'] = $_POST['code'];
+
+	}
 	
 	if(!$kaBanner->update($_POST['idbanner'], $vars)) $log=$kaTranslate->translate('Banner:Error while updating database');
 
@@ -246,7 +257,10 @@ if(!isset($_GET['idbanner']))
 			<label><?= $kaTranslate->translate('Banner:Views'); ?>:</label> <?= $banner['views']; ?><br>
 			<br>
 			
-			<div class="submit"><input type="submit" name="update" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" onclick="b3_openMessage('<?= addslashes($kaTranslate->translate('Banner:Saving...')); ?>');" /></div>
+			<div class="submit">
+				<input type="submit" name="update" value="<?= $kaTranslate->translate('UI:Save'); ?>" class="button" onclick="b3_openMessage('<?= addslashes($kaTranslate->translate('Banner:Saving...')); ?>');" />
+				<div class="draft"><?= b3_create_input("online","checkbox",$kaTranslate->translate('Banner:DRAFT'),'n',false,false,($banner['online']=='s'?'':'checked')); ?></div>
+			</div>
 		</form>
 	</div>
 
