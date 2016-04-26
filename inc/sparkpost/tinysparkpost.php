@@ -71,7 +71,11 @@ class TinySparkPost
 			$response = false;
 		} else {
 			$response = json_decode($response);
-			return $response->results->id;
+			if(!empty($response->results->id)) return $response->results->id;
+			else {
+				var_dump($response);
+				$response = false;
+			}
 		}
 
 		curl_close($ch); 

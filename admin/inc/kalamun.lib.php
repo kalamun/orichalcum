@@ -353,6 +353,7 @@ class kaAdminMenu {
 		$output.='<ul>';
 		foreach($this->menu as $ka=>$v)
 		{
+			if(empty($v['title'])) $v['title']="";
 			$output.='<li><a '.($ka==$this->sel['parent']?' class="sel"':'').'>'.$v['title'].'</a>';
 			$output.='<ul>';
 

@@ -829,7 +829,13 @@ class kShop {
 		$output['embeddedimgs']=array();
 		$output['embeddeddocs']=array();
 		$output['embeddedmedias']=array();
-		$output['anteprima']=$this->kText->formatText($output['anteprima']);
+		
+		foreach( array('anteprima', 'privatearea', 'prezzo', 'manufacturer', 'titolo') as $param)
+		{
+			if(empty($output[$param])) $output[$param] = "";
+		}
+		$output['anteprima'] = $this->kText->formatText($output['anteprima']);
+		
 		$tmp=$this->kText->embedImg($output['anteprima']);
 			$output['anteprima']=$tmp[0];
 			if(is_array($tmp[1])) $output['embeddedimgs']=array_merge($output['embeddedimgs'],$tmp[1]);
