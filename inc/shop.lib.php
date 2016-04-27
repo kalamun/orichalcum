@@ -2138,7 +2138,7 @@ class kShop {
 			kSendEmail($mail['from'], $mail['to'], $mail['subject'], $mail['message']);
 			
 			// then send a copy to the admin
-			kSendEmail($mail['to'], $mail['from'], $mail['subject'], $mail['message']);
+			kSendEmail($mail['from'], $mail['from'], $mail['subject'], $mail['message']);
 		}
 	}
 
