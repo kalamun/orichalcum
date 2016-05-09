@@ -332,11 +332,14 @@ class kEmails
 				if(isset($t[1]) && trim($t[1]," <>")!="")
 				{
 					$toname=trim($t[0]);
-					$tomail=trim($t[1]," <>");
+					$tomail=trim($t[1]," <>\n\r\t");
 				} else {
-					$toname=trim($t[0]," <>");
-					$tomail=trim($t[0]," <>");
+					$toname=trim($t[0]," <>\n\r\t");
+					$tomail=trim($t[0]," <>\n\r\t");
 				}
+				
+				if(empty($toname)) $toname = "undefined";
+				if(empty($tomail)) $tomail = ADMIN_MAIL;
 
 				if(!isset($replacements[$k])) $replacements[$k]=array();
 

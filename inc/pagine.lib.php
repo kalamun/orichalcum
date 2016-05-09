@@ -588,7 +588,7 @@ class kPages {
 			$to=explode("\n",$conv['notification_emails']);
 
 			if($conv['notification_from']=="self"&&$correspondence['email']!="") $from=$_POST[$correspondence['email']];
-			elseif($conv['notification_from']=="admin") $from=ADMIN_NAME.' <'.ADMIN_mail.'>';
+			elseif($conv['notification_from']=="admin") $from=ADMIN_NAME.' <'.ADMIN_MAIL.'>';
 			else $from=$conv['notification_from'];
 
 			$fullname="";
@@ -628,11 +628,12 @@ class kPages {
 			$message=str_replace("{USERNAME}",$m_username,$message);
 			$message=str_replace("{PASSWORD}",$m_password,$message);
 			
-			foreach($to as $sendto) {
+			foreach($to as $sendto)
+			{
 				$GLOBALS['__emails']->send($from,$sendto,$subject,$message);
-				}
-
 			}
+
+		}
 
 		/* FOLLOW-UP */
 		if(trim(strip_tags($conv['followup_text'],"<img>"))!=""&&$correspondence['email']!="") {
