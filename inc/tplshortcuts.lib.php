@@ -2874,7 +2874,7 @@ function kGetPrivateFileList($dir)
 
 function kPrivateIsFile($dir="")
 {
-	if($dir=="") $dir=trim($GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," ./");
+	if($dir=="") $dir = trim($GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," ./");
 	return $GLOBALS['__private']->isFile($dir);
 }
 

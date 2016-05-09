@@ -198,14 +198,16 @@ class kPrivate {
 		return false;
 		}
 	
-	public function isFile($filename) {
-		$filename=trim($filename," ./");
-		$filename=str_replace("../","",$filename);
-		$filename=$_SERVER["DOCUMENT_ROOT"].BASEDIR.DIR_PRIVATE.$filename;
+	public function isFile($filename)
+	{
+		$filename = trim($filename," ./");
+		$filename = str_replace("../","",$filename);
+		$filename = $_SERVER["DOCUMENT_ROOT"].BASEDIR.DIR_PRIVATE.$filename;
+		echo $filename;
 		if(!file_exists($filename)) return false;
 		if(is_dir($filename)) return false;
 		return true;
-		}
+	}
 	
 	public function canIDownload($filename) {
 		if(!$this->inited) $this->init();
@@ -221,7 +223,8 @@ class kPrivate {
 		return false;
 		}
 	
-	public function forceDownload($filename) {
+	public function forceDownload($filename)
+	{
 		if(!$this->inited) $this->init();
 		$filename=trim($filename," ./");
 		
@@ -245,7 +248,7 @@ class kPrivate {
 		//$this->log($_SESSION['magazzino']['iduser'],$_SESSION['magazzino']['name'],"MDW","[".$dir."] ".$filename);
 		//$this->notify($dir,"L'utente ".$_SESSION['magazzino']['name']." ha scaricato il file ".$filename." dallo spazio ".$mag['name']);
 		exit(0);
-		}
+	}
 
 	private function readfile_chunked($filename,$retbytes=true) {
 		$chunksize=1*(1024*1024); // how many bytes per chunk

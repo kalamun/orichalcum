@@ -30,36 +30,37 @@ $kaPrivate=new kaPrivate();
 
 /* ACTIONS */
 $log="";
-if(isset($_POST['mkdir'])&&isset($_POST['permissions'])) {
+if(isset($_POST['mkdir'])&&isset($_POST['permissions']))
+{
 	$_POST['dir']=utf8_decode($_POST['dir']);
 	$_GET['dir']=trim($_GET['dir']," ./");
 	if(!isset($_POST['members'])) $_POST['members']=array();
 	if(!isset($_POST['membersw'])) $_POST['membersw']=array();
 	$kaPrivate->mkdir($_GET['dir'].'/'.$_POST['dir'],$_POST['permissions'],$_POST['members'],$_POST['permissionsw'],$_POST['membersw']);
-	$kaPrivate->kaPrivate();
-	}
-elseif(isset($_POST['rename'])) {
+	$kaPrivate->__construct();
+
+} elseif(isset($_POST['rename'])) {
 	$_POST['oldname']=trim(utf8_decode($_POST['oldname'])," ./");
 	$dir=dirname($_POST['oldname']);
 	$_POST['newname']=trim(utf8_decode($_POST['newname'])," ./");
 	if(!$kaPrivate->rename($_POST['oldname'],$dir.'/'.$_POST['newname'])) $log="Errors occurred while renaming";
-	$kaPrivate->kaPrivate();
-	}
-elseif(isset($_GET['delete'])) {
+	$kaPrivate->__construct();
+
+} elseif(isset($_GET['delete'])) {
 	$_GET['dir']=trim($_GET['dir']," ./");
 	$_GET['delete']=trim($_GET['delete']," ./");
 	$kaPrivate->delete($_GET['dir'].'/'.$_GET['delete']);
-	$kaPrivate->kaPrivate();
-	}
-elseif(isset($_POST['setPermissions'])) {
+	$kaPrivate->__construct();
+
+} elseif(isset($_POST['setPermissions'])) {
 	$_POST['dir']=trim($_POST['dir']," ./");
 	if(!isset($_POST['members'])) $_POST['members']=array();
 	if(!isset($_POST['canWrite'])) $_POST['canWrite']=false;
 	if(!isset($_POST['members'])) $_POST['members']=array();
 	if(!isset($_POST['membersw'])) $_POST['membersw']=array();
 	$kaPrivate->setPermissions($_POST['dir'],$_POST['permissions'],$_POST['members'],$_POST['permissionsw'],$_POST['membersw']);
-	$kaPrivate->kaPrivate();
-	}
+	$kaPrivate->__construct();
+}
 
 /* END ACTIONS */
 
