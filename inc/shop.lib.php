@@ -152,8 +152,8 @@ class kShop {
 		if($dir[0]!=kGetVar('dir_shop')) return false;
 		if(!isset($dir[2])) $dir[2]="";
 
-		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND ll='".ksql_real_escape_string(strtoupper($ll))."' AND online='y' ";
-		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND `public`<=NOW() ";
+		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND ll='".ksql_real_escape_string(strtoupper($ll))."' ";
+		if(!isset($_GET['preview']) || $_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND `public`<=NOW() AND online='y' ";
 		//if($expired=="nascondi") $query.="AND expired<=NOW() ";
 		$query.=" LIMIT 1";
 		$results=ksql_query($query);
@@ -423,7 +423,7 @@ class kShop {
 		if($ll==false) $ll=LANG;
 		$expired=$GLOBALS['__template']->getVar('shop-order',2);
 
-		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE `online`='y' AND (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".ksql_real_escape_string($dir)."') AND `ll`='".ksql_real_escape_string($ll)."' ";
+		$query="SELECT * FROM ".TABLE_SHOP_ITEMS." WHERE (`dir`='".b3_htmlize($dir,true,'')."' OR `dir`='".ksql_real_escape_string($dir)."') AND `ll`='".ksql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) {
 			$query.="AND public<='".date("Y-m-d H:i:s")."' ";
 			if($expired=="nascondi") $query.="AND expired>'".date("Y-m-d H:i:s")."' ";
@@ -436,6 +436,7 @@ class kShop {
 			$query.=") ";
 			}
 		$query.=' LIMIT 1';
+
 		$results=ksql_query($query);
 		$row=ksql_fetch_array($results);
 		return $this->row2output($row);
@@ -448,8 +449,9 @@ class kShop {
 		$idsitem=intval($idsitem);
 		$expired=$GLOBALS['__template']->getVar('shop-order',2);
 
-		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE `online`='y' AND `idsitem`='".$idsitem."' AND `ll`='".ksql_real_escape_string($ll)."' ";
+		$query="SELECT * FROM `".TABLE_SHOP_ITEMS."` WHERE `idsitem`='".$idsitem."' AND `ll`='".ksql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) {
+			$query.="AND `online`='y' ";
 			$query.="AND public<=NOW() ";
 			if($expired=="nascondi") $query.="AND expired>NOW() ";
 			}
@@ -568,8 +570,8 @@ class kShop {
 		if($dir==false) $dir=$GLOBALS['__subsubdir__'];
 		$orderby=kGetVar('shop-order',1);
 		$expired=kGetVar('shop-order',2);
-		$query="SELECT `layout` FROM `".TABLE_SHOP_ITEM."` WHERE `ll`='".LANG."' AND `online`='y' ";
-		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND `public`<=NOW() ";
+		$query="SELECT `layout` FROM `".TABLE_SHOP_ITEM."` WHERE `ll`='".LANG."' ";
+		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.="AND `online`='y' AND `public`<=NOW() ";
 		if($dir!="") $query.="AND `dir`='".ksql_real_escape_string($dir)."' ";
 		if($expired=="nascondi") $query.="AND `expired`<=NOW() ";
 		if(count($this->cat)>0) {
@@ -657,7 +659,7 @@ class kShop {
 		if(empty($vars['coupons'])) $vars['coupons']=array();
 		if(!is_array($vars['coupons'])) $vars['coupons']=array($vars['coupons']);
 		
-		$applydiscount=false;
+		$applydiscount = false;
 		foreach($vars['coupons'] as $code)
 		{
 			$c=$this->getCouponByCode($code);
@@ -678,13 +680,14 @@ class kShop {
 
 
 		/* apply variations*/
-		if(!isset($vars['variations'])||!is_array($vars['variations'])) $vars['variations']=array();
+		if(!isset($vars['variations']) || !is_array($vars['variations'])) $vars['variations'] = array();
 		$variationsprice=0;
 		foreach($variations as $variation)
 		{
+			// for each variation available for this product...
 			foreach($variation as $v)
 			{
-				if(array_search($v['idsvar'],$vars['variations'])!==false)
+				if(array_search($v['idsvar'], $vars['variations'])!==false)
 				{
 					// apply discount price if active
 					if($applydiscount==true || (kGetVar('shop-discount',1)=='always' && $pricediscounted>0)) $v['realprice']=trim($v['discounted']);
@@ -693,7 +696,7 @@ class kShop {
 						if(kGetVar('shop-discount',2)<=$this->getCartItemsCount() && $v['discounted']!="") $v['realprice']=trim($v['discounted']);
 					} else {
 						// normal price
-						$v['realprice']=trim($v['price']);
+						$v['realprice'] = trim($v['price']);
 					}
 					
 					if($v['realprice']!="")
@@ -1199,37 +1202,38 @@ class kShop {
 				{
 					$id=count($output);
 					
-					$output[$id]=$this->getItemById($item['id']);
-					$output[$id]['id']=$item['id']; //the id as saved on the cart
-					$variations=$output[$id]['variations'];
-					$output[$id]['variations']=array();
-					$variationsIds=array();
-					foreach($item['variations'] as $idsvar=>$true)
+					$output[$id] = $this->getItemById($item['id']);
+					$output[$id]['id'] = $item['id']; //the id as saved on the cart
+
+					$variations = $output[$id]['variations'];
+					$output[$id]['variations'] = array();
+					$variationsIds = array();
+					foreach($item['variations'] as $idsvar)
 					{
 						foreach($variations as $collection=>$v)
 						{
 							foreach($v as $var)
 							{
-								if($var['idsvar']==$idsvar)
+								if($var['idsvar'] == $idsvar)
 								{
-									$output[$id]['variations'][]=$var;
-									$variationsIds[]=$idsvar;
+									$output[$id]['variations'][] = $var;
+									$variationsIds[] = $idsvar;
 								}
 							}
 						}
 					}
-					$output[$id]['customvariations']=$item['customvariations'];
-					$output[$id]['qty']=1;
-					$output[$id]['uid']=$item['uid'];
+					$output[$id]['customvariations'] = $item['customvariations'];
+					$output[$id]['qty'] = 1;
+					$output[$id]['uid'] = $item['uid'];
 					
 					/* price calc */
-					$output[$id]['realprice']=$this->getItemPrice(array('idsitem'=>$item['id'],'variations'=>$variationsIds,'coupons'=>$vars['coupons']));
-					$output[$id]['totalprice']=$output[$id]['realprice']*$output[$id]['qty'];
+					$output[$id]['realprice'] = $this->getItemPrice( array('idsitem'=>$item['id'], 'variations'=>$variationsIds, 'coupons'=>$vars['coupons']) );
+					$output[$id]['totalprice'] = $output[$id]['realprice'] * $output[$id]['qty'];
 				
 				//else add 1 to quantity
 				} else {
 					$output[$exists]['qty']++;
-					$output[$id]['totalprice']=$output[$id]['realprice']*$output[$id]['qty'];
+					$output[$id]['totalprice'] = $output[$id]['realprice'] * $output[$id]['qty'];
 				}
 			}
 			return $output;
@@ -1309,7 +1313,7 @@ class kShop {
 		return $payment_method['price']+($totalamount*$payment_method['pricepercent']/100);
 	}
 
-	public function getCartTotalPrice($vars=false,$iddel=false,$country=false)
+	public function getCartTotalPrice($vars=false, $iddel=false, $country=false)
 	{
 		if(!$this->inited) $this->init();
 		if(!is_array($vars))
@@ -1324,10 +1328,10 @@ class kShop {
 		if(!isset($vars['coupons'])) $vars['coupons']=array();
 		if(!is_array($vars['coupons'])) $vars['coupons']=array($vars['coupons']);
 
-		$price=floatval($this->getCartItemsPrice());
-		$shippingprice=floatval($this->getCartShippingPrice($vars['iddel'],$vars['country']));
-		$paymentprice=floatval($this->getCartPaymentPrice($price,$vars['idspay']));
-		
+		$price = floatval($this->getCartItemsPrice());
+		$shippingprice = floatval($this->getCartShippingPrice($vars['iddel'],$vars['country']));
+		$paymentprice = floatval($this->getCartPaymentPrice($price,$vars['idspay']));
+
 		/* coupons discounts */
 		$discount=0;
 		foreach($vars['coupons'] as $code)
@@ -1378,13 +1382,15 @@ class kShop {
 		if(empty($variations) || !is_array($variations)) $variations=array();
 		if(empty($customvariations) || !is_array($customvariations)) $customvariations=array();
 		
-		asort($variations);
-		asort($customvariations);
+		ksort($variations);
+		ksort($customvariations);
 		
 		$string=$idsitem;
 		
 		foreach($variations as $k=>$v)
 		{
+			if(empty($k) && !empty($v)) $k=$v;
+			if(empty($k)) continue;
 			$string.='-'.$k;
 		}
 		
@@ -1964,7 +1970,6 @@ class kShop {
 				}
 
 				// ...grant access to private area
-				
 				$dirlist=array();
 				foreach($o['items'] as $items)
 				{

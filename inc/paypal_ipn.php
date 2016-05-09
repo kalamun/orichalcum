@@ -41,6 +41,7 @@ if(!$fp)
 	while(!feof($fp))
 	{ 
 		$res = fgets($fp, 1024);
+
 		if(strcmp($res, "VERIFIED") == 0)
 		{
 			mark_as_payed();
@@ -56,6 +57,7 @@ function mark_as_payed()
 {
 	// Identify order id
 	$order = kGetShopOrderByNumber($_POST['custom']);
+
 	if(empty($order['idord']))
 	{
 		trigger_error("Invalid order ID");
@@ -73,7 +75,7 @@ function mark_as_payed()
 
 		} else {
 			// Check that receiver_email is your Primary PayPal email
-			if(!empty($_POST['receiver_email']) && strtolower($_POST['receiver_email']) != strtolower(kGetVar('shop-paypal',1)))
+			if(!empty($_POST['receiver_email']) && strtolower($_POST['receiver_email']) != strtolower(kGetVar('shop-paypal',1)) && strtolower($_POST['receiver_id']) != strtolower(kGetVar('shop-paypal',1)))
 			{
 				trigger_error("receiver id doesn't correspond to the shop administrator");
 				return false;
@@ -89,8 +91,6 @@ function mark_as_payed()
 			// Process payment 
 			if(isset($_POST['mc_gross_1']) && !isset($_POST['mc_gross'])) $_POST['mc_gross'] = $_POST['mc_gross_1'];
 				
-file_put_contents('log.txt', "add payment\n");
-
 			// the addPayment function also sends notifications to the customer and to the admin if the total order amount will be covered by the payment
 			$GLOBALS['__shop']->addPayment($order['uid'], $_POST['mc_gross'], $order['idspay'], "txn_id='".$_POST['txn_id']."'");
 		}
