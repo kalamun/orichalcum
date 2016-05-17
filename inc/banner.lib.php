@@ -61,9 +61,9 @@ class kBanners {
 		{
 			// get order from category metadata
 			$query="SELECT * FROM `".TABLE_METADATA."` WHERE `tabella`='".TABLE_CATEGORIE."' AND `id`='".intval($idcat)."' AND `param`='orderby' LIMIT 1";
-			$results = mysql_query($query);
-			$row = mysql_fetch_array($results);
-			$vars['orderby'] = "`".mysql_real_escape_string($row['value'])."`";
+			$results = ksql_query($query);
+			$row = ksql_fetch_array($results);
+			$vars['orderby'] = "`".ksql_real_escape_string($row['value'])."`";
 			if($vars['orderby']=='clicks') $vars['orderby']='RAND()';
 		}
 
