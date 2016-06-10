@@ -107,11 +107,21 @@ class kTemplate {
 			$this->metadata=array_merge($this->metadata,$metadata);
 			if(isset($metadata['traduzioni'])) $this->setTrad($metadata['traduzioni']);
 			}
-		}
-	public function getTitle() {
-		if(isset($this->metadata['seo_title'])&&trim($this->metadata['seo_title'])!="") return $this->metadata['seo_title'];
+	}
+
+	/* returns the page title reading it from the metadata */
+	public function getTitle()
+	{
+		if(isset($this->metadata['seo_title']) && trim($this->metadata['seo_title'])!="") return $this->metadata['seo_title'];
 		else return $this->metadata['titolo'];
-		}
+	}
+	
+	/* set a custom page title */
+	public function setTitle($title)
+	{
+		$this->metadata['seo_title'] = $title;
+	}
+
 	public function getTranslations() {
 		if(!is_array($this->metadata['traduzioni'])) $this->metadata['traduzioni']=array();
 		return $this->metadata['traduzioni'];
