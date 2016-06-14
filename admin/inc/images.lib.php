@@ -451,7 +451,7 @@ class kaImages {
 	*/
 	function getFileType($file)
 	{
-		$filename=trim(basename($file)," ./");
+		$filename=trim(basename(strtolower($file))," ./");
 		$filename=str_replace("/","",$filename);
 		$fileextension=substr($filename,strrpos($filename,".")+1);
 
