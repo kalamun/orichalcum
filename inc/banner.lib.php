@@ -67,8 +67,9 @@ class kBanners {
 			if($vars['orderby']=='clicks') $vars['orderby']='RAND()';
 		}
 
+		if(trim($vars['orderby'],"` ")=="") $vars['orderby'] = '`ordine`';
 		$query = "SELECT * FROM `".TABLE_BANNER."` WHERE `categoria`='".ksql_real_escape_string($idcat)."' AND `ll`='".ksql_real_escape_string(strtoupper($vars['lang']))."' AND `online`='s' ORDER BY ".ksql_real_escape_string($vars['orderby'])."";
-		
+
 		if(isset($vars['from'])) $vars['offset'] = $vars['from']; //backwards compatibility
 		if((isset($vars['limit'])&&$vars['limit']>=0)) $query .= " LIMIT ".intval($vars['limit'])." ";
 		if((isset($vars['offset'])&&$vars['offset']>=0)) $query .= " OFFSET ".intval($vars['offset'])." ";

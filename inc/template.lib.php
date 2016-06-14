@@ -291,7 +291,7 @@ class kTemplate {
 			while($ref>0) {
 				$this->menuContents[$ref]['ancestor']=true;
 				array_unshift($this->menuCrumbs,$ref);
-				$ref=$this->menuContents[$ref]['ref'];
+				$ref = (!empty($this->menuContents[$ref]['ref'])) ? $this->menuContents[$ref]['ref'] : 0;
 				}
 			}
 		}
