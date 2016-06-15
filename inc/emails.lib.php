@@ -519,7 +519,17 @@ class kEmails
 
 		return $output;
 	}
-	
+
+	// convert string to id compatible chars
+	public function stringToId($string)
+	{
+		$string = str_replace(" ","_",$string);
+		$string = str_replace("'","_",$string);
+		$string = str_replace('"',"_",$string);
+		$string = str_replace('?',"_",$string);
+		return $string;
+	}
+
 	public function preview($from,$to,$subject,$message,$template="",$uid="")
 	{
 		if(!$this->inited) $this->init();
@@ -528,7 +538,10 @@ class kEmails
 		$this->from=$this->fixEmailSyntax($from);
 		$this->to=$this->fixEmailSyntax($to);
 		$this->subject=$subject;
-		$this->message=$message;
+
+		if(is_array($message)) $this->message = $message;
+		else $this->message = unserialize($message);
+		
 		$this->uid=$uid;
 
 		$boundary_main="----=_NextPart_".rand(10000,99999).".".rand(100000000,999999999);

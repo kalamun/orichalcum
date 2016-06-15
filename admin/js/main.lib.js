@@ -3,29 +3,41 @@
 kInitZenEditor = function () {
 	var areas = Array();
 
-	this.init = function (newadmindir) {
-		for (var i = 0, areas = document.getElementsByTagName('textarea'); areas[i]; i++) {
+	this.init = function (newadmindir)
+	{
+		for (var i = 0, areas = document.getElementsByTagName('textarea'); areas[i]; i++)
+		{
 			initTextarea(areas[i], newadmindir);
 		}
 	}
 
-	var initTextarea = function (textarea, newadmindir) {
+	var initTextarea = function (textarea, newadmindir)
+	{
 		if (!textarea)
 			return false;
-		if (!textarea.getAttribute('editor') || textarea.getAttribute('editor') != 'kzen')
+		if (!textarea.getAttribute('editor') || textarea.getAttribute('editor') != 'kzen' || textarea.getAttribute('data-inited'))
 			return false;
 		var id = areas.length;
 		areas[id] = new kZenEditor;
 		areas[id].init(textarea, newadmindir, id);
 	}
 
-	var getArea = function (id) {
+	var getArea = function (id)
+	{
 		return areas[id];
 	}
 	this.getArea = getArea;
 	
-	var addCSS = function (url) {
-		for(var i=0; areas[i]; i++) {
+	var countAreas = function()
+	{
+		return areas.length;
+	}
+	this.countAreas = countAreas;
+
+	var addCSS = function (url)
+	{
+		for(var i=0; areas[i]; i++)
+		{
 			areas[i].addCSS(url);
 		}
 	}
@@ -132,6 +144,7 @@ kZenEditor = function () {
 
 	this.init = function (txtarea, newadmindir, newid) {
 		textarea = txtarea;
+		textarea.setAttribute('data-inited',"true");
 		this.textarea = textarea;
 		if (newadmindir)
 			ADMINDIR = newadmindir;
@@ -416,17 +429,23 @@ kZenEditor = function () {
 		if (mode != "text" && mode != "rich") mode = "text";
 		if (mode == designMode) {}
 		else if (mode == "text") {
-			if (iframe)
+			if(iframe)
+			{
 				iframe.style.display = 'none';
-			var cnt = iframe.contentWindow.document.body.cloneNode(true);
-			cnt = kIframeToTextarea(cnt);
-			textarea.value = cnt;
+				var cnt = '';
+				if(iframe.contentWindow && iframe.contentWindow.document)
+				{
+					cnt = iframe.contentWindow.document.body.cloneNode(true);
+					cnt = kIframeToTextarea(cnt);
+				}
+				textarea.value = cnt;
+			}
 			designMode = "text";
 		} else if (mode == "rich" && iframe) {
 			iframe.style.display = 'block';
 			var cnt = textarea.value;
 			cnt = kTextareaToIframe(cnt);
-			iframe.contentWindow.document.body.innerHTML = cnt;
+			if(iframe.contentWindow && iframe.contentWindow.document) iframe.contentWindow.document.body.innerHTML = cnt;
 			designMode = "rich";
 		}
 		if (swapKeys)

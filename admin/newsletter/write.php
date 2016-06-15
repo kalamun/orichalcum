@@ -11,27 +11,55 @@ $kaNewsletter=new kaNewsletter();
 
 
 /* ACTIONS */
-if(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['message']!="")
+if(isset($_POST['send']) && isset($_POST['subject']) && isset($_POST['message']))
 {
 	$log="";
+	
+	if(empty($_POST['subject'])) $_POST['subject'] = $kaImpostazioni->getVar('sitename',1);
 
-	$config=$kaNewsletter->getConfig();
+	// collect all message parts: if only one block is defined (the default one) save it as string, otherwise serialize an array of blocks
+	$message = array();
+	$blocks = array();
+	foreach($_POST as $k=>$v)
+	{
+		if(substr($k,0,6)=="block-") $message[substr($k,6)] = b3_htmlize($v, false);
+	}
+	
+	if(count($message)>0) $message['-default-'] = b3_htmlize($_POST['message'],false);
+	else $message = b3_htmlize($_POST['message'],false);
+	
+	// convert local URLs into absolute URLs, adding the site name at the start
+	if(is_array($message))
+	{
+		foreach($message as $k=>$v)
+		{
+			$message[$k] = str_replace('="/', '="'.SITE_URL.'/', $message[$k]);
+			// remove html comments
+			$message[$k] = preg_replace("/\<\!--.*?--\>/s", "", $message[$k]);
+		}
+	} else {
+		$message = str_replace('="/','="'.SITE_URL.'/',$message);
+		$message = preg_replace("/\<\!--.*?--\>/s", "", $message);
+	}
 
+	$config = $kaNewsletter->getConfig();
+
+	// compose email
 	$mail=array();
-	$mail['subject']=b3_htmlize($config['prefix']." ".$_POST['subject'],false,"");
-	$mail['message']=b3_htmlize($_POST['message'],false);
-	$mail['message']=str_replace('="/','="'.SITE_URL.'/',$mail['message']);
-	$mail['from']=$config['from'];
-	if(!isset($_POST['template'])) $_POST['template']="";
-	$mail['template']=$_POST['template'];
+	$mail['subject'] = b3_htmlize($config['prefix']." ".$_POST['subject'],false,"");
+	$mail['message'] = serialize($message);
+	$mail['from'] = $config['from'];
+	
+	if(!isset($_POST['template'])) $_POST['template'] = "";
+	$mail['template'] = $_POST['template'];
 
-	//get the recipients
+	// get the recipients
 	if(!isset($_POST['idlista'])) $_POST['idlista']=array();
 	$lists=array();
 	foreach($_POST['idlista'] as $k=>$v) { $lists[]=$k; }
 	$recipients=$kaNewsletter->getRecipients(array("lists"=>$lists, "groupby"=>"email", "mandatary"=>array("email"), "conditions"=>"`status`='act'"));
 
-	//save into archive
+	// save into archive
 	$vars=array();
 	$vars['subject']=b3_htmlize($_POST['subject'],false,"");
 	$vars['from']=$mail['from'];
@@ -94,10 +122,17 @@ if(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['message']!="")
 
 if(isset($_GET['import']))
 {
-	$arch=$kaNewsletter->getFromArchive(array("idarch"=>$_GET['import']));
-	$_POST['subject']=$arch['titolo'];
-	$_POST['message']=$arch['testo'];
-	$_POST['template']=$arch['template'];
+	$arch = $kaNewsletter->getFromArchive(array("idarch"=>$_GET['import']));
+	$_POST['subject'] = $arch['titolo'];
+	
+	$_POST['message'] = $arch['testo']['-default-'];
+	foreach($arch['testo'] as $k=>$v)
+	{
+		if($k=='' || $k=='-default-') continue;
+		$_POST['block-'.$k] = $v;
+	}
+	
+	$_POST['template'] = $arch['template'];
 }
 if(!isset($_POST['subject'])) $_POST['subject']="";
 if(!isset($_POST['message'])) $_POST['message']="";
@@ -116,33 +151,59 @@ if($queueCount>0&&!(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['messag
 			<?= $kaTranslate->translate('Newsletter:There are %d e-mails in queue',$queueCount); ?></div>
 		<div style="display:inline-block;vertical-align:top;margin-right:20px;"><input type="button" onclick="processQueue();" value="<?= $kaTranslate->translate('Newsletter:Process queue'); ?>" class="button" /></div>
 		<div style="clear:both;"></div>
-		</div>
+	</div>
 	<?php  }
 ?>
 
 <br />
 
 <form action="?" method="post">
-	<div class="subset"><fieldset class="box"><?php 
-		$label=array();
-		$value=array();
-		$default="";
-		foreach($kaNewsletter->getTemplatesList() as $template) {
-			$label[]=$template['label'];
-			$value[]=$template['filename'];
-			if($template['default']==true) $default=$template['filename'];
+	<div class="subset">
+		<fieldset class="box">
+			<h2><?= $kaTranslate->translate("Newsletter:Template"); ?></h2>
+			<ul id="templatesList">
+			<?php 
+			/* templates */
+			$default = $_POST['template'];
+			
+			foreach($kaNewsletter->getTemplatesList() as $i=>$template)
+			{
+				if(empty($default) && !empty($template['default'])) $default = $template['filename'];
+				?>
+				<li class="<?= $default == $template['filename'] ? "selected" : ""; ?>" data-template="<?= $template['filename']; ?>">
+					<input type="radio" name="template" value="<?= $template['filename']; ?>" id="template<?= $i; ?>" <?= $default == $template['filename'] ? 'checked':''; ?>>
+					<label for="template<?= $i; ?>">
+						<?= $template['label']; ?><br>
+						<small><?= $value[] = $template['filename']; ?></small>
+					</label>
+				</li>
+				<?php
 			}
-		if($_POST['template']!="") $default=$_POST['template'];
-		echo b3_create_select("template",$kaTranslate->translate("Newsletter:Template").' ',$label,$value,$default).'<br />';
-		?></fieldset><br />
-		</div>
+			?>
+		</fieldset><br />
+		<script type="text/javascript">
+			for(var i=0, c=document.getElementById('templatesList').getElementsByTagName('LI'); c[i]; i++)
+			{
+				kAddEvent(c[i], "click", loadTemplate);
+			}
+		</script>
+	</div>
 	
 <div class="topset">
 	<?= b3_create_input("subject","text",$kaTranslate->translate("Newsletter:Subject").' ',$_POST['subject'],"300px",250); ?>
 	<br /><br />
-	<?= b3_create_textarea("message",$kaTranslate->translate("Newsletter:Message").'<br />',$_POST['message'],"99%","250px",RICH_EDITOR); ?>
-	<br /><br />
-
+	<?= b3_create_textarea("message",$kaTranslate->translate("Newsletter:Message").'<br />',$_POST['message'],"100%","250px",RICH_EDITOR); ?>
+	<div id="additionalBlocks"><?php
+		foreach($kaNewsletter->getTextBlocksFromTemplate($default) as $block)
+		{
+			if($block=="") continue;
+			if(!isset($_POST['block-'.$block])) $_POST['block-'.$block]="";
+			?><div data-block="<?= $block; ?>"><br><?= b3_create_textarea("block-".$block, $kaTranslate->translate("Newsletter:".$block).'<br />', $_POST['block-'.$block], "100%", "200px", RICH_EDITOR); ?></div><?php
+		}
+	?></div>
+	<br />
+	<br />
+	
 	<fieldset class="box"><legend><?= $kaTranslate->translate('Newsletter:Which lists to send?'); ?></legend>
 		<table><tr>
 			<?php 

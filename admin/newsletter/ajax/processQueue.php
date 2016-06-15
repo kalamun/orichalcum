@@ -92,7 +92,7 @@ if($refreshTimeout>0&&$mailInQueue>0) { ?><meta http-equiv="refresh" content="<?
 		{
 			foreach($kaNewsletter->getQueueList(array("limit"=>$mailLimitCycle)) as $mail)
 			{
-				$results=$GLOBALS['__emails']->send($mail['from'],$mail['to'],$mail['subject'],$mail['message'],$mail['template'],$mail['idarch'],array($mail['mergevars']));
+				$results = $GLOBALS['__emails']->send($mail['from'],$mail['to'],$mail['subject'],$mail['message'],$mail['template'],$mail['idarch'],array($mail['mergevars']));
 				if($results==true)
 				{
 					if($kaNewsletter->removeFromQueueById($mail['idemlq'])) $mailInQueue--;

@@ -33,23 +33,56 @@ class kaNewsletter {
 		$template=$GLOBALS['kaImpostazioni']->getVar('template_default',1);
 		$template_email=$GLOBALS['kaImpostazioni']->getVar('email_template_default',1);
 
-		$dir=$_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$template.'/email';
+		$dir = $_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$template.'/email';
 		if($template!=""&&file_exists($dir))
 		{
 			foreach(scandir($dir) as $filename)
 			{
-				if(trim($filename,".")!="" && !is_dir($dir.'/'.$filename))
+				if(trim($filename,".")!="" && !is_dir($dir.'/'.$filename) && substr($filename,-4)=='.php')
 				{
-					$tmp=array();
-					$tmp['filename']=$filename;
-					$tmp['label']=str_replace(".php","",$filename);
-					$tmp['default']=($template_email==$filename?true:false);
-					$output[]=$tmp;
+					$tmp = array();
+					$tmp['filename'] = $filename;
+					$tmp['label'] = str_replace(".php","",$filename);
+					$tmp['label'] = str_replace("_"," ",$tmp['label']);
+					$tmp['default'] = ($template_email==$filename ? true : false);
+					$output[] = $tmp;
 				}
 			}
 		}
 
 		return $output;
+	}
+	
+	// returns an array of blocks names for the requested template
+	public function getTextBlocksFromTemplate($template_email)
+	{
+		$template_email = trim($template_email, " ./");
+		
+		$output = array();
+		$template = $GLOBALS['kaImpostazioni']->getVar('template_default',1);
+		$filename = $_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMPLATE.$template.'/email/'.$template_email;
+		if(!file_exists($filename)) return $output;
+
+		$filecontent = file_get_contents($filename);
+		preg_match_all("/kGetEmailMessage\((.*?)\)/", $filecontent, $match);
+		foreach($match[1] as $block)
+		{
+			$block = trim($block, " '\"");
+			$block = $this->stringToId($block);
+			$output[$block] = true;
+		}
+		
+		return array_keys($output);
+	}
+	
+	// convert string to id compatible chars
+	public function stringToId($string)
+	{
+		$string = str_replace(" ","_",$string);
+		$string = str_replace("'","_",$string);
+		$string = str_replace('"',"_",$string);
+		$string = str_replace('?',"_",$string);
+		return $string;
 	}
 
 	/* returns the configuration values of the list */
@@ -237,6 +270,9 @@ class kaNewsletter {
 		$results=ksql_query($query);
 		$row=ksql_fetch_array($results);
 
+		$row['testo'] = unserialize($row['testo']);
+		if(!is_array($row['testo'])) $row['testo'] = array("-default-", $row['testo']);
+
 		return $row;
 	}
 
@@ -322,8 +358,8 @@ class kaNewsletter {
 				}
 			}
 			
-			// remove html comments
-			$output[$i]['message']=preg_replace("/\<\!--.*?--\>/s","",$output[$i]['message']);
+			$output[$i]['message'] = trim(preg_replace("/\<\!--.*?--\>/s", "", $output[$i]['message']));
+			$output[$i]['message'] = unserialize($output[$i]['message']);
 			
 			$i++;
 		}

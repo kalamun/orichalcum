@@ -49,3 +49,38 @@ table.tabella td,table.tabella th {
 	color:#ccc;
 	font-weight:bold;
 	}
+
+#templatesList {
+	list-style:none;
+	padding:5px;
+	margin:20px 0;
+}
+#templatesList li {
+	margin:0;
+}
+#templatesList li input {
+	display:none;
+}
+#templatesList li input+label {
+	display:block;
+	position:relative;
+	border-top:1px solid #ddd;
+	padding:10px;
+	color:#000;
+	cursor:pointer;
+	margin:0;
+}
+#templatesList li input+label:hover {
+	background-color:#FBF7C5;
+}
+#templatesList li input:checked+label {
+	background-color:#fff;
+}
+#templatesList li input:checked+label:before {
+	content:'';
+	position:absolute;
+	top:calc(50% - 5px);
+	left:-10px;
+	border:5px solid transparent;
+	border-right-color:#fff;
+}

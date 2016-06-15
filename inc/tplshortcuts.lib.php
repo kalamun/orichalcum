@@ -348,11 +348,6 @@ function kGetTitle()
 	}
 }
 
-function kSetTitle($title)
-{
-	$GLOBALS['__template']->setTitle($title);
-	return true;
-}
 
 function kGetSeoMetadata($dir=null,$ll=null)
 {
@@ -987,9 +982,15 @@ function kGetEmailSubject()
 	return $GLOBALS['__emails']->getVar('subject');
 }
 
-function kGetEmailMessage()
+function kGetEmailMessage($block="")
 {
-	return $GLOBALS['__emails']->getVar('message');
+	if($block=="") $block="-default-";
+	$block = $GLOBALS['__emails']->stringToId($block);
+	$message = $GLOBALS['__emails']->getVar('message');
+
+	if(!is_array($message)) return $message;
+	if(isset($message[$block])) return $message[$block];
+	return "";
 }
 
 function kGetEmailFooter()
@@ -2879,7 +2880,7 @@ function kGetPrivateFileList($dir)
 
 function kPrivateIsFile($dir="")
 {
-	if($dir=="") $dir = trim($GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," ./");
+	if($dir=="") $dir=trim($GLOBALS['__subdir__'].'/'.$GLOBALS['__subsubdir__']," ./");
 	return $GLOBALS['__private']->isFile($dir);
 }
 
