@@ -4,35 +4,50 @@
 class kaMembers {
 	protected $kaMetadata;
 	
-	public function __construct() {
+	public function __construct()
+	{
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/metadata.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/imgallery.lib.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].'/'.ADMINDIR.'inc/docgallery.lib.php');
 		$this->kaMetadata=new kaMetadata();
 		$this->kaImgallery=new kaImgallery();
 		$this->kaDocgallery=new kaDocgallery();
-		}
+	}
 	
-	public function add($name,$email,$username,$password,$affiliation="",$expiration="",$status="act") {
+	/* add a new member to the database */
+	public function add($name, $email, $username, $password, $affiliation="", $expiration="", $status="act")
+	{
 		/* clean inputs */
-		$email=strtolower($email);
-		if($email!=""&&!preg_match("/.*@.*\..*/",$email)) $email="";
+		$email = strtolower($email);
+		$email = preg_replace("/[^\w@\.-]/", "", $email);
+		if($email!="" && !preg_match("/[^@]+@[^.]+\..*/", $email)) $email = "";
+	
 		if(trim($name)=="" && $email!="") $name = $email;
-		if($password=="") $password=$this->generatePassword();
+		if(strlen($name)>64) $name = substr($name, 0, 64);
+		$name = mb_convert_encoding($name, "UTF-8", mb_detect_encoding($name));
+		
+		if(strlen($username)>64) $username = substr($username, 0, 64);
+		$username = mb_convert_encoding($username, "UTF-8", mb_detect_encoding($username));
+		
+		
+		if($password=="") $password = $this->generatePassword();
 		if(strlen($expiration)==10) $expiration.=" ".date("H:i:s");
 		if($expiration!=""&&preg_match("/\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/",$expiration)) $expiration=substr($expiration,0,4).'-'.substr($expiration,5,2).'-'.substr($expiration,8,2).' '.substr($expiration,11,2).':'.substr($expiration,14,2).':'.substr($expiration,17,2);
 		else $expiration="0000-00-00 00:00:00";
 		
-		$query="SELECT * FROM ".TABLE_MEMBERS." WHERE `username`='".ksql_real_escape_string($username)."' ";
+		$query="SELECT * FROM `".TABLE_MEMBERS."` WHERE `username`='".ksql_real_escape_string($username)."' ";
 		if($email!="") $query.=" OR `email`='".ksql_real_escape_string($email)."' ";
 		$query.=" LIMIT 1";
+		
 		$results=ksql_query($query);
-		if(!ksql_fetch_array($results)) {
-			$query="INSERT INTO ".TABLE_MEMBERS." (`name`,`email`,`username`,`password`,`affiliation`,`created`,`lastlogin`,`expiration`,`status`,`newsletter_lists`) VALUES('".b3_htmlize($name,true,"")."','".b3_htmlize($email,true,"")."','".b3_htmlize($username,true,"")."','".ksql_real_escape_string($password)."','".ksql_real_escape_string($affiliation)."',NOW(),NOW(),'".ksql_real_escape_string($expiration)."','".ksql_real_escape_string($status)."',',')";
+		if(!ksql_fetch_array($results))
+		{
+			$query = "INSERT INTO ".TABLE_MEMBERS." (`name`,`email`,`username`,`password`,`affiliation`,`created`,`lastlogin`,`expiration`,`status`,`newsletter_lists`) VALUES('".ksql_real_escape_string($name)."','".ksql_real_escape_string($email)."','".ksql_real_escape_string($username)."','".ksql_real_escape_string($password)."','".ksql_real_escape_string($affiliation)."',NOW(),NOW(),'".ksql_real_escape_string($expiration)."','".ksql_real_escape_string($status)."',',')";
 			if(ksql_query($query)) return ksql_insert_id();
-			}
-		return false;
 		}
+		
+		return false;
+	}
 	
 	public function addMass($qty=0,$prefix="",$affiliation="",$expiration="") {
 		$success=true;

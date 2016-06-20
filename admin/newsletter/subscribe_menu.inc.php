@@ -3,8 +3,8 @@
 ?>
 <div class="tab"><dl>
 <?php 
-$submenu_label=array("Iscrizione singola",$kaTranslate->translate('Newsletter:Mass subscription'));
-$submenu_url=array("subscribe.php","subscribe_mass.php");
+$submenu_label=array( $kaTranslate->translate('Newsletter:Single subscription'), $kaTranslate->translate('Newsletter:Mass subscription'), $kaTranslate->translate('Newsletter:Import'));
+$submenu_url=array("subscribe.php", "subscribe_mass.php", "subscribe_import.php");
 for($i=0;isset($submenu_label[$i]);$i++) {
 	echo '<dt>';
 	echo '<a href="'.$submenu_url[$i].'"';

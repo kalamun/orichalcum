@@ -104,15 +104,56 @@ if(isset($_POST['send']) && isset($_POST['subject']) && isset($_POST['message'])
 	}
 
 } elseif(isset($_POST['savedraft'])) {
-	$kaImpostazioni->setParam("email_draft",$_POST['subject'],$_POST['message'],"--");
+	// collect all message parts: if only one block is defined (the default one) save it as string, otherwise serialize an array of blocks
+	$message = array();
+	$blocks = array();
+	foreach($_POST as $k=>$v)
+	{
+		if(substr($k,0,6)=="block-") $message[substr($k,6)] = b3_htmlize($v, false);
+	}
+	
+	if(count($message)>0) $message['-default-'] = b3_htmlize($_POST['message'],false);
+	else $message = b3_htmlize($_POST['message'],false);
+	
+	// convert local URLs into absolute URLs, adding the site name at the start
+	if(is_array($message))
+	{
+		foreach($message as $k=>$v)
+		{
+			$message[$k] = str_replace('="/', '="'.SITE_URL.'/', $message[$k]);
+			// remove html comments
+			$message[$k] = preg_replace("/\<\!--.*?--\>/s", "", $message[$k]);
+		}
+	} else {
+		$message = str_replace('="/','="'.SITE_URL.'/',$message);
+		$message = preg_replace("/\<\!--.*?--\>/s", "", $message);
+	}
+	
+	$message = serialize($message);
+
+	$kaImpostazioni->setParam("email_draft", $_POST['subject'], $message, "--");
+	$kaImpostazioni->setParam("email_draft_template", $_POST['template'], '', "--");
 	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:Draft successfully saved').'</div>';
 	
 } elseif(isset($_POST['loaddraft'])) {
-	$_POST['subject']=$kaImpostazioni->getVar('email_draft',1,"--");
-	$_POST['message']=$kaImpostazioni->getVar('email_draft',2,"--");
+	$_POST['subject'] = $kaImpostazioni->getVar('email_draft',1,"--");
+	
+	$arch = $kaImpostazioni->getVar('email_draft',2,"--");
+	$arch = unserialize($arch);
+	if(!is_array($arch)) $arch = array("-default-", $arch);
+	$_POST['message'] = $arch['-default-'];
+	foreach($arch as $k=>$v)
+	{
+		if($k=='' || $k=='-default-') continue;
+		$_POST['block-'.$k] = $v;
+	}
+
+	$_POST['template'] = $kaImpostazioni->getVar('email_draft_template',1,"--");
+
 
 } elseif(isset($_POST['deletedraft'])) {
 	$kaImpostazioni->setParam("email_draft","","","--");
+	$kaImpostazioni->setParam("email_draft_template","","","--");
 	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:Draft successfully deleted').'</div>';
 	
 }
@@ -124,7 +165,7 @@ if(isset($_GET['import']))
 {
 	$arch = $kaNewsletter->getFromArchive(array("idarch"=>$_GET['import']));
 	$_POST['subject'] = $arch['titolo'];
-	
+
 	$_POST['message'] = $arch['testo']['-default-'];
 	foreach($arch['testo'] as $k=>$v)
 	{
@@ -137,7 +178,6 @@ if(isset($_GET['import']))
 if(!isset($_POST['subject'])) $_POST['subject']="";
 if(!isset($_POST['message'])) $_POST['message']="";
 if(!isset($_POST['template'])) $_POST['template']="";
-
 ?>
 
 <h1><?= $kaTranslate->translate('Newsletter:Write an e-mail'); ?></h1>
@@ -168,7 +208,7 @@ if($queueCount>0&&!(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['messag
 			
 			foreach($kaNewsletter->getTemplatesList() as $i=>$template)
 			{
-				if(empty($default) && !empty($template['default'])) $default = $template['filename'];
+				if(empty($default) && !empty($template['filename'])) $default = $template['filename'];
 				?>
 				<li class="<?= $default == $template['filename'] ? "selected" : ""; ?>" data-template="<?= $template['filename']; ?>">
 					<input type="radio" name="template" value="<?= $template['filename']; ?>" id="template<?= $i; ?>" <?= $default == $template['filename'] ? 'checked':''; ?>>

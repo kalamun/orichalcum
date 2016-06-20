@@ -271,7 +271,7 @@ class kaNewsletter {
 		$row=ksql_fetch_array($results);
 
 		$row['testo'] = unserialize($row['testo']);
-		if(!is_array($row['testo'])) $row['testo'] = array("-default-", $row['testo']);
+		if(!is_array($row['testo'])) $row['testo'] = array("-default-" => $row['testo']);
 
 		return $row;
 	}
