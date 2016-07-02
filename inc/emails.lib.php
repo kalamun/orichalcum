@@ -68,7 +68,7 @@ class kEmails
 		return $this->$var;
 	}
 
-	public function send($from,$to,$subject,$message,$template="",$idarch=0,$replacements=array())
+	public function send($from, $to, $subject, $message, $template="", $idarch=0, $replacements=array())
 	{
 		if(!$this->inited) $this->init();
 		
@@ -288,8 +288,8 @@ class kEmails
 			require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/sparkpost/tinysparkpost.php');
 			$sparkpost = new TinySparkPost($this->sparkpost['api_key']);
 
-			$this->uid='{{UID}}';
-			$composition=$this->preview($from,'{{NAME}} <{{EMAIL}}>',$subject,$message,$template,$this->uid);
+			$this->uid = '{{UID}}';
+			$composition=$this->preview($from,'{{NAME}} <{{EMAIL}}>',$subject, $message, $template, $this->uid);
 
 			// replace Orichalcum-style placeholders with mailchimp-style placeholders
 			foreach($replacements as $replacement)
@@ -360,6 +360,7 @@ class kEmails
 			}
 			
 			$sparkpost->setRecipients($recipients);
+			$sparkpost->setCampaignName(SITE_NAME.' - '.$idarch);
 
 			// set contents
 			$content = array(
