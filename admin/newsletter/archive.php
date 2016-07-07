@@ -49,6 +49,7 @@ if(isset($_GET['delete']))
 
 <table class="tabella">
 <tr>
+	<th><?= $kaTranslate->translate('Newsletter:ID'); ?></th>
 	<th><?= $kaTranslate->translate('Newsletter:Submission date'); ?></th>
 	<th><?= $kaTranslate->translate('Newsletter:Subject'); ?></th>
 	<th><?= $kaTranslate->translate('Newsletter:Recipients number'); ?></th>
@@ -63,24 +64,28 @@ if(isset($_GET['delete']))
 	$records=$kaNewsletter->getArchiveList(array("from"=>$q_start,"limit"=>$q_show));
 	foreach($records as $i=>$row) { ?>
 		<tr class="<?= ($i%2==0?"odd":"even"); ?>">
+		<td class="id">
+			<?= $row['idarch']; ?>
+		</td>
 		<td class="date">
 			<?= preg_replace("/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}):\d{2}/","$3-$2-$1",$row['data']) ?><br />
 			<img src="<?= ADMINRELDIR; ?>img/clock10.png" width="10" height="10" alt="" /> <?= preg_replace("/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}):\d{2}/","$4",$row['data']) ?>
-			</td>
+		</td>
 		<td class="subject"><?= $row['titolo']; ?></td>
 		<td class="recipients"><?= $row['destinatari']; ?><br />
 			<small><?php 
 			if($row['inqueue']==0) echo $kaTranslate->translate('Newsletter:Already sent');
 			elseif($row['inqueue']==intval($row['destinatari'])) echo $kaTranslate->translate('Newsletter:On queue');
 			else echo $kaTranslate->translate('Newsletter:Processing');
-			?></small></td>
+			?></small>
+		</td>
 		<td class="read"><?= $row['read']; ?><br />
 			<small><?= ($row['destinatari'] ? round(100/$row['destinatari']*$row['read'],2) : '--'); ?> %</small>
-			</td>
+		</td>
 		<td nowrap>
 			<a href="write.php?import=<?= $row['idarch']; ?>" class="smallbutton"><?= $kaTranslate->translate('Newsletter:Edit as new'); ?></a>
 			<a href="?delete=<?= $row['idarch']; ?>" class="smallalertbutton" onclick="return confirm('<?= addslashes($kaTranslate->translate('Newsletter:Do you really want to delete this entry and all his e-mails still in queue?')); ?>')"><?= $kaTranslate->translate('UI:Delete'); ?></a>
-			</td>
+		</td>
 		</tr>
 		<?php  } ?>
 	</table>
