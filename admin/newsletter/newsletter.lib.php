@@ -20,10 +20,18 @@ class kaNewsletter {
 		$results=ksql_query($query);
 		while($row=ksql_fetch_array($results))
 		{
-			$row['subscribers_number']=$this->kaMembers->countUsers(array("lists"=>array($row['idlista']), "conditions"=>"`status`='act'"));
+			$row['subscribers_number'] = $this->countNewsletterSubsbribers($row['idlista']);
 			$output[]=$row;
 		}
 		return $output;
+	}
+	
+	/* returns the number of subscribers for the given list */
+	public function countNewsletterSubsbribers($idlista)
+	{
+		$idlista = intval($idlista);
+		$count = $this->kaMembers->countUsers(array("lists"=>array($idlista), "conditions"=>"`status`='act'"));
+		return $count;
 	}
 
 	/* returns the list of available email templates for the current default template */
@@ -185,6 +193,25 @@ class kaNewsletter {
 
 		if(ksql_query($query)) return true;
 		else return false;
+	}
+
+	public function emptyList($vars=array())
+	{
+		if(empty($vars['idlist']))
+		{
+			trigger_error('Is not possible to empty list: no list specified');
+			return false;
+		}
+		
+		// get list members
+		foreach($this->kaMembers->getUsersList(array('lists'=>array($vars['idlist']))) as $member)
+		{
+			// update each member
+			$newsletter_lists = str_replace(','.$vars['idlist'].',', '', $member['newsletter_lists']);
+			$this->kaMembers->updateNewsletter($member['idmember'], $newsletter_lists);
+		}
+		
+		return true;
 	}
 
 	public function deleteList($vars=array())

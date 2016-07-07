@@ -165,11 +165,11 @@ class kaImages {
 		$output['width'] = 0;
 		$output['height'] = 0;
 
-		if(isset($output['filename']) && $output['filename']!="" && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['filename']) && filesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['filename']) > 11)
+		if(isset($output['filename']) && $output['filename']!="" && file_exists(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']) && filesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']) > 11)
 		{
 			if($row['filetype'] == 1)
 			{
-				if(exif_imagetype($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['filename'])!=false) $size = getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['filename']);
+				if(exif_imagetype(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename'])!=false) $size = getimagesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['filename']);
 				else $size=array(0,0,0,"");
 				$output['width'] = $size[0];
 				$output['height'] = $size[1];
@@ -185,7 +185,7 @@ class kaImages {
 			$output['thumb']['filename']=isset($output['thumbnail'])?$output['thumbnail']:array();
 			$output['thumb']['url']=(isset($row['idimg'])&&isset($row['thumbnail']))?$dir.$row['idimg'].'/'.$row['thumbnail']:'';
 			
-			if(!empty($output['thumbnail']) && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['thumbnail']) && filesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['thumbnail']) && exif_imagetype($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['thumbnail'])!=false) $size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.$dir.$row['idimg'].'/'.$row['thumbnail']);
+			if(!empty($output['thumbnail']) && file_exists(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail']) && filesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail']) && exif_imagetype(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail'])!=false) $size=getimagesize(BASERELDIR.$dir.$row['idimg'].'/'.$row['thumbnail']);
 			else $size=array(0,0,0,"");
 			$output['thumb']['width']=$size[0];
 			$output['thumb']['height']=$size[1];
@@ -236,8 +236,8 @@ class kaImages {
 		else return false;
 		
 		//copy on the right dir
-		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir)) mkdir($_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir);
-		if(!file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg)) mkdir($_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg);
+		if(!file_exists(BASERELDIR.$default_dir)) mkdir(BASERELDIR.$default_dir);
+		if(!file_exists(BASERELDIR.$default_dir.$idimg)) mkdir(BASERELDIR.$default_dir.$idimg);
 
 		$ffile = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg.'/'.$filename;
 		if(copy($file, $ffile)) unlink($file);
@@ -246,7 +246,7 @@ class kaImages {
 		if($filetype==1)
 		{
 			//another copy before resize, to preserve the original version
-			$ofile = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg.'/-originalsize';
+			$ofile = BASERELDIR.$default_dir.$idimg.'/-originalsize';
 			copy($ffile, $ofile);
 
 			//resize
@@ -259,7 +259,7 @@ class kaImages {
 			// create mobile version, if active
 			if($this->mobile['active']=="y")
 			{
-				$mfile = $_SERVER['DOCUMENT_ROOT'].BASEDIR.$default_dir.$idimg.'/m_'.$filename;
+				$mfile = BASERELDIR.$default_dir.$idimg.'/m_'.$filename;
 				$mwidth = min($size[0], $this->img['width']);
 				$mheight = min($size[1], $this->img['height']);
 				copy($ofile, $mfile);
@@ -574,23 +574,23 @@ class kaImages {
 
 
 			// delete old images
-			if($filename!=$row['filename'] && file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/'.$row['filename'])) unlink($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/'.$row['filename']);
-			if(file_exists($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/m_'.$row['filename'])) unlink($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/m_'.$row['filename']);
+			if($filename!=$row['filename'] && file_exists(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/'.$row['filename']);
+			if(file_exists(BASERELDIR.DIR_IMG.$idimg.'/m_'.$row['filename'])) unlink(BASERELDIR.DIR_IMG.$idimg.'/m_'.$row['filename']);
 
 			if($resize==true)
 			{
-				$size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/'.$filename);
+				$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
 				if($this->needToResize($size[0],$size[1])==true) $this->resize($ffile, $this->img['width'], $this->img['height'], $this->img['quality'], $this->img['mode']);
 				else $this->recompress($ffile, $this->img['quality']);
 				
-				$size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/'.$filename);
+				$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
 				$this->mobile['width'] = intval($size[0] / 100 * $this->mobile['ratio']);
 				$this->mobile['height'] = intval($size[1] / 100 * $this->mobile['ratio']);
 
 			} else {
 				if($width>0 || $height>0)
 				{
-					$size=getimagesize($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg.'/'.$filename);
+					$size=getimagesize(BASERELDIR.DIR_IMG.$idimg.'/'.$filename);
 					if($width==0) $width=$size[0]/$size[1]*$height;
 					elseif($height==0) $height=$size[1]/$size[0]*$width;
 					$this->resize($ffile,$width,$height,$this->img['quality'],'fit');
@@ -625,7 +625,7 @@ class kaImages {
 			$query="DELETE FROM `".TABLE_IMG."` WHERE `idimg`=".intval($idimg);
 			if(!ksql_query($query)) return false;
 			
-			kRemoveDir($_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_IMG.$idimg); // recursive remove
+			kRemoveDir(BASERELDIR.DIR_IMG.$idimg); // recursive remove
 
 		} else return false;
 		

@@ -31,14 +31,24 @@ if(isset($_POST['insert']) && isset($_FILES['emails'])) {
 		{
 			$p++;
 			$line = trim($line);
+			
+			// when line is in "name <email>" format
 			if(preg_match("/^[^<]+<[^@]+@[^>]+>$/", $line))
 			{
 				preg_match("/^([^<]+)<([^@]+@[^>]+)>$/", $line, $match);
 				$name=trim($match[1]);
-				$email=trim($match[2]);
+				$email=trim($match[2], "<> ");
 			
+			// when line is in "name \t email" format
+			} elseif(preg_match("/.*\t.*@.*/",$line)) {
+				$match = explode("\t", $line);
+				$name = trim($match[0]);
+				$email = trim($match[1], "<> ");
+			
+			// when only email is specified
 			} elseif(preg_match("/.*@.*/",$line)) {
 				$email = trim($line, "<> ");
+				$name = substr($email, 0, strpos($email, "@"));
 				$name = preg_replace("/[^[:alnum:]]/i", " ", $name);
 			
 			} else {
@@ -64,6 +74,8 @@ if(isset($_POST['insert']) && isset($_FILES['emails'])) {
 					$members = $kaMembers->getUsersList(array("email"=>$email));
 				}
 
+				if(empty($members)) $log = $kaTranslate->translate("Newsletter:Error while subscribing %s", htmlentities($line)).'<br />';
+
 				foreach($members as $m)
 				{
 					$userlists = $lists;
@@ -71,16 +83,15 @@ if(isset($_POST['insert']) && isset($_FILES['emails'])) {
 					{
 						if(strpos($stringlists,",".$idlista.",")===false) $userslists[]=$idlista;
 					}
-
-					if($kaNewsletter->subscribe($m['idmember'],$userlists))
+					if($kaNewsletter->subscribe($m['idmember'], $userlists))
 					{
 						//welcome message
 						if(isset($_POST['welcome'])) $kaNewsletter->sendWelcomeMessage($m['idmember']);
-					} else $log=$kaTranslate->translate("Newsletter:Error while subscribing").' '.$m['name'].' ('.$m['email'].')<br />';
+					} else $log = $kaTranslate->translate("Newsletter:Error while subscribing %s", $m['name'].' ('.$m['email'].')').'<br />';
 
 					$i++;
 				}
-			}
+			} else $log = $kaTranslate->translate("Newsletter:Error while subscribing %s", htmlentities($line)).'<br />';
 
 		}
 		
@@ -88,16 +99,16 @@ if(isset($_POST['insert']) && isset($_FILES['emails'])) {
 		echo $i.' iscritti<br>';
 	}
 
-	if($log=="") {
+	if($log=="")
+	{
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate("Newsletter:Successfully saved").'</div>';
 		$kaLog->add("UPD",'Newsletter: Mass subscription successfully done');
-		}
-	else {
+	} else {
 		echo '<div id="MsgAlert">'.$kaTranslate->translate($log).'</div>';
 		$kaLog->add("ERR",'Newsletter: Error during a mass subscription');
-		}
-
 	}
+
+}
 /* FINE AZIONI */
 
 
@@ -132,7 +143,7 @@ if(isset($_POST['insert']) && isset($_FILES['emails'])) {
 	<br /><br />
 	<div class="submit">
 		<input type="submit" name="insert" value="<?= $kaTranslate->translate('UI:Import'); ?>" class="button">
-		<?= b3_create_input("welcome","checkbox",$kaTranslate->translate('Newsletter:Send the welcome message'),"false","","","checked"); ?>
+		<?= b3_create_input("welcome","checkbox",$kaTranslate->translate('Newsletter:Send the welcome message'),"false","","",""); ?>
 		</div>
 	</form>
 

@@ -120,59 +120,71 @@ class kaMembers {
 		return $log;
 		}
 	
-	public function getUsersList($vars=array()) {
+	/* GET A LIST OF USERS, USING SOME FILTERS */
+	public function getUsersList($vars=array())
+	{
 		if(!is_array($vars)) $vars=array('idmemberAsKey'=>$vars);
 		
 		$output=array();
 		$query="SELECT * FROM `".TABLE_MEMBERS."` WHERE ";
 
 		// filter by email
-		if(isset($vars['email'])) {
-			$query.="`email`='".ksql_real_escape_string($vars['email'])."' AND ";
-			}
+		if(isset($vars['email']))
+		{
+			$email = strtolower($vars['email']);
+			$email = preg_replace("/[^\w@\.-]/", "", $email);
+			$query.="`email`='".ksql_real_escape_string($email)."' AND ";
+		}
 		
 		// filter by given array of list ids
-		if(isset($vars['lists'])) {
+		if(isset($vars['lists']))
+		{
 			$query.="(";
-			foreach($vars['lists'] as $idlista) {
+			foreach($vars['lists'] as $idlista)
+			{
 				$query.="`newsletter_lists` LIKE '%,".ksql_real_escape_string($idlista).",%' OR ";
-				}
-			$query.="idmember=0) AND ";
 			}
+			$query.="idmember=0) AND ";
+		}
 
 		//mandatory fields
-		if(isset($vars['mandatary'])) {
-			foreach($vars['mandatary'] as $field) {
+		if(isset($vars['mandatary']))
+		{
+			foreach($vars['mandatary'] as $field)
+			{
 				$query.="`".ksql_real_escape_string($field)."`<>'' AND ";
-				}
 			}
+		}
 
 		//custom conditions
-		if(isset($vars['conditions'])&&$vars['conditions']!="") {
+		if(isset($vars['conditions'])&&$vars['conditions']!="")
+		{
 			$query.=" (".$vars['conditions'].") AND ";
-			}
+		}
 
 		$query.=" `idmember`>0 ";
 
 		// group by specified field
-		if(isset($vars['groupby'])) {
+		if(isset($vars['groupby']))
+		{
 			$query.=" GROUP BY `".ksql_real_escape_string($vars['groupby'])."` ";
-			}
+		}
 
 		$query.=" ORDER BY ";
 		if(isset($vars['orderby'])) $query.=$vars['orderby'];
 		else $query.="`name`,`username`,`created`";
 		$results=ksql_query($query);
 		if(!$results) return false;
-		while($row=ksql_fetch_array($results)) {
+		while($row=ksql_fetch_array($results))
+		{
 			isset($vars['idmemberAsKey'])&&$vars['idmemberAsKey']==true?$i=$row['idmember']:$i=count($output);
 			$output[$i]=$row;
 			$output[$i]['created_friendly']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['created']);
 			$output[$i]['lastlogin_friendly']=preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['lastlogin']);
 			$output[$i]['expiration_friendly']=trim($row['expiration'],"0- :")==""?'-':preg_replace("/(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2})/","$3-$2-$1 h$4:$5",$row['expiration']);
-			}
-		return $output;
 		}
+		return $output;
+	}
 	
 	public function countUsers($vars=array()) {
 		if(!is_array($vars)) $vars=array('idmemberAsKey'=>$vars);

@@ -71,7 +71,7 @@ class TinySparkPost
 			$response = false;
 		} else {
 			$response = json_decode($response);
-			if(!empty($response->results->id)) return $response->results->id;
+			if(!empty($response) && !empty($response->results->id)) return $response->results->id;
 			else {
 				var_dump($response);
 				$response = false;
