@@ -68,7 +68,7 @@ class kEmails
 		return $this->$var;
 	}
 
-	public function send($from, $to, $subject, $message, $template="", $idarch=0, $replacements=array())
+	public function send($from,$to,$subject,$message,$template="",$idarch=0,$replacements=array())
 	{
 		if(!$this->inited) $this->init();
 		
@@ -289,9 +289,9 @@ class kEmails
 			$sparkpost = new TinySparkPost($this->sparkpost['api_key']);
 
 			$this->uid = '{{UID}}';
-			$composition=$this->preview($from,'{{NAME}} <{{EMAIL}}>',$subject, $message, $template, $this->uid);
+			$composition = $this->preview($from, '{{NAME}} <{{EMAIL}}>', $subject, $message, $template, $this->uid);
 
-			// replace Orichalcum-style placeholders with mailchimp-style placeholders
+			// replace Orichalcum-style placeholders with sparkpost-style placeholders
 			foreach($replacements as $replacement)
 			{
 				foreach($replacement as $n=>$v)
@@ -307,6 +307,19 @@ class kEmails
 			$composition['plain']=str_replace('{EMAIL}','{{EMAIL}}',$composition['plain']);
 			$this->subject=str_replace('{NAME}','{{NAME}}',$this->subject);
 			$this->subject=str_replace('{EMAIL}','{{EMAIL}}',$this->subject);
+			
+			// map links
+			$DOM = new DOMDocument;
+			$DOM->preserveWhiteSpace = false;
+			$DOM->formatOutput = true;
+			@$DOM->loadHTML($composition['html']);
+			$items = $DOM->getElementsByTagName('a');
+			for ($i = 0; $i < $items->length; $i++)
+			{
+				// add data-msys-linkname attribute
+				$items->item($i)->setAttribute("data-msys-linkname", $items->item($i)->getAttribute("href"));
+			}
+			$composition['html'] = $DOM->saveHTML();
 			
 			// split "from" in "name" and "mail address"
 			$fromname=ADMIN_NAME;
@@ -360,7 +373,6 @@ class kEmails
 			}
 			
 			$sparkpost->setRecipients($recipients);
-			$sparkpost->setCampaignName(kGetSiteName().' - '.$idarch);
 
 			// set contents
 			$content = array(
@@ -540,7 +552,7 @@ class kEmails
 		$this->to=$this->fixEmailSyntax($to);
 		$this->subject=$subject;
 
-		if(is_array($message)) $this->message = $message;
+		if(is_array($message) || substr($message,0,2)!="a:") $this->message = $message; // if it is not serialized
 		else $this->message = unserialize($message);
 		
 		$this->uid=$uid;
