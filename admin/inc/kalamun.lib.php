@@ -18,29 +18,48 @@ function kaInit() {
 	}
 kaInit();
 
-function kaGenericErrorHandler($errorNumber,$errorString,$errorFile="",$errorLine="",$errorContext="") {
-	switch ($errorNumber) {
-	case E_ERROR||E_CORE_ERROR||E_COMPILE_ERROR||E_PARSE||E_USER_ERROR:
-	  	?>
-	  	<div id="MsgAlert" style="display:block;">
-	  	<strong>FATAL ERROR:</strong> [<?= $errorNumber; ?>] <?= $errorString; ?><br />
-		<small>File <?= $errorFile; ?> - Line <?= $errorLine; ?></small>
-		</div>
-		<?php 
-		if(defined("ADMINRELDIR")&&isset($__db)) include(ADMINRELDIR.'inc/foot.inc.php');
-		die();
-		break;
-	case E_WARNING||E_CORE_WARNING||E_COMPILE_WARNING||E_USER_WARNING:
-		echo "<strong>ERROR</strong> [$errorNumber] $errorString<br>\n";
-		break;
-	case E_NOTICE||E_STRICT||E_USER_NOTICE:
-		echo "<strong>WARNING</strong> [$errorNumber] $errorString<br>\n";
-		break;
-	default:
-		echo "Generic Error: [$errorNumber] $errorString<br>\n";
-		break;
-		}
-    }
+function kaGenericErrorHandler($errorNumber, $errorString, $errorFile="", $errorLine="", $errorContext="")
+{
+	// This error code is not included in error_reporting
+    if (!(error_reporting() & $errorNumber)) return;
+
+	switch ($errorNumber)
+	{
+		case E_ERROR:
+		case E_CORE_ERROR:
+		case E_COMPILE_ERROR:
+		case E_PARSE:
+		case E_USER_ERROR:
+			?>
+			<div id="MsgAlert" style="display:block;">
+			<strong>FATAL ERROR:</strong> [<?= $errorNumber; ?>] <?= $errorString; ?><br />
+			<small>File <?= $errorFile; ?> - Line <?= $errorLine; ?></small>
+			</div>
+			<?php 
+			if(defined("ADMINRELDIR")&&isset($__db)) include(ADMINRELDIR.'inc/foot.inc.php');
+			die();
+			break;
+		
+		case E_WARNING:
+		case E_CORE_WARNING:
+		case E_COMPILE_WARNING:
+		case E_USER_WARNING:
+			echo "<strong>ERROR</strong> [$errorNumber] $errorString<br>\n";
+			break;
+		
+		case E_NOTICE:
+		case E_STRICT:
+		case E_USER_NOTICE:
+			echo "<strong>WARNING</strong> [$errorNumber] $errorString<br>\n";
+			break;
+		
+		default:
+			echo "Generic Error: [$errorNumber] $errorString<br>\n";
+			break;
+	}
+	
+	return true;
+}
 set_error_handler("kaGenericErrorHandler");
 
 
