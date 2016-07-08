@@ -130,15 +130,17 @@ if(isset($_POST['send']) && isset($_POST['subject']) && isset($_POST['message'])
 	}
 	
 	$message = serialize($message);
+	
+	$id = $_SESSION['iduser'].'_'.time();
 
-	$kaImpostazioni->setParam("email_draft", $_POST['subject'], $message, "--");
-	$kaImpostazioni->setParam("email_draft_template", $_POST['template'], '', "--");
+	$kaImpostazioni->setParam("newsletter_draft_content_".$id, $_POST['subject'], $message, "--");
+	$kaImpostazioni->setParam("newsletter_draft_meta_".$id, $_POST['template'], date("Y-m-d H:i"), "--");
 	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:Draft successfully saved').'</div>';
 	
-} elseif(isset($_POST['loaddraft'])) {
-	$_POST['subject'] = $kaImpostazioni->getVar('email_draft',1,"--");
+} elseif(isset($_GET['loaddraft'])) {
+	$_POST['subject'] = $kaImpostazioni->getVar('newsletter_draft_content_'.$_GET['loaddraft'], 1, "--");
 	
-	$arch = $kaImpostazioni->getVar('email_draft',2,"--");
+	$arch = $kaImpostazioni->getVar('newsletter_draft_content_'.$_GET['loaddraft'],2,"--");
 	$arch = unserialize($arch);
 	if(!is_array($arch)) $arch = array("-default-", $arch);
 	$_POST['message'] = $arch['-default-'];
@@ -148,12 +150,12 @@ if(isset($_POST['send']) && isset($_POST['subject']) && isset($_POST['message'])
 		$_POST['block-'.$k] = $v;
 	}
 
-	$_POST['template'] = $kaImpostazioni->getVar('email_draft_template',1,"--");
+	$_POST['template'] = $kaImpostazioni->getVar('newsletter_draft_meta_'.$_GET['loaddraft'], 1, "--");
 
 
-} elseif(isset($_POST['deletedraft'])) {
-	$kaImpostazioni->setParam("email_draft","","","--");
-	$kaImpostazioni->setParam("email_draft_template","","","--");
+} elseif(isset($_GET['deletedraft'])) {
+	$kaImpostazioni->deleteParam('newsletter_draft_content_'.$_GET['deletedraft'], "--");
+	$kaImpostazioni->deleteParam('newsletter_draft_meta_'.$_GET['deletedraft'], "--");
 	echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:Draft successfully deleted').'</div>';
 	
 }
@@ -268,18 +270,54 @@ if($queueCount>0&&!(isset($_POST['send'])&&$_POST['subject']!=""&&$_POST['messag
 	<div class="submit">
 		<input type="button" value="<?= $kaTranslate->translate('Newsletter:Preview'); ?>" onclick="openPreviewPopup();" class="button" />
 		<input type="submit" name="send" onclick="processQueue();" value="<?= $kaTranslate->translate('Newsletter:Send newsletter'); ?>" class="button" />
-	</div>
-	<div class="note">
+		<br>
+		<br>
 		<input type="submit" name="savedraft" value="<?= htmlentities($kaTranslate->translate('Newsletter:Save draft')); ?>" class="smallbutton">
-
-		<?php
-		if($kaImpostazioni->getVar("email_draft",2,"--")!="" || $kaImpostazioni->getVar("email_draft",1,"--")!="") { ?>
-			<input type="submit" name="loaddraft" value="<?= htmlentities($kaTranslate->translate('Newsletter:Load draft')); ?>" class="smallbutton" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Newsletter:Loading draft you will overwrite current contents: do you want to proceed?')); ?>');">
-			<input type="submit" name="deletedraft" value="<?= htmlentities($kaTranslate->translate('Newsletter:Delete draft')); ?>" class="smallalertbutton" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Newsletter:Do you really want to delete saved draft?')); ?>');">
-		<?php }
-		?>
 	</div>
 
+
+	<?php
+	$drafts = $kaImpostazioni->getParamsList('newsletter_draft_content_%','--');
+	$meta = $kaImpostazioni->getParamsList('newsletter_draft_meta_%','--');
+
+	if(!empty($drafts))
+	{
+		rsort($drafts);
+		?>
+		<div class="drafts">
+			<h2><?= $kaTranslate->translate('Newsletter:Saved drafts'); ?></h2>
+			<table class="tabella">
+				<tr>
+					<th><?= $kaTranslate->translate('Newsletter:Date'); ?></th>
+					<th><?= $kaTranslate->translate('Newsletter:Subject'); ?></th>
+					<th><?= $kaTranslate->translate('Newsletter:Template'); ?></th>
+					<th>&nbsp;</th>
+				</tr>
+				<?php
+				foreach($drafts as $draft)
+				{
+					$id = substr($draft['param'],25);
+					$m = !empty($meta['newsletter_draft_meta_'.$id]) ? $meta['newsletter_draft_meta_'.$id] : array();
+					?>
+					<tr>
+					<td class="date"><?= preg_replace("/(\d{4}).(\d{2}).(\d{2}) (\d{2}.\d{2})/", "$3-$2-$1 $4", $m['value2']); ?></td>
+					<td><?= $draft['value1']; ?></td>
+					<td><?= $m['value1']; ?></td>
+					<td>
+						<small class="actions">
+							<a href="?loaddraft=<?= $id; ?>" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Newsletter:Loading draft you will overwrite current contents: do you want to proceed?')); ?>');"><?= htmlentities($kaTranslate->translate('Newsletter:Load draft')); ?></a> |
+							<a href="?deletedraft=<?= $id; ?>" class="delete" onclick="return confirm('<?= htmlentities($kaTranslate->translate('Newsletter:Do you really want to delete saved draft?')); ?>');"><?= htmlentities($kaTranslate->translate('Newsletter:Delete draft')); ?></a>
+						</small>
+					</td>
+				<?php
+				}
+				?>
+			</table>
+		</div>
+	<?php
+	}
+	?>
+</div>
 </form>
 
 <?php  include_once("../inc/foot.inc.php"); 

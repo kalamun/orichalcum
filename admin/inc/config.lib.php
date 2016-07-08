@@ -39,6 +39,15 @@ class kaImpostazioni
 		else return false;
 	}
 	
+	/* delete a parameter from db */
+	public function deleteParam($param,$ll=false)
+	{
+		if($ll==false) $ll=$this->ll;
+		$query="DELETE FROM `".TABLE_CONFIG."` WHERE `param`='".ksql_real_escape_string($param)."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
+		if(ksql_query($query)) return true;
+		else return false;
+	}
+	
 	/* update a parameter if it already exists, or add it */
 	public function replaceParam($param,$value1,$value2,$ll=false)
 	{
@@ -58,6 +67,24 @@ class kaImpostazioni
 		$results=ksql_query($query);
 		if($row=ksql_fetch_array($results)) return $row;
 		else return false;
+	}
+
+	/* returns a list of params for the given search */
+	public function getParamsList($param=false, $ll=false)
+	{
+		if(empty($ll)) $ll = $this->ll;
+		$output = array();
+		
+		$query = "SELECT * FROM `".TABLE_CONFIG."` WHERE ";
+		if(!empty($param)) $query .= "`param` LIKE '".ksql_real_escape_string($param)."' AND ";
+		$query .= "`ll`='".ksql_real_escape_string($ll)."' ORDER BY `param`";
+
+		$results = ksql_query($query);
+		while($row = ksql_fetch_array($results))
+		{
+			$output[$row['param']] = $row;
+		}
+		return $output;
 	}
 
 	/* return only the requested value (1 or 2) for the given param */
