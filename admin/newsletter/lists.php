@@ -92,7 +92,7 @@ if(isset($_POST['insert'])&&$_POST['lista']!="")
 <h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>
 
 <?php 
-$queueCount=$kaNewsletter->getQueueCount();
+$queueCount=$kaNewsletter->getQueueCount(array("idlista"=>$_GET['idlista']));
 if($queueCount>0) { ?>
 	<br />
 	<script type="text/javascript" src="js/newsletter.js"></script>
@@ -227,7 +227,7 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 				if($kaey=="chg_lang" || $kaey=="delete" || $kaey=="l") $append_var = preg_replace("/".$kaey."=[^&]*&?/","",$append_var);
 			}
 
-			$letters="!#ABCDEFGHIJKLMNOPQRSTUWYXZ";
+			$letters="!#ABCDEFGHIJKLMNOPQRSTUWYKXZ";
 			for($i=0;isset($letters[$i]);$i++)
 			{ ?>
 				<a href="?l=<?= urlencode($letters[$i]); ?>&<?= $append_var; ?>" class="<?= $_GET['l']==$letters[$i]?'selected':''; ?>">
@@ -248,7 +248,7 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 			</tr>
 			<?php 
 			$i=0;
-			$members = $kaNewsletter->getRecipients(array("lists"=>array($_GET['idlista']), "orderby"=>$orderby[$_GET['orderby']], "conditions"=>"`name` LIKE '".ksql_real_escape_string($_GET['l'])."%'"));
+			$members = $kaNewsletter->getRecipients(array("lists"=>array($_GET['idlista']), "orderby"=>$orderby[$_GET['orderby']], "conditions"=>"`status`='act' AND `name` LIKE '".ksql_real_escape_string($_GET['l'])."%'"));
 			if($members!=false) {
 				foreach($members as $m) {
 					?>

@@ -5,7 +5,8 @@ class kTemplate {
 	protected $id,$subtitle,$pagecontents,$pageindex,$pagepreview,$images,$documentgallery,$thumbs,$docs,$freetext,$tpl,$layout,$menu,$menuCollection,$menuSelected,$menuManualURL,$menuCrumbs,$dizionario,$metadata,$menuCurrentSettings,$categories,$categoriesList,$llurl,$kText;
 	public $imgDB,$docDB,$mediaDB,$pageDB,$commentDB,$config,$menuStructure,$menuByRef,$contents,$currentConversion; //contents is a temporary recipient
 	
-	public function __construct() {
+	public function __construct()
+	{
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR.'inc/setlang.inc.php');
 		require_once($_SERVER['DOCUMENT_ROOT'].BASEDIR."inc/images.lib.php");
 
@@ -54,14 +55,14 @@ class kTemplate {
 		}
 
 		//load dictionary terms for the current language
-		$this->dizionario=array();
+		$this->dizionario = array();
 		$query="SELECT * FROM `".TABLE_DIZIONARIO."` WHERE `ll`='".LANG."'";
 		$results=ksql_query($query);
 		for($i=0;$row=ksql_fetch_array($results);$i++)
 		{
-			$this->dizionario[$i]=array();
-			$this->dizionario[$i]['param']=$row['param'];
-			$this->dizionario[$i]['testo']=$row['testo'];
+			$this->dizionario[$i] = array();
+			$this->dizionario[$i]['param'] = b3_unhtmlize($row['param']);
+			$this->dizionario[$i]['testo'] = b3_unhtmlize($row['testo']);
 		}
 	}
 	
@@ -142,24 +143,27 @@ class kTemplate {
 		}
 
 	//dictionary
-	public function translate($param,$ll=false,$args=array()) {
+	public function translate($param, $ll=false, $args=array())
+	{
 		if($ll==false) $ll=LANG;
-		if($ll==LANG) {
-			foreach($this->dizionario as $d) {
-				if($d['param']==$param) return $d['testo'];
+		if($ll==LANG)
+		{
+			foreach($this->dizionario as $d)
+			{
+				if($d['param'] == $param)
+				{
+					return $d['testo'];
 				}
 			}
-		else {
-			$query="SELECT * FROM ".TABLE_DIZIONARIO." WHERE param='".ksql_real_escape_string($param)."' AND ll='".ksql_real_escape_string($ll)."' LIMIT 1";
+		} else {
+			$query="SELECT * FROM `".TABLE_DIZIONARIO."` WHERE `param`='".ksql_real_escape_string($param)."' AND `ll`='".ksql_real_escape_string($ll)."' LIMIT 1";
 			$results=ksql_query($query);
 			if($row=ksql_fetch_array($results)) return $row['testo'];
-			}
-
-		if(count($args)>0) {
-			return vsprintf($param,$args);
-			}
-		return $param;
 		}
+
+		if(count($args)>0) return vsprintf($param,$args);
+		return $param;
+	}
 
 	// navigation menu
 	public function setMenuCollection($collection) {
