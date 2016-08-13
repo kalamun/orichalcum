@@ -44,17 +44,26 @@ function kaGenericErrorHandler($errorNumber, $errorString, $errorFile="", $error
 		case E_CORE_WARNING:
 		case E_COMPILE_WARNING:
 		case E_USER_WARNING:
-			echo "<strong>ERROR</strong> [$errorNumber] $errorString<br>\n";
+			?>
+			<strong>ERROR</strong> [<?= $errorNumber; ?>] <?= $errorString; ?><br>
+			<small>File <?= $errorFile; ?> - Line <?= $errorLine; ?></small>
+			<?php
 			break;
 		
 		case E_NOTICE:
 		case E_STRICT:
 		case E_USER_NOTICE:
-			echo "<strong>WARNING</strong> [$errorNumber] $errorString<br>\n";
+			?>
+			<strong>WARNING</strong> [<?= $errorNumber; ?>] <?= $errorString; ?><br>
+			<small>File <?= $errorFile; ?> - Line <?= $errorLine; ?></small>
+			<?php
 			break;
 		
 		default:
-			echo "Generic Error: [$errorNumber] $errorString<br>\n";
+			?>
+			Generic Error: [<?= $errorNumber; ?>] <?= $errorString; ?><br>
+			<small>File <?= $errorFile; ?> - Line <?= $errorLine; ?></small>
+			<?php
 			break;
 	}
 	

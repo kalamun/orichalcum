@@ -18,6 +18,7 @@ include_once("../inc/head.inc.php");
 <br />
 <ul class="mainopt">
 <li><a href="backup.php"><?= $kaTranslate->translate('Maintenance:Backup'); ?></a></li>
+<li><a href="antimalware.php"><?= $kaTranslate->translate('Maintenance:Anti-malware'); ?></a></li>
 <li><a href="mailserver.php"><?= $kaTranslate->translate('Maintenance:Check mailserver'); ?></a></li>
 <li><a href="permalink.php"><?= $kaTranslate->translate('Maintenance:Fix duplicated or invalid permalinks'); ?></a></li>
 <li><a href="contentcleaning.php"><?= $kaTranslate->translate('Maintenance:Batch content cleaning'); ?></a></li>

@@ -6,13 +6,14 @@
 <?php 
 $submenu_label=array(
 	$kaTranslate->translate('Maintenance:Backup'),
+	$kaTranslate->translate('Maintenance:Anti-malware'),
 	$kaTranslate->translate('Maintenance:Check mailserver'),
 	$kaTranslate->translate('Maintenance:Check Permalinks'),
 	$kaTranslate->translate('Maintenance:Check Images'),
 	$kaTranslate->translate('Maintenance:UTF-8 charset'),
 	$kaTranslate->translate('Maintenance:E-mails existence')
 	);
-$submenu_url=array("backup.php","mailserver.php","permalink.php","images.php","utf8.php","emails.php");
+$submenu_url=array("backup.php","antimalware.php","mailserver.php","permalink.php","images.php","utf8.php","emails.php");
 foreach($submenu_label as $i=>$label) {
 	echo '<dt>';
 	echo '<a href="'.$submenu_url[$i].'"';
