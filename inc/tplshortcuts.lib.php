@@ -988,7 +988,7 @@ function kGetEmailMessage($block="")
 	$block = $GLOBALS['__emails']->stringToId($block);
 	$message = $GLOBALS['__emails']->getVar('message');
 
-	if(!is_array($message)) return $message;
+	if($block=="-default-" && !is_array($message)) return $message;
 	if(isset($message[$block])) return $message[$block];
 	return "";
 }

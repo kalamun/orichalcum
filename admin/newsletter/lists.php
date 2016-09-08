@@ -48,7 +48,7 @@ if(isset($_POST['insert'])&&$_POST['lista']!="")
 	if($log=="")
 	{
 		echo '<div id="MsgSuccess">'.$kaTranslate->translate("Newsletter:Successfully removed").'</div>';
-		$kaLog->add("DEL",'Newsletter: Removed list <em>ID '.$_GET['idlista'].'</em>');
+		$kaLog->add("DEL",'Newsletter: Removed list <em>ID '.$_GET['delete'].'</em>');
 	} else {
 		echo '<div id="MsgAlert">'.$kaTranslate->translate('Newsletter:Error while deleting list').'</div>';
 		$kaLog->add("ERR",'Newsletter: Error while creating list <em>'.$_POST['lista'].'</em>');
@@ -58,21 +58,21 @@ if(isset($_POST['insert'])&&$_POST['lista']!="")
 	unset($_GET['idlista']);
 
 /* REMOVE A MEMBER FROM A NEWSLETTER */
-} elseif(isset($_GET['delete']) && isset($_GET['idmember'])) {
+} elseif(isset($_GET['unsubscribe']) && isset($_GET['idlista'])) {
 	$log="";
-	$user=$kaMembers->getUserById($_GET['idmember']);
+	$user=$kaMembers->getUserById($_GET['unsubscribe']);
 
 	if(isset($user['newsletter_lists']))
 	{
-		$newsletter_lists=str_replace(",".$_GET['delete'].",",",",$user['newsletter_lists']);
-		if(!$kaMembers->updateNewsletter($user['idmember'],$newsletter_lists)) $log="Newsletter:Error while saving";
+		$newsletter_lists = str_replace(",".$_GET['idlista'].",",",",$user['newsletter_lists']);
+		if(!$kaMembers->updateNewsletter($user['idmember'], $newsletter_lists)) $log="Newsletter:Error while saving";
 	
 	} else $log="Newsletter:User not found";
 
 	if($log=="") echo '<div id="MsgSuccess">'.$kaTranslate->translate('Newsletter:User successfully removed').'</div>';
 	else echo '<div id="MsgAlert">'.$kaTranslate->translate($log).'</div>';
 
-	unset($_GET['delete']);
+	unset($_GET['unsubscribe']);
 	unset($_GET['idmember']);
 
 /* EMPTY A LIST */
@@ -92,17 +92,21 @@ if(isset($_POST['insert'])&&$_POST['lista']!="")
 <h1><?= $kaTranslate->translate(PAGE_NAME); ?></h1>
 
 <?php 
-$queueCount=$kaNewsletter->getQueueCount(array("idlista"=>$_GET['idlista']));
-if($queueCount>0) { ?>
-	<br />
-	<script type="text/javascript" src="js/newsletter.js"></script>
-	<div class="box alert">
-		<div style="display:inline-block;margin-right:20px;"><h3><?= $kaTranslate->translate('Newsletter:E-mail queue'); ?></h3>
-			<?= $kaTranslate->translate('Newsletter:There are %d e-mails in queue',$queueCount); ?></div>
-		<div style="display:inline-block;vertical-align:top;margin-right:20px;"><input type="button" onclick="processQueue();" value="<?= $kaTranslate->translate('Newsletter:Process queue'); ?>" class="button" /></div>
-		<div style="clear:both;"></div>
-		</div>
-	<?php  }
+if(isset($_GET['idlista']))
+{
+	$queueCount=$kaNewsletter->getQueueCount(array("idlista"=>$_GET['idlista']));
+	if($queueCount>0)
+	{ ?>
+		<br />
+		<script type="text/javascript" src="js/newsletter.js"></script>
+		<div class="box alert">
+			<div style="display:inline-block;margin-right:20px;"><h3><?= $kaTranslate->translate('Newsletter:E-mail queue'); ?></h3>
+				<?= $kaTranslate->translate('Newsletter:There are %d e-mails in queue',$queueCount); ?></div>
+			<div style="display:inline-block;vertical-align:top;margin-right:20px;"><input type="button" onclick="processQueue();" value="<?= $kaTranslate->translate('Newsletter:Process queue'); ?>" class="button" /></div>
+			<div style="clear:both;"></div>
+			</div>
+	<?php }
+}
 ?>
 
 
@@ -110,14 +114,14 @@ if($queueCount>0) { ?>
 <?php 
 if(isset($_GET['delete']) && !isset($_GET['confirm']))
 {
-	$list=$kaNewsletter->getNewslettersList(array("idlista"=>$_GET['idlista']));
+	$list=$kaNewsletter->getNewslettersList(array("idlista"=>$_GET['delete']));
 	$lists=$kaNewsletter->getNewslettersList();
 	if(isset($list[0]))
 	{
 		$list=$list[0];
 		?>
 		<div class="topset">
-			<form action="?delete&idlista=<?= $_GET['idlista']; ?>&confirm" method="post">
+			<form action="?delete=<?= $_GET['delete']; ?>&confirm" method="post">
 				<h2><?= $kaTranslate->translate('Newsletter:You are going to delete the following list'); ?>: <em><?= $list['lista']; ?></em></h2>
 				<br />
 				<?php  if($list['subscribers_number']>0) { ?>
@@ -125,29 +129,35 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 					<br /><br />
 					<?php  } ?>
 
-				<?php  if($list['subscribers_number']>0) { ?>
+				<?php
+				if($list['subscribers_number']>0)
+				{ ?>
 					<div class="submit"><input type="submit" name="remove_subscribers" value="<?= $kaTranslate->translate('Newsletter:Remove all subscribers'); ?>" class="alertbutton" /></div>
 					<br /><br />
 
 					<div class="submit">
 						<?php 
-						foreach($lists as $l) {
-							if($l['idlista']!=$_GET['idlista']) {
+						foreach($lists as $l)
+						{
+							if($l['idlista'] != $_GET['delete'])
+							{
 								$option[]=$l['lista'].' ('.$l['ll'].')';
 								$value[]=$l['idlista'];
-								}
 							}
+						}
 						echo b3_create_select("destination",$kaTranslate->translate('Newsletter:Move here')." ",$option,$value);
 						?>
 						<input type="submit" name="move_subscribers" value="Sposta" class="button"/>
 						</div>
 					<br /><br />
-					<?php  }
+					<?php
 
-				else { ?>
+				} else { ?>
 					<div class="submit"><input type="submit" name="remove_subscribers" value="<?= $kaTranslate->translate('UI:Delete'); ?>" class="alertbutton" /></div>
-						<br /><br />
-					<?php  } ?>
+					<br /><br />
+					<?php
+				}
+				?>
 
 				<div style="text-align:center;"><input type="button" value="Annulla" class="button" onclick="window.location.href='?';" /></div>
 
@@ -156,7 +166,7 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 		<?php
 	
 	} else {
-		unset($_GET['idlista']);
+		unset($_GET['delete']);
 	}
 
 		
@@ -201,7 +211,6 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 } elseif(isset($_GET['idlista'])) {
 	
 	if(empty($_GET['orderby'])) $_GET['orderby']='name';
-	if(empty($_GET['l'])) $_GET['l']='A';
 
 	$orderby=array();
 	$orderby['name']="`name`,`email` DESC";
@@ -219,25 +228,32 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 		</h2>
 		<br />
 
-		<div class="box pager" style="text-align:center;">
-			<?php 
-			$append_var=$_SERVER['QUERY_STRING'];
-			foreach($_GET as $kaey => $value)
-			{
-				if($kaey=="chg_lang" || $kaey=="delete" || $kaey=="l") $append_var = preg_replace("/".$kaey."=[^&]*&?/","",$append_var);
-			}
-
-			$letters="!#ABCDEFGHIJKLMNOPQRSTUWYKXZ";
-			for($i=0;isset($letters[$i]);$i++)
-			{ ?>
-				<a href="?l=<?= urlencode($letters[$i]); ?>&<?= $append_var; ?>" class="<?= $_GET['l']==$letters[$i]?'selected':''; ?>">
-					<?= $letters[$i]; ?>
-				</a>
-				<?php
-			}
+		<?php
+		if($list['subscribers_number'] > 50 || isset($_GET['l'])) 
+		{
+			if(empty($_GET['l'])) $_GET['l']='A';
 			?>
-		</div>
-		<br />
+			<div class="box pager" style="text-align:center;">
+				<?php 
+				$append_var=$_SERVER['QUERY_STRING'];
+				foreach($_GET as $kaey => $value)
+				{
+					if($kaey=="chg_lang" || $kaey=="delete" || $kaey=="l") $append_var = preg_replace("/".$kaey."=[^&]*&?/","",$append_var);
+				}
+
+				$letters="!#ABCDEFGHIJKLMNOPQRSTUWXYZ";
+				for($i=0;isset($letters[$i]);$i++)
+				{ ?>
+					<a href="?l=<?= urlencode($letters[$i]); ?>&<?= $append_var; ?>" class="<?= $_GET['l']==$letters[$i]?'selected':''; ?>">
+						<?= $letters[$i]; ?>
+					</a>
+					<?php
+				}
+				?>
+			</div>
+			<br />
+		<?php
+		} ?>
 
 		<table class="tabella">
 			<tr>
@@ -248,7 +264,9 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 			</tr>
 			<?php 
 			$i=0;
-			$members = $kaNewsletter->getRecipients(array("lists"=>array($_GET['idlista']), "orderby"=>$orderby[$_GET['orderby']], "conditions"=>"`status`='act' AND `name` LIKE '".ksql_real_escape_string($_GET['l'])."%'"));
+			$conditions = "`status`='act' ";
+			if(isset($_GET['l'])) $conditions .= " AND `name` LIKE '".ksql_real_escape_string($_GET['l'])."%'";
+			$members = $kaNewsletter->getRecipients(array("lists"=>array($_GET['idlista']), "orderby"=>$orderby[$_GET['orderby']], "conditions"=>$conditions));
 			if($members!=false) {
 				foreach($members as $m) {
 					?>
@@ -258,7 +276,7 @@ if(isset($_GET['delete']) && !isset($_GET['confirm']))
 					<td><?= trim($m['expiration'],"0-: ")!=""?preg_replace("/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}).*/","$3-$2-$1 $4",$m['expiration']):$kaTranslate->translate('Newsletter:Never'); ?></td>
 					<td>
 						<a href="subscribe.php?email=<?= urlencode($m['email']); ?>" class="smallbutton"><?= $kaTranslate->translate('Newsletter:Edit subscriptions'); ?></a>
-						<a name="row<?= $i; ?>" href="?delete&idmember=<?= $m['idmember']; ?>&idlista=<?= $_GET['idlista']; ?>&orderby=<?= $_GET['orderby']; ?>#row<?= $i; ?>" class="smallalertbutton" onclick="return confirm('<?= $kaTranslate->translate('Newsletter:Are you sure you want to delete this user?'); ?>');"><?= $kaTranslate->translate('UI:Delete'); ?></a>
+						<a name="row<?= $i; ?>" href="?unsubscribe=<?= $m['idmember']; ?>&idlista=<?= $_GET['idlista']; ?>&orderby=<?= $_GET['orderby']; ?>#row<?= $i; ?>" class="smallalertbutton" onclick="return confirm('<?= $kaTranslate->translate('Newsletter:Are you sure you want to delete this user?'); ?>');"><?= $kaTranslate->translate('UI:Delete'); ?></a>
 						</td>
 					</tr>
 					<?php 
