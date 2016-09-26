@@ -18,6 +18,7 @@ if(isset($_POST['update'])) {
 	$vars['online'] = $_POST['online'];
 	$vars['title'] = $_POST['title'];
 	$vars['idcat'] = $_POST['idcat'];
+	$vars['url'] = $_POST['url'];
 
 	if($_POST['type']=="image")
 	{
@@ -251,7 +252,7 @@ if(!isset($_GET['idbanner']))
 			<br>
 
 			<div class="hidewhencode">
-				<?= b3_create_input("url", "text", $kaTranslate->translate('Banner:Target URL'), "http://","100%"); ?><br><br>
+				<?= b3_create_input("url", "text", $kaTranslate->translate('Banner:Target URL'), $banner['url'],"100%"); ?><br><br>
 			</div>
 
 			<label><?= $kaTranslate->translate('Banner:Views'); ?>:</label> <?= $banner['views']; ?><br>
