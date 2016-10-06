@@ -86,10 +86,19 @@ class kBanners {
 			$banners[$i]['register_click_url'] = SITE_URL . BASEDIR . 'inc/event_logger.php?family=banner&event=click&ref=' . urlencode($row['idbanner'].': '.date("Y-m-d"));
 			
 			// increase the views counter
-			$query="UPDATE `".TABLE_BANNER."` SET `views`=(`views`+1) WHERE `idbanner`='".$row['idbanner']."' LIMIT 1";
-			ksql_query($query);
+			if(strpos($system,"MSIE")!==false
+			||strpos($system,"Edge")!==false
+			||strpos($system,"Firefox")!==false
+			||strpos($system,"Chrome")!==false
+			||strpos($system,"Safari")!==false
+			||strpos($system,"Opera")!==false
+			) {
+				$query="UPDATE `".TABLE_BANNER."` SET `views`=(`views`+1) WHERE `idbanner`='".$row['idbanner']."' LIMIT 1";
+				ksql_query($query);
 
-			registerEvent("banner", "view", $row['idbanner'].': '.date("Y-m-d"));
+				registerEvent("banner", "view", $row['idbanner'].': '.date("Y-m-d"));
+			}
+
 		}
 
 		return $banners;

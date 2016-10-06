@@ -371,6 +371,7 @@ function kStatistiche() {
 
 	/* filters: record only knowed browsers */
 	if(strpos($system,"MSIE")!==false
+		||strpos($system,"Edge")!==false
 		||strpos($system,"Firefox")!==false
 		||strpos($system,"Chrome")!==false
 		||strpos($system,"Safari")!==false
