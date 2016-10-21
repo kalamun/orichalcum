@@ -61,10 +61,10 @@ define("PAGE_NAME",$kaTranslate->translate('Pages:Conversions Manager'));
 		$vars['moderate']=intval($_POST['moderate']);
 		$vars['create_member']=isset($_POST['create_member'])?true:false;
 		$vars['create_member_config']="";
-		$vars['create_member_config'].="u:".$_POST['create_member_username']."\n";
-		$vars['create_member_config'].="p:".$_POST['create_member_password']."\n";
-		$vars['create_member_config'].="e:".$_POST['create_member_expiration']."\n";
-		$vars['create_member_config'].="a:".$_POST['create_member_affiliation']."\n";
+		if(isset($_POST['create_member_username'])) $vars['create_member_config'].="u:".$_POST['create_member_username']."\n";
+		if(isset($_POST['create_member_password'])) $vars['create_member_config'].="p:".$_POST['create_member_password']."\n";
+		if(isset($_POST['create_member_expiration'])) $vars['create_member_config'].="e:".$_POST['create_member_expiration']."\n";
+		if(isset($_POST['create_member_affiliation'])) $vars['create_member_config'].="a:".$_POST['create_member_affiliation']."\n";
 		
 		$vars['private_dir']=isset($_POST['private_dir'])?true:false;
 		$vars['newsletters_add']=",";
