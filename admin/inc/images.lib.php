@@ -796,10 +796,28 @@ class kaImages {
 				$cropW=$x-1;
 				$cropH=$y-1;
 				break;
+
+			case "cropcenter":
+				if(($size[0]/$x)<=($size[1]/$y))
+				{
+					$ratio=$size[0]/$x;
+					$y=$size[1]/$ratio;
+					$cropW=$x-1;
+					$cropH=$cropW;
+				} else {
+					$ratio=$size[1]/$y;
+					$x=$size[0]/$ratio;
+					$cropH=$y-1;
+					$cropW=$cropH;
+				}
+				$cropX = floor( ($x-$cropW) / 2 );
+				$cropY = floor( ($y-$cropH) / 2 );
+				break;
+
 		}
 		
-		$cropX=0; //crop left starting point
-		$cropY=0; //crop top starting point
+		if( !isset($cropX) ) $cropX=0; //crop left starting point
+		if( !isset($cropY) ) $cropY=0; //crop top starting point
 
 		if($size['mime']=='image/jpeg')
 		{

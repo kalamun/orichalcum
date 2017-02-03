@@ -190,8 +190,9 @@ else {
 		}
 		
 		/* move into the right directory and save in db */
-		$tmpfilename = $_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMP.'/tmp'.time().$filename;
-		if(file_put_contents($tmpfilename,file_get_contents('php://input')))
+		$tmpfilename = $_SERVER['DOCUMENT_ROOT'].BASEDIR.DIR_TEMP.'tmp'.time().$filename;
+
+		if(file_put_contents($tmpfilename, file_get_contents('php://input')))
 		{
 			// insert into db
 			$idimg = $kaImages->upload($tmpfilename,$filename);

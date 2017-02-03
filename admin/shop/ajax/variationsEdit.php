@@ -20,7 +20,7 @@ if(isset($_POST['save']))
 	$vars['name']=$_POST['name'];
 	$vars['descr']=b3_htmlize($_POST['variation_descr'],false);
 	$vars['price']=$_POST['price'];
-	if(!empty($vars['discounted'])) $vars['discounted']=$_POST['discounted'];
+	if(!empty($_POST['discounted'])) $vars['discounted']=$_POST['discounted'];
 	$idsvar=$kaShop->updateVariation($vars);
 	if($idsvar)
 	{

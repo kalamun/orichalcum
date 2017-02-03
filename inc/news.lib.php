@@ -121,7 +121,7 @@ class kNews {
 
 		$query.="`ll`='".ksql_real_escape_string(LANG)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() AND `online`='y' ";
-		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
+		if($this->if_expired=="nascondi") $query.=" AND `scadenza` >= NOW() ";
 		$query.="ORDER BY ".$this->orderby."";
 
 		$results=ksql_query($query);
@@ -255,7 +255,7 @@ class kNews {
 		if($this->orderby=="") $this->orderby="data";
 		$query="SELECT * FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir[2],true,"")."' OR `dir`='".ksql_real_escape_string($dir[2])."') AND `ll`='".ksql_real_escape_string($ll)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() AND `online`='y' ";
-		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
+		if($this->if_expired=="nascondi") $query.=" AND `scadenza` >= NOW() ";
 		$query.=" LIMIT 1";
 			$results=ksql_query($query);
 				if($row=ksql_fetch_array($results)) return true;
@@ -286,7 +286,7 @@ class kNews {
 		// else get from database
 		$query="SELECT `template`,`layout` FROM ".TABLE_NEWS." WHERE (`dir`='".b3_htmlize($dir,true,"")."' OR `dir`='".ksql_real_escape_string($dir)."') AND `ll`='".ksql_real_escape_string(LANG)."' ";
 		if(!isset($_GET['preview'])||$_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() AND `online`='y' ";
-		if($this->if_expired=="nascondi") $query.=" AND `scaduta`<=NOW() ";
+		if($this->if_expired=="nascondi") $query.=" AND `scadenza` >= NOW() ";
 		if(count($this->allowedCategories)>0) {
 			$query.="AND (`categorie`=',' ";
 			foreach($this->allowedCategories as $cat=>$true) {
@@ -512,7 +512,7 @@ class kNews {
 		if(!isset($_GET['preview']) || $_GET['preview']!=md5(ADMIN_MAIL)) $query.=" AND `pubblica`<=NOW() AND `online`='y' ";
 
 		// apply expired posts policies
-		if($this->if_expired=="nascondi") $query.=" AND scaduta<=NOW() ";
+		if($this->if_expired=="nascondi") $query.=" AND `scadenza` >= NOW() ";
 
 		$query .= "ORDER BY ".$this->orderby." LIMIT 1";
 
@@ -538,7 +538,7 @@ class kNews {
 				if($row=ksql_fetch_array($results)) {
 			$output=array();
 			$query="SELECT * FROM ".TABLE_NEWS." WHERE `".$sortingDate."`<'".$row[$sortingDate]."' AND ll='".LANG."' AND pubblica<=NOW() AND `online`='y' ";
-			if($this->if_expired=="nascondi") $query.="AND scaduta<=NOW() ";
+			if($this->if_expired=="nascondi") $query.="AND `scadenza` >= NOW() ";
 			$query.="AND (categorie='' ";
 			foreach($this->allowedCategories as $cat=>$on) {
 				$query.="OR categorie LIKE '%,".$cat.",%' ";
@@ -568,7 +568,7 @@ class kNews {
 		if($row=ksql_fetch_array($results)) {
 			$output=array();
 			$query="SELECT * FROM ".TABLE_NEWS." WHERE `".$sortingDate."`>'".$row[$sortingDate]."' AND ll='".LANG."' AND pubblica<=NOW() AND `online`='y' ";
-			if($this->if_expired=="nascondi") $query.="AND scaduta<=NOW() ";
+			if($this->if_expired=="nascondi") $query.="AND `scadenza` >= NOW() ";
 			$query.="AND (categorie='' ";
 			foreach($this->allowedCategories as $cat=>$on) {
 				$query.="OR categorie LIKE '%,".$cat.",%' ";
@@ -645,9 +645,9 @@ class kNews {
 
 		if($this->if_expired=="archivia"&&isset($vars['archive']))
 		{
-			if($vars['archive']==true) $query.="AND `scadenza`<NOW() ";
+			if($vars['archive']==true) $query.="AND `scadenza` < NOW() ";
 			else $query.="AND `scadenza`>=NOW() ";
-		} elseif($this->if_expired=="nascondi") $query.="AND `scadenza`<NOW() ";
+		} elseif($this->if_expired=="nascondi") $query.="AND `scadenza` > NOW() ";
 
 		if(isset($vars['conditions'])&&$vars['conditions']!="") $query.="AND (".$vars['conditions'].") ";
 		
@@ -723,9 +723,9 @@ class kNews {
 		// add the expiration policies
 		if($this->if_expired=="archivia" && isset($vars['archive']))
 		{
-			if($vars['archive']==true) $query.="AND `scadenza`<NOW() ";
-			else $query.="AND `scadenza`>=NOW() ";
-		} elseif($this->if_expired=="nascondi") $query.="AND `scadenza`<NOW() ";
+			if($vars['archive']==true) $query.="AND `scadenza` < NOW() ";
+			else $query.="AND `scadenza` >= NOW() ";
+		} elseif($this->if_expired=="nascondi") $query.="AND `scadenza` > NOW() ";
 		
 		if(isset($vars['conditions'])&&$vars['conditions']!="") $query.="AND (".$vars['conditions'].") ";
 		

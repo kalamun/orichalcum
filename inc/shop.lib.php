@@ -1208,6 +1208,7 @@ class kShop {
 					$variations = $output[$id]['variations'];
 					$output[$id]['variations'] = array();
 					$variationsIds = array();
+					if(!is_array($item['variations'])) $item['variations']=array();
 					foreach($item['variations'] as $idsvar)
 					{
 						foreach($variations as $collection=>$v)
@@ -1386,12 +1387,10 @@ class kShop {
 		ksort($customvariations);
 		
 		$string=$idsitem;
-		
 		foreach($variations as $k=>$v)
 		{
-			if(empty($k) && !empty($v)) $k=$v;
-			if(empty($k)) continue;
-			$string.='-'.$k;
+			if(empty($v)) $v=$k;
+			$string.='-'.$v;
 		}
 		
 		foreach($customvariations as $k=>$v)

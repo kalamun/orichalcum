@@ -373,6 +373,7 @@ class kEmails
 			}
 			
 			$sparkpost->setRecipients($recipients);
+			$sparkpost->setCampaignName(kGetSiteName().' ['.$idarch.'] '.$this->subject);
 
 			// set contents
 			$content = array(

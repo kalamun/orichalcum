@@ -777,10 +777,10 @@ class kaShop {
 		
 		if($copy=="")
 		{
-			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`collection`,`order`) VALUES('".$idsitem."','".$name."','','','".$collection."','".$order."')";
+			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`discounted`,`collection`,`order`) VALUES('".$idsitem."','".$name."','','','','".$collection."','".$order."')";
 			if(ksql_query($query)) return ksql_insert_id();
 		} else {
-			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`collection`,`order`) SELECT `idsitem`,`name`,`descr`,`price`,`collection`,`order` FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsvar`='".$copy."' LIMIT 1";
+			$query="INSERT INTO ".TABLE_SHOP_VARIATIONS." (`idsitem`,`name`,`descr`,`price`,`discounted`,`collection`,`order`) SELECT `idsitem`,`name`,`descr`,`price`,`discounted`,`collection`,`order` FROM ".TABLE_SHOP_VARIATIONS." WHERE `idsvar`='".$copy."' LIMIT 1";
 			if(ksql_query($query))
 			{
 				$id=ksql_insert_id();
