@@ -140,6 +140,7 @@ function kReprocess()
 	
 	var onSuccessHandler = function(html)
 	{
+		console.log(html);
 		if(html!="true")
 		{
 			kReprocessing=false;

@@ -464,62 +464,98 @@ class kEmails
 					/* send via smtp */
 					if($smtpConn=fsockopen($this->smtp['host'],$this->smtp['port']))
 					{
-						$talk="";
-						fputs ($smtpConn,"EHLO ".$_SERVER['HTTP_HOST']."\r\n");
+						$talk=[];
+						
+						verbose("*** ORICHALCUM: START SENDING EMAIL THROUGH SMTP ***\n\n");
+						
+						$command = "EHLO ".$_SERVER['HTTP_HOST']."\r\n";
+						$talk['send '.$i++] = $command;
+						fputs($smtpConn, $command);
 						if($talk["hello"]=fgets($smtpConn))
 						{
 							$tmp=$talk["hello"];
 							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["hello"].="\n".$tmp; }
 						}
-						fputs($smtpConn,"AUTH LOGIN\r\n");
-						if($talk["res"]=fgets($smtpConn))
+						
+						// authenticate only if password is not empty, else try without authentication
+						if( !empty( $this->smtp['password'] ) )
 						{
-							$tmp=$talk["res"];
-							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["res"].="\n".$tmp; }
+							$command = "AUTH LOGIN\r\n";
+							$talk['send '.$i++] = $command;
+							fputs($smtpConn, $command);
+							if($talk["res"]=fgets($smtpConn))
+							{
+								$tmp=$talk["res"];
+								while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["res"].="\n".$tmp; }
+							}
+							
+							$command = base64_encode($this->smtp['username'])."\r\n";
+							$talk['send '.$i++] = $command;
+							fputs($smtpConn, $command);
+							if($talk["user"]=fgets($smtpConn))
+							{
+								$tmp=$talk["user"];
+								while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["user"].="\n".$tmp; }
+							}
+							
+							$command = base64_encode($this->smtp['password'])."\r\n";
+							$talk['send '.$i++] = $command;
+							fputs($smtpConn, $command);
+							if($talk["pass"]=fgets($smtpConn))
+							{
+								$tmp=$talk["pass"];
+								while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["pass"].="\n".$tmp; }
+							}
 						}
-						fputs($smtpConn,base64_encode($this->smtp['username'])."\r\n");
-						if($talk["user"]=fgets($smtpConn))
-						{
-							$tmp=$talk["user"];
-							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["user"].="\n".$tmp; }
-						}
-						fputs($smtpConn,base64_encode($this->smtp['password'])."\r\n");
-						if($talk["pass"]=fgets($smtpConn))
-						{
-							$tmp=$talk["pass"];
-							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["pass"].="\n".$tmp; }
-						}
-						fputs ($smtpConn,"MAIL FROM: <".preg_replace('/.*?<(.*)>/','$1',$this->from).">\r\n");
+						
+						$command = "MAIL FROM: <".preg_replace('/.*?<(.*)>/','$1', $this->from).">\r\n";
+						$talk['send '.$i++] = $command;
+						fputs($smtpConn, $command);
 						if($talk["from"]=fgets($smtpConn))
 						{
 							$tmp=$talk["from"];
 							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["from"].="\n".$tmp; }
 						}
-						fputs ($smtpConn,"RCPT TO: <".preg_replace('/.*?<(.*)>/','$1',$to).">\r\n");
+						
+						$command = "RCPT TO: <".preg_replace('/.*?<(.*)>/','$1',$to).">\r\n";
+						$talk['send '.$i++] = $command;
+						fputs($smtpConn, $command);
 						if($talk["to"]=fgets($smtpConn))
 						{
 							$tmp=$talk["to"];
 							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["to"].="\n".$tmp; }
 						}
-						fputs($smtpConn,"DATA\r\n");
+						
+						$command = "DATA\r\n";
+						$talk['send '.$i++] = $command;
+						fputs($smtpConn, $command);
 						if($talk["data"]=fgets($smtpConn))
 						{
 							$tmp=$talk["data"];
 							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["data"].="\n".$tmp; }
 						}
-						fputs($smtpConn,"To: ".$to."\r\nSubject:".$composition['subject']."\r\n".$composition['headers']."\n\n".$composition['message']."\r\n.\r\n");
+						
+						$command = "To: ".$to."\r\nSubject:".$composition['subject']."\r\n".$composition['headers']."\n\n".$composition['message']."\r\n.\r\n";
+						$talk['send '.$i++] = $command;
+						fputs($smtpConn, $command);
 						if($talk["send"]=fgets($smtpConn))
 						{
 							$tmp=$talk["send"];
 							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["send"].="\n".$tmp; }
 						}
-						fputs($smtpConn,"QUIT\r\n");
+						
+						$command = "QUIT\r\n";
+						$talk['send '.$i++] = $command;
+						fputs($smtpConn, $command);
 						if($talk["quit"]=fgets($smtpConn))
 						{
 							$tmp=$talk["quit"];
 							while($tmp{3}=='-') { $tmp=fgets($smtpConn); $talk["quit"].="\n".$tmp; }
 						}
+						
 						fclose($smtpConn);
+						
+						verbose($talk);
 						$sent=true;
 					}
 				}

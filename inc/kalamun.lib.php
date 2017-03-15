@@ -16,6 +16,27 @@ if(!function_exists('apache_request_headers'))
 }
 
 
+/* output string or array if verbose is active */
+function verbose( $output )
+{
+	if( !defined("VERBOSE") || VERBOSE != true ) return false;
+	
+	echo '<pre>';
+	
+	if( is_array($output) )
+	{
+		
+		foreach($output as $k=>$v)
+		{
+			echo $k .": ". htmlentities($v) ."\n";
+		}
+		
+	} else echo htmlentities($output);
+	
+	echo '</pre>';
+}
+
+
 /* text utilities */
 class kText
 {

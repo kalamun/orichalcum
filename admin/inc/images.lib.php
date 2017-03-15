@@ -750,6 +750,7 @@ class kaImages {
 	function resize($img, $x, $y, $quality=100, $mode="inside")
 	{
 		$size=getimagesize($img);
+		if(empty($size)) return false;
 		
 		// if one size is 0, set it larger than the equivalent default size proportionally with the other side
 		if($x==0&&$y==0) return false;
@@ -758,7 +759,6 @@ class kaImages {
 		
 		// add 1 pixel for side to prevent the black border issue (this pixel will be cropped later)
 		$x++; $y++;
-
 		// maintain aspect ratio
 		switch($mode)
 		{

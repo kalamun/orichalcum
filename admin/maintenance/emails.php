@@ -5,6 +5,8 @@
 define("PAGE_NAME","Maintenance:Check if the e-mail address of registered users exists");
 include_once("../inc/head.inc.php");
 
+if( !defined("VERBOSE") ) define("VERBOSE", true);
+
 /* AZIONI */
 /* FINE AZIONI */
 
