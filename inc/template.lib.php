@@ -276,6 +276,8 @@ class kTemplate {
 			}
 		else {
 			$page=substr(rtrim(urldecode($_SERVER['REQUEST_URI']),"/"),(strlen(BASEDIR)+strlen($this->getLanguageURI(LANG))));
+			$page = rtrim($page, "?");
+
 			if(
 				rtrim($row['url'],"/")==$page ||
 				rtrim($row['url'],"/")==b3_htmlize($page,true,"") ||
