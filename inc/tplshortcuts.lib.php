@@ -21,7 +21,7 @@ function kInit($dir=false)
 		$GLOBALS['__subsubdir__'].='/'.$GLOBALS['url'][$i];
 	}
 
-	require_once($dir."admin/inc/config.inc.php");
+	require_once("ok-config.inc.php");
 	if(defined("DEBUG") && DEBUG==true)
 	{
 		error_reporting(E_ALL);

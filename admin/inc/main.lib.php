@@ -46,7 +46,7 @@ class kaOrichalcum
 		if($vars['x-frame-options']!="") header('X-Frame-Options: '.$vars['x-frame-options']);
 
 		/* connect to db and set default constants */
-		require_once("config.inc.php");
+		require_once("ok-config.inc.php");
 		if(!isset($db['id'])) require_once("connect.inc.php");
 		require_once("main.lib.php");
 		require_once("kalamun.lib.php");
