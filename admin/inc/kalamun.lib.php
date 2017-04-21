@@ -241,13 +241,13 @@ class kaAdminMenu {
 		
 					// populate an array with only active elements for the current user
 					if($j==0) $menu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
-					elseif(strpos($_SESSION['permissions'], ",".$xml[$i][$j]['id'].",") !== false) $menu[(count($menu)-1)]['submenu'][] = $xml[$i][$j];
+					elseif(strpos($_SESSION['permissions'], ",".$xml[$i][$j]['id'].",") !== false) $menu[max(array_keys($menu))]['submenu'][] = $xml[$i][$j];
 					
 					// populate an array with all the elements, indipendently of permissions
 					if($j==0) $fullmenu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
 					else $fullmenu[(count($fullmenu)-1)]['submenu'][] = $xml[$i][$j];
 				}
-				if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
+				if(count($menu[max(array_keys($menu))]['submenu'])==0) unset($menu[max(array_keys($menu))]);
 			}
 		}
 
@@ -290,13 +290,13 @@ class kaAdminMenu {
 			
 						// populate an array with only active elements for the current user
 						if($j==0) $menu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
-						elseif(strpos($_SESSION['permissions'], ",".$xml[$i][$j]['id'].",") !== false) $menu[(count($menu)-1)]['submenu'][] = $xml[$i][$j];
+						elseif(strpos($_SESSION['permissions'], ",".$xml[$i][$j]['id'].",") !== false) $menu[max(array_keys($menu))]['submenu'][] = $xml[$i][$j];
 						
 						// populate an array with all the elements, indipendently of permissions
 						if($j==0) $fullmenu[] = array_merge($xml[$i][$j], array("submenu"=>array()));
 						else $fullmenu[(count($fullmenu)-1)]['submenu'][] = $xml[$i][$j];
 					}
-					if(count($menu[(count($menu)-1)]['submenu'])==0) unset($menu[(count($menu)-1)]);
+					if(count($menu[max(array_keys($menu))]['submenu'])==0) unset($menu[max(array_keys($menu))]);
 				}
 			}
 		}
