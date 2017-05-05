@@ -1,5 +1,5 @@
 <?php 
-/* (c) Kalamun.org - GNU/GPL 3 */
+/* (c) Kalamun.org - GNU/GPL v3 */
 
 function kaInit() {
 	$reldir="";
@@ -277,7 +277,7 @@ class kaAdminMenu {
 
 						// get the id (the directoty of the correspondant module)
 						preg_match('/id="(.*?)"/', $tmp, $match);
-						if($match[1] == '{SITE_URL}') $match[1] = SITE_URL;
+						if(!empty($match[1]) && $match[1] == '{SITE_URL}') $match[1] = SITE_URL;
 						$xml[$i][$j]['id'] = !empty($match[1]) ? $match[1] : '';
 						
 						// get the url (optional)
