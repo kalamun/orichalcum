@@ -348,6 +348,11 @@ function kGetTitle()
 	}
 }
 
+function kSetTitle($title)
+{
+	$GLOBALS['__template']->setTitle($title);
+	return true;
+}
 
 function kGetSeoMetadata($dir=null,$ll=null)
 {
