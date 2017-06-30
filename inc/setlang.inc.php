@@ -6,20 +6,28 @@ function kDetectLang() {
 	$codes=array();
 	$query="SELECT * FROM `".TABLE_LINGUE."` WHERE `online`='s' ORDER BY `ordine`";
 	$results=ksql_query($query);
-	while($row=ksql_fetch_array($results)) {
+	
+	while($row=ksql_fetch_array($results))
+	{
 		$codes[$row['ll']]=$row['code'];
-		}
-	if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-		foreach($codes as $ll=>$code) {
+	}
+	
+	if(!empty($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+	{
+		foreach($codes as $ll=>$code)
+		{
 			if(strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']),$code)!==false) return strtoupper($ll);
-			}
-		foreach($codes as $ll=>$code) {
+		}
+		
+		foreach($codes as $ll=>$code)
+		{
 			$p=strtolower($ll);
 			if(strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']),$p)!==false) return strtoupper($ll);
-			}
 		}
-	return strtoupper(DEFAULT_LANG);
 	}
+
+	return strtoupper(DEFAULT_LANG);
+}
 
 // if language is set by URL (eg. /en/)
 if(isset($_GET['lang']) && $_GET['lang']!="") {
