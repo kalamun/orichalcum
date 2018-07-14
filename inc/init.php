@@ -267,6 +267,10 @@ function get_site_url()
 	return $site_url . get_site_directory_uri();
 }
 
+function get_admin_url()
+{
+	return get_site_url() . '/admin';
+}
 
 /*
 * load configuration variables from db

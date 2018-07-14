@@ -8,13 +8,17 @@ require_once( "functions.php" );
 
 ok_init();
 
-do_action( "delete_user" );
-
-
-
 ok_admin_header();
 
 ?>
+
+<section class="page-submenu">
+	<div class="row">
+		<div class="grid w12">
+			<?php include( 'submenu.php' ); ?>
+		</div>
+	</div>
+</section>
 
 <div class="page-header">
 	<div class="row">
@@ -24,58 +28,63 @@ ok_admin_header();
 	</div>
 </div>
 
+<?php
+print_clean_errors();
+print_clean_successes();
+print_clean_notifications();
+?>
+
 <div class="page-container">
 	<div class="row">
 		<div class="grid w12">
 
-			<form action="" method="post">
-	
-				<?= ok_input( [ "type" => "hidden", "name" => "nonce", "value" => ok_create_nonce( "delete-user" ) ] ); ?>
-
-				<table>
-					<tr>
-						<th>Nome</th>
-						<th>Cognome</th>
-						<th>Username</th>
-						<th>Creato il</th>
-						<th>Ultimo log-in</th>
-						<th>&nbsp;</th>
-					</tr>
-					
-					<?php
-					$args = [
-						"where" => [
-							"relation" => "AND",
-							[
-								"key" => "type",
-								"compare" => "=",
-								"value" => "GUEST",
-							],
-							[
-								"key" => "status",
-								"compare" => "=",
-								"value" => "ACT",
-							],
+			<table>
+				<tr>
+					<th>Nome e Cognome</th>
+					<th>Username</th>
+					<th>Creato il</th>
+					<th>Ultimo log-in</th>
+				</tr>
+				
+				<?php
+				$args = [
+					"where" => [
+						"relation" => "AND",
+						[
+							"key" => "type",
+							"compare" => "=",
+							"value" => "GUEST",
 						],
-					];
+						[
+							"key" => "status",
+							"compare" => "=",
+							"value" => "ACT",
+						],
+					],
+				];
 
-					foreach( get_users( $args ) as $user )
-					{
-						?>
-						<tr>
-							<td><?= $user->first_name; ?></td>
-							<td><?= $user->last_name; ?></td>
-							<td><?= $user->username; ?></td>
-							<td><?= $user->date_created; ?></td>
-							<td><?= $user->date_last_login; ?></td>
-							<td><?= ok_input( [ "type"=>"submit", "name"=>"delete-user[".$user->user_id."]", "value"=>"Rimuovi", "class"=>"small button" ] ); ?></td>
-						</tr>
-						<?php
-					}
+				foreach( get_users( $args ) as $user )
+				{
 					?>
-				</table>
-			
-			</form>
+					<tr>
+						<td>
+							<a href="edit.php?user_id=<?= $user->user_id; ?>"><?= $user->first_name; ?> <?= $user->last_name; ?></a><br>
+							<small class="actions">
+								<a href="edit.php?user_id=<?= $user->user_id; ?>">Modifica</a>
+								• <a href="delete.php?user_id=<?= $user->user_id; ?>" class="alert">Elimina</a>
+							</small>
+						</td>
+						<td><?= $user->username; ?></td>
+						<td class="date"><?= decode_datetime( $user->date_created ); ?></td>
+						<td class="date"><?= !empty( $user->date_last_login ) ? decode_datetime( $user->date_last_login ) : ''; ?></td>
+					</tr>
+					<?php
+				}
+				?>
+			</table>
+
+			<br>
+			<a href="add.php" class="small button">Crea un nuovo utente</a><br>
 
 		</div>
 	</div>

@@ -8,12 +8,17 @@ require_once( "functions.php" );
 
 ok_init();
 
-do_action( "save_user" );
-
-
 ok_admin_header();
 
 ?>
+
+<section class="page-submenu">
+	<div class="row">
+		<div class="grid w12">
+			<?php include( 'submenu.php' ); ?>
+		</div>
+	</div>
+</section>
 
 <div class="page-header">
 	<div class="row">
@@ -23,12 +28,22 @@ ok_admin_header();
 	</div>
 </div>
 
+<?php
+print_clean_errors();
+print_clean_successes();
+print_clean_notifications();
+?>
+
 <div class="page-container">
 
 	<form action="" method="post">
 	
-		<?= ok_input( [ "type" => "hidden", "name" => "nonce", "value" => ok_create_nonce( "add-new-user" ) ] ); ?>
-		
+		<?= ok_input( [ "type" => "hidden", "name" => "nonce", "value" => ok_create_nonce( "edit-user" ) ] ); ?>
+
+		<!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+		<?= ok_input( [ "type" => "text", "name" => "fakeusernameremembered", "value" => "", "style" => "display:none;" ] ); ?>
+		<?= ok_input( [ "type" => "password", "name" => "fakepasswordremembered", "value" => "", "style" => "display:none;" ] ); ?>
+
 		<div class="row">
 			<div class="grid column w12">
 				<?= ok_input( [ "type" => "text", "name" => "username", "id" => "username", "class" => "full-width" ], "Nome utente" ); ?>
@@ -57,7 +72,9 @@ ok_admin_header();
 		
 		<div class="row margin-top-60">
 			<div class="submit">
-				<?= ok_input( [ "type" => "submit", "name" => "add-new-user", "value" => "Crea l’utente" ] ); ?>
+				<?= ok_input( [ "type" => "submit", "name" => "edit-user", "value" => "Crea l’utente" ] ); ?><br>
+				<br>
+				<small><a href="index.php">annulla</a></small>
 			</div>
 		</div>
 		

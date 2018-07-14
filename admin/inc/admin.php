@@ -30,7 +30,7 @@ function ok_init_admin()
 */
 function ok_admin_header()
 {
-	require_once( get_site_directory() . "/admin/inc/template/header.php" );
+	require_once( get_admin_directory() . "/inc/template/header.php" );
 }
 
 /*
@@ -38,7 +38,7 @@ function ok_admin_header()
 */
 function ok_admin_footer()
 {
-	require_once( get_site_directory() . "/admin/inc/template/footer.php" );
+	require_once( get_admin_directory() . "/inc/template/footer.php" );
 }
 
 /*
@@ -46,7 +46,7 @@ function ok_admin_footer()
 */
 function ok_admin_login_page()
 {
-	$login_template = get_site_directory() . '/admin/inc/template/login.php';
+	$login_template = get_admin_directory() . '/inc/template/login.php';
 	if( file_exists( $login_template ) )
 	{
 		include( $login_template );
@@ -132,7 +132,6 @@ function add_admin_nav_element( $element, $ancestor = null )
 
 /*
 * admin nav class
-* input options: object | html
 */
 class admin_nav
 {
@@ -141,10 +140,19 @@ class admin_nav
 	public function __construct()
 	{
 		$this->elements = [];
+		$menu = file_get_contents( get_admin_directory() . '/inc/admin_menu.json' );
+		$menu = json_decode( $menu );
+		
+		foreach( $menu->nav as $element )
+		{
+			$this->add_element( $element );
+		}
 	}
 	
 	public function add_element( $element, $ancestor = null )
 	{
+		$element = (array) $element;
+		
 		if( empty( $element['label'] ) )
 		{
 			trigger_error( 'Admin nav: label must be defined' );
@@ -180,8 +188,13 @@ class admin_nav
 	
 	private function get_structure_node( $e )
 	{
+		$e = (array) $e;
 		$element = new stdClass();
 		$element->label = $e['label'];
+		
+		if( substr( $e['url'], 0, 1 ) == "/" )
+			$e['url'] = get_admin_url() . $e['url'];
+		
 		$element->url = $e['url'];
 		$element->selected = $this->is_selected( $e['url'] );
 		$element->ancestor = false;
@@ -189,7 +202,7 @@ class admin_nav
 		if( !empty( $e['child'] ) )
 		{
 			$element->child = [];
-			foreach( $e['child']  as $e_child )
+			foreach( $e['child'] as $e_child )
 			{
 				$element->child[] = $this->get_structure_node( $e_child );
 			}
@@ -253,7 +266,7 @@ class admin_nav
 		if( strpos( $current_url, "?" ) !== false )
 			$current_url = substr( $current_url, 0, strpos( $current_url, "?" ) );
 		
-		return ( rtrim( $url, "/" ) == $current_url );
+		return ( strpos( $current_url, rtrim( $url, "/" ) ) === 0 );
 	}
 	
 	/*

@@ -1,0 +1,68 @@
+{
+	"nav": [
+		{
+			"label": "Dashboard",
+			"url": "/index.php"
+		},
+
+		{
+			"label": "Pages",
+			"url": "/pages",
+
+			"child": [{
+					"label": "Add page",
+					"url": "/pages/add.php"
+				},
+				{
+					"label": "Edit pages",
+					"url": "/pages"
+				}
+			]
+		},
+
+		{
+			"label": "News",
+			"url": "/news",
+
+			"child": [{
+					"label": "Add user",
+					"url": "/news/add.php"
+				},
+				{
+					"label": "Users",
+					"url": "/news"
+				}
+			]
+		},
+
+		{
+			"label": "Users",
+			"url": "/users",
+
+			"child": [{
+					"label": "Add user",
+					"url": "/users/add.php"
+				},
+				{
+					"label": "Users",
+					"url": "/users"
+				}
+			]
+		},
+
+		{
+			"label": "Settings",
+			"url": "/settings",
+
+			"child": [{
+					"label": "Administrators",
+					"url": "/settings/admins"
+				},
+				{
+					"label": "Languages",
+					"url": "/settings/languages"
+				}
+			]
+		}
+	]
+}
