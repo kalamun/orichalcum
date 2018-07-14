@@ -1,0 +1,289 @@
+<?php
+
+/*************
+* ERRORS
+*************/
+
+/*
+* error reporting
+*/
+if( defined("DEBUG") && DEBUG == true )
+{
+	error_reporting( E_ALL );
+	ini_set( 'error_reporting', E_ALL );
+	ini_set( 'display_errors', 1 );
+} else error_reporting(0);
+
+
+
+/*
+* notifications API
+*/
+$GLOBALS['ok_notifications'] = new ok_notifications();
+		$_SESSION['ok_notifications'] = [];
+
+class ok_notifications
+{
+	
+	public function __construct()
+	{
+		if( !isset( $_SESSION['ok_notifications'] ) )
+			$this->empty_notifications();
+	}
+	
+	public function insert_notification( $type = "error", $message = "", $description = "" )
+	{
+		$_SESSION['ok_notifications'][] = [ "type" => $type, "message" => $message, "description" => $description ];
+	}
+	
+	public function get_notifications( $type = false )
+	{
+		if( $type === false )
+			return $_SESSION['ok_notifications'];
+		
+		$notifications = [];
+		
+		foreach( $_SESSION['ok_notifications'] as $notification )
+		{
+			if( $notification['type'] == $type ) $notifications[] = $notification; 
+		}
+		
+		return $notifications;
+	}
+	
+	// empty notification records by type (remove all when type is not declared)
+	public function empty_notifications( $type = false )
+	{
+		if( $type === false )
+			$_SESSION['ok_notifications'] = [];
+		
+		else {
+			foreach( $_SESSION['ok_notifications'] as $k=>$notification )
+			{
+				if( $notification['type'] == $type ) unset( $_SESSION['ok_notifications'][ $k ] ); 
+			}
+		}
+	}
+	
+	public function have_notifications( $type = false )
+	{
+		$count = 0;
+		
+		if( empty( $_SESSION['ok_notifications'] ) )
+			return 0;
+
+		if( $type === false )
+			$count = count( $_SESSION['ok_notifications'] );
+		
+		else
+		{
+			foreach( $_SESSION['ok_notifications'] as $notification )
+			{
+				if( $notification['type'] == $type ) $count++;
+			}
+		}
+		
+		return $count > 0;
+	}
+}
+
+
+/*
+* notification handling
+*/
+
+function insert_notification( $message, $description = "" )
+{
+	$GLOBALS['ok_notifications']->insert_notification( "notification", $message, $description );
+}
+
+function get_notifications()
+{
+	return $GLOBALS['ok_notifications']->get_notifications( "notification" );
+}
+
+function empty_notifications()
+{
+	return $GLOBALS['ok_notifications']->empty_notifications( "notification" );
+}
+
+function have_notifications()
+{
+	return $GLOBALS['ok_notifications']->have_notifications( "notification" );
+}
+
+function print_notifications()
+{
+	if( !have_notifications() ) return;
+	
+	$html = '<div class="notification">';
+	
+	foreach( get_notifications() as $notification )
+	{
+		$html .= '<div class="notification">'
+				. '<strong>' . $notification['message'] . '</strong><br>';
+
+		if( !empty( $notification['description'] ) )
+			$html .= $notification['description'] . '<br>';
+		
+		$html .= '</div>';
+	}
+	
+	$html .= '</div>';
+	
+	//do_action( "print_errors", $html, $errors );
+	
+	echo $html;
+}
+
+function print_clean_notifications()
+{
+	print_notifications();
+	empty_notifications();
+}
+
+/*
+* success handling
+*/
+
+function insert_success( $message, $description = "" )
+{
+	$GLOBALS['ok_notifications']->insert_notification( "success", $message, $description );
+}
+
+function get_successes()
+{
+	return $GLOBALS['ok_notifications']->get_notifications( "success" );
+}
+
+function empty_successes()
+{
+	return $GLOBALS['ok_notifications']->empty_notifications( "success" );
+}
+
+function have_successes()
+{
+	return $GLOBALS['ok_notifications']->have_notifications( "success" );
+}
+
+function print_successes()
+{
+	if( !have_successes() ) return;
+	
+	$html = '<div class="successes">';
+	
+	foreach( get_successes() as $success )
+	{
+		$html .= '<div class="success">'
+				. '<strong>' . $success['message'] . '</strong><br>';
+
+		if( !empty( $success['description'] ) )
+			$html .= $success['description'] . '<br>';
+		
+		$html .= '</div>';
+	}
+	
+	$html .= '</div>';
+	
+	//do_action( "print_successes", $html, $success );
+	
+	echo $html;
+}
+
+function print_clean_successes()
+{
+	print_successes();
+	empty_successes();
+}
+
+/*
+* error handling
+*/
+
+function insert_error( $message, $description = "" )
+{
+	$GLOBALS['ok_notifications']->insert_notification( "error", $message, $description );
+}
+
+function get_errors()
+{
+	return $GLOBALS['ok_notifications']->get_notifications( "error" );
+}
+
+function empty_errors()
+{
+	return $GLOBALS['ok_notifications']->empty_notifications( "error" );
+}
+
+function have_errors()
+{
+	return $GLOBALS['ok_notifications']->have_notifications( "error" );
+}
+
+function print_errors()
+{
+	if( !have_errors() ) return;
+	
+	$html = '<div class="errors">';
+	
+	foreach( get_errors() as $error )
+	{
+		$html .= '<div class="error">'
+				. '<strong>' . $error['message'] . '</strong><br>';
+
+		if( !empty( $error['description'] ) )
+			$html .= $error['description'] . '<br>';
+		
+		$html .= '</div>';
+	}
+	
+	$html .= '</div>';
+	
+	//do_action( "print_errors", $html, $errors );
+	
+	echo $html;
+}
+
+function print_clean_errors()
+{
+	print_errors();
+	empty_errors();
+}
+
+/*
+* handle all errors generated by trigger_error();
+*/
+function generic_error_handler( $errorNumber, $errorString, $errorFile="", $errorLine="", $errorContext="" )
+{
+	switch ($errorNumber)
+	{
+		case E_ERROR||E_CORE_ERROR||E_COMPILE_ERROR||E_PARSE||E_USER_ERROR:
+			
+			$message = 'FATAL ERROR: ' . $errorString;
+			$description = '[' . $errorNumber . '] File ' . $errorFile . ' - Line ' . $errorLine;
+			insert_error( $message, $description );
+			print_errors();
+			die();
+			break;
+
+		case E_WARNING||E_CORE_WARNING||E_COMPILE_WARNING||E_USER_WARNING:
+			$message = 'WARNING: ' . $errorString;
+			$description = '[' . $errorNumber . '] File ' . $errorFile . ' - Line ' . $errorLine;
+			insert_error( $message, $description );
+			break;
+
+		case E_notification||E_STRICT||E_USER_notification:
+			$message = 'notification: ' . $errorString;
+			$description = '[' . $errorNumber . '] File ' . $errorFile . ' - Line ' . $errorLine;
+			insert_error( $message, $description );
+			break;
+
+		default:
+			$message = 'ERROR: ' . $errorString;
+			$description = '[' . $errorNumber . '] File ' . $errorFile . ' - Line ' . $errorLine;
+			insert_error( $message, $description );
+			break;
+	}
+}
+
+set_error_handler( "generic_error_handler" );

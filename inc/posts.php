@@ -1,0 +1,6 @@
+<?php
+
+/*
+* POSTS FUNCTIONS
+*/
+
