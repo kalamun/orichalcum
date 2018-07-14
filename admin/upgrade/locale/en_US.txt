@@ -1,6 +1,0 @@
-//UPGRADE
-Upgrade:Automatic upgrade						Automatic upgrade
-Upgrade:No updates available					No updates available
-Upgrade:Upgrade to Bettino						Upgrade to Bettino
-Upgrade:Error occurred reading upgrade data		Error occurred reading upgrade data
-Upgrade:Start upgrade							Start upgrade

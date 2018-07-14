@@ -1,5 +1,7 @@
+.htaccess
 vendor
-admin/inc/config.inc.php
+ok-config.inc.php
+_src
 
 # Windows image file caches
 Thumbs.db

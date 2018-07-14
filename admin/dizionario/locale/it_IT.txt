@@ -1,8 +1,0 @@
-//DICTIONARY
-Dictionary:Term						Termine
-Dictionary:Translation				Traduzione
-Dictionary:%s translation			Traduzione %s
-Dictionary:Actions					Azioni
-Dictionary:Add a new term			Inserisci un nuovo termine
-Dictionary:Import terms from default template			Importa i termini dal template corrente
-Dictionary:No terms defined yet		Non sono ancora stati definiti termini
