@@ -58,6 +58,73 @@ function ok_footer( $footer = "" )
 }
 
 /*
+* print head section
+*/
+function ok_head()
+{
+	// print enqueued scripts
+	$scripts = "";
+	
+	if( !empty( $GLOBALS['ok_scripts'] ) )
+	{
+		foreach( $GLOBALS['ok_scripts'] as $script )
+		{
+			if( $script['position'] != "head" ) continue;
+			
+			if( !isset( $script['attributes']['charset'] ) )
+				$script['attributes']['charset'] = "UTF-8";
+			
+			$attributes = "";
+			foreach( $script['attributes'] as $param => $value )
+			{
+				$attributes .= ' ' . $param . '="' . esc_attr($value) .'"';
+			}
+			
+			$url = $script['url'];
+			if( !empty( $script['version'] ) )
+			{
+				$url .= strpos( $url, "?" ) === false ? "?" : "&";
+				$url .= $script['version'];
+			}
+			
+			$scripts .= '<script type="text/javascript" src="' . $url . '"' . $attributes . '></script>' . "\n";
+		}
+	}
+	
+	// print enqueued styles
+	$styles = "";
+	
+	if( !empty( $GLOBALS['ok_styles'] ) )
+	{
+		foreach( $GLOBALS['ok_styles'] as $style )
+		{
+			if( $style['position'] != "head" ) continue;
+			
+			if( !isset( $style['attributes']['media'] ) )
+				$style['attributes']['media'] = "*";
+			
+			$attributes = "";
+			foreach( $style['attributes'] as $param => $value )
+			{
+				$attributes .= ' ' . $param . '="' . esc_attr($value) .'"';
+			}
+			
+			$url = $style['url'];
+			if( !empty( $style['version'] ) )
+			{
+				$url .= strpos( $url, "?" ) === false ? "?" : "&";
+				$url .= $style['version'];
+			}
+			
+			$styles .= '<link rel="stylesheet" href="' . $url . '"' . $attributes . '">' . "\n";
+		}
+	}
+	
+	echo $scripts . $styles;
+}
+
+
+/*
 * load login page
 */
 function ok_login_page()
@@ -174,3 +241,47 @@ function get_template_part( $filename )
 	return ob_get_clean();
 }
 
+
+/*
+* format date from yyyy-mm-dd to dd/mm/yyyy
+*/
+function decode_date( $date )
+{
+	$date = trim( $date );
+	$date = strtotime( $date );
+	return date('d/m/Y', $date );
+}
+
+/*
+* format date and time
+*/
+function decode_datetime( $date )
+{
+	$date = trim( $date );
+	$date = strtotime( $date );
+	return date('d/m/Y H:i', $date );
+}
+
+/*
+* return a nice date output
+*/
+function get_nice_date( $date )
+{
+	$date = trim( $date );
+	$date = strtotime( $date );
+	
+	if( date("Y-m-d") == date("Y-m-d", $date) ) $output = "Oggi";
+	elseif( date("Y-m-d", time()-86400) == date("Y-m-d", $date) ) $output = "Ieri";
+	elseif( date("Y-m-d", time()+86400) == date("Y-m-d", $date) ) $output = "Domani";
+	elseif( date("Y-m-d", time()-(86400*7)) == date("Y-m-d", $date) ) $output = "una settimana fa";
+	elseif( date("Y-m-d", time()+(86400*7)) == date("Y-m-d", $date) ) $output = "tra una settimana";
+	elseif( date("Y-m-d", time()+(86400*14)) == date("Y-m-d", $date) ) $output = "tra due settimane";
+	elseif( date("Y-m-d", time()+(86400*21)) == date("Y-m-d", $date) ) $output = "tra tre settimane";
+	elseif( date("Y-m-d", time()+(86400*28)) == date("Y-m-d", $date) ) $output = "tra quattro settimane";
+	elseif( date("Y-m-d", time()+(86400*30)) == date("Y-m-d", $date) ) $output = "tra un mese";
+	elseif( time() < $date && time()+(86400*30) > $date ) $output = "tra ". round( ($date-time()) / 86400 ) ." giorni";
+	elseif( time() > $date && time()-(86400*30) < $date ) $output = round( (time()-$date) / 86400 ) ." giorni fa";
+	else $output = strftime('%d %B %Y', $date );
+	
+	return $output;
+}
