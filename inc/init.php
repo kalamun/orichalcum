@@ -5,7 +5,7 @@
 */
 
 /*
-* bootstrap: init without functions
+* bootstrap: init minimum functions
 */
 function ok_bootstrap()
 {
@@ -441,6 +441,35 @@ function ok_verify_nonce( $nonce, $action )
 	if( $nonce == $nonce_match ) return true;
 	
 	return false;
+}
+
+
+/*
+* enqueue script
+*/
+function ok_enqueue_script( $id, $url, $version = "", $attributes = [], $position = "head" )
+{
+	if( !isset( $GLOBALS['ok_scripts'] ) )
+		$GLOBALS['ok_scripts'] = [];
+	
+	if( !is_array( $attributes ) )
+		$attributes = [];
+	
+	$GLOBALS['ok_scripts'][ $id ] = [ "url" => $url, "version" => $version, "attributes" => $attributes, "position" => $position ];
+}
+
+/*
+* enqueue styles
+*/
+function ok_enqueue_style( $id, $url, $version = "", $attributes = [], $position = "head" )
+{
+	if( !isset( $GLOBALS['ok_scripts'] ) )
+		$GLOBALS['ok_styles'] = [];
+	
+	if( !is_array( $attributes ) )
+		$attributes = [];
+	
+	$GLOBALS['ok_styles'][ $id ] = [ "url" => $url, "version" => $version, "attributes" => $attributes, "position" => $position ];
 }
 
 
