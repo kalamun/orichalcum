@@ -163,6 +163,10 @@ p {
 small {
 	font-size: .85em;
 }
+h1 small {
+	font-size: .5em;
+	opacity: .5;
+}
 
 iframe {
 	max-width: 100% ;
@@ -178,10 +182,11 @@ a:hover {
 }
 
 input, select, textarea {
-	border:2px solid var(--light-color);
-	border-bottom-color:#ccc;
+	border:0;
+	border-bottom:2px solid var(--light-color);
 	padding:5px 10px;
-	border-radius:5px;
+	border-radius-top-left: var(--default-radius);
+	border-radius-top-right: var(--default-radius);
 	background-color:#fff;
 	transition: border-color .3s;
 }
@@ -556,7 +561,11 @@ section.main_container .page-header h1 {
 }
 
 section.main_container .page-container {
-	padding:40px;
+	padding: 40px;
+	max-width: 1200px;
+}
+section.main_container .page-container.full-width {
+	max-width: 100%;
 }
 
 section.main_container .page-submenu {
