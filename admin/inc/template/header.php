@@ -12,6 +12,10 @@
 	
 	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/functions.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/admin.js" charset="UTF-8"></script>
+	
+	<?php
+	ok_head();
+	?>
 </head>
 
 <body>
