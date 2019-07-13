@@ -12,6 +12,10 @@
 	
 	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/functions.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/admin.js" charset="UTF-8"></script>
+
+	<script>
+	var ajax_uri = '<?= get_ajax_url(); ?>';
+	</script>
 	
 	<?php
 	ok_head();
@@ -27,7 +31,6 @@
 		
 		<div class="nav">
 			<?php
-			
 			print_admin_nav();
 			?>
 		</div>

@@ -12,15 +12,15 @@ var ok_add_event = function( obj, event, func, model )
 /*
 USAGE:
 var aj = new ok_ajax();
-aj.onSuccess( onSuccessCallBackFunction );
-aj.onFail( onFailCallBackFunction );
+aj.on_success( on_successCallBackFunction );
+aj.on_fail( on_failCallBackFunction );
 aj.send( "post", "ajaxHandler.php", "action=read&id=111", "json");
 */
 
 var ok_ajax = function()
 {
-	var onSuccess = function(txt) {};
-	var onFail = function(txt) {};
+	var on_success = function(txt) {};
+	var on_fail = function(txt) {};
 	var xhr = null;
 	var method = "get";
 	var uri = "";
@@ -35,8 +35,8 @@ var ok_ajax = function()
 		return_format = v_return_format;
 		ajaxSend();
 	}
-	this.onSuccess = function(func) { onSuccess=func }
-	this.onFail = function(func) { onFail=func; }
+	this.on_success = function(func) { on_success=func }
+	this.on_fail = function(func) { on_fail=func; }
 
 	function createXMLHttpRequest()
 	{
@@ -51,19 +51,23 @@ var ok_ajax = function()
 		if(xhr.readyState === 4)
 		{
 			if(xhr.status == 200) {
-				if(return_format == 'html') onSuccess(xhr.responseText);
-				else if(return_format == 'xml') onSuccess(xhr.xhr.responseXML);
-				else if(return_format == 'json') onSuccess(JSON.parse(xhr.responseText));
+				if(return_format == 'html') on_success(xhr.responseText);
+				else if(return_format == 'xml') on_success(xhr.xhr.responseXML);
+				else if(return_format == 'json') on_success(JSON.parse(xhr.responseText));
 			}
-			else onFail(xhr.status);
+			else on_fail(xhr.status);
 		}
 	}
 
 	function ajaxSend()
 	{
-		xhr=createXMLHttpRequest();
+		xhr = createXMLHttpRequest();
 		if(method=="get")
 		{
+			if( typeof vars == "object" )
+			{
+				vars = new URLSearchParams(vars).toString()
+			}
 			uri+="?"+vars;
 			xhr.open(method, uri, true);
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
