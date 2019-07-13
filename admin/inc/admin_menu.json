@@ -51,16 +51,41 @@
 		},
 
 		{
+			"label": "Appearance",
+			"url": "/appearance",
+
+			"child": [
+				{
+					"label": "Menus",
+					"url": "/appearance/menus"
+				},
+				{
+					"label": "Theme",
+					"url": "/appearance/theme"
+				}
+			]
+		},
+
+		{
 			"label": "Settings",
 			"url": "/settings",
 
-			"child": [{
-					"label": "Administrators",
-					"url": "/settings/admins"
+			"child": [
+				{
+					"label": "General settings",
+					"url": "/settings/general"
 				},
 				{
 					"label": "Languages",
 					"url": "/settings/languages"
+				},
+				{
+					"label": "Administrators",
+					"url": "/settings/admins"
+				},
+				{
+					"label": "Site structure",
+					"url": "/settings/structure"
 				}
 			]
 		}
