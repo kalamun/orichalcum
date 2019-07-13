@@ -75,7 +75,7 @@ function get_languages( $args=[] )
 	
 	$languages = unserialize( $languages );
 	
-	$output = $languages;
+	$output = [];
 	
 	// exclusion based on status
 	foreach( $languages as $order => $language )
@@ -83,7 +83,7 @@ function get_languages( $args=[] )
 		if( empty($args['status']) || $language->status == $args['status'] )
 			$output[] = $language;
 	}
-	
+
 	// sorting
 	// orderby = order is already done by previuos foreach
 	// sort only in case of language ordering
@@ -109,7 +109,9 @@ function get_languages( $args=[] )
 */
 function get_language( $code = null )
 {
-
+	// to do
+	if( empty( $code ) )
+		return $code;
 }
 
 
@@ -135,9 +137,16 @@ function insert_language( $args )
 	if( empty( $args['language'] ) ) return false;
 	if( empty( $args['code'] ) ) return false;
 	if( empty( $args['status'] ) ) $args['status'] = "pending";
+	if( empty( $args['default'] ) ) $args['default'] = false;
 	
 	$languages = get_languages();
 
+	// check if language already exists
+	foreach( $languages as $l )
+	{
+		if( $l->code == $args['code'] ) return false;
+	}
+	
 	$new_language = new stdClass();
 	$new_language->language = $args['language'];
 	$new_language->code = $args['code'];

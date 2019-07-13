@@ -2,12 +2,7 @@
 /* (c) Kalamun.org - GNU/GPL 3 */
 
 require_once( "../../../inc/init.php" );
-ok_bootstrap();
-
-require_once( "functions.php" );
-
 ok_init();
-
 
 ok_admin_header();
 

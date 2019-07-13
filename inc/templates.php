@@ -184,6 +184,14 @@ function ok_input( $attr, $label = "", $label_position = null )
 {
 	$html = '';
 	$label_printed = false;
+
+	if( empty( $attr['name'] ) && empty( $attr['id'] ) )
+		$attr['name'] = 'unnamed';
+	
+	if( empty( $attr['id'] ) )
+	{
+		$attr['id'] = $attr['name'] . '-' . rand( 10000, 99999 );
+	}
 	
 	if( !empty($label) && ( ( !empty( $attr['type'] ) && $attr['type'] != 'checkbox' && $attr['type'] != 'radio' && $label_position === null ) || $label_position == "before" ) )
 	{
@@ -197,11 +205,15 @@ function ok_input( $attr, $label = "", $label_position = null )
 	$html .= '<input';
 	foreach( $attr as $key => $value )
 	{
+		if( $key == "checked" && $value == false )
+			continue;
+		
 		$html .= ' ' . $key . '="' . esc_attr( $value ) .'"';
 	}
 	$html .= '>';
 	
-	if( !empty( $label ) && !$label_printed )
+	// always print the label for checkboxes, 'cause it helps to visually customize them
+	if( ( !empty( $label ) || $attr['type'] == "checkbox" || $attr['type'] == "radio" ) && !$label_printed )
 	{
 		$html .= '<label';
 		if( !empty( $attr['class'] ) ) $html .= ' class="' . esc_attr( $attr['class'] ) . '"';
@@ -285,3 +297,4 @@ function get_nice_date( $date )
 	
 	return $output;
 }
+
