@@ -14,6 +14,7 @@ function ok_bootstrap()
 	// define base path
 	define( "ROOT_DIR", get_site_directory() );
 	define( "ROOT_URI", get_site_directory_uri() );
+	define( "ADMIN_SUBDIR", "admin" );
 
 	// load config
 	require_once( ROOT_DIR . '/ok-config.php' );
@@ -72,9 +73,9 @@ function ok_init()
 	if( file_exists( $functions ) ) include_once( $functions );
 
 	// admin functions
-	if( is_backend() || is_admin() )
+	if( is_backend() || ( defined( "IS_AJAX" ) && IS_AJAX == true && is_admin() ) )
 	{
-		require_once( ROOT_DIR . '/admin/inc/admin.php' );
+		require_once( ROOT_DIR . '/' . ADMIN_SUBDIR . '/inc/admin.php' );
 		ok_init_admin();
 	}
 	
@@ -217,7 +218,7 @@ function get_ajax_url()
 */
 function get_admin_directory()
 {
-	return get_site_directory() . '/admin';
+	return get_site_directory() . '/' . ADMIN_SUBDIR;
 }
 
 
@@ -226,7 +227,7 @@ function get_admin_directory()
 */
 function get_admin_directory_uri()
 {
-	return get_site_directory_uri() . '/admin';
+	return get_site_directory_uri() . '/' . ADMIN_SUBDIR;
 }
 
 
@@ -269,7 +270,7 @@ function get_site_url()
 
 function get_admin_url()
 {
-	return get_site_url() . '/admin';
+	return get_site_url() . '/' . ADMIN_SUBDIR;
 }
 
 /*
