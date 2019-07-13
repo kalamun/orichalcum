@@ -22,6 +22,58 @@ function ok_init_admin()
 		ok_redirect( "?" );
 	}
 	
+	ok_admin_include_libraries();
+}
+	
+/*
+* include current module's library, and the parent directory ones, by default
+*/
+function ok_admin_include_libraries( $url = null )
+{
+	$basedir = get_site_directory();
+	$basedir_rel = substr( $basedir, strlen( $_SERVER['DOCUMENT_ROOT'] ) );
+	
+	if( $url === null )
+		$url = get_request_uri_parts();
+	
+	else {
+		// check that url is part of the admin dir
+		$admin_directory = get_admin_directory();
+		if( substr( $url, 0, strlen( $admin_directory ) ) != $admin_directory )
+		{
+			$admin_rel_directory = substr( $admin_directory, strlen( $_SERVER['DOCUMENT_ROOT'] ) );
+
+			if( substr( $url, 0, strlen( $admin_rel_directory ) ) != $admin_rel_directory )
+				return false;
+		}
+		
+		// remove site dir from url
+		$url = preg_replace( "/^" . preg_quote( $basedir, "/" ) . "/", "", $url );
+		$url = preg_replace( "/^" . preg_quote( $basedir_rel, "/" ) . "/", "", $url );
+		$url = explode( "/", trim( $url, "/" ) );
+	}
+
+	$inside_admin = false;
+	
+	foreach( $url as $i => $lib )
+	{
+		if( $lib == ADMIN_SUBDIR )
+			$inside_admin = true;
+		
+		$basedir .= "/" . $lib;
+		
+		// consider only files inside admin dir
+		if( !$inside_admin )
+			continue;
+
+		if( is_file( $basedir ) ) break;
+		
+		$filename = $basedir . '/' . $lib . '.lib.php';
+
+		if( file_exists( $filename ) )
+			include_once( $filename );
+	}
+	
 	do_action( "init_admin" );
 }
 
