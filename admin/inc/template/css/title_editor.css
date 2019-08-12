@@ -1,0 +1,14 @@
+.title .title_editor_container .editor {
+	font-size:2.5rem;
+	line-height:1.2em;
+}
+.subtitle .title_editor_container .editor {
+	font-size:1.5rem;
+	line-height:1.2em;
+}
+.title_editor_container .editor {
+	min-height:1em;
+}
+.title_editor_container textarea.title_editor {
+	display:none;
+}

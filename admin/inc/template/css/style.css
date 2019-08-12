@@ -281,6 +281,7 @@ input[type=checkbox] + label,
 input[type=radio] + label {
 	margin:0;
 	vertical-align:middle;
+	cursor:pointer;
 }
 input[type=checkbox] + label:before,
 input[type=radio] + label:before {
@@ -468,9 +469,9 @@ table tr .actions .alert {
 .grid.o9 { margin-left: calc( 15px + 75% ); }
 .grid.o10 { margin-left: calc( 15px + 83.3334% ); }
 .grid.o11 { margin-left: calc( 15px + 91.6667% ); }
-.grid.padding-15 { padding:15px; }
-.grid.padding-30 { padding:30px; }
-.grid.padding-60 { padding:60px; }
+.padding-15 { padding:15px; }
+.padding-30 { padding:30px; }
+.padding-60 { padding:60px; }
 .margin-top-15 { margin-top:15px; }
 .margin-bottom-15 { margin-bottom:15px; }
 .margin-top-30 { margin-top:30px; }
@@ -733,4 +734,26 @@ section.main_container .page-submenu li.selected a {
 section.main_container .page-submenu li:first-child a {
 	border-top-left-radius:var(--default-radius);
 	border-bottom-left-radius:var(--default-radius);
+}
+
+/* modal window */
+#modal {
+	position:fixed;
+	top:60px;
+	left:60px;
+	width:calc(100vw - 120px);
+	height:calc(100vh - 120px);
+	z-index:10001;
+	overflow:auto;
+	background:var(--light-color);
+}
+#modal-bkg {
+	background:var(--dark-color);
+	opacity:.8;
+	position:absolute;
+	left:0;
+	top:0;
+	width:100vw;
+	height:100vh;
+	z-index:10000;
 }

@@ -196,8 +196,6 @@ function ok_insert_user( $userdata )
 		
 	}
 	
-	print_r( $fields );
-
 	$ok_db->insert( $ok_db->prefix . 'users', $fields, [ 'on duplicate key update' => $fields ] );
 
 	return $ok_db->last_insert_id();

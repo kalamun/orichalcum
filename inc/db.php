@@ -378,14 +378,15 @@ class ok_pdo
 		$query = "UPDATE `". $this->esc_name( $table ) ."` SET ";
 		foreach( $esc_fields as $k => $v )
 		{
-			$query .= "`". $v ."`=". $esc_placeholders[ $k ] ." ";
+			$query .= "`". $v ."`=". $esc_placeholders[ $k ] .", ";
 		}
+		$query = rtrim( $query, ", " );
 		
 		if( !empty( $where['query'] ) )
 			$query .= " WHERE ". $where['query'] ." ";
 		
 		if( isset( $args['limit'] ) ) $query .= " LIMIT ". intval( $args['limit'] ) ." ";
-
+echo $query;
 		// prepare and execute
 		try
 		{

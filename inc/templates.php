@@ -166,6 +166,16 @@ function esc_attr( $attr )
 
 
 /*
+* escape text for texrtarea purpose
+*/
+function esc_textarea( $attr )
+{
+	$attr = htmlspecialchars( $attr );
+	return $attr;
+}
+
+
+/*
 * escape URLs
 */
 function esc_url( $url )
@@ -222,6 +232,63 @@ function ok_input( $attr, $label = "", $label_position = null )
 		$label_printed = true;
 	}
 	
+	return $html;
+}
+
+
+/*
+* returns a textarea
+* all attribute names in lowercase
+* optional label position accepts: before | after
+*/
+function ok_textarea( $attr, $label = "", $editor = false )
+{
+	$html = '';
+	$label_printed = false;
+
+	if( empty( $attr['name'] ) && empty( $attr['id'] ) )
+		$attr['name'] = 'unnamed';
+	
+	if( empty( $attr['id'] ) )
+	{
+		$attr['id'] = $attr['name'] . '-' . rand( 10000, 99999 );
+	}
+	
+	if( $editor != false )
+	{
+		if( empty( $attr['class'] ) )
+			$attr['class'] = "";
+		
+		$attr['class'] .= " " . $editor;
+		$attr['class'] = trim( $attr['class'] );
+	}
+	
+	if( !empty($label) )
+	{
+		$html .= '<label';
+		if( !empty( $attr['class'] ) ) $html .= ' class="' . esc_attr( $attr['class'] ) . '"';
+		if( !empty( $attr['id'] ) ) $html .= ' for="' . esc_attr( $attr['id'] ) . '"';
+		$html .= '>' . $label .'</label>';
+	}
+
+	$html .= '<textarea';
+	foreach( $attr as $key => $value )
+	{
+		if( $key == "checked" && $value == false )
+			continue;
+		
+		if( $key == "value" )
+			continue;
+		
+		$html .= ' ' . $key . '="' . esc_attr( $value ) .'"';
+	}
+	$html .= '>';
+	
+	if( isset( $attr['value'] ) )
+		$html .= esc_textarea( $attr['value'] );
+	
+	$html .= '</textarea>';
+		
 	return $html;
 }
 

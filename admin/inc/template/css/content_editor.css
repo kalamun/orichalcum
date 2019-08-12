@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'karla';
+    src: url('../fonts/karla-bold-webfont.woff2') format('woff2'),
+         url('../fonts/karla-bold-webfont.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'karla';
+    src: url('../fonts/karla-bolditalic-webfont.woff2') format('woff2'),
+         url('../fonts/karla-bolditalic-webfont.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'karla';
+    src: url('../fonts/karla-regular-webfont.woff2') format('woff2'),
+         url('../fonts/karla-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'karla';
+    src: url('../fonts/karla-regularitalic-webfont.woff2') format('woff2'),
+         url('../fonts/karla-regularitalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+
+.content_editor_container .editor {
+	font-family:karla;
+	font-size:1.2rem;
+	line-height:1.6em;
+	max-width:900px;
+}
+.content_editor_container textarea.content_editor {
+	display:none;
+}

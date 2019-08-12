@@ -68,7 +68,7 @@ var ok_ajax = function()
 			{
 				vars = new URLSearchParams(vars).toString()
 			}
-			uri+="?"+vars;
+			uri += "?"+vars;
 			xhr.open(method, uri, true);
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 			xhr.onreadystatechange = onStateChange;
@@ -84,6 +84,26 @@ var ok_ajax = function()
 
 		delete xhr;
 	}	
+}
+
+/*
+* APPEND CHILD PROCESSING JAVASCRIPT
+*/
+function ok_append( html, container )
+{
+	var range = document.createRange();
+	range.selectNode( container );
+	
+	if( typeof(html) == 'string' )
+	{
+		var documentFragment = range.createContextualFragment( html );
+		container.appendChild( documentFragment );
+	}
+	
+	if( typeof(html) == 'object' )
+	{
+		container.appendChild( html );
+	}		
 }
 
 

@@ -68,6 +68,9 @@ function ok_init()
 	// templates functions
 	require_once( ROOT_DIR . '/inc/templates.php' );
 	
+	// uploads functions
+	require_once( ROOT_DIR . '/inc/uploads.php' );
+	
 	// include functions.php if exists
 	$functions = get_template_directory() . '/functions.php';
 	if( file_exists( $functions ) ) include_once( $functions );
@@ -569,3 +572,40 @@ function do_action( $tag )
 		call_user_func_array( $function_name, $args );
 	}
 }
+
+
+/*
+* Add leading zeros when necessary.
+*/
+function zeroise( $number, $threshold )
+{
+	return sprintf( '%0' . $threshold . 's', $number );
+}
+
+/*
+* Adds backslashes before letters and before a number at the start of a string.
+*/
+function backslashit( $string )
+{
+	if( isset( $string[0] ) && $string[0] >= '0' && $string[0] <= '9' ) {
+		$string = '\\\\' . $string;
+	}
+	return addcslashes( $string, 'A..Za..z' );
+}
+
+/*
+* Appends a trailing slash.
+*/
+function trailingslashit( $string )
+{
+	return untrailingslashit( $string ) . '/';
+}
+
+/*
+* Removes trailing forward slashes and backslashes if they exist.
+*/
+function untrailingslashit( $string )
+{
+	return rtrim( $string, '/\\' );
+}
+

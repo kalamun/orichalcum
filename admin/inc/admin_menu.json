@@ -7,32 +7,37 @@
 
 		{
 			"label": "Pages",
-			"url": "/pages",
+			"url": "/posts/?type=page",
 
 			"child": [{
 					"label": "Add page",
-					"url": "/pages/add.php"
+					"url": "/pages/add.php?type=page"
 				},
 				{
 					"label": "Edit pages",
-					"url": "/pages"
+					"url": "/pages/?type=page"
 				}
 			]
 		},
 
 		{
 			"label": "News",
-			"url": "/news",
+			"url": "/posts/?type=post",
 
 			"child": [{
-					"label": "Add user",
-					"url": "/news/add.php"
+					"label": "Add news",
+					"url": "/pages/add.php?type=post"
 				},
 				{
-					"label": "Users",
-					"url": "/news"
+					"label": "Edit news",
+					"url": "/pages/?type=post"
 				}
 			]
+		},
+
+		{
+			"label": "Uploads",
+			"url": "/uploads/"
 		},
 
 		{

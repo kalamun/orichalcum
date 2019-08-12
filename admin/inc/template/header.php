@@ -9,12 +9,17 @@
 
 	<link rel="shortcut icon" href="<?= get_site_directory_uri(); ?>/inc/template/favicon.png" />
 	<link rel="stylesheet" media="screen" href="<?= get_site_directory_uri(); ?>/admin/inc/template/css/style.css">
+	<link rel="stylesheet" media="screen" href="<?= get_site_directory_uri(); ?>/admin/inc/template/css/title_editor.css">
+	<link rel="stylesheet" media="screen" href="<?= get_site_directory_uri(); ?>/admin/inc/template/css/content_editor.css">
 	
 	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/functions.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/admin.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/title_editor.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="<?= get_admin_directory_uri(); ?>/inc/template/js/content_editor.js" charset="UTF-8"></script>
 
 	<script>
-	var ajax_uri = '<?= get_ajax_url(); ?>';
+	var ajax_uri = '<?= get_ajax_url(); ?>',
+		admin_uri = '<?= get_admin_directory_uri(); ?>';
 	</script>
 	
 	<?php

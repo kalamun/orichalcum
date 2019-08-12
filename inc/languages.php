@@ -6,6 +6,16 @@
 
 
 /*
+* get string translated
+*/
+function __( $string, $text_domain = '' )
+{
+	// to do
+	return $string;
+}
+
+
+/*
 * try to autodetect the current language from browser and match with active languages, or fallback to the default one
 */
 function init_language()
@@ -21,7 +31,7 @@ function init_language()
 	}
 	
 	// set locale to current language
-	setlocale(LC_TIME, get_language_code() );
+	setlocale(LC_TIME, get_language_shortcode() );
 }
 
 
@@ -77,6 +87,9 @@ function get_languages( $args=[] )
 	
 	$output = [];
 	
+	if( empty( $languages ) )
+		return $output;
+	
 	// exclusion based on status
 	foreach( $languages as $order => $language )
 	{
@@ -105,13 +118,21 @@ function get_languages( $args=[] )
 
 
 /*
-* get the current language or, if specified a code, get the requested language
+* get the current language or, if specified a code or a shortcode, get the requested language
 */
 function get_language( $code = null )
 {
-	// to do
 	if( empty( $code ) )
-		return $code;
+	{
+		$code = get_language_code();
+	}
+	
+	foreach( get_languages() as $language )
+	{
+		if( $code == $language->code || $code == $language->shortcode )
+			return $language;
+	}
+	
 }
 
 
@@ -124,6 +145,24 @@ function get_language_code()
 	
 	$default_language = get_option( 'default_language', 'en_EN', '*' );
 	return $default_language;
+}
+
+
+/*
+* get the current language shortcode or, as fallback, the default language
+*/
+function get_language_shortcode()
+{
+	$default_language_code = !empty( $_COOKIE['ok_lang_code'] )
+								? $_COOKIE['ok_lang_code']
+								: get_option( 'default_language', 'en_EN', '*' );
+	
+	$default_language = get_language( $default_language_code );
+	
+	if( !empty( $default_language->shortcode ) )
+		return $default_language->shortcode;
+	
+	return false;
 }
 
 
